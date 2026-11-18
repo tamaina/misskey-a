@@ -51,6 +51,7 @@ export type DbJobMap = {
 	exportAntennas: DBExportAntennasData;
 	exportNotes: DbJobDataWithUser;
 	exportFukushu: DbExportFukushuData;
+	importFukushu: DbImportFukushuData;
 	exportFavorites: DbJobDataWithUser;
 	exportFollowing: DbExportFollowingData;
 	exportMuting: DbJobDataWithUser;
@@ -67,6 +68,7 @@ export type DbJobMap = {
 	deleteAccount: DbUserDeleteJobData;
 };
 
+export type DbImportFukushuData = { ownerId: string; fileId: string; requestId: string; size: number; md5: string };
 export type DbExportFukushuData = { user: ThinUser; deckId: string; upstream?: boolean };
 
 export type DbJobDataWithUser = {

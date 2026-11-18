@@ -16,6 +16,7 @@ export class MiFukushuUpstreamRecord {
 	@Column('text') public data: string;
 	@Column('bytea', { nullable: true }) public blob: Buffer | null;
 	@Column('integer', { default: 0 }) public revision: number;
+	@Column('integer', { nullable: true }) public chunkedSize: number | null;
 	@Column('integer') public position: number;
 	@Column('varchar', { length: 64 }) public sourceHash: string;
 }

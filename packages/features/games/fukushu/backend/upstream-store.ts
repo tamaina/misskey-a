@@ -5,27 +5,33 @@
 import { createHash } from 'node:crypto';
 import { QueryFailedError } from 'typeorm';
 import * as v from 'valibot';
-import { readUpstreamArchive } from '../shared/upstream-reader.js';
+import { scanSourceArchive, MAX_SOURCE_ARCHIVE_BYTES } from '../shared/source-scan.js';
+import { emptyUpstreamRecords, UPSTREAM_MAGIC } from '../shared/upstream-reader.js';
+import { upstreamStoreSchemas } from '../shared/upstream-records.schema.js';
 import { studyRequestIdSchema } from '../shared/study.schema.js';
 import { MAX_BACKUP_BYTES } from '../shared/backup.schema.js';
 import { planGiftUpdate } from './gift-update.js';
 import { BackupError } from './backup-codec.js';
 import { MaterialError } from './store.js';
 import { StudyError } from './study-store.js';
-import { UpstreamCompatibilitySession, encodeUpstreamFrames } from './pilot/upstream-session.js';
+import { applyUpstreamReview, CompatibilitySessionError, encodeUpstreamFrames } from './pilot/upstream-session.js';
 import { MiFukushuUpstreamRecord } from './models/FukushuUpstreamRecord.js';
+import { MiFukushuSourceUsage } from './models/FukushuSourceUsage.js';
 import { MiFukushuOperationReceipt } from './models/FukushuOperationReceipt.js';
+import { MiFukushuUpstreamChunk } from './models/FukushuUpstreamChunk.js';
 import type { DataSource, EntityManager } from 'typeorm';
 import type { UpstreamArchive, UpstreamFrame } from '../shared/upstream-reader.js';
-import type { FukushuBackupInspector } from './backup-drive.js';
+import type { SourceFrame } from '../shared/source-scan.js';
+import type { DriveSnapshot, WithSource } from './backup-drive.js';
 import type { CompatibilityReviewInput } from './pilot/upstream-session.js';
 
+const SOURCE_CHUNK_BYTES = 256 * 1024;
 const hash = (value: Uint8Array | string) => createHash('sha256').update(value).digest('hex');
 const key = (value: unknown) => hash(JSON.stringify(value));
 export type PersistedUpstreamReview = Omit<CompatibilityReviewInput, 'reviewedAt'>;
 
 export class FukushuUpstreamStore {
-	constructor(private readonly db: DataSource, private readonly reader: Pick<FukushuBackupInspector, 'read'>, private readonly clock: () => Date = () => new Date()) {}
+	constructor(private readonly db: DataSource, private readonly reader: { withSource: WithSource }, private readonly clock: () => Date = () => new Date()) {}
 
 	private async lock(manager: EntityManager, ownerId: string) {
 		await manager.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`fukushu:create:${ownerId}`]);
@@ -37,14 +43,25 @@ export class FukushuUpstreamStore {
 		return row ? JSON.parse(row.result) : undefined;
 	}
 
-	async restore(ownerId: string, fileId: string, requestId: string): Promise<{ restored: true; sha256: string; records: number }> {
+	async restored(ownerId: string, fileId: string, requestId: string): Promise<boolean> {
+		return Boolean(await this.receipt(this.db.manager, ownerId, requestId, JSON.stringify({ operation: 'restore', fileId })));
+	}
+
+	async restore(ownerId: string, fileId: string, requestId: string, accepted?: { size: number; md5: string }): Promise<{ restored: true; sha256: string; records: number }> {
 		const id = v.parse(studyRequestIdSchema, requestId);
 		const request = JSON.stringify({ operation: 'restore', fileId });
 		const prior = await this.receipt(this.db.manager, ownerId, id, request);
 		if (prior) return prior;
-		const bytes = await this.reader.read(ownerId, fileId);
-		const archive = await readUpstreamArchive(bytes, async value => hash(value));
-		const frames = archive.frames();
+		return this.reader.withSource(ownerId, fileId, async snapshot => {
+			if (!accepted && snapshot.blob.size > MAX_BACKUP_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
+			if (accepted && (snapshot.blob.size !== accepted.size || snapshot.md5 !== accepted.md5)) throw new BackupError('BACKUP_FAILED');
+			const frames: SourceFrame[] = [];
+			await scanSourceArchive(snapshot.blob, undefined, frame => frames.push(frame));
+			return this.commitRestore(ownerId, fileId, id, request, snapshot, frames);
+		}, accepted ? MAX_SOURCE_ARCHIVE_BYTES : MAX_BACKUP_BYTES);
+	}
+
+	private async commitRestore(ownerId: string, fileId: string, id: string, request: string, snapshot: DriveSnapshot, frames: SourceFrame[]) {
 		try {
 			return await this.db.transaction(async manager => {
 				await this.lock(manager, ownerId);
@@ -53,7 +70,7 @@ export class FukushuUpstreamStore {
 				const files = await manager.query('SELECT "userId", "userHost", uri, "isLink", size, md5 FROM drive_file WHERE id = $1 AND "userId" = $2 FOR SHARE', [fileId, ownerId]);
 				const file = files[0];
 				if (!file) throw new MaterialError('NO_SUCH_FILE');
-				if (file.userHost !== null || file.uri !== null || file.isLink || file.size !== bytes.length || file.md5 !== createHash('md5').update(bytes).digest('hex')) throw new BackupError('BACKUP_FAILED');
+				if (file.userHost !== null || file.uri !== null || file.isLink || file.size !== snapshot.blob.size || file.md5 !== snapshot.md5) throw new BackupError('BACKUP_FAILED');
 				const records = manager.getRepository(MiFukushuUpstreamRecord);
 				const existing = await records.find({ where: { ownerId }, select: { store: true, key: true } });
 				const occupied = new Set(existing.map(row => `${row.store}:${row.key}`));
@@ -63,9 +80,37 @@ export class FukushuUpstreamStore {
 					for (const row of rows) occupied.add(`${store}:${key(row.id)}`);
 				}
 				for (const frame of frames) if (occupied.has(`${frame.store}:${key(frame.value.id ?? frame.value.questionId)}`)) throw new BackupError('BACKUP_CONFLICT');
-				const rows = frames.map((frame, position) => ({ ownerId, store: frame.store, key: key(frame.value.id ?? frame.value.questionId), data: JSON.stringify(frame.value), blob: frame.blob === undefined ? null : Buffer.from(frame.blob), revision: 0, position, sourceHash: archive.fileSha256 }));
-				for (let offset = 0; offset < rows.length; offset += 100) await records.insert(rows.slice(offset, offset + 100));
-				const result = { restored: true as const, sha256: archive.fileSha256, records: rows.length };
+				// Keep the validated metadata bounded, reread each binary from the immutable snapshot.
+				// A batch never accumulates binary buffers, even for many small media.
+				for (let index = 0; index < frames.length; index += 100) {
+					const batch = frames.slice(index, index + 100);
+					const rows = batch.map((frame, i) => ({
+						ownerId,
+						store: frame.store,
+						key: key(frame.value.id ?? frame.value.questionId),
+						data: JSON.stringify(frame.value),
+						position: index + i,
+						revision: 0,
+						sourceHash: snapshot.sha256,
+						chunkedSize: frame.blobSize !== undefined && frame.blobSize > MAX_BACKUP_BYTES ? frame.blobSize : null,
+					}));
+					await records.insert(rows);
+					for (const [i, frame] of batch.entries()) {
+						if (frame.blobSize === undefined) continue;
+						const identity = { ownerId, store: frame.store, key: rows[i].key };
+						const attachment = snapshot.blob.slice(frame.blobOffset, frame.blobOffset + frame.blobSize);
+						if (rows[i].chunkedSize === null) {
+							await records.update(identity, { blob: Buffer.from(await attachment.arrayBuffer()) });
+						} else {
+							for (let start = 0; start < attachment.size; start += SOURCE_CHUNK_BYTES) {
+								const bytes = Buffer.from(await attachment.slice(start, start + SOURCE_CHUNK_BYTES).arrayBuffer());
+								await manager.getRepository(MiFukushuUpstreamChunk).insert({ ...identity, part: start / SOURCE_CHUNK_BYTES, bytes });
+							}
+						}
+					}
+				}
+				await this.refreshUsage(manager, ownerId);
+				const result = { restored: true as const, sha256: snapshot.sha256, records: frames.length };
 				await manager.getRepository(MiFukushuOperationReceipt).insert({ ownerId, id, request, result: JSON.stringify(result) });
 				return result;
 			});
@@ -75,8 +120,26 @@ export class FukushuUpstreamStore {
 		}
 	}
 
+	private async refreshUsage(manager: EntityManager, ownerId: string) {
+		// UTF-8 frame JSON contributes 21 fixed bytes around store/value and 12 around an optional blobSize.
+		const [usage] = await manager.query(`INSERT INTO fukushu_source_usage ("ownerId", count, last, logs, bytes, binaries)
+			SELECT "ownerId", COUNT(*)::int, MAX(position),
+				COUNT(*) FILTER (WHERE store = 'reviewLogs')::int,
+				SUM(octet_length(data) + octet_length(store) + 21
+					+ CASE WHEN size IS NULL THEN 0 ELSE 12 + length(size::text) END)::int,
+				SUM(COALESCE(size, 0))::int
+			FROM (
+				SELECT "ownerId", position, store, data, COALESCE("chunkedSize", octet_length(blob)) AS size
+				FROM fukushu_upstream_record WHERE "ownerId" = $1
+			) records GROUP BY "ownerId"
+			ON CONFLICT ("ownerId") DO UPDATE SET count = EXCLUDED.count, last = EXCLUDED.last,
+				logs = EXCLUDED.logs, bytes = EXCLUDED.bytes, binaries = EXCLUDED.binaries
+			RETURNING count, bytes, binaries`, [ownerId]);
+		if (usage.bytes > MAX_BACKUP_BYTES || usage.bytes + usage.binaries + usage.count * 4 + UPSTREAM_MAGIC.length + 64 > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
+	}
+
 	private async read(manager: EntityManager, ownerId: string): Promise<{ archive: UpstreamArchive; rows: MiFukushuUpstreamRecord[] }> {
-		const [budget] = await manager.query('SELECT COUNT(*)::integer AS count, COALESCE(SUM(octet_length(data) + COALESCE(octet_length(blob), 0)), 0)::text AS bytes FROM fukushu_upstream_record WHERE "ownerId" = $1', [ownerId]);
+		const [budget] = await manager.query('SELECT COUNT(*)::integer AS count, COALESCE(SUM(octet_length(data) + COALESCE("chunkedSize", octet_length(blob), 0)), 0)::text AS bytes FROM fukushu_upstream_record WHERE "ownerId" = $1', [ownerId]);
 		if (budget.count === 0) throw new MaterialError('NO_SUCH_MATERIAL');
 		if (budget.count > 20_000 || Number(budget.bytes) > MAX_BACKUP_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
 		const rows = await manager.getRepository(MiFukushuUpstreamRecord).find({ where: { ownerId }, order: { position: 'ASC', store: 'ASC', key: 'ASC' } });
@@ -86,6 +149,7 @@ export class FukushuUpstreamStore {
 
 	async media(ownerId: string, id: string) {
 		const row = await this.db.getRepository(MiFukushuUpstreamRecord).findOneBy({ ownerId, store: 'media', key: key(id) });
+		if (row?.chunkedSize != null) throw new BackupError('BACKUP_TOO_LARGE');
 		if (!row?.blob) throw new MaterialError('NO_SUCH_MATERIAL');
 		const { mimeType } = JSON.parse(row.data);
 		return { mimeType: String(mimeType), base64: row.blob.toString('base64') };
@@ -125,20 +189,67 @@ export class FukushuUpstreamStore {
 						await repo.insert({ ownerId, store: frame.store, key: id, data, revision: 0, blob: null, position: ++position, sourceHash: hash(bytes) });
 					}
 				}
+				await this.refreshUsage(manager, ownerId);
 			}
 			return { ...summary, token, applied: expected !== undefined };
 		});
 	}
 
+	async assertOwned(ownerId: string) {
+		if (!await this.db.getRepository(MiFukushuUpstreamRecord).existsBy({ ownerId, store: 'settings' })) throw new MaterialError('NO_SUCH_MATERIAL');
+	}
+
 	async show(ownerId: string) {
 		return this.db.transaction('REPEATABLE READ', async manager => {
-			const { archive, rows } = await this.read(manager, ownerId);
-			return { records: archive.normalizedRecords(), revisions: rows.filter(row => row.store === 'studyStates').map(row => ({ questionId: String(JSON.parse(row.data).questionId), revision: row.revision })) };
+			const rows = await manager.getRepository(MiFukushuUpstreamRecord).find({ where: { ownerId }, select: { store: true, data: true, revision: true }, order: { position: 'ASC', store: 'ASC', key: 'ASC' } });
+			if (!rows.length) throw new MaterialError('NO_SUCH_MATERIAL');
+			const records = emptyUpstreamRecords();
+			const revisions = [];
+			for (const row of rows) {
+				const store = row.store as keyof typeof records;
+				const value = JSON.parse(row.data);
+				(records[store] as unknown[]).push(v.parse(upstreamStoreSchemas[store], value));
+				if (store === 'studyStates') revisions.push({ questionId: String(value.questionId), revision: row.revision });
+			}
+			return { records, revisions };
 		});
 	}
 
-	async export(ownerId: string): Promise<Buffer> {
-		return this.db.transaction('REPEATABLE READ', async manager => Buffer.from((await this.read(manager, ownerId)).archive.originalBytes()));
+	/** Await each write inside a single snapshot. The caller publishes only after completion. */
+	async writeExport(ownerId: string, write: (bytes: Buffer) => Promise<void>) {
+		await this.db.transaction('REPEATABLE READ', async manager => {
+			const rows: { store: string; key: string; data: string; size: number | null; chunked: boolean }[] = await manager.query(
+				'SELECT store, key, data, COALESCE("chunkedSize", octet_length(blob)) AS size, ("chunkedSize" IS NOT NULL) AS chunked FROM fukushu_upstream_record WHERE "ownerId" = $1 ORDER BY position, store, key', [ownerId]);
+			if (!rows.length) throw new MaterialError('NO_SUCH_MATERIAL');
+			const digest = createHash('sha256');
+			let total = 64;
+
+			async function payload(bytes: Buffer) {
+				total += bytes.length;
+				if (total > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
+				digest.update(bytes);
+				await write(bytes);
+			}
+
+			await payload(Buffer.from(UPSTREAM_MAGIC));
+			for (const row of rows) {
+				const json = Buffer.from(JSON.stringify({ store: row.store, value: JSON.parse(row.data), ...(row.size === null ? {} : { blobSize: row.size }) }));
+				const header = Buffer.alloc(4);
+				header.writeUInt32LE(json.length);
+				await payload(Buffer.concat([header, json]));
+				const mediaHash = row.store === 'media' ? createHash('sha256') : undefined;
+				for (let offset = 0; offset < (row.size ?? 0); offset += SOURCE_CHUNK_BYTES) {
+					const [result] = row.chunked
+						? await manager.query('SELECT bytes FROM fukushu_upstream_chunk WHERE "ownerId" = $1 AND store = $2 AND key = $3 AND part = $4', [ownerId, row.store, row.key, offset / SOURCE_CHUNK_BYTES])
+						: await manager.query('SELECT substring(blob FROM $4 FOR $5) AS bytes FROM fukushu_upstream_record WHERE "ownerId" = $1 AND store = $2 AND key = $3', [ownerId, row.store, row.key, offset + 1, SOURCE_CHUNK_BYTES]);
+					if (result?.bytes.length !== Math.min(SOURCE_CHUNK_BYTES, Number(row.size) - offset)) throw new BackupError('BACKUP_FAILED');
+					mediaHash?.update(result.bytes);
+					await payload(result.bytes);
+				}
+				if (mediaHash && mediaHash.digest('hex') !== JSON.parse(row.data).id) throw new BackupError('BACKUP_FAILED');
+			}
+			await write(Buffer.from(digest.digest('hex')));
+		});
 	}
 
 	async review(ownerId: string, input: PersistedUpstreamReview) {
@@ -150,18 +261,29 @@ export class FukushuUpstreamStore {
 			const previous = await this.receipt(manager, ownerId, id, request);
 			if (previous) return previous;
 			if (await manager.query('SELECT 1 FROM fukushu_review_log WHERE "ownerId" = $1 AND id = $2::uuid', [ownerId, id]).then(rows => rows.length > 0)) throw new StudyError('STUDY_CONFLICT');
-			const { archive, rows } = await this.read(manager, ownerId);
-			const state = rows.find(row => row.store === 'studyStates' && row.key === key(input.questionId));
-			if (!state || state.revision !== input.expectedRevision || state.revision === 2_147_483_647) throw new StudyError('STUDY_CONFLICT');
-			const session = await UpstreamCompatibilitySession.open(archive.originalBytes());
-			const result = await session.recordReview({ ...input, requestId: id, expectedRevision: 0, reviewedAt: this.clock().toISOString() });
-			const updated = await readUpstreamArchive(session.export(), async value => hash(value));
-			const nextState = updated.frames().find(frame => frame.store === 'studyStates' && frame.value.questionId === input.questionId)!;
-			const nextLog = updated.frames().find(frame => frame.store === 'reviewLogs' && frame.value.id === id)!;
-			result.revision = state.revision + 1;
 			const records = manager.getRepository(MiFukushuUpstreamRecord);
-			await records.update({ ownerId, store: state.store, key: state.key }, { data: JSON.stringify(nextState.value), revision: result.revision });
-			await records.insert({ ownerId, store: 'reviewLogs', key: key(id), data: JSON.stringify(nextLog.value), blob: null, revision: 0, position: Math.max(...rows.map(row => row.position)) + 1, sourceHash: state.sourceHash });
+			if (await records.existsBy({ ownerId, store: 'reviewLogs', key: key(id) })) throw new CompatibilitySessionError('HISTORY_ID_EXISTS');
+			const cardKey = key(input.questionId);
+			const usage = manager.getRepository(MiFukushuSourceUsage);
+			const budget = await usage.findOneBy({ ownerId });
+			if (!budget) throw new MaterialError('NO_SUCH_MATERIAL');
+			const state = await records.findOneBy({ ownerId, store: 'studyStates', key: cardKey });
+			if (!state || state.revision !== input.expectedRevision || state.revision === 2_147_483_647) throw new StudyError('STUDY_CONFLICT');
+			const question = await records.findOneByOrFail({ ownerId, store: 'questions', key: cardKey });
+			const settings = await records.findOneByOrFail({ ownerId, store: 'settings', key: key('global') });
+			const original = JSON.parse(state.data);
+			const result = { revision: state.revision + 1, ...applyUpstreamReview({ ...input, requestId: id, reviewedAt: this.clock().toISOString() },
+				v.parse(upstreamStoreSchemas.questions, JSON.parse(question.data)),
+				v.parse(upstreamStoreSchemas.studyStates, original),
+				v.parse(upstreamStoreSchemas.settings, JSON.parse(settings.data)).desiredRetention) };
+			const data = JSON.stringify({ ...original, card: result.state.card, updatedAt: result.state.updatedAt });
+			const logData = JSON.stringify(result.record);
+			const jsonBytes = budget.bytes + Buffer.byteLength(data) - Buffer.byteLength(state.data) + Buffer.byteLength(JSON.stringify({ store: 'reviewLogs', value: result.record }));
+			const fileBytes = UPSTREAM_MAGIC.length + 64 + (budget.count + 1) * 4 + Number(budget.binaries) + jsonBytes;
+			if (budget.count >= 20_000 || budget.logs >= 10_000 || jsonBytes > MAX_BACKUP_BYTES || fileBytes > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
+			await usage.update({ ownerId }, { count: budget.count + 1, last: budget.last + 1, logs: budget.logs + 1, bytes: jsonBytes });
+			await records.update({ ownerId, store: state.store, key: cardKey }, { data, revision: result.revision });
+			await records.insert({ ownerId, store: 'reviewLogs', key: key(id), data: logData, blob: null, revision: 0, position: budget.last + 1, sourceHash: state.sourceHash });
 			await manager.getRepository(MiFukushuOperationReceipt).insert({ ownerId, id, request, result: JSON.stringify(result) });
 			return result;
 		});

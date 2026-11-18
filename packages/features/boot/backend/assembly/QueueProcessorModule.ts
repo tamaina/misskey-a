@@ -28,6 +28,7 @@ import { ExportBlockingProcessorService } from '@features/relationships/backend/
 import { ExportCustomEmojisProcessorService } from '@features/emojis/backend/jobs/ExportCustomEmojisProcessorService.js';
 import { ExportFollowingProcessorService } from '@features/relationships/backend/jobs/ExportFollowingProcessorService.js';
 import { ExportMutingProcessorService } from '@features/relationships/backend/jobs/ExportMutingProcessorService.js';
+import { ImportFukushuProcessorService } from '@features/games/fukushu/backend/jobs/ImportFukushuProcessorService.js';
 import { ExportFukushuProcessorService } from '@features/games/fukushu/backend/jobs/ExportFukushuProcessorService.js';
 import { ExportNotesProcessorService } from '@features/notes/backend/jobs/ExportNotesProcessorService.js';
 import { ExportClipsProcessorService } from '@features/collections/backend/jobs/ExportClipsProcessorService.js';
@@ -64,6 +65,7 @@ import { CoreModule } from './CoreModule.js';
 		DeleteDriveFilesProcessorService,
 		ExportCustomEmojisProcessorService,
 		ExportNotesProcessorService,
+		ImportFukushuProcessorService,
 		ExportFukushuProcessorService,
 		ExportClipsProcessorService,
 		ExportFavoritesProcessorService,

@@ -5,6 +5,8 @@
 
 // https://github.com/typeorm/typeorm/issues/2400
 import { MiFukushuDeck } from '@features/games/fukushu/backend/models/FukushuDeck.js';
+import { MiFukushuSourceUsage } from '@features/games/fukushu/backend/models/FukushuSourceUsage.js';
+import { MiFukushuUpstreamChunk } from '@features/games/fukushu/backend/models/FukushuUpstreamChunk.js';
 import { MiFukushuUpstreamRecord } from '@features/games/fukushu/backend/models/FukushuUpstreamRecord.js';
 import { MiFukushuOperationReceipt } from '@features/games/fukushu/backend/models/FukushuOperationReceipt.js';
 import { MiFukushuQuestion } from '@features/games/fukushu/backend/models/FukushuQuestion.js';
@@ -14,7 +16,6 @@ import { MiFukushuReviewLog } from '@features/games/fukushu/backend/models/Fukus
 import pg from 'pg';
 import { DataSource, Logger, type QueryRunner } from 'typeorm';
 import { entities as charts } from '@features/statistics/backend/charts/registry.js';
-import { Config } from '@/config.js';
 import { Logger as MisskeyLogger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 
@@ -96,6 +97,7 @@ import { MiBubbleGameRecord } from '@features/games/backend/models/BubbleGameRec
 import { MiReversiGame } from '@features/games/backend/models/ReversiGame.js';
 import { MiChatApproval } from '@features/chat/backend/models/ChatApproval.js';
 import { MiSystemAccount } from '@features/users/backend/models/SystemAccount.js';
+import { Config } from '@/config.js';
 
 pg.types.setTypeParser(20, Number);
 
@@ -266,6 +268,8 @@ export const entities = [
 	MiBubbleGameRecord,
 	MiFukushuDeck,
 	MiFukushuUpstreamRecord,
+	MiFukushuUpstreamChunk,
+	MiFukushuSourceUsage,
 	MiFukushuOperationReceipt,
 	MiFukushuQuestion,
 	MiFukushuQuestionVersion,

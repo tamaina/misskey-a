@@ -15,6 +15,7 @@ import { assertApiAuthorization, requirePrincipal } from '@features/api/backend/
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { DI } from '@/di-symbols.js';
 import { UpstreamBackupError } from '../shared/upstream-reader.js';
+import { sourceRestoreJob } from './jobs/ImportFukushuProcessorService.js';
 import { CompatibilitySessionError } from './pilot/upstream-session.js';
 import { FukushuUpstreamStore } from './upstream-store.js';
 import { FukushuBackupRestorer } from './backup-restore.js';
@@ -42,7 +43,7 @@ async function invoke<T>(operation: () => Promise<T>): Promise<T> {
 	}
 }
 
-export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list' | 'update' | 'archive' | 'updateCardExplanation' | 'listCardVersions' | 'showCardVersion'>, importer?: Pick<FukushuDriveImporter, 'import'>, study?: Pick<FukushuStudyStore, 'queue' | 'review' | 'history'>, backup?: { restorer?: Pick<FukushuBackupRestorer, 'restore'>; store: Pick<FukushuBackupStore, 'assertOwned'>; inspector: Pick<FukushuBackupInspector, 'inspect' | 'inspectUpstream'>; enqueue(ownerId: string, deckId: string): Promise<void> }, upstream?: { store: Pick<FukushuUpstreamStore, 'restore' | 'show' | 'review' | 'media' | 'updateGift'>; readGift?(ownerId: string, fileId: string): Promise<Buffer>; enqueue(ownerId: string): Promise<void> }) {
+export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list' | 'update' | 'archive' | 'updateCardExplanation' | 'listCardVersions' | 'showCardVersion'>, importer?: Pick<FukushuDriveImporter, 'import'>, study?: Pick<FukushuStudyStore, 'queue' | 'review' | 'history'>, backup?: { restorer?: Pick<FukushuBackupRestorer, 'restore'>; store: Pick<FukushuBackupStore, 'assertOwned'>; inspector: Pick<FukushuBackupInspector, 'inspect' | 'inspectUpstream'>; enqueue(ownerId: string, deckId: string): Promise<void> }, upstream?: { store: Pick<FukushuUpstreamStore, 'assertOwned' | 'restore' | 'show' | 'review' | 'media' | 'updateGift'>; restoreJob?(ownerId: string, input: { fileId: string; requestId: string; statusOnly?: boolean }): ReturnType<typeof sourceRestoreJob>; readGift?(ownerId: string, fileId: string): Promise<Buffer>; enqueue(ownerId: string): Promise<void> }) {
 	const procedure = createApiProcedure<MiLocalUser>();
 	const principal = requirePrincipal<MiLocalUser>();
 	const upstreamStore = () => { if (!upstream) throw new BackupError('BACKUP_FAILED'); return upstream.store; };
@@ -54,11 +55,15 @@ export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' 
 			if (!reader) throw new BackupError('BACKUP_FAILED');
 			return upstreamStore().updateGift(context.principal.id, input.deckId, input.fileId, () => reader(context.principal.id, input.fileId), input.confirmToken);
 		})),
+		upstreamRestoreJob: procedure(fukushuContract.upstreamRestoreJob).use(principal).handler(({ input, context }) => invoke(async () => {
+			if (!upstream?.restoreJob) throw new BackupError('BACKUP_FAILED');
+			return upstream.restoreJob(context.principal.id, input);
+		})),
 		upstreamRestore: procedure(fukushuContract.upstreamRestore).use(principal).handler(({ input, context }) => invoke(() => upstreamStore().restore(context.principal.id, input.fileId, input.requestId))),
 		upstreamShow: procedure(fukushuContract.upstreamShow).use(principal).handler(({ context }) => invoke(() => upstreamStore().show(context.principal.id))),
 		upstreamReview: procedure(fukushuContract.upstreamReview).use(principal).handler(({ input, context }) => invoke(() => upstreamStore().review(context.principal.id, input))),
 		upstreamExport: procedure(fukushuContract.upstreamExport).use(principal).handler(({ context }) => invoke(async () => {
-			await upstreamStore().show(context.principal.id);
+			await upstreamStore().assertOwned(context.principal.id);
 			await upstream!.enqueue(context.principal.id);
 		})),
 		upstreamInspect: procedure(fukushuContract.upstreamInspect).use(principal).handler(({ input, context }) => invoke(async () => {
@@ -114,12 +119,15 @@ export class FukushuApiProvider {
 			);
 			const backupStore = new FukushuBackupStore(this.moduleRef.get(DI.db, { strict: false }));
 			const inspector = new FukushuBackupInspector(this.moduleRef.get(DI.driveFilesRepository, { strict: false }), this.moduleRef.get(InternalStorageService, { strict: false }), this.moduleRef.get(DownloadService, { strict: false }), backupStore);
+			const sourceStore = new FukushuUpstreamStore(this.moduleRef.get(DI.db, { strict: false }), inspector);
 			this.router = createFukushuRouter(store, importer, new FukushuStudyStore(this.moduleRef.get(DI.db, { strict: false })), {
 				store: backupStore,
 				inspector,
 				restorer: new FukushuBackupRestorer(this.moduleRef.get(DI.db, { strict: false }), inspector),
 				enqueue: async (ownerId, deckId) => { await this.moduleRef.get(QueueService, { strict: false }).createExportFukushuJob({ id: ownerId }, deckId); },
-			}, { readGift: (owner, file) => inspector.readGift(owner, file), store: new FukushuUpstreamStore(this.moduleRef.get(DI.db, { strict: false }), inspector), enqueue: async ownerId => { await this.moduleRef.get(QueueService, { strict: false }).createExportFukushuJob({ id: ownerId }, '', true); } });
+			}, { readGift: (owner, file) => inspector.readGift(owner, file), store: sourceStore,
+								restoreJob: (ownerId, input) => sourceRestoreJob(this.moduleRef.get(QueueService, { strict: false }).dbQueue, sourceStore, inspector, ownerId, input),
+								enqueue: async ownerId => { await this.moduleRef.get(QueueService, { strict: false }).createExportFukushuJob({ id: ownerId }, '', true); } });
 		}
 		return this.router;
 	}

@@ -17,7 +17,7 @@ import { inspectUpstreamBytes } from '../shared/upstream-reader.ts';
 const writerFixture = new URL('./backend/fixtures/upstream-backup.fukushu', import.meta.url);
 const magic = Buffer.from('FUKUSHU-BACKUP-1\n');
 
-async function generate(path, cards, mediaMiB) {
+async function generate(path, cards, mediaMiB, variedMedia = false) {
 	const sample = await readFile(writerFixture);
 	const out = await open(path, 'wx');
 	const digest = createHash('sha256');
@@ -58,6 +58,16 @@ async function generate(path, cards, mediaMiB) {
 			await frame({ store: 'studyStates', value: { ...state, questionId: id } });
 		}
 		const chunk = Buffer.alloc(1024 ** 2);
+		// Deterministic nonzero data for the DB test, to exercise actual attachment storage.
+		if (variedMedia) {
+			let word = 1234567;
+			for (let i = 0; i < chunk.length; i += 4) {
+				word ^= word << 13;
+				word ^= word >>> 17;
+				word ^= word << 5;
+				chunk.writeUInt32LE(word >>> 0, i);
+			}
+		}
 		const mediaHash = createHash('sha256');
 		for (let i = 0; i < mediaMiB; i++) mediaHash.update(chunk);
 		const size = mediaMiB * chunk.length;
@@ -67,7 +77,10 @@ async function generate(path, cards, mediaMiB) {
 	} finally { await out.close(); }
 }
 
-if (process.argv[2]) {
+if (process.argv[2] === '--fixture') {
+	// Exclusive creation. The full-app scale regression uses this synthetic collection.
+	await generate(process.argv[3], 5000, 24, true);
+} else if (process.argv[2]) {
 	const [mode, path] = process.argv.slice(2);
 	const file = Object.assign(await openAsBlob(path), { name: 'scale.fukushu' });
 	const start = performance.now();

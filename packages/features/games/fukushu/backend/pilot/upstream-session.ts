@@ -29,6 +29,22 @@ export class CompatibilitySessionError extends Error {
 	constructor(public readonly code: 'STALE_STATE' | 'REQUEST_CONFLICT' | 'HISTORY_ID_EXISTS' | 'NOT_STUDYABLE') { super(code); }
 }
 
+/** The same upstream scheduler serves a single persisted card and the in-memory compatibility fixture. */
+export function applyUpstreamReview(input: CompatibilityReviewInput, question: UpstreamRecords['questions'][number] | undefined,
+	state: UpstreamRecords['studyStates'][number] | undefined, desiredRetention: number) {
+	if (!question?.enabled || !state || state.suspended || question.kind === 'unsupported') throw new CompatibilitySessionError('NOT_STUDYABLE');
+	const scheduled = review(state.card, new Date(input.reviewedAt), input.rating, desiredRetention);
+	const nextState = v.parse(upstreamStoreSchemas.studyStates, { ...state, card: scheduled.card, updatedAt: input.reviewedAt });
+	const record = v.parse(upstreamStoreSchemas.reviewLogs, {
+		id: input.requestId, questionId: question.id, deckId: question.deckId,
+		reviewedAt: input.reviewedAt, rating: input.rating, correct: input.correct,
+		durationMs: input.durationMs, fsrsLog: scheduled.log,
+		...(['single-choice', 'multiple-choice', 'matching'].includes(question.kind)
+			? { selectedAnswerIds: input.answers } : { responseText: input.answers[0] ?? '' }),
+	});
+	return { state: nextState, record };
+}
+
 /** Existing upstream binary framing, not a new backup version. Never writes schema defaults. */
 export async function encodeUpstreamFrames(frames: UpstreamFrame[]): Promise<UpstreamArchive> {
 	const parts: Uint8Array[] = [new TextEncoder().encode(UPSTREAM_MAGIC)];
@@ -82,18 +98,9 @@ export class UpstreamCompatibilitySession {
 		if (input.expectedRevision !== revision) throw new CompatibilitySessionError('STALE_STATE');
 		const question = records.questions.find(row => row.id === input.questionId);
 		const state = records.studyStates.find(row => row.questionId === input.questionId);
-		if (!question?.enabled || !state || state.suspended || question.kind === 'unsupported') throw new CompatibilitySessionError('NOT_STUDYABLE');
-		const scheduled = review(state.card, new Date(input.reviewedAt), input.rating, records.settings[0].desiredRetention);
-		const nextState = v.parse(upstreamStoreSchemas.studyStates, { ...state, card: scheduled.card, updatedAt: input.reviewedAt });
-		const record = v.parse(upstreamStoreSchemas.reviewLogs, {
-			id: input.requestId, questionId: question.id, deckId: question.deckId,
-			reviewedAt: input.reviewedAt, rating: input.rating, correct: input.correct,
-			durationMs: input.durationMs, fsrsLog: scheduled.log,
-			...(['single-choice', 'multiple-choice', 'matching'].includes(question.kind)
-				? { selectedAnswerIds: input.answers } : { responseText: input.answers[0] ?? '' }),
-		});
+		const { state: nextState, record } = applyUpstreamReview(input, question, state, records.settings[0].desiredRetention);
 		const frames = baseline.frames();
-		const index = frames.findIndex(frame => frame.store === 'studyStates' && frame.value.questionId === question.id);
+		const index = frames.findIndex(frame => frame.store === 'studyStates' && frame.value.questionId === input.questionId);
 		// Preserve original optional source values; replace only the reviewed state and append one log.
 		frames[index] = { ...frames[index], value: { ...frames[index].value, card: nextState.card, updatedAt: nextState.updatedAt } };
 		frames.push({ store: 'reviewLogs', value: record });
@@ -103,7 +110,7 @@ export class UpstreamCompatibilitySession {
 		if (this.archive !== baseline) throw new CompatibilitySessionError('STALE_STATE');
 		const result = { revision: revision + 1, state: nextState, record };
 		this.archive = candidate;
-		this.revisions.set(question.id, result.revision);
+		this.revisions.set(input.questionId, result.revision);
 		this.requests.set(input.requestId, { fingerprint, result });
 		return structuredClone(result);
 	}

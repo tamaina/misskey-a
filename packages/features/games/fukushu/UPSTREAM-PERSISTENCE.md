@@ -50,18 +50,23 @@ result without advancing again. This revision is independent of source reps and
 historical log count. Suspended/disabled/unsupported cards are not reviewed.
 Historical card snapshots absent in the source remain unknown.
 
-The bounded source snapshot is validated before writes and before review commits.
-Existing inspection limits remain: 8 MiB total (including framing/checksum),
-20,000 frames, exactly one settings record, 100 decks, 1,000 questions/states and
-10,000 per other store. No base64 expansion or limit increase is introduced.
-Larger archives, older JSON backups, arbitrary past versions and missing-settings
-fallback are not covered. Hitting a size/count limit prevents a new write without
-changing existing history; it must be addressed before claiming general migration.
+The source reader validates the complete archive before persistence. Reviews
+use the target question, current state and global settings. An owner usage row
+tracks the serialized UTF-8 metadata, binary bytes, frame count, log count and
+last position. The review transaction checks and updates these counters before
+appending a log. At the frame, log or byte ceiling a new review fails atomically.
+Existing study history remains exportable.
 
 ## API and ordinary-user input
 
 - `fukushu/upstream/restore`: normal login only; owned `fileId`, new `requestId`,
   `confirmRestore: true`. Returns source SHA-256 and record count.
+- `fukushu/upstream/restore-job`: the same authenticated confirmation, with an
+  optional `statusOnly` query. The UI uses the existing database job queue for
+  files over 8 MiB. Its job ID is scoped to the owner and request ID. The job
+  stores only identifiers, size and Drive MD5. The persistent success receipt
+  remains authoritative after the queue entry expires. Explicit retry after
+  failure reads and validates the original again.
 - `fukushu/upstream/show`: `read:account`; source records and current local
   revisions for the authenticated owner. JSON is the validated view (schema
   defaults may be visible); retained source JSON and binaries are not replaced.
@@ -130,42 +135,42 @@ imports are refused. Direct updates from Anki text or a new APKG are pending.
 
 ## Collection size and old backups
 
-The local file chooser can inspect a binary file up to 1 GiB, including large media or
-an original APKG. It reads 256 KiB slices, checks the payload SHA-256 and each media
-digest, and discards binary contents as it goes. It retains validated JSON for
-cross-record references and the history summary. It accepts up to 8 MiB of JSON,
-20,000 records overall, one settings row, 100 decks and 10,000 rows per remaining
-store. The 1 GiB local work budget covers the upstream 600 MiB example. JSON and
-row budgets bound retained objects separately. Closing the page or cancelling
-stops the scan. No local report authorizes server writes.
+Local and Drive inspection and queued source imports accept a framed binary
+archive up to 1 GiB, with 8 MiB of JSON, 20,000 total frames, one global
+settings record, 100 decks and up to 10,000 records in each remaining store.
+Framing and the checksum also count toward the archive ceiling. Drive role,
+instance, storage and downloader limits can be lower. The default role permits 30 MiB per file. Synchronous restore
+accepts files up to 8 MiB. Source media and APKG bytes remain opaque. The
+reader checks bounds before allocating each JSON frame and never inflates an
+embedded archive.
 
-The pinned app streams the binary archive and allows JSON metadata frames up to
-64 MiB. 9k's current adapter reconstructs a bounded archive for review, update
-and export. Its whole-file limit is 8 MiB, including media and the original
-APKG, with separate limits of 100 decks, 1,000 questions, 1,000 study states
-and 20,000 total frames. When a new review would exceed a limit it rolls back.
-Handling large collections requires incremental reads/writes and a streaming
-export. Raising just the upload limit would leave later reviews unable to save.
+The importer takes a private disk snapshot of the owned Drive original.
+It checks the byte length and Drive MD5, hashes the complete original, validates
+the envelope and media digests, and retains bounded metadata and offsets.
+Inside one PostgreSQL transaction it checks the owner, Drive identity, receipt
+and collisions again, then re-reads the same snapshot to insert records and
+attachments. Attachments above 8 MiB occupy permanent 256 KiB rows in
+`fukushu_upstream_chunk`; smaller and existing inline attachments keep their
+representation. An error rolls back records, chunks, usage and receipt together.
+This design requires temporary space for one input and an uninterrupted
+transaction during the database write. It needs no persistent import staging
+or partial-row cleanup. Queue restart can repeat work from the original.
 
-| Server stage at #341 | Resource use and next change |
-| --- | --- |
-| Drive recognition and original read | FileInfo reads the candidate into a size-bounded buffer. Internal storage accumulates chunks and concatenates them. For object storage the shared downloader first stages the object on disk. Stream the recognized envelope and enforce actual byte counts, the recorded MD5, local ownership, role quota and download protections. |
-| Inspect and restore | The lossless reader keeps the input, frames, normalized records and binary views. Restore builds insert rows before sending batches of 100. Stage bounded batches and binaries under an owner/job ID, validate all digests, uniqueness and references, then publish in one transaction. Under the owner lock recheck Drive identity, all native/imported ID conflicts and the durable retry receipt. Discard staging on failure or expiry. |
-| Library, media and review | Show reads all owner rows, including blobs, and encodes them again. Review repeats this inside the owner lock. Read paged metadata and the requested state, use owner-scoped media streams, and commit the state revision, history and receipt together. |
-| GIFT update | The 256 KiB UTF-8 source becomes a token/document tree, diagnostics and converted questions. Preview and apply also re-encode the owner's entire archive. Preserve category context and source-key matching across batches and recheck a collection revision when applying the preview. |
-| Export | The repeatable-read snapshot currently becomes a complete encoded buffer before the export worker writes its temporary file. Read ordered metadata and binary chunks from one snapshot, hash as the file is written, publish to Drive only after finishing, and remove partial files on error. |
+Export writes ordered frames and 256 KiB binary slices from one repeatable-read
+snapshot into a temporary file, then sends the completed file to Drive. Export
+requires free temporary space and Drive quota. The library list currently
+returns all bounded metadata. Inline media preview supports individual files
+up to 8 MiB. GIFT updates still use the small archive adapter (8 MiB archive,
+1,000 questions and study states) and 256 KiB of GIFT text. The native-v1
+format keeps its independent limits.
 
-Enable larger server imports after study and export support the same collection
-size. These server limits originated in the bounded 9k pilots (0e40fced,
-1dc5e2f3 and 9bec1cb1). The upstream binary archive stores raw media and
-opaque APKG bytes. Local inspection never inflates embedded archives. Any
-future APKG expansion needs limits on actual expanded bytes, entry count,
-per-entry bytes and total work before using the extracted data.
-
-To repeat the synthetic Linux time/RSS comparison on an idle machine, from
-`packages/frontend` run `node --import tsx ../features/games/fukushu/test/measure-local-inspection.mjs`.
-Each measurement uses a fresh Node process and a disk-backed file. The script
-cleans up its fixtures. These readings include the runtime and loaded packages.
+The opt-in full-application HTTP test uses `FUKUSHU_SCALE_FIXTURE=1` in its
+private run directory. From `packages/frontend`, create its input with
+`node --import tsx ../features/games/fukushu/test/measure-local-inspection.mjs --fixture <run-directory>/scale.fukushu`.
+This synthetic input has 5,000 questions and a 24 MiB attachment. The test
+exercises ordinary Drive upload, racing job submissions, polling, review replay
+and a checksummed Drive export. Its reported RSS samples the application PID
+at 100 ms intervals and excludes the client, PostgreSQL and Redis.
 
 The pinned app accepts legacy JSON versions 1–3, reconstructs missing source
 metadata and repairs legacy APKG data for versions below 3. Direct JSON restore

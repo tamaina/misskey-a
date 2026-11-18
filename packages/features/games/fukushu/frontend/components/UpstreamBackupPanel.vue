@@ -129,9 +129,9 @@ onBeforeUnmount(() => { disposed = true; selection++; localScan.value?.abort(); 
 <locale locale="ja-JP" lang="json">
 {
 	"title": "本家 Fukushu のバックアップを調べる",
-	"scope": "本家の .fukushu バイナリ形式を検査します。Drive からの検査は 8 MiB・1,000 カードまでです。",
+	"scope": "本家の .fukushu バイナリ形式を検査します。端末・Drive ともに 1 GiB まで検査できます。",
 	"noWrite": "移行前の検査だけを行います。教材・予定・履歴は取り込まず、既存データも変更しません。",
-	"localDescription": "端末内では 1 GiB まで検査できます。教材・履歴などの JSON は合計 8 MiB、全体で 20,000 件、カードは 10,000 件までです。ファイルは送信されません。",
+	"localDescription": "教材・履歴などの JSON は合計 8 MiB、全体で 20,000 件、カードは 10,000 件までです。ファイルは送信されません。",
 	"cancelScan": "検査を中止",
 	"localChoose": "端末の .fukushu を検査",
 	"scanning": "端末内で検査中",
@@ -168,9 +168,9 @@ onBeforeUnmount(() => { disposed = true; selection++; localScan.value?.abort(); 
 <locale locale="en-US" lang="json">
 {
 	"title": "Inspect an upstream Fukushu backup",
-	"scope": "Inspect an upstream .fukushu binary backup. Drive inspection supports up to 8 MiB and 1,000 cards.",
+	"scope": "Inspect an upstream .fukushu binary backup. Both device and Drive inspection support up to 1 GiB.",
 	"noWrite": "Pre-import inspection only. No materials, schedules or history are imported, and existing data is unchanged.",
-	"localDescription": "Inspect up to 1 GiB on this device, with 8 MiB of JSON, 20,000 records in total and up to 10,000 cards. The file stays on your device.",
+	"localDescription": "The limits include 8 MiB of JSON, 20,000 records in total and up to 10,000 cards. The file stays on your device.",
 	"cancelScan": "Cancel inspection",
 	"localChoose": "Inspect a .fukushu on this device",
 	"scanning": "Inspecting on this device",

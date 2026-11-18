@@ -27,6 +27,7 @@ function fixture() {
 test('source import/export require normal login; show/review separate read/write scopes', async () => {
 	const { upstream, api, user } = fixture();
 	for (const context of [testContext(null), testContext(user, { permission: ['read:account', 'write:account', 'read:drive', 'write:drive'] })]) {
+		await expect(call(api.upstreamRestoreJob, input, { context })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
 		await expect(call(api.upstreamRestore, input, { context })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
 		await expect(call(api.upstreamExport, { acknowledgeDriveVisibility: true }, { context })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
 	}
@@ -46,12 +47,12 @@ test('binds identities and server time, preserves non-UUID source IDs, and requi
 	await call(api.upstreamReview, { ...review, ownerId: 'bob', reviewedAt: '2099-01-01T00:00:00Z', card: {} } as never, { context });
 	expect(upstream.store.review).toHaveBeenCalledWith('alice', review);
 	await call(api.upstreamExport, { acknowledgeDriveVisibility: true }, { context });
-	expect(upstream.store.show).toHaveBeenCalledWith('alice'); expect(upstream.enqueue).toHaveBeenCalledWith('alice');
-	expect(upstream.store.show.mock.invocationCallOrder[0]).toBeLessThan(upstream.enqueue.mock.invocationCallOrder[0]);
+	expect(upstream.store.assertOwned).toHaveBeenCalledWith('alice'); expect(upstream.enqueue).toHaveBeenCalledWith('alice');
+	expect(upstream.store.assertOwned.mock.invocationCallOrder[0]).toBeLessThan(upstream.enqueue.mock.invocationCallOrder[0]);
 });
 test('maps source format and concurrency errors without creating an export for missing owners', async () => {
 	const { upstream, api, user } = fixture(); const context = testContext(user);
-	upstream.store.show.mockRejectedValueOnce(new MaterialError('NO_SUCH_MATERIAL'));
+	upstream.store.assertOwned.mockRejectedValueOnce(new MaterialError('NO_SUCH_MATERIAL'));
 	await expect(call(api.upstreamExport, { acknowledgeDriveVisibility: true }, { context })).rejects.toMatchObject({ code: 'NO_SUCH_MATERIAL', status: 404 });
 	expect(upstream.enqueue).not.toHaveBeenCalled();
 	for (const code of ['INVALID_BACKUP', 'BACKUP_TOO_LARGE', 'UPSTREAM_INSPECTION_LIMIT'] as const) {

@@ -5,6 +5,7 @@
 
 import assert from 'node:assert/strict';
 import { createHash, randomUUID } from 'node:crypto';
+import { openAsBlob } from 'node:fs';
 import { lstat, readFile, realpath, writeFile } from 'node:fs/promises';
 import { isAbsolute, join, resolve } from 'node:path';
 import { test } from 'node:test';
@@ -678,5 +679,72 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		assert.equal(after.records.reviewLogs.length, 38);
 		assert.equal(after.records.studyStates.find(s => s.questionId === sourceReview.state.questionId).card.reps, 0);
 		assert.equal(after.records.questions.find(q => q.id === sourceReview.state.questionId).payload.correctAnswer, true);
+	});
+	if (process.env.FUKUSHU_SCALE_FIXTURE) await step('normal Drive upload, queued large restore, review and streamed export', async () => {
+		const path = join(directory, 'scale.fukushu');
+		const blob = await openAsBlob(path);
+		const endpoint = 'fukushu/upstream/restore-job';
+		const upload = async user => {
+			const form = new FormData();
+			form.set('i', user.token);
+			form.set('file', blob, 'scale-5000.fukushu');
+			const uploaded = ok(await readResponse(await fetch(origin + '/api/drive/files/create', { method: 'POST', body: form, headers: { origin }, redirect: 'error' })));
+			assert.equal(uploaded.size, blob.size);
+			return uploaded.id;
+		};
+		const rss = async () => Number((await readFile('/proc/' + ready.backend_pid + '/status', 'utf8')).match(/^VmRSS:\s+(\d+)/m)[1]);
+		const baselineKiB = await rss();
+		let peakKiB = baselineKiB;
+		const monitor = setInterval(async () => { peakKiB = Math.max(peakKiB, await rss()); }, 100);
+		try {
+			const started = performance.now();
+			const fileId = await upload(bob);
+			const uploaded = performance.now();
+			const input = { fileId, requestId: randomUUID(), confirmRestore: true };
+			const status = async (user = bob) => ok(await call(endpoint, { ...input, statusOnly: true }, user.token)).status;
+			assert.equal(await status(), 'missing');
+			assert.equal((await call(endpoint, input, alice.token)).status, 404);
+			const jobs = await Promise.all([call(endpoint, input, bob.token), call(endpoint, input, bob.token)]);
+			for (const job of jobs) assert.ok(['waiting', 'running', 'completed'].includes(ok(job).status));
+			const until = Date.now() + 45_000;
+			while (Date.now() < until) {
+				const result = await status();
+				if (result === 'completed') break;
+				assert.ok(['waiting', 'running'].includes(result));
+				await setTimeout(2000);
+			}
+			assert.equal(await status(), 'completed');
+			assert.equal(await status(alice), 'missing');
+			const restored = performance.now();
+			const reviewInput = { questionId: 'anki:scale:4999', requestId: randomUUID(), expectedRevision: 0, durationMs: 300, answers: ['A'], rating: 'good', correct: true };
+			const review = ok(await call('fukushu/upstream/review', reviewInput, bob.token));
+			assert.equal(review.revision, 1);
+			assert.deepEqual(ok(await call('fukushu/upstream/review', reviewInput, bob.token)), review);
+			const reviewed = performance.now();
+			ok(await call('fukushu/upstream/export', { acknowledgeDriveVisibility: true }, bob.token), 204);
+			let file;
+			const deadline = Date.now() + 40_000;
+			while (!file && Date.now() < deadline) {
+				const notes = ok(await call('i/notifications', { includeTypes: ['exportCompleted'], limit: 10 }, bob.token));
+				const event = notes.find(n => n.exportedEntity === 'fukushu');
+				if (event) file = ok(await call('drive/files/show', { fileId: event.fileId }, bob.token));
+				else await setTimeout(500);
+			}
+			assert.ok(file);
+			assert.equal(new URL(file.url).origin, origin);
+			const exported = performance.now();
+			const response = await fetch(file.url, { redirect: 'error' });
+			assert.equal(response.status, 200);
+			const rows = sourceFrames(Buffer.from(await response.arrayBuffer()));
+			assert.equal(rows.filter(r => r.store === 'questions').length, 5000);
+			const large = rows.find(r => r.blobSize === 24 * 1024 ** 2);
+			assert.ok(large);
+			assert.equal(createHash('sha256').update(large.binary).digest('hex'), large.value.id);
+			assert.deepEqual(rows.find(r => r.store === 'reviewLogs' && r.value.id === review.record.id).value, review.record);
+			assert.deepEqual(rows.find(r => r.store === 'studyStates' && r.value.questionId === reviewInput.questionId).value.card, review.state.card);
+			console.log(JSON.stringify({ bytes: blob.size, cards: 5000, baselineKiB, peakKiB, uploadMs: uploaded - started, importIncludingPollingMs: restored - uploaded, reviewAndReplayMs: reviewed - restored, exportIncludingPollingMs: exported - reviewed }));
+		} finally { clearInterval(monitor); }
+		// Fresh owner and source for the independent browser flow.
+		await upload(credentials.dana);
 	});
 });

@@ -5,17 +5,10 @@
 
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import * as Bull from 'bullmq';
-import type { Config } from '@/config.js';
-import { DI } from '@/di-symbols.js';
-import type { Logger } from '@features/runtime/backend/logging/logger.js';
-import { bindThis } from '../decorators.js';
 import { TelemetryService } from '@features/statistics/backend/services/TelemetryService.js';
 import { CheckModeratorsActivityProcessorService } from '@features/moderation/backend/jobs/CheckModeratorsActivityProcessorService.js';
-import { runQueueJob } from './queue-job-runner.js';
 import { McpStreamDeliverProcessorService } from '@features/integrations/backend/jobs/McpStreamDeliverProcessorService.js';
 import { reconcileStreamJobs, releaseStreamJob } from '@features/mcp/backend/stream-queue-admission.js';
-import type { McpStreamDeliverQueue } from '@features/boot/backend/assembly/QueueModule.js';
-import type { ArchiveAnnouncementJobData, McpStreamDeliverJobData } from './types.js';
 import { UserWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/UserWebhookDeliverProcessorService.js';
 import { SystemWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/SystemWebhookDeliverProcessorService.js';
 import { EndedPollNotificationProcessorService } from '@features/notes/backend/jobs/EndedPollNotificationProcessorService.js';
@@ -24,6 +17,7 @@ import { DeliverProcessorService } from '@features/federation/backend/jobs/Deliv
 import { InboxProcessorService } from '@features/federation/backend/jobs/InboxProcessorService.js';
 import { DeleteDriveFilesProcessorService } from '@features/drive/backend/jobs/DeleteDriveFilesProcessorService.js';
 import { ExportCustomEmojisProcessorService } from '@features/emojis/backend/jobs/ExportCustomEmojisProcessorService.js';
+import { ImportFukushuProcessorService } from '@features/games/fukushu/backend/jobs/ImportFukushuProcessorService.js';
 import { ExportFukushuProcessorService } from '@features/games/fukushu/backend/jobs/ExportFukushuProcessorService.js';
 import { ExportNotesProcessorService } from '@features/notes/backend/jobs/ExportNotesProcessorService.js';
 import { ExportClipsProcessorService } from '@features/collections/backend/jobs/ExportClipsProcessorService.js';
@@ -52,9 +46,16 @@ import { BakeBufferedReactionsProcessorService } from '@features/notes/backend/j
 import { CleanProcessorService } from '@features/operations/backend/jobs/CleanProcessorService.js';
 import { AggregateRetentionProcessorService } from '@features/statistics/backend/jobs/AggregateRetentionProcessorService.js';
 import { CleanRemoteNotesProcessorService } from '@features/notes/backend/jobs/CleanRemoteNotesProcessorService.js';
-import { QueueLoggerService } from './QueueLoggerService.js';
-import { QUEUE, baseWorkerOptions } from './const.js';
 import { InboxKeyDiscoveryDeferredError, inboxKeyDiscoveryBackoff } from '@features/federation/backend/utility/inbox-key-discovery.js';
+import { DI } from '@/di-symbols.js';
+import type { Config } from '@/config.js';
+import { bindThis } from '../decorators.js';
+import { QUEUE, baseWorkerOptions } from './const.js';
+import { QueueLoggerService } from './QueueLoggerService.js';
+import { runQueueJob } from './queue-job-runner.js';
+import type { ArchiveAnnouncementJobData, McpStreamDeliverJobData } from './types.js';
+import type { McpStreamDeliverQueue } from '@features/boot/backend/assembly/QueueModule.js';
+import type { Logger } from '@features/runtime/backend/logging/logger.js';
 
 // ref. https://github.com/misskey-dev/misskey/pull/7635#issue-971097019
 function httpRelatedBackoff(attemptsMade: number) {
@@ -114,6 +115,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		private inboxProcessorService: InboxProcessorService,
 		private deleteDriveFilesProcessorService: DeleteDriveFilesProcessorService,
 		private exportCustomEmojisProcessorService: ExportCustomEmojisProcessorService,
+		private importFukushuProcessorService: ImportFukushuProcessorService,
 		private exportFukushuProcessorService: ExportFukushuProcessorService,
 		private exportNotesProcessorService: ExportNotesProcessorService,
 		private exportClipsProcessorService: ExportClipsProcessorService,
@@ -226,6 +228,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 				switch (job.name) {
 					case 'deleteDriveFiles': return this.deleteDriveFilesProcessorService.process(job);
 					case 'exportCustomEmojis': return this.exportCustomEmojisProcessorService.process(job);
+					case 'importFukushu': return this.importFukushuProcessorService.process(job);
 					case 'exportFukushu': return this.exportFukushuProcessorService.process(job);
 					case 'exportNotes': return this.exportNotesProcessorService.process(job);
 					case 'exportClips': return this.exportClipsProcessorService.process(job);

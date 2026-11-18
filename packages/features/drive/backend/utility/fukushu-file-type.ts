@@ -2,8 +2,10 @@
  * SPDX-FileCopyrightText: misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { openAsBlob } from 'node:fs';
 import { open } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
+import { scanSourceArchive, MAX_SOURCE_ARCHIVE_BYTES } from '@features/games/fukushu/shared/source-scan.js';
 
 export const FUKUSHU_MIME = 'application/x-fukushu-backup';
 const magic = Buffer.from('FUKUSHU-BACKUP-1\n');
@@ -16,7 +18,11 @@ export async function isFukushuBackupFile(path: string): Promise<boolean> {
 	const file = await open(path, 'r');
 	try {
 		const size = (await file.stat()).size;
-		if (size < magic.length + 64 || size > 8 * 1024 * 1024) return false;
+		if (size < magic.length + 64 || size > MAX_SOURCE_ARCHIVE_BYTES) return false;
+		if (size > 8 * 1024 * 1024) {
+			await scanSourceArchive(await openAsBlob(path));
+			return true;
+		}
 		const bytes = Buffer.alloc(size + 1);
 		let read = 0;
 		while (read < bytes.length) { const part = await file.read(bytes, read, bytes.length - read, read); if (!part.bytesRead) break; read += part.bytesRead; }

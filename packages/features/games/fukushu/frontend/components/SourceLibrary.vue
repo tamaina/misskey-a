@@ -9,7 +9,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template v-else>
 		<div v-if="!deck" class="_buttons">
 			<MkButton :disabled="busy" primary @click="run(load)">{{ $locale.sfc.open }}</MkButton>
-			<MkButton :disabled="busy" @click="restore">{{ $locale.sfc.restore }}</MkButton>
+			<MkButton v-if="pendingImport" :disabled="busy" @click="run(() => checkImport(true))">{{ $locale.sfc.checkImport }}</MkButton>
+			<MkButton v-else :disabled="busy" @click="restore">{{ $locale.sfc.restore }}</MkButton>
 			<MkButton v-if="records" :disabled="busy" @click="exportBackup">{{ $locale.sfc.export }}</MkButton>
 		</div>
 		<p v-if="loaded && !records?.decks.length">{{ $locale.sfc.empty }}</p>
@@ -63,6 +64,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, shallowRef } from 'vue';
+import { $i } from '@features/auth/frontend/i.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { chooseDriveFile } from '@features/drive/frontend/utility/drive.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -92,6 +94,40 @@ const error = ref('');
 let picker = 0;
 onBeforeUnmount(() => { picker++; });
 const retryRestore = new Map<string, string>();
+
+type PendingImport = { fileId: string; requestId: string };
+const trackingKey = 'fukushu:import:' + $i?.id;
+const pendingImport = shallowRef<PendingImport>();
+try {
+	const saved = JSON.parse(sessionStorage.getItem(trackingKey) ?? 'null');
+	if (typeof saved?.fileId === 'string' && typeof saved.requestId === 'string') pendingImport.value = saved;
+} catch { /* Tracking still works in memory when session storage is unavailable. */ }
+
+function trackImport(job?: PendingImport) {
+	pendingImport.value = job;
+	try {
+		if (job) sessionStorage.setItem(trackingKey, JSON.stringify(job));
+		else sessionStorage.removeItem(trackingKey);
+	} catch { /* Optional same-tab resume. */ }
+}
+
+async function checkImport(statusOnly: boolean) {
+	const job = pendingImport.value;
+	if (!job) return;
+	const result = await misskeyApi('fukushu/upstream/restore-job', { ...job, confirmRestore: true, statusOnly });
+	if (result.status === 'completed') {
+		trackImport();
+		retryRestore.delete(job.fileId);
+		await load();
+		notice.value = $locale.value.sfc.restored;
+	} else if (result.status === 'failed' || result.status === 'missing') {
+		trackImport();
+		retryRestore.delete(job.fileId);
+		error.value = $locale.value.sfc.importFailed;
+	} else {
+		notice.value = $locale.value.sfc.importQueued;
+	}
+}
 
 function code(cause: unknown) { return typeof cause === 'object' && cause !== null && 'code' in cause ? cause.code : null; }
 
@@ -153,6 +189,11 @@ async function restore() {
 		if ((await os.confirm({ type: 'question', title: $locale.value.sfc.restore, text: file.name + '\n' + $locale.value.sfc.restoreConfirm })).canceled) return;
 		const id = retryRestore.get(file.id) ?? crypto.randomUUID();
 		retryRestore.set(file.id, id);
+		if (file.size > 8 * 1024 * 1024) {
+			trackImport({ fileId: file.id, requestId: id });
+			await checkImport(false);
+			return;
+		}
 		await misskeyApi('fukushu/upstream/restore', { fileId: file.id, requestId: id, confirmRestore: true });
 		retryRestore.delete(file.id);
 		await load(); notice.value = $locale.value.sfc.restored;
@@ -217,7 +258,10 @@ async function updateGift() {
 	"noneDue": "対象のカードはありません。",
 	"error": "操作を完了できませんでした。ファイルと接続を確認してください。",
 	"conflict": "既存データと重複するか、確認後に変更されました。教材を開き直してください。",
-	"limit": "取込上限を超えています。バックアップは 8 MiB、GIFT 更新ファイルは 256 KiB までです。",
+	"limit": "取込上限を超えています。バックアップは 1 GiB、内部の JSON は合計 8 MiB、GIFT 更新ファイルは 256 KiB までです。",
+	"checkImport": "取込状況を確認",
+	"importQueued": "サーバーで取り込んでいます。このタブで取込状況を確認できます。",
+	"importFailed": "取込が完了しませんでした。原本と既存教材との ID 重複を確認して、再度お試しください。",
 	"restoreConfirm": "教材・媒体・復習記録をこのアカウントに保存します。既存IDと重複する場合は取り込みません。",
 	"restored": "教材を取り込みました。",
 	"visibility": "学習記録も保存されます。Drive の URL を知っている人が取得できる場合があります。",
@@ -260,7 +304,10 @@ async function updateGift() {
 	"noneDue": "There are no eligible cards.",
 	"error": "The operation could not be completed. Check the file and connection.",
 	"conflict": "An ID already exists or this deck changed. Reopen the deck.",
-	"limit": "Import limit exceeded. Backups can be up to 8 MiB and GIFT updates up to 256 KiB.",
+	"limit": "Import limit exceeded. Backups support up to 1 GiB with 8 MiB of JSON. GIFT updates support up to 256 KiB.",
+	"checkImport": "Check import status",
+	"importQueued": "The server is importing the backup. Check its status from this tab.",
+	"importFailed": "Import did not complete. Check the original file and existing IDs, then try again.",
 	"restoreConfirm": "Save decks, media and study history to your account. Existing IDs prevent the entire import.",
 	"restored": "Decks imported.",
 	"visibility": "Includes your study history. People who know the Drive file URL may be able to access it.",
