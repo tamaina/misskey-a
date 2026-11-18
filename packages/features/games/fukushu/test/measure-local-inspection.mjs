@@ -21,10 +21,12 @@ async function generate(path, cards, mediaMiB) {
 	const sample = await readFile(writerFixture);
 	const out = await open(path, 'wx');
 	const digest = createHash('sha256');
+
 	async function writePayload(bytes) {
 		digest.update(bytes);
 		await out.writeFile(bytes);
 	}
+
 	async function frame(row) {
 		const json = Buffer.from(JSON.stringify(row));
 		const length = Buffer.alloc(4);
@@ -32,6 +34,7 @@ async function generate(path, cards, mediaMiB) {
 		await writePayload(length);
 		await writePayload(json);
 	}
+
 	try {
 		await writePayload(magic);
 		let question;
