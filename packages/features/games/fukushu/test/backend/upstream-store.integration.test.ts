@@ -17,6 +17,7 @@ import { FukushuQuestionVersions1794880800000 } from '../../../../../backend/mig
 import { FukushuStudy1794891600000 } from '../../../../../backend/migration/1794891600000-FukushuStudy.js';
 import { FukushuUpstreamStore1794924000000 } from '../../../../../backend/migration/1794924000000-FukushuUpstreamStore.js';
 import { FukushuUpstreamStore } from '../../backend/upstream-store.js';
+import { FukushuDeckHistoryIndex1794990000000 } from '../../../../../backend/migration/1794990000000-FukushuDeckHistoryIndex.js';
 import { FukushuMaterialBytes1794980000000 } from '../../../../../backend/migration/1794980000000-FukushuMaterialBytes.js';
 import { FukushuSourceChunks1794974400000 } from '../../../../../backend/migration/1794974400000-FukushuSourceChunks.js';
 import { FukushuStore } from '../../backend/store.js';
@@ -51,7 +52,7 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		await db.query('CREATE TABLE "user" (id varchar(32) PRIMARY KEY)');
 		await db.query('CREATE TABLE drive_file (id varchar(32) PRIMARY KEY, "userId" varchar(32) REFERENCES "user"(id), "userHost" text, uri text, "isLink" boolean NOT NULL DEFAULT false, size integer NOT NULL, md5 text NOT NULL)');
 		const runner = db.createQueryRunner();
-		try { for (const Migration of [FukushuMaterial1794838800000, FukushuMaterialManagement1794871800000, FukushuQuestionVersions1794880800000, FukushuStudy1794891600000, FukushuUpstreamStore1794924000000, FukushuSourceChunks1794974400000, FukushuMaterialBytes1794980000000]) await new Migration().up(runner); } finally { await runner.release(); }
+		try { for (const Migration of [FukushuMaterial1794838800000, FukushuMaterialManagement1794871800000, FukushuQuestionVersions1794880800000, FukushuStudy1794891600000, FukushuUpstreamStore1794924000000, FukushuSourceChunks1794974400000, FukushuMaterialBytes1794980000000, FukushuDeckHistoryIndex1794990000000]) await new Migration().up(runner); } finally { await runner.release(); }
 	});
 	afterAll(async () => { if (db.isInitialized) { try { await db.query('DROP SCHEMA fukushu_upstream_test CASCADE'); } finally { await db.destroy(); } } });
 	beforeEach(async () => { await db.query('TRUNCATE "user" CASCADE'); await db.query('INSERT INTO "user" VALUES ($1), ($2)', ['alice', 'bob']); files.clear(); });
@@ -332,7 +333,7 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		expect(output.includes(json)).toBe(true);
 	});
 
-	test('imports small history frames above 8 MiB, serves owner pages and restores a continued export', async () => {
+	test('pages and edits GIFT above 8 MiB of history without fetching unrelated review bodies', async () => {
 		const original = (await readUpstreamArchive(bytes, sha)).frames();
 		const sample = original.find(frame => frame.store === 'reviewLogs');
 		if (!sample) throw new Error('Expected a review log');
@@ -370,19 +371,71 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		expect(page.historyPage?.total).toBe(2200 + original.filter(f => f.store === 'reviewLogs' && f.value.deckId === deckId).length);
 		const after = page.historyPage?.next;
 		if (!after) throw new Error('Expected another page');
-		const next = await store.show('alice', { deckId, after });
-		expect(new Set([...page.records.reviewLogs, ...next.records.reviewLogs].map(log => log.id)).size).toBe(40);
+		let historyBodies = 0;
+		const subscriber: EntitySubscriberInterface = {
+			afterQuery(event) {
+				for (const row of event.rawResults?.rows ?? []) {
+					if (Object.values(row).some(value => typeof value === 'string' && value.includes('"id":"synthetic:'))) historyBodies++;
+				}
+			},
+		};
+		db.subscribers.push(subscriber);
+		try {
+			const next = await store.show('alice', { deckId, after });
+			expect(new Set([...page.records.reviewLogs, ...next.records.reviewLogs].map(log => log.id)).size).toBe(40);
+			expect(historyBodies).toBeGreaterThan(0);
+			expect(historyBodies).toBeLessThanOrEqual(20);
+		} finally { db.subscribers.splice(db.subscribers.indexOf(subscriber), 1); }
 		const { reviewedAt: _time, ...request } = expected.reset.request;
 		const [written, replay] = await Promise.all([store.review('alice', request), store.review('alice', request)]);
 		expect(replay).toEqual(written);
+		const giftDeck = page.records.decks.find(deck => deck.sourceType === 'gift');
+		if (!giftDeck) throw new Error('Expected the fixture GIFT deck');
+		const source = Buffer.from('::stable-name:: Sky is blue. {TRUE}');
+		const file = await upload('alice', source);
+		const update = (token?: string) => store.updateGift('alice', giftDeck.id, file, async () => source, token);
+		historyBodies = 0;
+		db.subscribers.push(subscriber);
+		try {
+			const preview = await update();
+			expect(preview).toMatchObject({ changed: 1, reset: 1, applied: false });
+			expect(await update(preview.token)).toMatchObject({ changed: 1, reset: 1, applied: true });
+			await expect(update(preview.token)).rejects.toThrow('STUDY_CONFLICT');
+			expect(historyBodies).toBe(0);
+		} finally { db.subscribers.splice(db.subscribers.indexOf(subscriber), 1); }
+		const reviewedDeck = await store.show('alice', { deckId: giftDeck.id });
+		expect(reviewedDeck.records.studyStates.find(state => state.questionId === request.questionId)?.card.reps).toBe(0);
+		expect(reviewedDeck.records.reviewLogs.some(log => log.id === written.record.id)).toBe(true);
 		const output = await exported(store, 'alice');
 		const prefixSize = payload.length - (bytes.length - 64 - 17);
 		expect(await sha(output.subarray(0, prefixSize))).toBe(await sha(input.subarray(0, prefixSize)));
 		await restore('bob', output);
 		expect(await sha(await exported(store, 'bob'))).toBe(await sha(output));
+		const [usage] = await db.query('SELECT count, bytes, binaries, "materialBytes" FROM fukushu_source_usage WHERE "ownerId" = $1', ['alice']);
+		expect(usage).toEqual((await db.query('SELECT count, bytes, binaries, "materialBytes" FROM fukushu_source_usage WHERE "ownerId" = $1', ['bob']))[0]);
+		expect(output.length).toBe(81 + 4 * usage.count + usage.bytes + usage.binaries);
 		const runner = db.createQueryRunner();
 		try { await expect(new FukushuMaterialBytes1794980000000().down(runner)).rejects.toThrow('previous reader'); } finally { await runner.release(); }
 	}, 60_000);
+
+	test('backfills pre-index records once under concurrent page reads and keeps owners separate', async () => {
+		for (const owner of ['alice', 'bob']) await store.restore(owner, await upload(owner), randomUUID());
+		const deckId = expected.reset.result.record.deckId;
+		const before = await exported(store, 'alice');
+		const migration = new FukushuDeckHistoryIndex1794990000000();
+		const runner = db.createQueryRunner();
+		try {
+			await migration.down(runner);
+			await migration.up(runner);
+		} finally { await runner.release(); }
+		const [first, second] = await Promise.all([store.show('alice', { deckId }), store.show('alice', { deckId })]);
+		expect(first).toEqual(second);
+		expect(first.historyPage?.total).toBe(1);
+		expect(await db.query(`SELECT DISTINCT "ownerId" FROM fukushu_upstream_record
+			WHERE store = 'reviewLogs' AND "historyDeck" IS NULL`)).toEqual([{ ownerId: 'bob' }]);
+		expect(await exported(store, 'alice')).toEqual(before);
+		expect((await store.show('bob', { deckId })).historyPage?.total).toBe(1);
+	});
 
 	test('a new answer at the pilot byte ceiling rolls back state, log and receipt', async () => {
 		await store.restore('alice', await upload('alice'), randomUUID());
@@ -470,6 +523,6 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 
 	test('migration down and up operate only on disposable empty tables', async () => {
 		const runner = db.createQueryRunner();
-		try { const migration = new FukushuUpstreamStore1794924000000(); const chunks = new FukushuSourceChunks1794974400000(); await new FukushuMaterialBytes1794980000000().down(runner); await chunks.down(runner); await migration.down(runner); await migration.up(runner); await chunks.up(runner); await new FukushuMaterialBytes1794980000000().up(runner); expect(await counts()).toEqual({ records: 0, receipts: 0 }); } finally { await runner.release(); }
+		try { const migration = new FukushuUpstreamStore1794924000000(); const chunks = new FukushuSourceChunks1794974400000(); await new FukushuDeckHistoryIndex1794990000000().down(runner); await new FukushuMaterialBytes1794980000000().down(runner); await chunks.down(runner); await migration.down(runner); await migration.up(runner); await chunks.up(runner); await new FukushuMaterialBytes1794980000000().up(runner); await new FukushuDeckHistoryIndex1794990000000().up(runner); expect(await counts()).toEqual({ records: 0, receipts: 0 }); } finally { await runner.release(); }
 	});
 });

@@ -9,7 +9,7 @@ import { emptyStoredCard } from './fsrs.js';
 import { previewGift } from './gift-preview.js';
 import { BackupError } from './backup-codec.js';
 import type { UpstreamRecords } from '../shared/upstream-records.schema.js';
-import type { UpstreamArchive, UpstreamFrame } from '../shared/upstream-reader.js';
+import type { UpstreamFrame } from '../shared/upstream-reader.js';
 
 type QuizQuestion = UpstreamRecords['questions'][number]['payload'];
 
@@ -59,8 +59,7 @@ function promptSimilarity(left: string, right: string): number {
 	return intersection / (a.size + b.size - intersection);
 }
 
-export function planGiftUpdate(archive: UpstreamArchive, deckId: string, source: string, now: Date) {
-	const records = archive.normalizedRecords();
+export function planGiftUpdate(records: UpstreamRecords, rawDeck: Record<string, unknown>, deckId: string, source: string, now: Date) {
 	const deck = records.decks.find(row => row.id === deckId);
 	if (!deck || deck.sourceType !== 'gift') throw new BackupError('INVALID_BACKUP');
 	const parsed = previewGift(source, deckId);
@@ -95,8 +94,7 @@ export function planGiftUpdate(archive: UpstreamArchive, deckId: string, source:
 		const state = states.get(old.id);
 		if (state) writes.push({ store: 'studyStates', value: { ...state, suspended: true, suspendedKey: 1, updatedAt: time } });
 	}
-	const rawDeck = archive.frames().find(row => row.store === 'decks' && row.value.id === deckId)!;
-	writes.push({ store: 'decks', value: { ...rawDeck.value, sourceText: source, sourceHash: parsed.sourceHash, updatedAt: time, questionCount: retained.size + removed.length, enabledQuestionCount: retained.size } });
+	writes.push({ store: 'decks', value: { ...rawDeck, sourceText: source, sourceHash: parsed.sourceHash, updatedAt: time, questionCount: retained.size + removed.length, enabledQuestionCount: retained.size } });
 	writes.push({ store: 'imports', value: { id: randomUUID(), deckId, importedAt: time, sourceHash: parsed.sourceHash, added, changed, disabled } });
 	return { writes, summary: { added, changed, disabled, reset } };
 }

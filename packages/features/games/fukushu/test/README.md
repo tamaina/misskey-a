@@ -138,8 +138,13 @@ isolated Chrome harness with `FUKUSHU_LONG_HISTORY=generate`. It restores the
 checked-in synthetic APKG/GIFT fixture into an empty IndexedDB and generates
 `long-input.fukushu` using the upstream writer. Of its 9,999 history entries,
 37 come from the original fixture; the rest are synthetic records. Import
-that file from an isolated owner's Drive, review the reset quiz twice, and
-save the Drive export and the last successful review response. Run the same
+that file from an isolated owner's Drive. Review the reset quiz once. To
+exercise GIFT editing, upload a UTF-8 file containing
+`::stable-name:: Sky is blue. {TRUE}` to that owner's Drive and apply it to
+the GIFT deck. The preview should report one changed and one reset card.
+The card should have zero repetitions and its preceding review should still
+be in history. Review the question once more and save the Drive export
+and the last successful review response. Run the same
 harness with `FUKUSHU_LONG_HISTORY=verify`, `FUKUSHU_PERSISTED_EXPORT` and
 `FUKUSHU_PERSISTED_STATE` pointing to those two test artifacts. It checks the
 restored state, continues learning and compares all 10,001 existing logs

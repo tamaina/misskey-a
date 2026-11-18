@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { createHash } from 'node:crypto';
-import { In, Not, QueryFailedError } from 'typeorm';
+import { In, QueryFailedError } from 'typeorm';
 import * as v from 'valibot';
 import { scanSourceArchive, MAX_SOURCE_ARCHIVE_BYTES, MAX_SOURCE_JSON_BYTES } from '../shared/source-scan.js';
-import { emptyUpstreamRecords, UPSTREAM_MAGIC } from '../shared/upstream-reader.js';
+import { checkMaterialCount, checkUpstreamRelations, emptyUpstreamRecords, UPSTREAM_MAGIC } from '../shared/upstream-reader.js';
 import { upstreamStoreSchemas } from '../shared/upstream-records.schema.js';
 import { studyRequestIdSchema } from '../shared/study.schema.js';
 import { MAX_BACKUP_BYTES } from '../shared/backup.schema.js';
@@ -14,18 +14,19 @@ import { planGiftUpdate } from './gift-update.js';
 import { BackupError } from './backup-codec.js';
 import { MaterialError } from './store.js';
 import { StudyError } from './study-store.js';
-import { applyUpstreamReview, CompatibilitySessionError, encodeUpstreamFrames } from './pilot/upstream-session.js';
+import { applyUpstreamReview, CompatibilitySessionError } from './pilot/upstream-session.js';
 import { MiFukushuUpstreamRecord } from './models/FukushuUpstreamRecord.js';
 import { MiFukushuSourceUsage } from './models/FukushuSourceUsage.js';
 import { MiFukushuOperationReceipt } from './models/FukushuOperationReceipt.js';
 import { MiFukushuUpstreamChunk } from './models/FukushuUpstreamChunk.js';
 import type { DataSource, EntityManager } from 'typeorm';
-import type { UpstreamArchive, UpstreamFrame } from '../shared/upstream-reader.js';
+import type { UpstreamFrame } from '../shared/upstream-reader.js';
 import type { SourceHistoryPage } from './upstream.contract.js';
 import type { SourceFrameOffset } from '../shared/source-scan.js';
 import type { DriveSnapshot, WithSource } from './backup-drive.js';
 import type { CompatibilityReviewInput } from './pilot/upstream-session.js';
 
+const materialStores = Object.keys(upstreamStoreSchemas).filter(store => store !== 'reviewLogs');
 const SOURCE_CHUNK_BYTES = 256 * 1024;
 const hash = (value: Uint8Array | string) => createHash('sha256').update(value).digest('hex');
 const key = (value: unknown) => hash(JSON.stringify(value));
@@ -73,6 +74,7 @@ export class FukushuUpstreamStore {
 				if (!file) throw new MaterialError('NO_SUCH_FILE');
 				if (file.userHost !== null || file.uri !== null || file.isLink || file.size !== snapshot.blob.size || file.md5 !== snapshot.md5) throw new BackupError('BACKUP_FAILED');
 				const records = manager.getRepository(MiFukushuUpstreamRecord);
+				const deckCounts = new Map<string, number>();
 				// The owner/store/key primary key rejects any source collision in the same transaction.
 				// Keep the validated metadata bounded, reread each binary from the immutable snapshot.
 				// A batch never accumulates binary buffers, even for many small media.
@@ -97,16 +99,21 @@ export class FukushuUpstreamStore {
 						const conflict = await manager.query(`SELECT 1 FROM ${table} WHERE "ownerId" = $1 AND id::text = ANY($2::text[]) LIMIT 1`, [ownerId, ids]);
 						if (conflict.length) throw new BackupError('BACKUP_CONFLICT');
 					}
-					const rows = batch.map((frame, i) => ({
-						ownerId,
-						store: frame.store,
-						key: key(frame.value.id ?? frame.value.questionId),
-						data: JSON.stringify(frame.value),
-						position: index + i,
-						revision: 0,
-						sourceHash: snapshot.sha256,
-						chunkedSize: frame.blobSize !== undefined && frame.blobSize > MAX_BACKUP_BYTES ? frame.blobSize : null,
-					}));
+					const rows = batch.map((frame, i) => {
+						const lookup = frame.store === 'reviewLogs' ? this.historyFields(frame.value) : undefined;
+						if (lookup) deckCounts.set(lookup.historyDeck, (deckCounts.get(lookup.historyDeck) ?? 0) + 1);
+						return {
+							...lookup,
+							ownerId,
+							store: frame.store,
+							key: key(frame.value.id ?? frame.value.questionId),
+							data: JSON.stringify(frame.value),
+							position: index + i,
+							revision: 0,
+							sourceHash: snapshot.sha256,
+							chunkedSize: frame.blobSize !== undefined && frame.blobSize > MAX_BACKUP_BYTES ? frame.blobSize : null,
+						};
+					});
 					await records.insert(rows);
 					for (const [i, frame] of batch.entries()) {
 						if (frame.blobSize === undefined) continue;
@@ -123,6 +130,11 @@ export class FukushuUpstreamStore {
 					}
 					index = end;
 				}
+				// The source can place logs before their deck. Set counts after all frames exist.
+				if (deckCounts.size) await manager.query(`UPDATE fukushu_upstream_record d SET "indexedReviews" = n.total
+					FROM unnest($2::text[], $3::int[]) AS n(key, total)
+					WHERE d."ownerId" = $1 AND d.store = 'decks' AND d.key = n.key`,
+				[ownerId, [...deckCounts.keys()], [...deckCounts.values()]]);
 				await this.refreshUsage(manager, ownerId);
 				const result = { restored: true as const, sha256: snapshot.sha256, records: frames.length };
 				await manager.getRepository(MiFukushuOperationReceipt).insert({ ownerId, id, request, result: JSON.stringify(result) });
@@ -154,13 +166,17 @@ export class FukushuUpstreamStore {
 		if (usage.materialBytes > MAX_BACKUP_BYTES || usage.bytes > MAX_SOURCE_JSON_BYTES || usage.bytes + usage.binaries + usage.count * 4 + UPSTREAM_MAGIC.length + 64 > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
 	}
 
-	private async read(manager: EntityManager, ownerId: string): Promise<{ archive: UpstreamArchive; rows: MiFukushuUpstreamRecord[] }> {
-		const [budget] = await manager.query('SELECT COUNT(*) FILTER (WHERE store <> \'reviewLogs\')::integer AS material, COALESCE(SUM(octet_length(data) + COALESCE("chunkedSize", octet_length(blob), 0)), 0)::text AS bytes FROM fukushu_upstream_record WHERE "ownerId" = $1', [ownerId]);
-		if (budget.material === 0) throw new MaterialError('NO_SUCH_MATERIAL');
-		if (budget.material > 20_000 || Number(budget.bytes) > MAX_BACKUP_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
-		const rows = await manager.getRepository(MiFukushuUpstreamRecord).find({ where: { ownerId }, order: { position: 'ASC', store: 'ASC', key: 'ASC' } });
-		const frames: UpstreamFrame[] = rows.map(row => ({ store: row.store as UpstreamFrame['store'], value: JSON.parse(row.data), ...(row.blob === null ? {} : { blob: new Uint8Array(row.blob) }) }));
-		return { archive: await encodeUpstreamFrames(frames), rows };
+	private materialRecords(frames: Iterable<UpstreamFrame>) {
+		const records = emptyUpstreamRecords();
+		let count = 0;
+		for (const { store, value } of frames) {
+			const parsed = v.safeParse(upstreamStoreSchemas[store], value);
+			if (!parsed.success) throw new BackupError('INVALID_BACKUP');
+			(records[store] as unknown[]).push(parsed.output);
+			checkMaterialCount(store, records, ++count, 10_000);
+		}
+		checkUpstreamRelations(records, new Set(records.media.map(row => row.id)));
+		return records;
 	}
 
 	async media(ownerId: string, id: string) {
@@ -177,23 +193,50 @@ export class FukushuUpstreamStore {
 		try { source = new TextDecoder('utf-8', { fatal: true }).decode(bytes); } catch { throw new BackupError('INVALID_BACKUP'); }
 		return this.db.transaction(async manager => {
 			await this.lock(manager, ownerId);
-			const { archive, rows } = await this.read(manager, ownerId);
-			const token = hash(JSON.stringify([ownerId, deckId, fileId, hash(bytes), archive.fileSha256]));
+			const repo = manager.getRepository(MiFukushuUpstreamRecord);
+			const usage = manager.getRepository(MiFukushuSourceUsage);
+			const budget = await usage.findOneBy({ ownerId });
+			if (!budget) throw new MaterialError('NO_SUCH_MATERIAL');
+			// Every supported collection edit appends a log or import frame under the owner lock.
+			const token = hash(JSON.stringify([ownerId, deckId, fileId, hash(bytes), budget.last]));
 			if (expected !== undefined && token !== expected) throw new StudyError('STUDY_CONFLICT');
 			const [file] = await manager.query('SELECT md5, size FROM drive_file WHERE id = $1 AND "userId" = $2 AND "userHost" IS NULL AND uri IS NULL AND NOT "isLink" FOR SHARE', [fileId, ownerId]);
 			if (!file || file.size !== bytes.length || file.md5 !== createHash('md5').update(bytes).digest('hex')) throw new BackupError('BACKUP_FAILED');
-			const { writes, summary } = planGiftUpdate(archive, deckId, source, this.clock());
+			const rows = await repo.find({
+				where: { ownerId, store: In(materialStores) },
+				select: { store: true, key: true, data: true, revision: true },
+				order: { position: 'ASC', store: 'ASC', key: 'ASC' },
+			});
+			const existing = new Map(rows.map(row => [row.store + ':' + row.key, row]));
+			const frames = new Map(rows.map(row => [row.store + ':' + row.key, { store: row.store as UpstreamFrame['store'], value: JSON.parse(row.data) }]));
+			const deck = frames.get('decks:' + key(deckId));
+			if (!deck) throw new MaterialError('NO_SUCH_MATERIAL');
+			const { writes, summary } = planGiftUpdate(this.materialRecords(frames.values()), deck.value, deckId, source, this.clock());
 			const identity = (frame: UpstreamFrame) => frame.store + ':' + key(frame.value.id ?? frame.value.questionId);
-			const frames = new Map(archive.frames().map(frame => [identity(frame), frame]));
+			const written = new Set<string>();
+			let delta = 0;
+			let appended = 0;
 			for (const frame of writes) {
-				if (frame.store === 'imports' && frames.has(identity(frame))) throw new BackupError('BACKUP_CONFLICT');
-				frames.set(identity(frame), frame);
+				const id = identity(frame);
+				if (written.has(id)) throw new BackupError('BACKUP_CONFLICT');
+				written.add(id);
+				const old = existing.get(id);
+				if (frame.store === 'imports' && old) throw new BackupError('BACKUP_CONFLICT');
+				if (old) delta += Buffer.byteLength(JSON.stringify(frame.value)) - Buffer.byteLength(old.data);
+				else {
+					delta += Buffer.byteLength(JSON.stringify(frame));
+					appended++;
+				}
+				frames.set(id, frame);
 			}
-			await encodeUpstreamFrames([...frames.values()]);
+			this.materialRecords(frames.values());
+			const count = budget.count + appended;
+			const jsonBytes = budget.bytes + delta;
+			const materialBytes = budget.materialBytes + delta;
+			if (materialBytes > MAX_BACKUP_BYTES || jsonBytes > MAX_SOURCE_JSON_BYTES ||
+				UPSTREAM_MAGIC.length + 64 + count * 4 + budget.binaries + jsonBytes > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
 			if (expected !== undefined) {
-				const repo = manager.getRepository(MiFukushuUpstreamRecord);
-				const existing = new Map(rows.map(row => [row.store + ':' + row.key, row]));
-				let position = Math.max(...rows.map(row => row.position));
+				let position = budget.last;
 				for (const frame of writes) {
 					const id = key(frame.value.id ?? frame.value.questionId);
 					const old = existing.get(identity(frame));
@@ -205,7 +248,7 @@ export class FukushuUpstreamStore {
 						await repo.insert({ ownerId, store: frame.store, key: id, data, revision: 0, blob: null, position: ++position, sourceHash: hash(bytes) });
 					}
 				}
-				await this.refreshUsage(manager, ownerId);
+				await usage.update({ ownerId }, { count, last: position, bytes: jsonBytes, materialBytes });
 			}
 			return { ...summary, token, applied: expected !== undefined };
 		});
@@ -216,60 +259,88 @@ export class FukushuUpstreamStore {
 	}
 
 	async show(ownerId: string, page?: SourceHistoryPage) {
-		return this.db.transaction('REPEATABLE READ', async manager => {
+		const indexing = page?.deckId !== undefined;
+		return this.db.transaction(indexing ? 'READ COMMITTED' : 'REPEATABLE READ', async manager => {
+			if (indexing) {
+				// All source writers take this owner lock. An older writer may have appended
+				// unindexed logs since the preceding page.
+				await this.lock(manager, ownerId);
+				await this.indexPendingReviews(manager, ownerId);
+			}
 			const repo = manager.getRepository(MiFukushuUpstreamRecord);
 			if (!page) {
 				const usage = await manager.getRepository(MiFukushuSourceUsage).findOneBy({ ownerId });
 				if (usage && usage.bytes > MAX_BACKUP_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
 			}
-			const rows = await repo.find({ where: page ? { ownerId, store: Not('reviewLogs') } : { ownerId }, select: { store: true, data: true, revision: true }, order: { position: 'ASC', store: 'ASC', key: 'ASC' } });
+			const rows = await repo.find({ where: page ? { ownerId, store: In(materialStores) } : { ownerId }, select: { store: true, key: true, data: true, revision: true, indexedReviews: true }, order: { position: 'ASC', store: 'ASC', key: 'ASC' } });
 			if (!rows.length) throw new MaterialError('NO_SUCH_MATERIAL');
 			const records = emptyUpstreamRecords();
+			const questionIds = new Map<string, string>();
+			let historyTotal = 0;
 			const revisions = [];
 			for (const row of rows) {
 				const store = row.store as keyof typeof records;
 				const value = JSON.parse(row.data);
 				(records[store] as unknown[]).push(v.parse(upstreamStoreSchemas[store], value));
+				if (store === 'decks' && page?.deckId === value.id) historyTotal = row.indexedReviews ?? 0;
+				if (store === 'questions') questionIds.set(row.key, value.id);
 				if (store === 'studyStates') revisions.push({ questionId: String(value.questionId), revision: row.revision });
 			}
 			if (page?.deckId !== undefined) {
-				const { logs, ...historyPage } = await this.historyPage(manager, ownerId, page.deckId, page);
+				const { logs, next, today } = await this.historyPage(manager, ownerId, page.deckId, page);
 				records.reviewLogs = logs;
-				return { records, revisions, historyPage };
+				return { records, revisions, historyPage: { next, total: historyTotal, today: today.map(row => questionIds.get(row.historyQuestion)).filter((id): id is string => id !== undefined) } };
 			}
 			return { records, revisions };
 		});
 	}
 
-	/** Scan a stable snapshot in small batches. Only the selected page's answers are returned to the client. */
-	private async historyPage(manager: EntityManager, ownerId: string, deckId: string, page: SourceHistoryPage) {
-		await manager.query(`DECLARE fukushu_history NO SCROLL CURSOR FOR
-			SELECT key, data FROM fukushu_upstream_record WHERE "ownerId" = $1 AND store = 'reviewLogs'`, [ownerId]);
-		type Candidate = { time: string; key: string; size: number };
-		const order = (a: { time: string; key: string }, b: { time: string; key: string }) =>
-			Date.parse(b.time) - Date.parse(a.time) || (a.key < b.key ? -1 : a.key > b.key ? 1 : 0);
-		const latest: Candidate[] = [];
-		const today = new Set<string>();
-		const start = Date.parse(page.day?.start ?? '');
-		const end = Date.parse(page.day?.end ?? '');
-		let total = 0;
+	// Negative UTC milliseconds preserve newest-first order with an ascending key tie-break.
+	private historyOrder(time: string) {
+		const millis = Date.parse(time);
+		return Number.isFinite(millis) ? String(-millis) : '9223372036854775807';
+	}
+
+	private historyFields(log: Record<string, unknown>) {
+		return { historyDeck: key(log.deckId), historyQuestion: key(log.questionId), historyOrder: this.historyOrder(String(log.reviewedAt)) };
+	}
+
+	private async indexPendingReviews(manager: EntityManager, ownerId: string) {
+		const pending = await manager.query(`SELECT 1 FROM fukushu_upstream_record WHERE "ownerId" = $1
+			AND store = 'reviewLogs' AND "historyDeck" IS NULL LIMIT 1`, [ownerId]);
+		if (!pending.length) return;
+		await manager.query(`DECLARE fukushu_pending NO SCROLL CURSOR FOR SELECT key, data FROM fukushu_upstream_record
+			WHERE "ownerId" = $1 AND store = 'reviewLogs' AND "historyDeck" IS NULL`, [ownerId]);
 		for (;;) {
-			const rows: { key: string; data: string }[] = await manager.query('FETCH FORWARD 16 FROM fukushu_history');
+			const rows: { key: string; data: string }[] = await manager.query('FETCH FORWARD 32 FROM fukushu_pending');
 			if (!rows.length) break;
-			for (const row of rows) {
-				const log = JSON.parse(row.data);
-				if (log.deckId !== deckId) continue;
-				total++;
-				const time = Date.parse(log.reviewedAt);
-				if (time >= start && time < end) today.add(log.questionId);
-				const candidate = { time: String(log.reviewedAt), key: row.key, size: Buffer.byteLength(row.data) };
-				if (page.after && order(candidate, page.after) <= 0) continue;
-				if (latest.length === 21 && order(candidate, latest[20]) >= 0) continue;
-				latest.push(candidate);
-				latest.sort(order);
-				if (latest.length > 21) latest.pop();
-			}
+			const entries = rows.map(row => {
+				return { key: row.key, ...this.historyFields(JSON.parse(row.data)) };
+			});
+			await manager.query(`WITH indexed AS (
+				UPDATE fukushu_upstream_record r SET "historyDeck" = v.deck, "historyOrder" = v.ord, "historyQuestion" = v.question
+				FROM unnest($2::text[], $3::text[], $4::bigint[], $5::text[]) AS v(key, deck, ord, question)
+				WHERE r."ownerId" = $1 AND r.store = 'reviewLogs' AND r.key = v.key AND r."historyDeck" IS NULL
+				RETURNING r."historyDeck"
+			), totals AS (SELECT "historyDeck", count(*)::int AS n FROM indexed GROUP BY "historyDeck")
+			UPDATE fukushu_upstream_record d SET "indexedReviews" = COALESCE(d."indexedReviews", 0) + t.n
+			FROM totals t WHERE d."ownerId" = $1 AND d.store = 'decks' AND d.key = t."historyDeck"`,
+			[ownerId, entries.map(e => e.key), entries.map(e => e.historyDeck), entries.map(e => e.historyOrder), entries.map(e => e.historyQuestion)]);
 		}
+	}
+
+	private async historyPage(manager: EntityManager, ownerId: string, deckId: string, page: SourceHistoryPage) {
+		const deckKey = key(deckId);
+		const parameters = page.after ? [ownerId, deckKey, this.historyOrder(page.after.time), page.after.key] : [ownerId, deckKey];
+		const after = page.after ? 'AND ("historyOrder", key COLLATE "C") > ($3::bigint, $4 COLLATE "C")' : '';
+		type Candidate = { key: string; size: number };
+		const latest: Candidate[] = await manager.query(`SELECT key, octet_length(data) AS size FROM fukushu_upstream_record
+			WHERE "ownerId" = $1 AND store = 'reviewLogs' AND "historyDeck" = $2 ${after}
+			ORDER BY "historyOrder", key COLLATE "C" LIMIT 21`, parameters);
+		const today: { historyQuestion: string }[] = page.day ? await manager.query(`SELECT DISTINCT "historyQuestion"
+			FROM fukushu_upstream_record WHERE "ownerId" = $1 AND store = 'reviewLogs' AND "historyDeck" = $2
+			AND "historyOrder" > $3 AND "historyOrder" <= $4`,
+		[ownerId, deckKey, this.historyOrder(page.day.end), this.historyOrder(page.day.start)]) : [];
 
 		const selected: Candidate[] = [];
 		let size = 0;
@@ -288,8 +359,8 @@ export class FukushuUpstreamStore {
 			return log;
 		});
 		const last = selected.at(-1);
-		const next = last && selected.length < latest.length ? { time: last.time, key: last.key } : null;
-		return { logs, total, today: [...today], next };
+		const next = last && selected.length < latest.length ? { time: logs[logs.length - 1].reviewedAt, key: last.key } : null;
+		return { logs, today, next };
 	}
 
 	/** Await each write inside a single snapshot. The caller publishes only after completion. */
@@ -372,7 +443,10 @@ export class FukushuUpstreamStore {
 			if (logBytes > MAX_BACKUP_BYTES || materialBytes > MAX_BACKUP_BYTES || jsonBytes > MAX_SOURCE_JSON_BYTES || fileBytes > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
 			await usage.update({ ownerId }, { count: budget.count + 1, last: budget.last + 1, logs: budget.logs + 1, bytes: jsonBytes, materialBytes });
 			await records.update({ ownerId, store: state.store, key: cardKey }, { data, revision: result.revision });
-			await records.insert({ ownerId, store: 'reviewLogs', key: key(id), data: logData, blob: null, revision: 0, position: budget.last + 1, sourceHash: state.sourceHash });
+			const lookup = this.historyFields(result.record);
+			await records.insert({ ...lookup, ownerId, store: 'reviewLogs', key: key(id), data: logData, blob: null, revision: 0, position: budget.last + 1, sourceHash: state.sourceHash });
+			await manager.query(`UPDATE fukushu_upstream_record SET "indexedReviews" = COALESCE("indexedReviews", 0) + 1
+				WHERE "ownerId" = $1 AND store = 'decks' AND key = $2`, [ownerId, lookup.historyDeck]);
 			await manager.getRepository(MiFukushuOperationReceipt).insert({ ownerId, id, request, result: JSON.stringify(result) });
 			return result;
 		});

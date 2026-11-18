@@ -163,8 +163,10 @@ file, then sends the completed file to Drive. A reader or writer failure
 rolls back the transaction and releases the cursor. The page bounds the row
 count; one large JSON value still needs to fit in memory. Export
 requires free temporary space and Drive quota. The library list requests only material metadata; each selected deck retrieves a separate history page. Inline media preview supports individual files
-up to 8 MiB. GIFT updates still use the small archive adapter (8 MiB archive,
-1,000 questions and study states) and 256 KiB of GIFT text. The native-v1
+up to 8 MiB. A GIFT update accepts up to 256 KiB of UTF-8 text and 1,000 incoming
+questions. It reads the owner’s material JSON, checks the resulting relations
+and accounts for the changed frames in the same transaction. Review bodies
+and attachments stay in place. The preview expires after a concurrent edit or review. The native-v1
 format keeps its independent limits.
 
 The opt-in full-application HTTP test uses `FUKUSHU_SCALE_FIXTURE=1` in its
@@ -179,7 +181,7 @@ at 100 ms intervals and excludes the client, PostgreSQL and Redis.
 
 The queued importer and the local/Drive scanners accept combined JSON over
 8 MiB when the excess comes from review history. The pilot bounds total JSON
-at 64 MiB to limit the duplicate-ID index, CPU and page scan time. The existing
+at 64 MiB to bound import validation, transaction size and the duplicate-ID index. The existing
 8 MiB non-history budget bounds the library response. Counters include the
 actual UTF-8 frame wrapper. Restore rereads at most 100 consecutive frames
 fitting in a 256 KiB window, or one larger frame, from the same private
@@ -191,15 +193,23 @@ returns up to 20 newest logs and a continuation cursor ordered by UTC time
 and record key. A page targets 256 KiB of stored answer data and includes one
 oversized log on its own. The server also returns distinct cards reviewed in
 the requested local study day so pagination cannot change the FSRS queue.
-This pilot scans the owner's logs with a transaction-local database cursor
-on each deck history request. A stored date/deck index is a follow-up if that
-scan becomes expensive. Legacy clients omitting `page` keep their full response
+New imports and reviews maintain an owner/deck index and an exact deck count
+in the source write transaction. Page selection reads up to 21 ordered keys.
+Daily limits use distinct question keys in the requested time interval, including
+reviews outside the visible page. The server still reads the bounded material
+metadata; the day query can visit every entry in that interval.
+
+On an existing installation the first deck request indexes that owner’s
+pre-migration logs in batches of 32 under the owner transaction lock. A failed
+transaction can be retried. Other users are indexed independently. Concurrent
+deck requests and writes for the same owner serialize. Index fields are derived
+from the original strings and are excluded from backup data. Legacy clients omitting `page` keep their full response
 through 8 MiB and receive an explicit capacity error above it.
 
 Review updates total and material usage with the state, new log and receipt.
 The migration backfills material bytes without changing any learning records.
 Downgrade refuses while older readers could not re-import an owner's history.
-GIFT editing continues to use its earlier, small-archive adapter.
+The deck history index migration can be reversed without modifying source frames.
 
 In an isolated ordinary-user Drive and Chrome test, the pinned upstream writer
 produced a 13,038,993-byte archive with 9,999 logs from a disposable IndexedDB.

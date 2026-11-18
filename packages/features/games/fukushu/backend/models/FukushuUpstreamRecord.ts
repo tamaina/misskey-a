@@ -2,9 +2,11 @@
  * SPDX-FileCopyrightText: misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { MiUser } from '@features/users/backend/models/User.js';
 
+@Index('IDX_fukushu_pending_history', { synchronize: false })
+@Index('IDX_fukushu_deck_history', { synchronize: false })
 @Entity('fukushu_upstream_record')
 export class MiFukushuUpstreamRecord {
 	@PrimaryColumn('varchar', { length: 32, primaryKeyConstraintName: 'PK_fukushu_upstream_record' }) public ownerId: string;
@@ -17,6 +19,10 @@ export class MiFukushuUpstreamRecord {
 	@Column('bytea', { nullable: true }) public blob: Buffer | null;
 	@Column('integer', { default: 0 }) public revision: number;
 	@Column('integer', { nullable: true }) public chunkedSize: number | null;
+	@Column('varchar', { length: 64, nullable: true }) public historyDeck: string | null;
+	@Column('varchar', { length: 64, nullable: true }) public historyQuestion: string | null;
+	@Column('bigint', { nullable: true }) public historyOrder: string | null;
+	@Column('integer', { nullable: true }) public indexedReviews: number | null;
 	@Column('integer') public position: number;
 	@Column('varchar', { length: 64 }) public sourceHash: string;
 }
