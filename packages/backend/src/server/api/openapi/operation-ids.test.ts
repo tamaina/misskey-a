@@ -112,6 +112,7 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 		['/fukushu/reminder/show', 'post___fukushu___reminder___show'],
 		['/fukushu/reminder/update', 'post___fukushu___reminder___update'],
 		['/fukushu/upstream/media', 'post___fukushu___upstream___media'],
+		['/fukushu/upstream/create-gift', 'post___fukushu___upstream___create-gift'],
 		['/fukushu/upstream/update-gift', 'post___fukushu___upstream___update-gift'],
 		['/fukushu/upstream/restore-job', 'post___fukushu___upstream___restore-job'],
 		['/fukushu/upstream/restore', 'post___fukushu___upstream___restore'],

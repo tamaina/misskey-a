@@ -59,12 +59,37 @@ function promptSimilarity(left: string, right: string): number {
 	return intersection / (a.size + b.size - intersection);
 }
 
-export function planGiftUpdate(records: UpstreamRecords, rawDeck: Record<string, unknown>, deckId: string, source: string, now: Date) {
-	const deck = records.decks.find(row => row.id === deckId);
-	if (!deck || deck.sourceType !== 'gift') throw new BackupError('INVALID_BACKUP');
+function parseGiftImport(source: string, deckId: string) {
 	const parsed = previewGift(source, deckId);
 	if (!parsed.questions.length || parsed.diagnostics.some(d => d.severity === 'error')) throw new BackupError('INVALID_BACKUP');
 	if (parsed.questions.length > 1000) throw new BackupError('UPSTREAM_INSPECTION_LIMIT');
+	return parsed;
+}
+
+// Matches saveNewDeck and defaultSettings in the pinned Fukushu app.
+export function planNewGift(deckId: string, name: string, fileName: string, source: string, now: Date, first: boolean) {
+	const { questions, sourceHash } = parseGiftImport(source, deckId);
+	const time = now.toISOString();
+	const common = { sourceType: 'gift', sourceFileName: fileName, sourceHash, sourceText: source, importedAt: time, updatedAt: time };
+	const sourceId = randomUUID();
+	const summary = { added: questions.length, changed: 0, disabled: 0, reset: 0 };
+	const writes: UpstreamFrame[] = [
+		{ store: 'importSources', value: { ...common, id: sourceId } },
+		{ store: 'decks', value: { ...common, id: deckId, sourceId, name, sourceDeckKey: name, studyMode: 'quiz', questionCount: questions.length, enabledQuestionCount: questions.length } },
+		{ store: 'imports', value: { id: randomUUID(), deckId, importedAt: time, sourceHash, added: questions.length, changed: 0, disabled: 0 } },
+	];
+	if (first) writes.unshift({ store: 'settings', value: { id: 'global', desiredRetention: 0.9, newQuestionsPerDay: 20, maxReviewsPerDay: null, checkpointInterval: 20, shuffleChoices: true, showImmediateFeedback: true, locale: 'ja', theme: 'system' } });
+	for (const [sourceOrder, payload] of questions.entries()) {
+		writes.push({ store: 'questions', value: { id: payload.id, deckId, sourceKey: payload.sourceKey, sourceOrder, kind: payload.kind, payload, enabled: true, enabledKey: 1, createdAt: time, updatedAt: time } });
+		writes.push({ store: 'studyStates', value: { questionId: payload.id, deckId, card: emptyStoredCard(now), suspended: false, suspendedKey: 0, updatedAt: time } });
+	}
+	return { writes, summary };
+}
+
+export function planGiftUpdate(records: UpstreamRecords, rawDeck: Record<string, unknown>, deckId: string, source: string, now: Date) {
+	const deck = records.decks.find(row => row.id === deckId);
+	if (!deck || deck.sourceType !== 'gift') throw new BackupError('INVALID_BACKUP');
+	const parsed = parseGiftImport(source, deckId);
 	const time = now.toISOString();
 	const previous = records.questions.filter(row => row.deckId === deckId);
 	const byKey = new Map(previous.map(row => [row.sourceKey, row]));

@@ -9,6 +9,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template v-else>
 		<div v-if="!deck" class="_buttons">
 			<MkButton :disabled="busy" primary @click="run(load)">{{ $locale.sfc.open }}</MkButton>
+			<MkButton v-if="pendingGift" :disabled="busy" @click="run(applyGift)">{{ $locale.sfc.retryGift }}</MkButton>
+			<MkButton v-else :disabled="busy" @click="createGift">{{ $locale.sfc.createGift }}</MkButton>
 			<MkButton v-if="pendingImport" :disabled="busy" @click="run(() => checkImport(true))">{{ $locale.sfc.checkImport }}</MkButton>
 			<MkButton v-else :disabled="busy" @click="restore">{{ $locale.sfc.restore }}</MkButton>
 			<MkButton v-if="records" :disabled="busy" @click="exportBackup">{{ $locale.sfc.export }}</MkButton>
@@ -144,7 +146,7 @@ async function run(action: () => Promise<void>) {
 	picker++; busy.value = true; notice.value = ''; error.value = '';
 	try { await action(); } catch (cause) {
 		const c = code(cause);
-		error.value = c === 'STUDY_CONFLICT' || c === 'BACKUP_CONFLICT' ? $locale.value.sfc.conflict : c === 'BACKUP_TOO_LARGE' || c === 'UPSTREAM_INSPECTION_LIMIT' ? $locale.value.sfc.limit : $locale.value.sfc.error;
+		error.value = c === 'INVALID_BACKUP' ? $locale.value.sfc.invalidFile : c === 'STUDY_CONFLICT' || c === 'BACKUP_CONFLICT' ? $locale.value.sfc.conflict : c === 'BACKUP_TOO_LARGE' || c === 'UPSTREAM_INSPECTION_LIMIT' ? $locale.value.sfc.limit : $locale.value.sfc.error;
 	} finally { busy.value = false; }
 }
 
@@ -240,6 +242,50 @@ async function exportBackup() {
 	});
 }
 
+type GiftConfirmation = { fileId: string; requestId: string; name: string; confirmToken: string };
+const giftKey = 'fukushu:create-gift:' + $i?.id;
+const pendingGift = shallowRef<GiftConfirmation>();
+try {
+	const saved = JSON.parse(sessionStorage.getItem(giftKey) ?? 'null');
+	if (saved && ['fileId', 'requestId', 'name', 'confirmToken'].every(key => typeof saved[key] === 'string')) pendingGift.value = saved;
+} catch { /* In-memory retry is available when session storage is unavailable. */ }
+
+function trackGift(input?: GiftConfirmation) {
+	pendingGift.value = input;
+	try {
+		if (input) sessionStorage.setItem(giftKey, JSON.stringify(input));
+		else sessionStorage.removeItem(giftKey);
+	} catch { /* Optional same-tab resume. */ }
+}
+
+async function applyGift() {
+	const input = pendingGift.value;
+	if (!input) return;
+	try {
+		await misskeyApi('fukushu/upstream/create-gift', input);
+	} catch (cause) {
+		if (['STUDY_CONFLICT', 'BACKUP_CONFLICT', 'INVALID_BACKUP', 'BACKUP_FAILED', 'BACKUP_TOO_LARGE', 'UPSTREAM_INSPECTION_LIMIT', 'NO_SUCH_FILE'].includes(String(code(cause)))) trackGift();
+		throw cause;
+	}
+	await selectDeck(input.requestId);
+	trackGift();
+}
+
+async function createGift() {
+	const file = await pickOwnedFile();
+	if (!file) return;
+	await run(async () => {
+		const answer = await os.inputText({ title: $locale.value.sfc.deckName, default: file.name.replace(/\.(gift|txt)$/i, ''), maxLength: 256 });
+		if (answer.canceled) return;
+		const input = { fileId: file.id, name: answer.result.trim() || $locale.value.sfc.untitled, requestId: crypto.randomUUID() };
+		const preview = await misskeyApi('fukushu/upstream/create-gift', input);
+		const text = input.name + '\n' + file.name + '\n' + $locale.value.sfc.added + ' ' + preview.added;
+		if ((await os.confirm({ type: 'question', title: $locale.value.sfc.createGift, text })).canceled) return;
+		trackGift({ ...input, confirmToken: preview.token });
+		await applyGift();
+	});
+}
+
 async function updateGift() {
 	const deckId = deck.value?.id;
 	if (deckId === undefined) return;
@@ -266,6 +312,11 @@ async function updateGift() {
 <locale locale="ja-JP" lang="json">
 {
 	"title": "Fukushu からの教材",
+	"createGift": "Drive の GIFT から教材を作成",
+	"retryGift": "確認済みの教材作成を再試行",
+	"deckName": "新しい教材の名前",
+	"untitled": "名称未設定の問題集",
+	"invalidFile": "ファイルを読み取れません。形式と内容を確認してください。",
 	"yes": "正しい",
 	"no": "誤り",
 	"open": "取込済み教材を開く",
@@ -312,6 +363,11 @@ async function updateGift() {
 <locale locale="en-US" lang="json">
 {
 	"title": "Decks from Fukushu",
+	"createGift": "Create a deck from a GIFT file in Drive",
+	"retryGift": "Retry confirmed deck creation",
+	"deckName": "New deck name",
+	"untitled": "Untitled deck",
+	"invalidFile": "Could not read this file. Check its format and contents.",
 	"yes": "True",
 	"no": "False",
 	"open": "Open imported decks",

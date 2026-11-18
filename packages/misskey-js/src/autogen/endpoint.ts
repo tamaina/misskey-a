@@ -123,6 +123,8 @@ import type {
 	FukushuUpstreamRestoreJobResponse,
 	FukushuUpstreamMediaRequest,
 	FukushuUpstreamMediaResponse,
+	FukushuUpstreamCreateGiftRequest,
+	FukushuUpstreamCreateGiftResponse,
 	FukushuUpstreamUpdateGiftRequest,
 	FukushuUpstreamUpdateGiftResponse,
 	FukushuUpstreamRestoreRequest,
@@ -920,6 +922,7 @@ export type Endpoints = {
 	'fukushu/backup/inspect': { req: FukushuBackupInspectRequest; res: FukushuBackupInspectResponse };
 	'fukushu/upstream/restore-job': { req: FukushuUpstreamRestoreJobRequest; res: FukushuUpstreamRestoreJobResponse };
 	'fukushu/upstream/media': { req: FukushuUpstreamMediaRequest; res: FukushuUpstreamMediaResponse };
+	'fukushu/upstream/create-gift': { req: FukushuUpstreamCreateGiftRequest; res: FukushuUpstreamCreateGiftResponse };
 	'fukushu/upstream/update-gift': { req: FukushuUpstreamUpdateGiftRequest; res: FukushuUpstreamUpdateGiftResponse };
 	'fukushu/upstream/restore': { req: FukushuUpstreamRestoreRequest; res: FukushuUpstreamRestoreResponse };
 	'fukushu/upstream/show': { req: FukushuUpstreamShowRequest; res: FukushuUpstreamShowResponse };

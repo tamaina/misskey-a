@@ -133,7 +133,15 @@ For multi-page files it gives decoded bytes to the browser to build a Blob and
 revokes the object URL when the card closes. Playback and seeking start after
 the download completes. The client respects the existing API rate limit.
 
-For a GIFT deck, choose an owned UTF-8 .gift or .txt file (up to 256 KiB).
+Choose **Create a deck from a GIFT file in Drive** to add a separate quiz deck.
+Select a UTF-8 `.gift` or `.txt` file (up to 256 KiB and 1,000 questions), enter
+the deck name, then confirm the question count. A deck with the same name can
+coexist. The transaction stores the source text, source filename, question order
+and initial FSRS states together. If a response is lost, retry the confirmed
+creation from the same browser tab. The source backup includes the new deck
+and its subsequent reviews.
+
+To update an existing GIFT deck, choose an owned UTF-8 .gift or .txt file (up to 256 KiB).
 Preview the counts before applying. Source keys match existing IDs. Incompatible
 answers or substantial prompt changes reset the current schedule as in the
 pinned app. Missing questions are disabled; their history stays attached.

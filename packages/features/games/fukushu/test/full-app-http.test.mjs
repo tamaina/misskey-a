@@ -78,7 +78,7 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		const password = `Fukushu-${randomUUID()}`;
 		const admin = ok(await call('admin/accounts/create', { username: 'fukushu_admin', password, setupPassword: credentials.setupPassword }));
 		credentials.admin = { username: 'fukushu_admin', password, token: admin.token, id: admin.id };
-		for (const username of ['fukushu_alice', 'fukushu_bob', 'fukushu_carol', 'fukushu_dana']) {
+		for (const username of ['fukushu_alice', 'fukushu_bob', 'fukushu_carol', 'fukushu_dana', 'fukushu_gift']) {
 			ok(await call('admin/accounts/create', { username, password }, admin.token));
 			// Keep the real IP rate limiter enabled: password logins are at least 1s apart.
 			await setTimeout(1100);
@@ -770,5 +770,44 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		} finally { clearInterval(monitor); }
 		// Fresh owner and source for the independent browser flow.
 		await upload(credentials.dana);
+	});
+	await step('normal owner previews and appends a new GIFT deck, studies it and exports the original source', async () => {
+		const owner = credentials.gift;
+		const source = '$CATEGORY: Biology\n\n::leaf:: Leaves absorb light. {TRUE}\n\n::root:: Name the plant part. {=root}';
+		const form = new FormData();
+		form.set('i', owner.token); form.set('file', new Blob([source], { type: 'text/plain' }), 'biology.gift.txt');
+		const file = ok(await readResponse(await fetch(origin + '/api/drive/files/create', { method: 'POST', body: form, headers: { origin } })));
+		const input = { name: 'Biology GIFT', fileId: file.id, requestId: randomUUID() };
+		const anonymous = await call('fukushu/upstream/create-gift', input);
+		assert.equal(anonymous.status, 400);
+		assert.equal(anonymous.body.error.code, 'ACCESS_DENIED');
+		assert.equal((await call('fukushu/upstream/create-gift', { ...input, ownerId: owner.id }, alice.token)).status, 404);
+		const preview = ok(await call('fukushu/upstream/create-gift', input, owner.token));
+		assert.equal(preview.added, 2); assert.equal(preview.applied, false);
+		const apply = () => call('fukushu/upstream/create-gift', { ...input, confirmToken: preview.token }, owner.token);
+		const [created, replay] = await Promise.all([apply(), apply()]);
+		assert.deepEqual(ok(created), ok(replay));
+		const { records } = ok(await call('fukushu/upstream/show', { page: {} }, owner.token));
+		const q = records.questions.find(q => q.deckId === input.requestId && q.kind === 'true-false');
+		assert.ok(q);
+		const review = ok(await call('fukushu/upstream/review', { questionId: q.id, requestId: randomUUID(), expectedRevision: 0, durationMs: 321, answers: ['true'], rating: 'good', correct: true }, owner.token));
+		ok(await call('fukushu/upstream/export', { acknowledgeDriveVisibility: true }, owner.token), 204);
+		let backup;
+		const deadline = Date.now() + 40000;
+		while (!backup && Date.now() < deadline) {
+			const notes = ok(await call('i/notifications', { includeTypes: ['exportCompleted'], limit: 10 }, owner.token));
+			const event = notes.find(n => n.exportedEntity === 'fukushu');
+			if (event) backup = ok(await call('drive/files/show', { fileId: event.fileId }, owner.token));
+			else await setTimeout(400);
+		}
+		assert.ok(backup);
+		const response = await fetch(backup.url, { redirect: 'error' });
+		assert.equal(response.status, 200);
+		const bytes = Buffer.from(await response.arrayBuffer());
+		const frames = sourceFrames(bytes);
+		assert.equal(frames.find(f => f.store === 'decks' && f.value.id === input.requestId).value.sourceText, source);
+		assert.deepEqual(frames.find(f => f.store === 'reviewLogs' && f.value.id === review.record.id).value, review.record);
+		await writeFile(join(directory, 'newgift.fukushu'), bytes);
+		await writeFile(join(directory, 'newgift.json'), JSON.stringify({ source, deckId: input.requestId, state: review.state, record: review.record }));
 	});
 });

@@ -35,6 +35,10 @@ export const upstreamContract = {
 		.route({ method: 'POST', path: '/fukushu/upstream/media', tags: ['fukushu'] })
 		.input(objectInput({ id: v.pipe(v.string(), v.regex(/^[a-f0-9]{64}$/)), offset: v.optional(integer) }))
 		.output(v.object({ mimeType: v.string(), base64: v.string(), totalBytes: v.optional(integer) })),
+	upstreamCreateGift: base.$meta({ ...backup, requestName: 'fukushu/upstream/create-gift' } as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/fukushu/upstream/create-gift', tags: ['fukushu'] })
+		.input(objectInput({ requestId: studyRequestIdSchema, name: v.pipe(v.string(), v.trim(), v.nonEmpty(), v.maxLength(256)), fileId: v.string(), confirmToken: v.optional(v.pipe(v.string(), v.regex(/^[a-f0-9]{64}$/))) }))
+		.output(v.object({ token: v.string(), applied: v.boolean(), added: integer, changed: integer, disabled: integer, reset: integer })),
 	upstreamUpdateGift: base.$meta({ ...backup, requestName: 'fukushu/upstream/update-gift' } as const satisfies Meta & ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/fukushu/upstream/update-gift', tags: ['fukushu'] })
 		.input(objectInput({ deckId: v.string(), fileId: v.string(), confirmToken: v.optional(v.pipe(v.string(), v.regex(/^[a-f0-9]{64}$/))) }))

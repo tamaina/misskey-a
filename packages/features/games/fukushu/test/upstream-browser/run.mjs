@@ -72,7 +72,21 @@ try {
 	page.on('pageerror', error => console.error(error));
 	await page.goto(`http://127.0.0.1:${server.address().port}/`);
 	await page.waitForFunction(() => window.compatibility);
-	if (process.env.FUKUSHU_LONG_HISTORY === 'generate') {
+	if (process.env.FUKUSHU_NEW_GIFT === 'verify') {
+		const saved = JSON.parse(await readFile(process.env.FUKUSHU_PERSISTED_STATE, 'utf8'));
+		await page.locator('#fixture').setInputFiles(process.env.FUKUSHU_PERSISTED_EXPORT);
+		const result = await page.evaluate(input => window.compatibility.verifyNewGift(input), saved);
+		assert.deepEqual(result.state, saved.state);
+		assert.deepEqual(result.log, saved.record);
+		assert.deepEqual(result.from9k, result.fromGift);
+		assert.equal(result.sourceText, saved.source);
+		assert.equal(result.sourceFileName, 'biology.gift.txt');
+		assert.equal(result.from9k.length, 2);
+		assert.equal(result.preserved, true);
+		assert.equal(result.reps, saved.state.card.reps + 1);
+		assert.equal(result.count, 2);
+		console.log(JSON.stringify({ upstream: pinned, chrome: browser.version(), sourceFileName: result.sourceFileName, questions: result.from9k.length, preserved: result.preserved, reps: result.reps, reviewCount: result.count, reexportBytes: result.bytes }));
+	} else if (process.env.FUKUSHU_LONG_HISTORY === 'generate') {
 		await page.locator('#fixture').setInputFiles(join(here, '../backend/fixtures/actual-upstream/actual-upstream.fukushu'));
 		const download = page.waitForEvent('download');
 		const result = await page.evaluate(() => window.compatibility.longHistory());

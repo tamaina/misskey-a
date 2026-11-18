@@ -53,7 +53,7 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 	beforeAll(async () => {
 		await db.initialize(); await db.query('CREATE SCHEMA fukushu_upstream_test');
 		await db.query('CREATE TABLE "user" (id varchar(32) PRIMARY KEY)');
-		await db.query('CREATE TABLE drive_file (id varchar(32) PRIMARY KEY, "userId" varchar(32) REFERENCES "user"(id), "userHost" text, uri text, "isLink" boolean NOT NULL DEFAULT false, size integer NOT NULL, md5 text NOT NULL)');
+		await db.query('CREATE TABLE drive_file (id varchar(32) PRIMARY KEY, name text NOT NULL DEFAULT \'fixture.gift\', "userId" varchar(32) REFERENCES "user"(id), "userHost" text, uri text, "isLink" boolean NOT NULL DEFAULT false, size integer NOT NULL, md5 text NOT NULL)');
 		const runner = db.createQueryRunner();
 		try { for (const Migration of [FukushuMaterial1794838800000, FukushuMaterialManagement1794871800000, FukushuQuestionVersions1794880800000, FukushuStudy1794891600000, FukushuUpstreamStore1794924000000, FukushuSourceChunks1794974400000, FukushuMaterialBytes1794980000000, FukushuDeckHistoryIndex1794990000000, FukushuReminder1795040000000]) await new Migration().up(runner); } finally { await runner.release(); }
 	});
@@ -249,6 +249,57 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		await expect(store.restore('bob', file, request)).rejects.toThrow('NO_SUCH_FILE');
 		await store.restore('bob', await upload('bob'), randomUUID());
 		expect(await store.show('alice')).toEqual(await store.show('bob'));
+	});
+
+	test('creates a GIFT collection atomically and replays the confirmed creation', async () => {
+		const source = '$CATEGORY: Biology\n\n::leaf:: Leaves absorb light. {TRUE}';
+		const bytes = Buffer.from(source);
+		const fileId = await upload('alice', bytes);
+		const input = { fileId, name: 'Biology', requestId: randomUUID() };
+		const read = async () => bytes;
+		const preview = await store.createGift('alice', input, read);
+		expect(preview).toMatchObject({ applied: false, added: 1 });
+		expect(await counts()).toEqual({ records: 0, receipts: 0 });
+		const confirmed = { ...input, confirmToken: preview.token };
+		await expect(store.createGift('bob', confirmed, read)).rejects.toThrow();
+		await expect(store.createGift('alice', { ...confirmed, name: 'Other' }, read)).rejects.toThrow('STUDY_CONFLICT');
+		await db.query("CREATE FUNCTION fail_gift() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'receipt rollback'; END $$");
+		await db.query('CREATE TRIGGER reject_gift BEFORE INSERT ON fukushu_operation_receipt FOR EACH ROW EXECUTE FUNCTION fail_gift()');
+		try {
+			await expect(store.createGift('alice', confirmed, read)).rejects.toThrow('receipt rollback');
+			expect(await counts()).toEqual({ records: 0, receipts: 0 });
+			expect(await db.query('SELECT 1 FROM fukushu_source_usage')).toEqual([]);
+		} finally { await db.query('DROP TRIGGER reject_gift ON fukushu_operation_receipt'); await db.query('DROP FUNCTION fail_gift()'); }
+		const [applied, replay] = await Promise.all([store.createGift('alice', confirmed, read), store.createGift('alice', confirmed, read)]);
+		expect(applied.applied).toBe(true); expect(replay).toEqual(applied);
+		const records = (await store.show('alice')).records;
+		expect(records.settings).toHaveLength(1);
+		expect(records.decks).toHaveLength(1);
+		expect(records.decks[0]).toMatchObject({ id: input.requestId, name: input.name, sourceFileName: 'fixture.gift', sourceText: source });
+		expect(records.importSources[0]).toMatchObject({ id: records.decks[0].sourceId, sourceText: source, sourceHash: records.decks[0].sourceHash });
+		expect(records.questions[0].payload.categoryPath).toEqual(['Biology']);
+		expect(records.studyStates[0].card.reps).toBe(0);
+		await expect(store.createGift('alice', confirmed, async () => { throw new Error('lost original'); })).resolves.toEqual(applied);
+		await expect(store.show('bob')).rejects.toThrow('NO_SUCH_MATERIAL');
+	});
+
+	test('appends a separate GIFT deck without replacing existing source frames, user settings or review history', async () => {
+		await store.restore('alice', await upload('alice'), randomUUID());
+		const before = await exported(store, 'alice');
+		const { reviewedAt: _at, ...review } = expected.reset.request;
+		const source = Buffer.from('::same title:: A new question. {TRUE}');
+		const input = { fileId: await upload('alice', source), requestId: randomUUID(), name: 'Compatibility reset example' };
+		const preview = await store.createGift('alice', input, async () => source);
+		await store.review('alice', review);
+		const reviewed = await exported(store, 'alice');
+		expect(reviewed).not.toEqual(before);
+		await store.createGift('alice', { ...input, confirmToken: preview.token }, async () => source);
+		const after = await exported(store, 'alice');
+		expect(after.subarray(0, reviewed.length - 64).equals(reviewed.subarray(0, -64))).toBe(true);
+		const absent = Buffer.from('// just a comment');
+		const invalid = { ...input, fileId: await upload('alice', absent), requestId: randomUUID() };
+		await expect(store.createGift('alice', invalid, async () => absent)).rejects.toThrow('INVALID_BACKUP');
+		expect(await exported(store, 'alice')).toEqual(after);
 	});
 
 	test('serves owned media and atomically updates a GIFT deck without rewriting history or APKG data', async () => {

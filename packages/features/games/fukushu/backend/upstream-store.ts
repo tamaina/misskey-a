@@ -10,7 +10,7 @@ import { checkMaterialCount, checkUpstreamRelations, emptyUpstreamRecords, UPSTR
 import { upstreamStoreSchemas } from '../shared/upstream-records.schema.js';
 import { studyRequestIdSchema } from '../shared/study.schema.js';
 import { MAX_BACKUP_BYTES } from '../shared/backup.schema.js';
-import { planGiftUpdate } from './gift-update.js';
+import { planGiftUpdate, planNewGift } from './gift-update.js';
 import { BackupError } from './backup-codec.js';
 import { MaterialError } from './store.js';
 import { StudyError } from './study-store.js';
@@ -214,6 +214,19 @@ export class FukushuUpstreamStore {
 	}
 
 	async updateGift(ownerId: string, deckId: string, fileId: string, readGift: () => Promise<Buffer>, expected?: string) {
+		return this.saveGift(ownerId, deckId, fileId, readGift, expected);
+	}
+
+	async createGift(ownerId: string, input: { requestId: string; fileId: string; name: string; confirmToken?: string }, readGift: () => Promise<Buffer>) {
+		return this.saveGift(ownerId, input.requestId, input.fileId, readGift, input.confirmToken, input.name);
+	}
+
+	private async saveGift(ownerId: string, deckId: string, fileId: string, readGift: () => Promise<Buffer>, expected?: string, newName?: string): Promise<{ added: number; changed: number; disabled: number; reset: number; token: string; applied: boolean }> {
+		const request = JSON.stringify(['createGift', fileId, newName, expected]);
+		if (newName !== undefined && expected !== undefined) {
+			const prior = await this.receipt(this.db.manager, ownerId, deckId, request);
+			if (prior) return prior;
+		}
 		const bytes = await readGift();
 		let source: string;
 		try { source = new TextDecoder('utf-8', { fatal: true }).decode(bytes); } catch { throw new BackupError('INVALID_BACKUP'); }
@@ -221,13 +234,20 @@ export class FukushuUpstreamStore {
 			await this.lock(manager, ownerId);
 			const repo = manager.getRepository(MiFukushuUpstreamRecord);
 			const usage = manager.getRepository(MiFukushuSourceUsage);
-			const budget = await usage.findOneBy({ ownerId });
-			if (!budget) throw new MaterialError('NO_SUCH_MATERIAL');
-			// Every supported collection edit appends a log or import frame under the owner lock.
-			const token = hash(JSON.stringify([ownerId, deckId, fileId, hash(bytes), budget.last]));
-			if (expected !== undefined && token !== expected) throw new StudyError('STUDY_CONFLICT');
-			const [file] = await manager.query('SELECT md5, size FROM drive_file WHERE id = $1 AND "userId" = $2 AND "userHost" IS NULL AND uri IS NULL AND NOT "isLink" FOR SHARE', [fileId, ownerId]);
+			if (newName !== undefined && expected !== undefined) {
+				const prior = await this.receipt(manager, ownerId, deckId, request);
+				if (prior) return prior;
+			}
+			const storedBudget = await usage.findOneBy({ ownerId });
+			if (!storedBudget && newName === undefined) throw new MaterialError('NO_SUCH_MATERIAL');
+			const budget = storedBudget ?? { count: 0, last: -1, logs: 0, bytes: 0, materialBytes: 0, binaries: 0 };
+			const [file] = await manager.query('SELECT name, md5, size FROM drive_file WHERE id = $1 AND "userId" = $2 AND "userHost" IS NULL AND uri IS NULL AND NOT "isLink" FOR SHARE', [fileId, ownerId]);
 			if (!file || file.size !== bytes.length || file.md5 !== createHash('md5').update(bytes).digest('hex')) throw new BackupError('BACKUP_FAILED');
+			if (newName !== undefined && !/\.(gift|txt)$/i.test(file.name)) throw new BackupError('INVALID_BACKUP');
+			const sourceHash = hash(bytes);
+			const token = newName === undefined ? hash(JSON.stringify([ownerId, deckId, fileId, sourceHash, budget.last]))
+				: hash(JSON.stringify(['createGift', ownerId, deckId, fileId, file.name, newName, sourceHash]));
+			if (expected !== undefined && token !== expected) throw new StudyError('STUDY_CONFLICT');
 			const rows = await repo.find({
 				where: { ownerId, store: In(materialStores) },
 				select: { store: true, key: true, data: true, revision: true },
@@ -236,8 +256,11 @@ export class FukushuUpstreamStore {
 			const existing = new Map(rows.map(row => [row.store + ':' + row.key, row]));
 			const frames = new Map(rows.map(row => [row.store + ':' + row.key, { store: row.store as UpstreamFrame['store'], value: JSON.parse(row.data) }]));
 			const deck = frames.get('decks:' + key(deckId));
-			if (!deck) throw new MaterialError('NO_SUCH_MATERIAL');
-			const { writes, summary } = planGiftUpdate(this.materialRecords(frames.values()), deck.value, deckId, source, this.clock());
+			if (newName === undefined && !deck) throw new MaterialError('NO_SUCH_MATERIAL');
+			if (newName !== undefined && (deck || (await manager.query('SELECT 1 FROM fukushu_deck WHERE "ownerId" = $1 AND id = $2', [ownerId, deckId])).length)) throw new BackupError('BACKUP_CONFLICT');
+			const { writes, summary } = newName === undefined
+				? planGiftUpdate(this.materialRecords(frames.values()), deck!.value, deckId, source, this.clock())
+				: planNewGift(deckId, newName, file.name, source, this.clock(), !storedBudget);
 			const identity = (frame: UpstreamFrame) => frame.store + ':' + key(frame.value.id ?? frame.value.questionId);
 			const written = new Set<string>();
 			let delta = 0;
@@ -247,7 +270,7 @@ export class FukushuUpstreamStore {
 				if (written.has(id)) throw new BackupError('BACKUP_CONFLICT');
 				written.add(id);
 				const old = existing.get(id);
-				if (frame.store === 'imports' && old) throw new BackupError('BACKUP_CONFLICT');
+				if ((newName !== undefined || frame.store === 'imports') && old) throw new BackupError('BACKUP_CONFLICT');
 				if (old) delta += Buffer.byteLength(JSON.stringify(frame.value)) - Buffer.byteLength(old.data);
 				else {
 					delta += Buffer.byteLength(JSON.stringify(frame));
@@ -263,18 +286,21 @@ export class FukushuUpstreamStore {
 				UPSTREAM_MAGIC.length + 64 + count * 4 + budget.binaries + jsonBytes > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
 			if (expected !== undefined) {
 				let position = budget.last;
+				const inserts: MiFukushuUpstreamRecord[] = [];
 				for (const frame of writes) {
 					const id = key(frame.value.id ?? frame.value.questionId);
 					const old = existing.get(identity(frame));
 					const data = JSON.stringify(frame.value);
-					if (old) {
-						await repo.update({ ownerId, store: frame.store, key: id }, { data, revision: old.revision + 1 });
-					} else {
-						if (frame.store === 'questions' && (await manager.query('SELECT 1 FROM fukushu_question WHERE "ownerId" = $1 AND id = $2', [ownerId, frame.value.id])).length) throw new BackupError('BACKUP_CONFLICT');
-						await repo.insert({ ownerId, store: frame.store, key: id, data, revision: 0, blob: null, position: ++position, sourceHash: hash(bytes) });
-					}
+					if (old) await repo.update({ ownerId, store: frame.store, key: id }, { data, revision: old.revision + 1 });
+					else inserts.push(repo.create({ ownerId, store: frame.store, key: id, data, revision: 0, blob: null, position: ++position, sourceHash }));
 				}
-				await usage.update({ ownerId }, { count, last: position, bytes: jsonBytes, materialBytes });
+				const questionIds = writes.filter(frame => frame.store === 'questions' && !existing.has(identity(frame))).map(frame => frame.value.id);
+				if (questionIds.length && (await manager.query('SELECT 1 FROM fukushu_question WHERE "ownerId" = $1 AND id = ANY($2::text[]) LIMIT 1', [ownerId, questionIds])).length) throw new BackupError('BACKUP_CONFLICT');
+				for (let i = 0; i < inserts.length; i += 100) await repo.insert(inserts.slice(i, i + 100));
+				const totals = { count, last: position, bytes: jsonBytes, materialBytes };
+				if (storedBudget) await usage.update({ ownerId }, totals);
+				else await usage.insert({ ownerId, logs: 0, binaries: 0, ...totals });
+				if (newName !== undefined) await manager.getRepository(MiFukushuOperationReceipt).insert({ ownerId, id: deckId, request, result: JSON.stringify({ ...summary, token, applied: true }) });
 			}
 			return { ...summary, token, applied: expected !== undefined };
 		});

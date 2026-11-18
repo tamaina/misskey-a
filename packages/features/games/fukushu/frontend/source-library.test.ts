@@ -7,6 +7,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/vu
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { chooseDriveFile } from '@features/drive/frontend/utility/drive.js';
+import * as os from '@features/ui/frontend/os.js';
 import SourceLibrary from './components/SourceLibrary.vue';
 import SourceContent from './components/SourceContent.vue';
 import SourceStudy from './components/SourceStudy.vue';
@@ -17,7 +18,7 @@ import type { UpstreamRecords } from '../shared/upstream-records.schema.js';
 
 vi.mock('@features/api/frontend/utility/misskey-api.js', () => ({ misskeyApi: vi.fn() }));
 vi.mock('@features/drive/frontend/utility/drive.js', () => ({ chooseDriveFile: vi.fn() }));
-vi.mock('@features/ui/frontend/os.js', () => ({ confirm: vi.fn() }));
+vi.mock('@features/ui/frontend/os.js', () => ({ confirm: vi.fn(), inputText: vi.fn() }));
 const i18n = createInternationalization({ initialLocale: 'ja-JP' });
 const global = { plugins: [i18n] };
 beforeAll(async () => { await i18n.ready; });
@@ -139,4 +140,18 @@ test('a dismissed or stale Drive picker leaves the library usable and cannot res
 	resolvePick([{ id: 'stale', name: 'ignored.fukushu' } as never]);
 	await Promise.resolve();
 	expect(vi.mocked(misskeyApi).mock.calls.map(call => call[0])).toEqual(['fukushu/upstream/show']);
+});
+
+test('cancelling the GIFT preview leaves the deck uncreated', async () => {
+	vi.mocked(chooseDriveFile).mockResolvedValue([{ id: 'gift-file', name: 'seasons.gift' } as never]);
+	vi.mocked(os.inputText).mockResolvedValue({ canceled: false, result: 'Seasons' });
+	vi.mocked(os.confirm).mockResolvedValue({ canceled: true });
+	vi.mocked(misskeyApi).mockResolvedValue({ added: 2, token: 'preview', applied: false } as never);
+	render(SourceLibrary, { global });
+	await fireEvent.click(screen.getByText('Drive の GIFT から教材を作成'));
+	await waitFor(() => expect(os.confirm).toHaveBeenCalledOnce());
+	expect(misskeyApi).toHaveBeenCalledExactlyOnceWith('fukushu/upstream/create-gift', {
+		fileId: 'gift-file', name: 'Seasons', requestId: expect.any(String),
+	});
+	expect(screen.queryByText('確認済みの教材作成を再試行')).toBeNull();
 });

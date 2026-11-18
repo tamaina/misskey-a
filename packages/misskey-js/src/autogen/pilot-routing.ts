@@ -4131,6 +4131,85 @@ export default {
 				}
 			}
 		},
+		"upstreamCreateGift": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"requestName": "fukushu/upstream/create-gift"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/upstream/create-gift",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
 		"upstreamUpdateGift": {
 			"~orpc": {
 				"errorMap": {

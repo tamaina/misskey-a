@@ -107,4 +107,34 @@ async function longHistory(saved) {
 	};
 }
 
-Object.assign(window, { compatibility: { generate, restoreAndContinue, longHistory } });
+// Run in a fresh IndexedDB with a 9k export from the GIFT HTTP fixture.
+async function verifyNewGift({ source, deckId, state, record }) {
+	await restoreBackupFile(document.querySelector('#fixture').files[0]);
+	const db = await database();
+	const deck = await db.get('decks', deckId);
+	const original = await db.get('importSources', deck.sourceId);
+	const savedState = await db.get('studyStates', state.questionId);
+	const log = await db.get('reviewLogs', record.id);
+	const clock = { now: () => new Date(Date.parse(record.reviewedAt) + 86400000) };
+	const item = (await buildStudyQueue(clock, deckId, true)).find(q => q.question.id === state.questionId);
+	await recordReview(item, 'good', true, ['true'], 500, clock);
+	const archive = await createBackupArchive();
+	await restoreBackupFile(archive);
+	const restored = await database();
+	const logs = await restored.getAll('reviewLogs');
+	const next = await restored.get('studyStates', state.questionId);
+	const comparisonId = crypto.randomUUID();
+	await saveNewDeck(deck.name, await previewGift(source, comparisonId), original.sourceFileName);
+	const all = await restored.getAll('questions');
+	// Only the automatically assigned identities differ for this two-kind fixture.
+	const material = id => all.filter(q => q.deckId === id).sort((a, b) => a.sourceOrder - b.sourceOrder)
+		.map(q => ({ ...q.payload, id: undefined, deckId: undefined }));
+	return {
+		state: savedState, log, from9k: material(deckId), fromGift: material(comparisonId),
+		sourceText: original.sourceText, sourceFileName: original.sourceFileName,
+		preserved: logs.some(row => JSON.stringify(row) === JSON.stringify(log)),
+		count: logs.length, reps: next.card.reps, bytes: archive.size,
+	};
+}
+
+Object.assign(window, { compatibility: { generate, restoreAndContinue, longHistory, verifyNewGift } });
