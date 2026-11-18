@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <section class="_gaps" :aria-busy="busy">
 	<template v-if="item">
-		<div>{{ index + 1 }} / {{ questions.length }}</div>
+		<div>{{ index + 1 }} / {{ questions.length }}<span v-if="currentDeck"> · {{ currentDeck.name }}</span></div>
 		<SourceContent :anki="item.payload.kind === 'flashcard' ? item.payload : undefined" :content="item.payload.prompt"/>
 		<fieldset v-if="!revealed && (!flash || needsText)" class="_gaps_s">
 			<legend>{{ $locale.sfc.answer }}</legend>
@@ -59,12 +59,13 @@ import type { SourceQuestion } from '../source-study.js';
 import type { GradeResult } from '../../../shared/fukushu-grading.js';
 import type { StudyRating } from '../../shared/study.schema.js';
 
-const props = defineProps<{ questions: SourceQuestion[]; revisions: Map<string, number>; flashMode: boolean; immediate: boolean; shuffle: boolean }>();
+const props = defineProps<{ questions: SourceQuestion[]; revisions: Map<string, number>; flashMode: boolean; sessionDecks?: ReadonlyMap<string, { name: string; studyMode: string }>; immediate: boolean; shuffle: boolean }>();
 const emit = defineEmits<{ close: [] }>();
 const ratings = ['again', 'hard', 'good', 'easy'] as const;
 const index = ref(0);
 const item = computed(() => props.questions[index.value]);
-const flash = computed(() => props.flashMode || item.value?.kind === 'flashcard');
+const currentDeck = computed(() => props.sessionDecks?.get(item.value?.deckId));
+const flash = computed(() => props.flashMode || currentDeck.value?.studyMode === 'flashcard' || item.value?.kind === 'flashcard');
 const selfRated = computed(() => flash.value || ['essay', 'description'].includes(item.value?.kind));
 const needsText = computed(() => item.value?.payload.kind === 'flashcard' && item.value.payload.typeAnswer);
 const selected = ref<string[]>([]);

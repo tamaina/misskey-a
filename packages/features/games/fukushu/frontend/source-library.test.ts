@@ -155,3 +155,36 @@ test('cancelling the GIFT preview leaves the deck uncreated', async () => {
 	});
 	expect(screen.queryByText('確認済みの教材作成を再試行')).toBeNull();
 });
+
+test('studies enabled cards across imported decks and preserves the mode and revision of each card', async () => {
+	const other = { ...question, id: 'b', deckId: 'another', payload: { ...question.payload, id: 'b', deckId: 'another' } };
+	const records = {
+		settings: [{ maxReviewsPerDay: 0, newQuestionsPerDay: 0, shuffleChoices: false, showImmediateFeedback: true }],
+		decks: [{ id: 'deck', name: 'Quiz', studyMode: 'quiz' }, { id: 'another', name: 'Flash', studyMode: 'flashcard' }],
+		questions: [question, other], reviewLogs: [],
+		studyStates: [
+			{ questionId: question.id, deckId: 'deck', suspended: false, card: { reps: 1, due: '2099-01-01' } },
+			{ questionId: 'b', deckId: 'another', suspended: false, card: { reps: 0 } },
+		],
+	};
+	const response = { records, revisions: [{ questionId: question.id, revision: 3 }, { questionId: 'b', revision: 0 }] };
+	vi.mocked(misskeyApi).mockResolvedValue(response as never);
+	render(SourceLibrary, { global });
+	await fireEvent.click(screen.getByText('取込済み教材を開く'));
+	await fireEvent.click(await screen.findByText('すべての取込済み教材を予定外も含めて復習'));
+	await screen.findByText('· Quiz');
+	await fireEvent.click(screen.getAllByRole('checkbox')[0]);
+	await fireEvent.click(screen.getByText('採点する'));
+	await fireEvent.click(screen.getByText('できた'));
+	await screen.findByText('· Flash');
+	await fireEvent.click(screen.getByText('答えを見る'));
+	await fireEvent.click(screen.getByText('できた'));
+	await screen.findByText('この回の復習は終了です。');
+	const writes = vi.mocked(misskeyApi).mock.calls.filter(call => call[0] === 'fukushu/upstream/review');
+	expect(writes.map(call => call[1])).toMatchObject([
+		{ questionId: question.id, expectedRevision: 3, correct: true, answers: ['a'] },
+		{ questionId: 'b', expectedRevision: 0, correct: true, answers: [] },
+	]);
+	await fireEvent.click(screen.getByText('教材に戻る'));
+	await screen.findByText('取込済み教材を開く');
+});

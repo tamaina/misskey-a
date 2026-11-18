@@ -4,8 +4,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 <template>
 <section class="_panel _gaps" :class="$style.panel" :aria-busy="busy">
-	<h2>{{ session && deck ? deck.name : $locale.sfc.title }}</h2>
-	<SourceStudy v-if="session && deck && records" :questions="session" :revisions="revisions" :flashMode="deck.studyMode === 'flashcard'" :shuffle="records.settings[0].shuffleChoices" :immediate="records.settings[0].showImmediateFeedback" @close="closeStudy"/>
+	<h2>{{ session ? (deck?.name ?? $locale.sfc.cramAll) : $locale.sfc.title }}</h2>
+	<SourceStudy v-if="session && records" :questions="session" :revisions="revisions" :sessionDecks="deck ? undefined : sessionDecks" :flashMode="deck?.studyMode === 'flashcard'" :shuffle="records.settings[0].shuffleChoices" :immediate="records.settings[0].showImmediateFeedback" @close="closeStudy"/>
 	<template v-else>
 		<div v-if="!deck" class="_buttons">
 			<MkButton :disabled="busy" primary @click="run(load)">{{ $locale.sfc.open }}</MkButton>
@@ -13,6 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkButton v-else :disabled="busy" @click="createGift">{{ $locale.sfc.createGift }}</MkButton>
 			<MkButton v-if="pendingImport" :disabled="busy" @click="run(() => checkImport(true))">{{ $locale.sfc.checkImport }}</MkButton>
 			<MkButton v-else :disabled="busy" @click="restore">{{ $locale.sfc.restore }}</MkButton>
+			<MkButton v-if="records && records.decks.length > 1" :disabled="busy" @click="run(() => start(true))">{{ $locale.sfc.cramAll }}</MkButton>
 			<MkButton v-if="records" :disabled="busy" @click="exportBackup">{{ $locale.sfc.export }}</MkButton>
 		</div>
 		<p v-if="loaded && !records?.decks.length">{{ $locale.sfc.empty }}</p>
@@ -85,6 +86,7 @@ const records = shallowRef<UpstreamRecords>();
 const revisions = shallowRef(new Map<string, number>());
 const selected = ref<string | null>(null);
 const deck = computed(() => records.value?.decks.find(d => d.id === selected.value));
+const sessionDecks = computed(() => new Map(records.value?.decks.map(d => [d.id, d])));
 const cards = computed(() => records.value?.questions.filter(q => q.deckId === selected.value).sort((a, b) => (a.sourceOrder ?? Infinity) - (b.sourceOrder ?? Infinity)) ?? []);
 const cardNames = computed(() => new Map(cards.value.map(q => [q.id, q.payload.name ?? (q.payload.prompt.format === 'plain' ? q.payload.prompt.value : q.sourceKey)])));
 const reviewHistory = computed(() => records.value?.reviewLogs ?? []);
@@ -195,13 +197,14 @@ function toggleAnswer(id: string, event: Event) {
 async function start(cram: boolean) {
 	const now = new Date();
 	if (studyDay(now).start !== loadedDay) await load();
-	if (!deck.value || !records.value) return;
-	const items = queue(records.value, deck.value.id, now, cram, reviewedToday);
-	if (items.length) { picker++; session.value = items; notice.value = ''; } else notice.value = $locale.value.sfc.noneDue;
+	if (!records.value || (!deck.value && !cram)) return;
+	const items = queue(records.value, deck.value?.id, now, cram, reviewedToday);
+	if (items.length) { picker++; session.value = items; emit('active', true); notice.value = ''; } else notice.value = $locale.value.sfc.noneDue;
 }
 
 async function closeStudy() {
 	session.value = undefined;
+	emit('active', selected.value !== null);
 	await run(load);
 }
 
@@ -327,6 +330,7 @@ async function updateGift() {
 	"decks": "教材一覧",
 	"study": "予定のカードを復習",
 	"cram": "予定外も含めて復習",
+	"cramAll": "すべての取込済み教材を予定外も含めて復習",
 	"update": "Drive の GIFT で教材を更新",
 	"added": "追加",
 	"changed": "変更",
@@ -378,6 +382,7 @@ async function updateGift() {
 	"decks": "Decks",
 	"study": "Study due cards",
 	"cram": "Study all active cards",
+	"cramAll": "Study all active cards across imported decks",
 	"update": "Update deck from GIFT in Drive",
 	"added": "Added",
 	"changed": "Changed",
