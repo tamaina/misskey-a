@@ -54980,7 +54980,37 @@ export interface operations {
     fukushu___upstream___show: {
         requestBody: {
             content: {
-                'application/json': Record<string, never> & unknown;
+                'application/json': {
+                    page?: {
+                        deckId?: string;
+                        after?: {
+                            /** Format: date-time */
+                            time: string;
+                            key: string;
+                        };
+                        day?: {
+                            /** Format: date-time */
+                            start: string;
+                            /** Format: date-time */
+                            end: string;
+                        };
+                    };
+                } & ({
+                    page?: {
+                        deckId?: string;
+                        after?: {
+                            /** Format: date-time */
+                            time: string;
+                            key: string;
+                        };
+                        day?: {
+                            /** Format: date-time */
+                            start: string;
+                            /** Format: date-time */
+                            end: string;
+                        };
+                    };
+                } & unknown);
             };
         };
         responses: {
@@ -55571,6 +55601,15 @@ export interface operations {
                             questionId: string;
                             revision: number;
                         }[];
+                        historyPage?: {
+                            total: number;
+                            next: {
+                                /** Format: date-time */
+                                time: string;
+                                key: string;
+                            } | null;
+                            today: string[];
+                        };
                     };
                 };
             };

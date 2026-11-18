@@ -14,5 +14,6 @@ export class MiFukushuSourceUsage {
 	@Column('integer') public logs: number;
 	@Column('integer') public last: number;
 	@Column('integer') public bytes: number;
+	@Column('integer') public materialBytes: number;
 	@Column('integer') public binaries: number;
 }

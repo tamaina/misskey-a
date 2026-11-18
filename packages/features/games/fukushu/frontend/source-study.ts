@@ -26,12 +26,12 @@ export function shuffled<T>(values: T[]) {
 	return result;
 }
 
-export function queue(records: UpstreamRecords, deckId: string, now: Date, cram: boolean): SourceQuestion[] {
+export function queue(records: UpstreamRecords, deckId: string, now: Date, cram: boolean, reviewedToday?: ReadonlySet<string>): SourceQuestion[] {
 	const settings = records.settings[0];
 	const states = records.studyStates.filter(s => s.deckId === deckId && !s.suspended)
 		.sort((a, b) => a.questionId < b.questionId ? -1 : a.questionId > b.questionId ? 1 : 0);
 	const questions = new Map(records.questions.filter(q => q.enabled && q.kind !== 'unsupported').map(q => [q.id, q]));
-	const today = new Set(records.reviewLogs.filter(r => day(new Date(r.reviewedAt)) === day(now)).map(r => r.questionId));
+	const today = reviewedToday ?? new Set(records.reviewLogs.filter(r => day(new Date(r.reviewedAt)) === day(now)).map(r => r.questionId));
 	const reviews = states.filter(s => s.card.reps > 0 && (cram || new Date(s.card.due) <= now) && questions.has(s.questionId))
 		.sort((a, b) => a.card.due.localeCompare(b.card.due));
 	const fresh = states.filter(s => s.card.reps === 0 && (cram || !today.has(s.questionId)));

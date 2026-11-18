@@ -52,7 +52,7 @@ Historical card snapshots absent in the source remain unknown.
 
 The source reader validates the complete archive before persistence. Reviews
 use the target question, current state and global settings. An owner usage row
-tracks the serialized UTF-8 metadata, binary bytes, frame count, log count and
+tracks total and non-history UTF-8 metadata, binary bytes, frame count, log count and
 last position. The review transaction checks and updates these counters before
 appending a log. Review history has no count ceiling. At the JSON or archive byte ceiling a new review fails atomically.
 Existing study history remains exportable.
@@ -136,7 +136,7 @@ imports are refused. Direct updates from Anki text or a new APKG are pending.
 ## Collection size and old backups
 
 Local and Drive inspection and queued source imports accept a framed binary
-archive up to 1 GiB, with 8 MiB of JSON, 20,000 frames excluding review history, one global
+archive up to 1 GiB, with 64 MiB total JSON, 8 MiB per JSON frame, 8 MiB of non-history JSON, 20,000 frames excluding review history, one global
 settings record, 100 decks and up to 10,000 records in each remaining material store.
 Framing and the checksum also count toward the archive ceiling. Drive role,
 instance, storage and downloader limits can be lower. The default role permits 30 MiB per file. Synchronous restore
@@ -146,7 +146,7 @@ embedded archive.
 
 The importer takes a private disk snapshot of the owned Drive original.
 It checks the byte length and Drive MD5, hashes the complete original, validates
-the envelope and media digests, and retains bounded metadata and offsets.
+the envelope and media digests, and retains frame offsets, IDs and references for validation. It releases each validated history body before reading the next one.
 Inside one PostgreSQL transaction it checks the owner, Drive identity, receipt
 and collisions again, then re-reads the same snapshot to insert records and
 attachments. Attachments above 8 MiB occupy permanent 256 KiB rows in
@@ -162,8 +162,7 @@ transaction-local PostgreSQL cursor. It writes the original frame order and
 file, then sends the completed file to Drive. A reader or writer failure
 rolls back the transaction and releases the cursor. The page bounds the row
 count; one large JSON value still needs to fit in memory. Export
-requires free temporary space and Drive quota. The library list currently
-returns all bounded metadata. Inline media preview supports individual files
+requires free temporary space and Drive quota. The library list requests only material metadata; each selected deck retrieves a separate history page. Inline media preview supports individual files
 up to 8 MiB. GIFT updates still use the small archive adapter (8 MiB archive,
 1,000 questions and study states) and 256 KiB of GIFT text. The native-v1
 format keeps its independent limits.
@@ -178,21 +177,37 @@ at 100 ms intervals and excludes the client, PostgreSQL and Redis.
 
 ### Long review histories
 
-Each upstream review appends the UTF-8 JSON of a log frame and changes the size
-of the current state. The 8 MiB aggregate budget counts both, along with all
-other metadata. The number of reviews that fit depends on the existing material
-and answers. At capacity the transaction rolls back the state, log and receipt.
+The queued importer and the local/Drive scanners accept combined JSON over
+8 MiB when the excess comes from review history. The pilot bounds total JSON
+at 64 MiB to limit the duplicate-ID index, CPU and page scan time. The existing
+8 MiB non-history budget bounds the library response. Counters include the
+actual UTF-8 frame wrapper. Restore rereads at most 100 consecutive frames
+fitting in a 256 KiB window, or one larger frame, from the same private
+snapshot inside one owner transaction. History may precede its question.
+Duplicate IDs, incompatible references and late collisions reject the batch.
 
-The export regression seeds a disposable database with over 9 MiB of synthetic
-review text and verifies the complete output digest and maximum fetched row
-count. This exercises only the export path beyond 8 MiB. Before accepting larger
-histories, local/Drive inspection and restore must validate logs without keeping
-every payload in memory. Preserve ID uniqueness and question/deck references
-even when a log precedes its question. Restore can reread the validated Drive
-snapshot inside the existing owner transaction. The library and study queue
-also need paged history and a query for the current study day, preserving the
-4 am local rollover. At that point, ordinary review and re-import can use the
-same revised byte policy.
+`upstream/show` with `page: {}` loads the material library. Supplying a deck
+returns up to 20 newest logs and a continuation cursor ordered by UTC time
+and record key. A page targets 256 KiB of stored answer data and includes one
+oversized log on its own. The server also returns distinct cards reviewed in
+the requested local study day so pagination cannot change the FSRS queue.
+This pilot scans the owner's logs with a transaction-local database cursor
+on each deck history request. A stored date/deck index is a follow-up if that
+scan becomes expensive. Legacy clients omitting `page` keep their full response
+through 8 MiB and receive an explicit capacity error above it.
+
+Review updates total and material usage with the state, new log and receipt.
+The migration backfills material bytes without changing any learning records.
+Downgrade refuses while older readers could not re-import an owner's history.
+GIFT editing continues to use its earlier, small-archive adapter.
+
+In an isolated ordinary-user Drive and Chrome test, the pinned upstream writer
+produced a 13,038,993-byte archive with 9,999 logs from a disposable IndexedDB.
+The 9k user opened both history pages, recorded two answers and exported
+10,001 logs. A fresh upstream IndexedDB restored the saved state, recorded
+one further review, exported and restored again. All 10,001 prior logs matched.
+Only the initial APKG/GIFT fixture is source-derived; the added history is
+synthetic. See the [test harness](test/README.md).
 
 The pinned app accepts legacy JSON versions 1–3, reconstructs missing source
 metadata and repairs legacy APKG data for versions below 3. Direct JSON restore

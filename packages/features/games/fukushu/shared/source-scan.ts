@@ -6,10 +6,13 @@ import { sha256 } from '@noble/hashes/sha2.js';
 import { bytesToHex } from '@noble/hashes/utils.js';
 import { MAX_BACKUP_BYTES } from './backup.schema.js';
 import { checkMaterialCount, checkUpstreamRelations, decodeUpstreamRecord, emptyUpstreamRecords, summarizeUpstreamRecords, UPSTREAM_MAGIC, UpstreamBackupError } from './upstream-reader.js';
+import type { UpstreamInspection } from './upstream-backup.schema.js';
 
 // The browser and the server use the same archive and metadata limits.
 // Only JSON counts toward the retained metadata budget. APKG/media stay opaque.
 export const MAX_SOURCE_ARCHIVE_BYTES = 1024 ** 3;
+// The pilot bounds the ID/reference index and scan work; history bodies are released per frame.
+export const MAX_SOURCE_JSON_BYTES = 64 * 1024 ** 2;
 const chunkBytes = 256 * 1024;
 
 class FileCursor {
@@ -46,10 +49,10 @@ class FileCursor {
 	}
 }
 
-export type SourceFrame = { store: keyof ReturnType<typeof emptyUpstreamRecords>; value: Record<string, unknown>; blobOffset: number; blobSize?: number };
+export type SourceFrameOffset = { start: number; length: number; blobSize?: number };
 
 /** Frame offsets are provisional until the trailer, media digests and references pass. */
-export async function scanSourceArchive(file: Blob, signal?: AbortSignal, onFrame?: (frame: SourceFrame) => void) {
+export async function scanSourceArchive(file: Blob, signal?: AbortSignal, onFrame?: (frame: SourceFrameOffset) => void) {
 	if (file.size > MAX_SOURCE_ARCHIVE_BYTES) throw new UpstreamBackupError('BACKUP_TOO_LARGE');
 	const cursor = new FileCursor(file, signal);
 	const end = file.size - 64;
@@ -61,6 +64,12 @@ export async function scanSourceArchive(file: Blob, signal?: AbortSignal, onFram
 	const seen = new Set<string>();
 	const media = new Set<string>();
 	let metadataBytes = 0;
+	let materialBytes = 0;
+	let materialCount = 0;
+	let logCount = 0;
+	const loggedQuestions = new Map<string, string>();
+	const deckCounts = new Map<string, number>();
+	const recent: UpstreamInspection['history'] = [];
 	let binaryBytes = 0;
 	while (cursor.position < end) {
 		const prefix = await cursor.read(4);
@@ -68,12 +77,34 @@ export async function scanSourceArchive(file: Blob, signal?: AbortSignal, onFram
 		const length = new DataView(prefix.buffer).getUint32(0, true);
 		if (!length || length > end - cursor.position) throw new UpstreamBackupError('INVALID_BACKUP');
 		metadataBytes += length;
-		if (metadataBytes > MAX_BACKUP_BYTES) throw new UpstreamBackupError('UPSTREAM_INSPECTION_LIMIT');
+		if (length > MAX_BACKUP_BYTES || metadataBytes > MAX_SOURCE_JSON_BYTES) throw new UpstreamBackupError('UPSTREAM_INSPECTION_LIMIT');
 		const json = await cursor.read(length);
 		digest.update(json);
 		const { store, value, blobSize } = decodeUpstreamRecord(json, seen, records);
-		checkMaterialCount(store, records, seen.size, 10_000);
-		onFrame?.({ store, value, blobOffset: cursor.position, blobSize });
+		if (store === 'reviewLogs') {
+			const log = records.reviewLogs.pop();
+			if (!log) throw new UpstreamBackupError('INVALID_BACKUP');
+			const previous = loggedQuestions.get(log.questionId);
+			if (previous !== undefined && previous !== log.deckId) throw new UpstreamBackupError('INVALID_BACKUP');
+			loggedQuestions.set(log.questionId, log.deckId);
+			deckCounts.set(log.deckId, (deckCounts.get(log.deckId) ?? 0) + 1);
+			logCount++;
+			const entry: UpstreamInspection['history'][number] = {
+				id: log.id, deckId: log.deckId, questionId: log.questionId,
+				reviewedAt: log.reviewedAt, rating: log.rating, correct: log.correct, questionSnapshot: 'unavailable',
+				cardBefore: null, cardAfter: null, scheduler: null,
+			};
+			const index = recent.findIndex(other => Date.parse(entry.reviewedAt) > Date.parse(other.reviewedAt)
+				|| (Date.parse(entry.reviewedAt) === Date.parse(other.reviewedAt) && entry.id.localeCompare(other.id) < 0));
+			if (index !== -1) recent.splice(index, 0, entry);
+			else if (recent.length < 20) recent.push(entry);
+			if (recent.length > 20) recent.pop();
+		} else {
+			materialBytes += length;
+			if (materialBytes > MAX_BACKUP_BYTES) throw new UpstreamBackupError('UPSTREAM_INSPECTION_LIMIT');
+			checkMaterialCount(store, records, ++materialCount, 10_000);
+		}
+		onFrame?.({ start: cursor.position - length, length, blobSize });
 		if (blobSize === undefined) {
 			if (store === 'media') throw new UpstreamBackupError('INVALID_BACKUP');
 			continue;
@@ -93,5 +124,13 @@ export async function scanSourceArchive(file: Blob, signal?: AbortSignal, onFram
 	if (cursor.position !== end || new TextDecoder('utf-8', { ignoreBOM: true }).decode(await cursor.read(64)) !== hash) throw new UpstreamBackupError('INVALID_BACKUP');
 	signal?.throwIfAborted();
 	checkUpstreamRelations(records, media);
-	return summarizeUpstreamRecords(records, hash, binaryBytes);
+	const questions = new Map(records.questions.map(question => [question.id, question.deckId]));
+	for (const [id, deck] of loggedQuestions) {
+		if (questions.get(id) !== deck) throw new UpstreamBackupError('INVALID_BACKUP');
+	}
+	const summary = summarizeUpstreamRecords(records, hash, binaryBytes);
+	summary.counts.reviewLogs = logCount;
+	for (const deck of summary.decks) deck.reviewLogs = deckCounts.get(deck.id) ?? 0;
+	summary.history = recent;
+	return summary;
 }

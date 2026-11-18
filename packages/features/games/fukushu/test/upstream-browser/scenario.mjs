@@ -64,4 +64,47 @@ export async function restoreAndContinue(raw, questionId, reviewedAt = '2026-11-
 	const newLogs = (await (await database()).getAll('reviewLogs')).filter(row => !logs.some(old => old.id === row.id));
 	return { before: state, after: nextState, record: newLogs[0], logCountBefore: logs.length, logCountAfter: await (await database()).count('reviewLogs'), archive: await bytes(await createBackupArchive()) };
 }
-Object.assign(window, { compatibility: { generate, restoreAndContinue } });
+
+// Only used in the fresh browser context created by the opt-in test runner.
+async function longHistory(saved) {
+	const db = await database();
+	assert(await db.count('decks') === 0, 'Expected an empty disposable database');
+	const file = document.querySelector('#fixture').files[0];
+	await restoreBackupFile(file);
+	const logs = await db.getAll('reviewLogs');
+	if (!saved) {
+		const template = logs.find(log => !log.id.startsWith('anki:'));
+		assert(template && logs.length === 37, 'Expected the APKG and reset-study fixture');
+		const tx = db.transaction('reviewLogs', 'readwrite');
+		for (let i = logs.length; i < 9999; i++) {
+			await tx.store.add({
+				...template, id: 'synthetic-long-' + i,
+				reviewedAt: new Date(Date.UTC(2024, 0, 1) + i * 864000).toISOString(), responseText: '学習記録'.repeat(70) + i,
+			});
+		}
+		await tx.done;
+		const archive = await createBackupArchive();
+		const link = document.createElement('a');
+		link.download = 'long-input.fukushu';
+		link.href = URL.createObjectURL(archive);
+		link.click();
+		return { bytes: archive.size, logs: await db.count('reviewLogs') };
+	}
+
+	const question = saved.state.questionId;
+	const before = await db.get('studyStates', question);
+	const clock = { now: () => new Date(Date.parse(saved.record.reviewedAt) + 86400000) };
+	const item = (await buildStudyQueue(clock, undefined, true)).find(row => row.question.id === question);
+	await recordReview(item, 'good', true, ['continued'], 500, clock);
+	const archive = await createBackupArchive();
+	await restoreBackupFile(archive);
+	const restored = await database();
+	const after = await restored.getAll('reviewLogs');
+	const byId = new Map(after.map(row => [row.id, JSON.stringify(row)]));
+	return {
+		before, state: await restored.get('studyStates', question), previous: logs.length,
+		logs: after.length, preserved: logs.every(row => JSON.stringify(row) === byId.get(row.id)), bytes: archive.size,
+	};
+}
+
+Object.assign(window, { compatibility: { generate, restoreAndContinue, longHistory } });

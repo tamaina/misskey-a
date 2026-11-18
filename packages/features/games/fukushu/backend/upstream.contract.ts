@@ -12,6 +12,12 @@ import type { ApiProcedureMetadata } from '../../../api/backend/transport/policy
 import type { Meta } from '@orpc/contract';
 
 const integer = v.pipe(v.number(), v.safeInteger(), v.minValue(0), v.maxValue(2_147_483_647));
+const historyCursor = v.object({ time: v.pipe(v.string(), v.isoTimestamp()), key: v.pipe(v.string(), v.regex(/^[a-f0-9]{64}$/)) });
+const historyPage = v.object({
+	deckId: v.optional(v.string()), after: v.optional(historyCursor),
+	day: v.optional(v.object({ start: v.pipe(v.string(), v.isoTimestamp()), end: v.pipe(v.string(), v.isoTimestamp()) })),
+});
+export type SourceHistoryPage = v.InferOutput<typeof historyPage>;
 const backup = { requireCredential: true, secure: true, limit: { duration: 60000, max: 5 } } as const;
 const base = oc.errors({ ...commonErrors,
 																									NO_SUCH_FILE: { status: 404, data: apiErrorData }, NO_SUCH_MATERIAL: { status: 404, data: apiErrorData },
@@ -38,8 +44,8 @@ export const upstreamContract = {
 		.input(objectInput({ fileId: v.pipe(v.string(), v.metadata({ format: 'misskey:id' })), requestId: studyRequestIdSchema, confirmRestore: v.literal(true) }))
 		.output(v.object({ restored: v.literal(true), sha256: v.string(), records: integer })),
 	upstreamShow: base.$meta({ requireCredential: true, kind: 'read:account', requestName: 'fukushu/upstream/show', limit: { duration: 60000, max: 30 } } as const satisfies Meta & ApiProcedureMetadata)
-		.route({ method: 'POST', path: '/fukushu/upstream/show', tags: ['fukushu'] }).input(objectInput({}))
-		.output(v.object({ records: v.object({ settings: v.array(s.settings), decks: v.array(s.decks), questions: v.array(s.questions), studyStates: v.array(s.studyStates), reviewLogs: v.array(s.reviewLogs), importSources: v.array(s.importSources), media: v.array(s.media), imports: v.array(s.imports) }), revisions: v.array(v.object({ questionId: v.string(), revision: integer })) })),
+		.route({ method: 'POST', path: '/fukushu/upstream/show', tags: ['fukushu'] }).input(objectInput({ page: v.optional(historyPage) }))
+		.output(v.object({ records: v.object({ settings: v.array(s.settings), decks: v.array(s.decks), questions: v.array(s.questions), studyStates: v.array(s.studyStates), reviewLogs: v.array(s.reviewLogs), importSources: v.array(s.importSources), media: v.array(s.media), imports: v.array(s.imports) }), revisions: v.array(v.object({ questionId: v.string(), revision: integer })), historyPage: v.optional(v.object({ total: integer, next: v.nullable(historyCursor), today: v.array(v.string()) })) })),
 	upstreamReview: base.$meta({ requireCredential: true, kind: 'write:account', requestName: 'fukushu/upstream/review', limit: { duration: 60000, max: 60 } } as const satisfies Meta & ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/fukushu/upstream/review', tags: ['fukushu'] })
 		.input(objectInput({ requestId: studyRequestIdSchema, questionId: v.string(), expectedRevision: integer, rating: studyRatingSchema, correct: v.boolean(), answers: v.array(v.string()), durationMs: integer }))

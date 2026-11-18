@@ -74,6 +74,9 @@ test('normal queue respects the 4 am day boundary and reset history; cram includ
 																			reviewLogs: [{ questionId: row.id, reviewedAt: new Date(2026, 5, 2, 23).toISOString() }] } as UpstreamRecords;
 	expect(queue(records, 'deck', now, false)).toEqual([]);
 	expect(queue(records, 'deck', now, true)).toEqual([question]);
+	const withoutHistory = { ...records, reviewLogs: [] };
+	expect(queue(withoutHistory, 'deck', now, false, new Set([row.id]))).toEqual([]);
+	expect(queue(withoutHistory, 'deck', now, true, new Set([row.id]))).toEqual([question]);
 	expect(queue(records, 'deck', new Date(2026, 5, 3, 4), false)).toEqual([question]);
 });
 

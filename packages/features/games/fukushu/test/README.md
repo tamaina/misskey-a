@@ -132,3 +132,15 @@ An isolated Playwright Chrome fallback stopped at sandbox initialization. No
 permission or sandbox setting was weakened. Post-selection browser rendering
 is unverified; final frontend types, builds and 25 real HTTP cases passed.
 Neither path imports upstream data into the database.
+
+For the long-history round trip use the same pinned upstream checkout and
+isolated Chrome harness with `FUKUSHU_LONG_HISTORY=generate`. It restores the
+checked-in synthetic APKG/GIFT fixture into an empty IndexedDB and generates
+`long-input.fukushu` using the upstream writer. Of its 9,999 history entries,
+37 come from the original fixture; the rest are synthetic records. Import
+that file from an isolated owner's Drive, review the reset quiz twice, and
+save the Drive export and the last successful review response. Run the same
+harness with `FUKUSHU_LONG_HISTORY=verify`, `FUKUSHU_PERSISTED_EXPORT` and
+`FUKUSHU_PERSISTED_STATE` pointing to those two test artifacts. It checks the
+restored state, continues learning and compares all 10,001 existing logs
+after one more upstream export/restore.

@@ -60,7 +60,7 @@ export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' 
 			return upstream.restoreJob(context.principal.id, input);
 		})),
 		upstreamRestore: procedure(fukushuContract.upstreamRestore).use(principal).handler(({ input, context }) => invoke(() => upstreamStore().restore(context.principal.id, input.fileId, input.requestId))),
-		upstreamShow: procedure(fukushuContract.upstreamShow).use(principal).handler(({ context }) => invoke(() => upstreamStore().show(context.principal.id))),
+		upstreamShow: procedure(fukushuContract.upstreamShow).use(principal).handler(({ context, input }) => invoke(() => upstreamStore().show(context.principal.id, input.page))),
 		upstreamReview: procedure(fukushuContract.upstreamReview).use(principal).handler(({ input, context }) => invoke(() => upstreamStore().review(context.principal.id, input))),
 		upstreamExport: procedure(fukushuContract.upstreamExport).use(principal).handler(({ context }) => invoke(async () => {
 			await upstreamStore().assertOwned(context.principal.id);

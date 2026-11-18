@@ -14,21 +14,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkButton v-if="records" :disabled="busy" @click="exportBackup">{{ $locale.sfc.export }}</MkButton>
 		</div>
 		<p v-if="loaded && !records?.decks.length">{{ $locale.sfc.empty }}</p>
-		<button v-for="d in !deck ? records?.decks : []" :key="d.id" type="button" class="_button" :class="$style.row" :disabled="busy" @click="selectDeck(d.id)">
+		<button v-for="d in !deck ? records?.decks : []" :key="d.id" type="button" class="_button" :class="$style.row" :disabled="busy" @click="run(() => selectDeck(d.id))">
 			<strong>{{ d.name }}</strong><span>{{ d.enabledQuestionCount }} {{ $locale.sfc.cards }} ›</span>
 		</button>
 		<template v-if="deck && records">
-			<div class="_buttons"><MkButton small :disabled="busy" @click="selectDeck(null)">← {{ $locale.sfc.decks }}</MkButton></div>
+			<div class="_buttons"><MkButton small :disabled="busy" @click="run(() => selectDeck(null))">← {{ $locale.sfc.decks }}</MkButton></div>
 			<h3>{{ deck.name }}</h3><p v-if="deck.description">{{ deck.description }}</p>
 			<div class="_buttons">
-				<MkButton primary :disabled="busy" @click="start(false)">{{ $locale.sfc.study }}</MkButton>
-				<MkButton :disabled="busy" @click="start(true)">{{ $locale.sfc.cram }}</MkButton>
+				<MkButton primary :disabled="busy" @click="run(() => start(false))">{{ $locale.sfc.study }}</MkButton>
+				<MkButton :disabled="busy" @click="run(() => start(true))">{{ $locale.sfc.cram }}</MkButton>
 				<MkButton v-if="deck.sourceType === 'gift'" :disabled="busy" @click="updateGift">{{ $locale.sfc.update }}</MkButton>
 			</div>
 			<details v-if="reviewHistory.length">
-				<summary>{{ $locale.sfc.history }} ({{ reviewHistory.length }})</summary>
+				<summary>{{ $locale.sfc.history }} ({{ historyTotal }})</summary>
 				<ul :class="$style.logs">
-					<li v-for="log in reviewHistory.slice(0, historyLimit)" :key="log.id">
+					<li v-for="log in reviewHistory" :key="log.id">
 						<time :datetime="log.reviewedAt">{{ new Date(log.reviewedAt).toLocaleString() }}</time> · {{ $locale.sfc[log.rating] }} · {{ log.correct ? $locale.sfc.correct : $locale.sfc.incorrect }}
 						<details>
 							<summary>{{ cardNames.get(log.questionId) || log.questionId }}</summary>
@@ -37,7 +37,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</details>
 					</li>
 				</ul>
-				<MkButton v-if="historyLimit < reviewHistory.length" small @click="historyLimit += 20">{{ $locale.sfc.more }}</MkButton>
+				<div class="_buttons">
+					<MkButton v-if="historyStack.length > 1" small :disabled="busy" @click="run(() => turnHistory(false))">{{ $locale.sfc.previous }}</MkButton>
+					<MkButton v-if="nextHistory" small :disabled="busy" @click="run(() => turnHistory(true))">{{ $locale.sfc.next }}</MkButton>
+				</div>
 			</details>
 			<h4>{{ $locale.sfc.cards }}</h4>
 			<div v-for="c in cards.slice(page * 10, (page + 1) * 10)" :key="c.id" :class="$style.card">
@@ -82,9 +85,14 @@ const selected = ref<string | null>(null);
 const deck = computed(() => records.value?.decks.find(d => d.id === selected.value));
 const cards = computed(() => records.value?.questions.filter(q => q.deckId === selected.value).sort((a, b) => (a.sourceOrder ?? Infinity) - (b.sourceOrder ?? Infinity)) ?? []);
 const cardNames = computed(() => new Map(cards.value.map(q => [q.id, q.payload.name ?? (q.payload.prompt.format === 'plain' ? q.payload.prompt.value : q.sourceKey)])));
-const reviewHistory = computed(() => records.value?.reviewLogs.filter(l => l.deckId === selected.value).sort((a, b) => b.reviewedAt.localeCompare(a.reviewedAt)) ?? []);
+const reviewHistory = computed(() => records.value?.reviewLogs ?? []);
+type Cursor = { time: string; key: string };
+const historyStack = shallowRef<(Cursor | undefined)[]>([undefined]);
+const nextHistory = shallowRef<Cursor | null>(null);
+const historyTotal = ref(0);
+let reviewedToday = new Set<string>();
+let loadedDay = '';
 const page = ref(0);
-const historyLimit = ref(20);
 const expanded = ref(new Set<string>());
 const session = shallowRef<SourceQuestion[]>();
 const loaded = ref(false);
@@ -140,9 +148,24 @@ async function run(action: () => Promise<void>) {
 	} finally { busy.value = false; }
 }
 
-async function load() {
+function studyDay(now: Date) {
+	const start = new Date(now);
+	if (start.getHours() < 4) start.setDate(start.getDate() - 1);
+	start.setHours(4, 0, 0, 0);
+	const end = new Date(start);
+	end.setDate(end.getDate() + 1);
+	return { start: start.toISOString(), end: end.toISOString() };
+}
+
+async function load(id: string | null = selected.value, stack: (Cursor | undefined)[] = [undefined]) {
 	try {
-		const result = await misskeyApi('fukushu/upstream/show', {});
+		const day = studyDay(new Date());
+		const result = await misskeyApi('fukushu/upstream/show', { page: id === null ? {} : { deckId: id, day, after: stack.at(-1) } });
+		historyStack.value = stack;
+		nextHistory.value = result.historyPage?.next ?? null;
+		historyTotal.value = result.historyPage?.total ?? 0;
+		reviewedToday = new Set(result.historyPage?.today);
+		loadedDay = day.start;
 		records.value = result.records;
 		revisions.value = new Map(result.revisions.map(r => [r.questionId, r.revision]));
 	} catch (cause) {
@@ -152,17 +175,26 @@ async function load() {
 	loaded.value = true;
 }
 
-function selectDeck(id: string | null) {
-	picker++; selected.value = id; emit('active', id !== null); expanded.value.clear(); page.value = 0; historyLimit.value = 20; notice.value = ''; error.value = '';
+async function turnHistory(next: boolean) {
+	const stack = historyStack.value;
+	if (next && nextHistory.value) await load(selected.value, [...stack, nextHistory.value]);
+	else if (!next && stack.length > 1) await load(selected.value, stack.slice(0, -1));
+}
+
+async function selectDeck(id: string | null) {
+	await load(id);
+	picker++; selected.value = id; emit('active', id !== null); expanded.value.clear(); page.value = 0; notice.value = ''; error.value = '';
 }
 
 function toggleAnswer(id: string, event: Event) {
 	if ((event.target as HTMLDetailsElement).open) expanded.value.add(id); else expanded.value.delete(id);
 }
 
-function start(cram: boolean) {
-	if (!deck.value || !records.value || busy.value) return;
-	const items = queue(records.value, deck.value.id, new Date(), cram);
+async function start(cram: boolean) {
+	const now = new Date();
+	if (studyDay(now).start !== loadedDay) await load();
+	if (!deck.value || !records.value) return;
+	const items = queue(records.value, deck.value.id, now, cram, reviewedToday);
 	if (items.length) { picker++; session.value = items; notice.value = ''; } else notice.value = $locale.value.sfc.noneDue;
 }
 
@@ -258,7 +290,7 @@ async function updateGift() {
 	"noneDue": "対象のカードはありません。",
 	"error": "操作を完了できませんでした。ファイルと接続を確認してください。",
 	"conflict": "既存データと重複するか、確認後に変更されました。教材を開き直してください。",
-	"limit": "取込上限を超えています。バックアップは 1 GiB、内部の JSON は合計 8 MiB、GIFT 更新ファイルは 256 KiB までです。",
+	"limit": "取込上限を超えています。バックアップは 1 GiB、JSON は合計 64 MiB（履歴以外は合計 8 MiB、1 件は 8 MiB）、GIFT 更新ファイルは 256 KiB までです。",
 	"checkImport": "取込状況を確認",
 	"importQueued": "サーバーで取り込んでいます。このタブで取込状況を確認できます。",
 	"importFailed": "取込が完了しませんでした。原本と既存教材との ID 重複を確認して、再度お試しください。",
@@ -304,7 +336,7 @@ async function updateGift() {
 	"noneDue": "There are no eligible cards.",
 	"error": "The operation could not be completed. Check the file and connection.",
 	"conflict": "An ID already exists or this deck changed. Reopen the deck.",
-	"limit": "Import limit exceeded. Backups support up to 1 GiB with 8 MiB of JSON. GIFT updates support up to 256 KiB.",
+	"limit": "Import limit exceeded. Backups support up to 1 GiB with 64 MiB total JSON, 8 MiB outside review history and 8 MiB per record. GIFT updates support up to 256 KiB.",
 	"checkImport": "Check import status",
 	"importQueued": "The server is importing the backup. Check its status from this tab.",
 	"importFailed": "Import did not complete. Check the original file and existing IDs, then try again.",

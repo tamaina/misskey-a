@@ -72,7 +72,25 @@ try {
 	page.on('pageerror', error => console.error(error));
 	await page.goto(`http://127.0.0.1:${server.address().port}/`);
 	await page.waitForFunction(() => window.compatibility);
-	if (process.env.FUKUSHU_PERSISTED_EXPORT) {
+	if (process.env.FUKUSHU_LONG_HISTORY === 'generate') {
+		await page.locator('#fixture').setInputFiles(join(here, '../backend/fixtures/actual-upstream/actual-upstream.fukushu'));
+		const download = page.waitForEvent('download');
+		const result = await page.evaluate(() => window.compatibility.longHistory());
+		await (await download).saveAs(join(out, 'long-input.fukushu'));
+		assert.equal(result.logs, 9999);
+		assert(result.bytes > 8 * 1024 ** 2);
+		console.log(JSON.stringify({ ...result, upstream: pinned, chrome: browser.version() }));
+	} else if (process.env.FUKUSHU_LONG_HISTORY === 'verify') {
+		const saved = JSON.parse(await readFile(process.env.FUKUSHU_PERSISTED_STATE, 'utf8'));
+		await page.locator('#fixture').setInputFiles(process.env.FUKUSHU_PERSISTED_EXPORT);
+		const result = await page.evaluate(saved => window.compatibility.longHistory(saved), saved);
+		assert.deepEqual(result.before, saved.state);
+		assert.equal(result.previous, 10001);
+		assert.equal(result.logs, 10002);
+		assert.equal(result.state.card.reps, saved.state.card.reps + 1);
+		assert.equal(result.preserved, true);
+		console.log(JSON.stringify({ ...result, upstream: pinned, chrome: browser.version() }));
+	} else if (process.env.FUKUSHU_PERSISTED_EXPORT) {
 		// Explicit test artifact from full-app-http in its fresh, isolated owner DB.
 		const archive = await readFile(process.env.FUKUSHU_PERSISTED_EXPORT);
 		const session = await UpstreamCompatibilitySession.open(archive);

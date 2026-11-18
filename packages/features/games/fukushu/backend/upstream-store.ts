@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { createHash } from 'node:crypto';
-import { QueryFailedError } from 'typeorm';
+import { In, Not, QueryFailedError } from 'typeorm';
 import * as v from 'valibot';
-import { scanSourceArchive, MAX_SOURCE_ARCHIVE_BYTES } from '../shared/source-scan.js';
+import { scanSourceArchive, MAX_SOURCE_ARCHIVE_BYTES, MAX_SOURCE_JSON_BYTES } from '../shared/source-scan.js';
 import { emptyUpstreamRecords, UPSTREAM_MAGIC } from '../shared/upstream-reader.js';
 import { upstreamStoreSchemas } from '../shared/upstream-records.schema.js';
 import { studyRequestIdSchema } from '../shared/study.schema.js';
@@ -21,7 +21,8 @@ import { MiFukushuOperationReceipt } from './models/FukushuOperationReceipt.js';
 import { MiFukushuUpstreamChunk } from './models/FukushuUpstreamChunk.js';
 import type { DataSource, EntityManager } from 'typeorm';
 import type { UpstreamArchive, UpstreamFrame } from '../shared/upstream-reader.js';
-import type { SourceFrame } from '../shared/source-scan.js';
+import type { SourceHistoryPage } from './upstream.contract.js';
+import type { SourceFrameOffset } from '../shared/source-scan.js';
 import type { DriveSnapshot, WithSource } from './backup-drive.js';
 import type { CompatibilityReviewInput } from './pilot/upstream-session.js';
 
@@ -55,13 +56,13 @@ export class FukushuUpstreamStore {
 		return this.reader.withSource(ownerId, fileId, async snapshot => {
 			if (!accepted && snapshot.blob.size > MAX_BACKUP_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
 			if (accepted && (snapshot.blob.size !== accepted.size || snapshot.md5 !== accepted.md5)) throw new BackupError('BACKUP_FAILED');
-			const frames: SourceFrame[] = [];
+			const frames: SourceFrameOffset[] = [];
 			await scanSourceArchive(snapshot.blob, undefined, frame => frames.push(frame));
 			return this.commitRestore(ownerId, fileId, id, request, snapshot, frames);
 		}, accepted ? MAX_SOURCE_ARCHIVE_BYTES : MAX_BACKUP_BYTES);
 	}
 
-	private async commitRestore(ownerId: string, fileId: string, id: string, request: string, snapshot: DriveSnapshot, frames: SourceFrame[]) {
+	private async commitRestore(ownerId: string, fileId: string, id: string, request: string, snapshot: DriveSnapshot, frames: SourceFrameOffset[]) {
 		try {
 			return await this.db.transaction(async manager => {
 				await this.lock(manager, ownerId);
@@ -72,20 +73,30 @@ export class FukushuUpstreamStore {
 				if (!file) throw new MaterialError('NO_SUCH_FILE');
 				if (file.userHost !== null || file.uri !== null || file.isLink || file.size !== snapshot.blob.size || file.md5 !== snapshot.md5) throw new BackupError('BACKUP_FAILED');
 				const records = manager.getRepository(MiFukushuUpstreamRecord);
-				// Native PostgreSQL text IDs cannot contain NUL or unpaired surrogates.
-				// Preserve these in the source JSON; they have no possible native collision.
-				for (const [table, store] of [['fukushu_deck', 'decks'], ['fukushu_question', 'questions'], ['fukushu_review_log', 'reviewLogs']]) {
-					const ids = frames.filter(frame => frame.store === store).map(frame => frame.value.id)
-						.filter((value): value is string => typeof value === 'string' && !value.includes('\0') && value.isWellFormed());
-					if (!ids.length) continue;
-					const conflict = await manager.query(`SELECT 1 FROM ${table} WHERE "ownerId" = $1 AND id::text = ANY($2::text[]) LIMIT 1`, [ownerId, ids]);
-					if (conflict.length) throw new BackupError('BACKUP_CONFLICT');
-				}
 				// The owner/store/key primary key rejects any source collision in the same transaction.
 				// Keep the validated metadata bounded, reread each binary from the immutable snapshot.
 				// A batch never accumulates binary buffers, even for many small media.
-				for (let index = 0; index < frames.length; index += 100) {
-					const batch = frames.slice(index, index + 100);
+				for (let index = 0; index < frames.length;) {
+					const first = frames[index];
+					let end = index + 1;
+					while (end < frames.length && end - index < 100 && frames[end].start + frames[end].length - first.start <= SOURCE_CHUNK_BYTES) end++;
+					const offsets = frames.slice(index, end);
+					const last = frames[end - 1];
+					const bytes = Buffer.from(await snapshot.blob.slice(first.start, last.start + last.length).arrayBuffer());
+					const batch = offsets.map(frame => {
+						const offset = frame.start - first.start;
+						const { store, value }: UpstreamFrame = JSON.parse(bytes.toString('utf8', offset, offset + frame.length));
+						return { store, value, blobSize: frame.blobSize, blobOffset: frame.start + frame.length };
+					});
+					// Native PostgreSQL text IDs cannot contain NUL or unpaired surrogates.
+					// Preserve these in the source JSON; they have no possible native collision.
+					for (const [table, store] of [['fukushu_deck', 'decks'], ['fukushu_question', 'questions'], ['fukushu_review_log', 'reviewLogs']]) {
+						const ids = batch.filter(frame => frame.store === store).map(frame => frame.value.id)
+							.filter((value): value is string => typeof value === 'string' && !value.includes('\0') && value.isWellFormed());
+						if (!ids.length) continue;
+						const conflict = await manager.query(`SELECT 1 FROM ${table} WHERE "ownerId" = $1 AND id::text = ANY($2::text[]) LIMIT 1`, [ownerId, ids]);
+						if (conflict.length) throw new BackupError('BACKUP_CONFLICT');
+					}
 					const rows = batch.map((frame, i) => ({
 						ownerId,
 						store: frame.store,
@@ -110,6 +121,7 @@ export class FukushuUpstreamStore {
 							}
 						}
 					}
+					index = end;
 				}
 				await this.refreshUsage(manager, ownerId);
 				const result = { restored: true as const, sha256: snapshot.sha256, records: frames.length };
@@ -124,20 +136,22 @@ export class FukushuUpstreamStore {
 
 	private async refreshUsage(manager: EntityManager, ownerId: string) {
 		// UTF-8 frame JSON contributes 21 fixed bytes around store/value and 12 around an optional blobSize.
-		const [usage] = await manager.query(`INSERT INTO fukushu_source_usage ("ownerId", count, last, logs, bytes, binaries)
+		const [usage] = await manager.query(`INSERT INTO fukushu_source_usage ("ownerId", count, last, logs, bytes, binaries, "materialBytes")
 			SELECT "ownerId", COUNT(*)::int, MAX(position),
 				COUNT(*) FILTER (WHERE store = 'reviewLogs')::int,
 				SUM(octet_length(data) + octet_length(store) + 21
 					+ CASE WHEN size IS NULL THEN 0 ELSE 12 + length(size::text) END)::int,
-				SUM(COALESCE(size, 0))::int
+				SUM(COALESCE(size, 0))::int,
+				SUM(octet_length(data) + octet_length(store) + 21
+					+ CASE WHEN size IS NULL THEN 0 ELSE 12 + length(size::text) END) FILTER (WHERE store <> 'reviewLogs')::int
 			FROM (
 				SELECT "ownerId", position, store, data, COALESCE("chunkedSize", octet_length(blob)) AS size
 				FROM fukushu_upstream_record WHERE "ownerId" = $1
 			) records GROUP BY "ownerId"
 			ON CONFLICT ("ownerId") DO UPDATE SET count = EXCLUDED.count, last = EXCLUDED.last,
-				logs = EXCLUDED.logs, bytes = EXCLUDED.bytes, binaries = EXCLUDED.binaries
-			RETURNING count, bytes, binaries`, [ownerId]);
-		if (usage.bytes > MAX_BACKUP_BYTES || usage.bytes + usage.binaries + usage.count * 4 + UPSTREAM_MAGIC.length + 64 > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
+				logs = EXCLUDED.logs, bytes = EXCLUDED.bytes, binaries = EXCLUDED.binaries, "materialBytes" = EXCLUDED."materialBytes"
+			RETURNING count, bytes, binaries, "materialBytes"`, [ownerId]);
+		if (usage.materialBytes > MAX_BACKUP_BYTES || usage.bytes > MAX_SOURCE_JSON_BYTES || usage.bytes + usage.binaries + usage.count * 4 + UPSTREAM_MAGIC.length + 64 > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
 	}
 
 	private async read(manager: EntityManager, ownerId: string): Promise<{ archive: UpstreamArchive; rows: MiFukushuUpstreamRecord[] }> {
@@ -201,9 +215,14 @@ export class FukushuUpstreamStore {
 		if (!await this.db.getRepository(MiFukushuUpstreamRecord).existsBy({ ownerId, store: 'settings' })) throw new MaterialError('NO_SUCH_MATERIAL');
 	}
 
-	async show(ownerId: string) {
+	async show(ownerId: string, page?: SourceHistoryPage) {
 		return this.db.transaction('REPEATABLE READ', async manager => {
-			const rows = await manager.getRepository(MiFukushuUpstreamRecord).find({ where: { ownerId }, select: { store: true, data: true, revision: true }, order: { position: 'ASC', store: 'ASC', key: 'ASC' } });
+			const repo = manager.getRepository(MiFukushuUpstreamRecord);
+			if (!page) {
+				const usage = await manager.getRepository(MiFukushuSourceUsage).findOneBy({ ownerId });
+				if (usage && usage.bytes > MAX_BACKUP_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
+			}
+			const rows = await repo.find({ where: page ? { ownerId, store: Not('reviewLogs') } : { ownerId }, select: { store: true, data: true, revision: true }, order: { position: 'ASC', store: 'ASC', key: 'ASC' } });
 			if (!rows.length) throw new MaterialError('NO_SUCH_MATERIAL');
 			const records = emptyUpstreamRecords();
 			const revisions = [];
@@ -213,8 +232,64 @@ export class FukushuUpstreamStore {
 				(records[store] as unknown[]).push(v.parse(upstreamStoreSchemas[store], value));
 				if (store === 'studyStates') revisions.push({ questionId: String(value.questionId), revision: row.revision });
 			}
+			if (page?.deckId !== undefined) {
+				const { logs, ...historyPage } = await this.historyPage(manager, ownerId, page.deckId, page);
+				records.reviewLogs = logs;
+				return { records, revisions, historyPage };
+			}
 			return { records, revisions };
 		});
+	}
+
+	/** Scan a stable snapshot in small batches. Only the selected page's answers are returned to the client. */
+	private async historyPage(manager: EntityManager, ownerId: string, deckId: string, page: SourceHistoryPage) {
+		await manager.query(`DECLARE fukushu_history NO SCROLL CURSOR FOR
+			SELECT key, data FROM fukushu_upstream_record WHERE "ownerId" = $1 AND store = 'reviewLogs'`, [ownerId]);
+		type Candidate = { time: string; key: string; size: number };
+		const order = (a: { time: string; key: string }, b: { time: string; key: string }) =>
+			Date.parse(b.time) - Date.parse(a.time) || (a.key < b.key ? -1 : a.key > b.key ? 1 : 0);
+		const latest: Candidate[] = [];
+		const today = new Set<string>();
+		const start = Date.parse(page.day?.start ?? '');
+		const end = Date.parse(page.day?.end ?? '');
+		let total = 0;
+		for (;;) {
+			const rows: { key: string; data: string }[] = await manager.query('FETCH FORWARD 16 FROM fukushu_history');
+			if (!rows.length) break;
+			for (const row of rows) {
+				const log = JSON.parse(row.data);
+				if (log.deckId !== deckId) continue;
+				total++;
+				const time = Date.parse(log.reviewedAt);
+				if (time >= start && time < end) today.add(log.questionId);
+				const candidate = { time: String(log.reviewedAt), key: row.key, size: Buffer.byteLength(row.data) };
+				if (page.after && order(candidate, page.after) <= 0) continue;
+				if (latest.length === 21 && order(candidate, latest[20]) >= 0) continue;
+				latest.push(candidate);
+				latest.sort(order);
+				if (latest.length > 21) latest.pop();
+			}
+		}
+
+		const selected: Candidate[] = [];
+		let size = 0;
+		for (const item of latest) {
+			if (selected.length === 20 || (selected.length > 0 && size + item.size > 256 * 1024)) break;
+			selected.push(item);
+			size += item.size;
+		}
+		const rows = selected.length ? await manager.getRepository(MiFukushuUpstreamRecord).findBy({
+			ownerId, store: 'reviewLogs', key: In(selected.map(item => item.key)),
+		}) : [];
+		const logsByKey = new Map(rows.map(row => [row.key, v.parse(upstreamStoreSchemas.reviewLogs, JSON.parse(row.data))]));
+		const logs = selected.map(item => {
+			const log = logsByKey.get(item.key);
+			if (!log) throw new BackupError('BACKUP_FAILED');
+			return log;
+		});
+		const last = selected.at(-1);
+		const next = last && selected.length < latest.length ? { time: last.time, key: last.key } : null;
+		return { logs, total, today: [...today], next };
 	}
 
 	/** Await each write inside a single snapshot. The caller publishes only after completion. */
@@ -289,10 +364,13 @@ export class FukushuUpstreamStore {
 				v.parse(upstreamStoreSchemas.settings, JSON.parse(settings.data)).desiredRetention) };
 			const data = JSON.stringify({ ...original, card: result.state.card, updatedAt: result.state.updatedAt });
 			const logData = JSON.stringify(result.record);
-			const jsonBytes = budget.bytes + Buffer.byteLength(data) - Buffer.byteLength(state.data) + Buffer.byteLength(JSON.stringify({ store: 'reviewLogs', value: result.record }));
+			const stateDelta = Buffer.byteLength(data) - Buffer.byteLength(state.data);
+			const logBytes = Buffer.byteLength(JSON.stringify({ store: 'reviewLogs', value: result.record }));
+			const materialBytes = budget.materialBytes + stateDelta;
+			const jsonBytes = budget.bytes + stateDelta + logBytes;
 			const fileBytes = UPSTREAM_MAGIC.length + 64 + (budget.count + 1) * 4 + Number(budget.binaries) + jsonBytes;
-			if (jsonBytes > MAX_BACKUP_BYTES || fileBytes > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
-			await usage.update({ ownerId }, { count: budget.count + 1, last: budget.last + 1, logs: budget.logs + 1, bytes: jsonBytes });
+			if (logBytes > MAX_BACKUP_BYTES || materialBytes > MAX_BACKUP_BYTES || jsonBytes > MAX_SOURCE_JSON_BYTES || fileBytes > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
+			await usage.update({ ownerId }, { count: budget.count + 1, last: budget.last + 1, logs: budget.logs + 1, bytes: jsonBytes, materialBytes });
 			await records.update({ ownerId, store: state.store, key: cardKey }, { data, revision: result.revision });
 			await records.insert({ ownerId, store: 'reviewLogs', key: key(id), data: logData, blob: null, revision: 0, position: budget.last + 1, sourceHash: state.sourceHash });
 			await manager.getRepository(MiFukushuOperationReceipt).insert({ ownerId, id, request, result: JSON.stringify(result) });
