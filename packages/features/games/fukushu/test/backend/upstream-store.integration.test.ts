@@ -610,6 +610,7 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		const file = await upload('alice', input);
 		const accepted = { size: input.length, md5: createHash('md5').update(input).digest('hex') };
 		await store.restore('alice', file, randomUUID(), accepted);
+
 		// Upstream sorts object keys (including blobSize). Compare every field and
 		// attachment in order while allowing equivalent JSON object order.
 		function* frames(bytes: Buffer) {
@@ -628,6 +629,7 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 			}
 			expect(offset).toBe(end);
 		}
+
 		const original = frames(input);
 		for (const stored of frames(await exported(store, 'alice'))) {
 			deepStrictEqual(stored, original.next().value);
@@ -646,8 +648,9 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 
 		const path = join(dir, 'continued.fukushu');
 		const output = await open(path, 'w');
-		try { await store.writeExport('alice', async chunk => { await output.writeFile(chunk); }); }
-		finally { await output.close(); }
+		try {
+			await store.writeExport('alice', async chunk => { await output.writeFile(chunk); });
+		} finally { await output.close(); }
 		const bytes = readFileSync(path);
 		const copied = await upload('bob', bytes);
 		await store.restore('bob', copied, randomUUID(), { size: bytes.length, md5: createHash('md5').update(bytes).digest('hex') });
