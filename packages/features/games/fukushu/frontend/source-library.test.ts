@@ -96,9 +96,7 @@ test('maps the upstream Anki cloze blank, label and hint onto local styles', () 
 	const { container } = render(SourceContent, { global, props: { content: { format: 'html', value } } });
 	const spans = [...container.querySelectorAll('span')];
 	expect(spans.map(span => span.textContent)).toEqual(['ア年', 'ア', '年', '年号']);
-	expect(new Set(spans.slice(0, 3).map(span => span.className)).size).toBe(3);
-	expect(spans.slice(0, 3).every(span => span.className.length > 0)).toBe(true);
-	expect(spans[3].className).toBe('');
+	expect(spans.map(span => span.getAttribute('data-fukushu-cloze'))).toEqual(['blank', 'label', 'hint', null]);
 	expect(container.querySelector('.other')).toBeNull();
 });
 

@@ -7,18 +7,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 <script setup lang="ts">
 import { marked } from 'marked';
-import { computed, h, shallowRef, useCssModule, watch } from 'vue';
+import { computed, h, shallowRef, watch } from 'vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import type { VNodeChild } from 'vue';
 import type { Content } from '../source-study.js';
 
 const props = defineProps<{ content: Content }>();
-const style = useCssModule();
-const clozeClasses = new Map([
-	['cloze-blank', style.clozeBlank],
-	['cloze-label', style.clozeLabel],
-	['cloze-hint', style.clozeHint],
-]);
+const clozeRoles = ['blank', 'label', 'hint'] as const;
 const allowed = new Set('p br b strong mark details summary i em u s sub sup ruby rt rp ul ol li span div table thead tbody tr th td blockquote pre code hr h1 h2 h3 h4 h5 h6'.split(' '));
 const blocked = new Set('style script iframe frame object embed link svg math template noscript form video'.split(' '));
 const mediaId = /^fukushu-media:([a-f0-9]{64})$/;
@@ -67,8 +62,8 @@ function renderNode(node: Node): VNodeChild {
 	}
 	const children = [...node.childNodes].map(renderNode);
 	if (tag === 'span' && el.hasAttribute('class')) {
-		const classes = [...el.classList].map(name => clozeClasses.get(name)).filter(Boolean);
-		return h('span', { class: classes }, children);
+		const role = clozeRoles.find(role => el.classList.contains('cloze-' + role));
+		return h('span', { 'data-fukushu-cloze': role }, children);
 	}
 	return allowed.has(tag) ? h(tag, children) : children;
 }
@@ -90,7 +85,7 @@ function RenderContent(): VNodeChild {
 .markdown :global(pre) { overflow-x: auto; white-space: pre; }
 .markdown > :first-child { margin-block-start: 0; }
 .markdown > :last-child { margin-block-end: 0; }
-.clozeBlank {
+.content :global([data-fukushu-cloze="blank"]) {
 	display: inline-flex;
 	align-items: baseline;
 	justify-content: center;
@@ -100,8 +95,8 @@ function RenderContent(): VNodeChild {
 	border: 1px solid currentColor;
 	border-radius: 2px;
 }
-.clozeLabel { font-weight: bold; }
-.clozeHint { font-size: .75em; }
+.content :global([data-fukushu-cloze="label"]) { font-weight: bold; }
+.content :global([data-fukushu-cloze="hint"]) { font-size: .75em; }
 .content :global(audio) { display: block; margin-block: 6px; }
 .content :global(img), .content :global(audio) { max-width: 100%; }
 </style>
