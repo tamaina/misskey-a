@@ -30,11 +30,10 @@ deck and review request UUIDs. Existing other-owner IDs remain independent. No
 upsert, delete, overwrite, skip-conflicts or partial success is allowed. Unique
 constraints remain the last line of defense and cause a full rollback.
 
-Check the existing owner quotas while holding the same lock: 100 decks including
-archived ones, 64 versions per card, 32 MiB saved question-version JSON, and
-10,000 / 32 MiB review rows. Recompute server byte accounting from restored JSON,
-using the same formula as current writers. Refuse the complete backup if it does
-not fit; never trim history to make it fit.
+While holding the owner lock, enforce the 100-deck limit including archived
+decks, the 64-version limit per card and the 32 MiB version budget. Compute the
+byte size of each restored review from its JSON. Existing reviews in other decks
+do not consume a v1 file's review allowance.
 
 Insert deck, current questions, saved versions, study states and reviews in FK
 order, in bounded batches within one transaction. Preserve original IDs, revisions,

@@ -61,10 +61,10 @@ review leaves no baseline, state or log behind. A later explanation edit retains
 state/history; a stale queued card returns a conflict rather than recording a
 different explanation than the one displayed.
 
-New review records are capped at 10,000 rows and 32 MiB JSON per owner. Current
-and archived decks both count. At capacity reject the entire write and retain
-all prior records. Baseline capture also obeys #325's 32 MiB version budget.
-Never prune history automatically. Request-ID retries remain usable at capacity.
+Saving an answer appends one review and keeps previous reviews across active
+and archived decks. A retry with the same request ID returns the committed
+result. The separate 32 MiB card-version budget still applies to the first
+baseline. Native v1 backups retain their per-file limits (see RESTORE.md).
 The study migration downgrade refuses while state/history rows exist. Account
 deletion follows the existing owner cascade; no study/history deletion API exists.
 

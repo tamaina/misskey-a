@@ -79,7 +79,7 @@ async function longHistory(saved) {
 		for (let i = logs.length; i < 9999; i++) {
 			await tx.store.add({
 				...template, id: 'synthetic-long-' + i,
-				reviewedAt: new Date(Date.UTC(2024, 0, 1) + i * 864000).toISOString(), responseText: '学習記録'.repeat(70) + i,
+				reviewedAt: new Date(Date.UTC(2024, 0, 1) + i * 864000).toISOString(), responseText: '学習記録'.repeat(560) + i,
 			});
 		}
 		await tx.done;

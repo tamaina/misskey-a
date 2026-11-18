@@ -45,7 +45,7 @@ export function emptyUpstreamRecords(): UpstreamRecords {
 }
 
 /** Both readers apply the same schemas and retain the same normalized validation view. */
-export function decodeUpstreamRecord(bytes: Uint8Array, seen: Set<string>, records: UpstreamRecords) {
+export function decodeUpstreamRecord(bytes: Uint8Array, seen: Set<string>, records: UpstreamRecords, externalReviewIndex = false) {
 	let raw: unknown;
 	try { raw = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes)); } catch { throw new UpstreamBackupError('INVALID_BACKUP'); }
 	const parsedRecord = v.safeParse(recordSchema, raw);
@@ -54,8 +54,12 @@ export function decodeUpstreamRecord(bytes: Uint8Array, seen: Set<string>, recor
 	const parsedValue = v.safeParse(upstreamStoreSchemas[record.store], record.value);
 	if (!parsedValue.success) throw new UpstreamBackupError('INVALID_BACKUP');
 	const key = record.value.id ?? record.value.questionId;
-	check(typeof key === 'string' && !seen.has(`${record.store}:${key}`));
-	seen.add(`${record.store}:${key}`);
+	check(typeof key === 'string');
+	if (record.store !== 'reviewLogs' || !externalReviewIndex) {
+		const identity = `${record.store}:${key}`;
+		check(!seen.has(identity));
+		seen.add(identity);
+	}
 	check(record.value.sourceArchiveBase64 === undefined && (record.store !== 'media' || record.value.blobBase64 === ''));
 	(records[record.store] as unknown[]).push(parsedValue.output);
 	return record;

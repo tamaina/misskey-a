@@ -601,12 +601,12 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		expect((await store.show('bob', { deckId })).historyPage?.total).toBe(1);
 	});
 
-	test('a new answer at the pilot byte ceiling rolls back state, log and receipt', async () => {
+	test('a new answer at the archive size ceiling rolls back state, log and receipt', async () => {
 		await store.restore('alice', await upload('alice'), randomUUID());
 		const before = await exported(store, 'alice');
 		const prior = await counts();
-		// Simulate the measured counter at capacity without allocating a 64 MiB collection.
-		await db.query('UPDATE fukushu_source_usage SET bytes = $1 WHERE "ownerId" = $2', [64 * 1024 * 1024, 'alice']);
+		// Simulate the measured counter at capacity without allocating a 1 GiB collection.
+		await db.query('UPDATE fukushu_source_usage SET bytes = $1 WHERE "ownerId" = $2', [1024 ** 3, 'alice']);
 		const { reviewedAt: _time, ...request } = expected.reset.request;
 		await expect(store.review('alice', request)).rejects.toThrow('BACKUP_TOO_LARGE');
 		expect(await counts()).toEqual(prior);

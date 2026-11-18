@@ -137,7 +137,7 @@ describe.skipIf(!socket)('atomic native restore PostgreSQL', () => {
 		expect((await allRows()).every(rows => rows.length === 0)).toBe(true);
 	});
 
-	test.each(['decks', 'version-count', 'version-bytes', 'review-count', 'review-bytes'] as const)('enforces the existing %s quota without partial import', async kind => {
+	test.each(['decks', 'version-count', 'version-bytes', 'review-count', 'review-bytes'] as const)('applies the correct restore policy at the former %s boundary', async kind => {
 		const payload = backupFixture();
 		if (kind === 'version-count') {
 			payload.questions[0].currentVersion = 65;
@@ -150,10 +150,43 @@ describe.skipIf(!socket)('atomic native restore PostgreSQL', () => {
 			if (kind === 'review-bytes') await db.query('UPDATE fukushu_review_log SET "byteSize" = 33554432');
 			if (kind === 'review-count') await db.query('INSERT INTO fukushu_review_log ("ownerId", id, "questionId", "deckId", "questionVersion", "stateRevision", "reviewedAt", data, before, after, request, "schedulerVersion", "desiredRetention", "enableFuzz", "byteSize") SELECT "ownerId", (\'22222222-2222-4222-8222-\' || lpad(n::text,12,\'0\'))::uuid, "questionId", "deckId", "questionVersion", "stateRevision", "reviewedAt", data, before, after, request, "schedulerVersion", "desiredRetention", "enableFuzz", "byteSize" FROM fukushu_review_log CROSS JOIN generate_series(1,9999) n');
 		}
+		if (kind === 'review-count' || kind === 'review-bytes') {
+			const result = await restorer.restore('bob', await upload('bob', encodeBackup(payload)));
+			expect(result.reviews).toBe(payload.reviews.length);
+			expect((await study.history('bob', result.deckId)).map(row => row.id)).toEqual(payload.reviews.map(row => row.id));
+			return;
+		}
 		const before = await allRows();
 		await expect(restorer.restore('bob', await upload('bob', encodeBackup(payload)))).rejects.toThrow('BACKUP_LIMIT');
 		expect(await allRows()).toEqual(before);
 	});
+
+	// Opt-in because this exercises 10,020 real FSRS/DB writes and two complete libraries.
+	test.skipIf(process.env.FUKUSHU_NATIVE_LONG_HISTORY !== '1')('round-trips v1 decks after crossing both former owner history limits', async () => {
+		let total = 0;
+		for (let index = 0; index < 20; index++) {
+			const source = material('教材'.repeat(125) + index, '問題'.repeat(125) + index);
+			const id = source.deck.id;
+			const questionId = source.questions[0].id;
+			await materials.create('alice', source);
+			now = new Date('2026-11-17T00:00:00Z');
+			for (let revision = 0; revision < 501; revision++) {
+				const input = request({ id, questionId, expectedStateRevision: revision, rating: 'again' });
+				const result = await study.review('alice', input);
+				now = new Date(result.card.due);
+				total++;
+			}
+			const bytes = await backups.export('alice', id);
+			const restored = await restorer.restore('bob', await upload('bob', bytes, 'deck-' + index));
+			expect(restored.reviews).toBe(501);
+			expect((await backups.export('bob', id)).equals(bytes)).toBe(true);
+		}
+		expect(total).toBe(10020);
+		const stats = await db.query('SELECT "ownerId", COUNT(*)::integer AS count, SUM("byteSize")::integer AS bytes FROM fukushu_review_log GROUP BY "ownerId" ORDER BY "ownerId"');
+		expect(stats.map(row => row.count)).toEqual([total, total]);
+		expect(stats[0].bytes).toBeGreaterThan(32 * 1024 ** 2);
+		expect(stats[1].bytes).toBe(stats[0].bytes);
+	}, 240_000);
 
 	test('rolls back deck, questions, versions and states after a late review insert failure', async () => {
 		await materials.create('bob', material('existing', 'other'));

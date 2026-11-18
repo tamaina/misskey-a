@@ -78,7 +78,7 @@ try {
 		const result = await page.evaluate(() => window.compatibility.longHistory());
 		await (await download).saveAs(join(out, 'long-input.fukushu'));
 		assert.equal(result.logs, 9999);
-		assert(result.bytes > 8 * 1024 ** 2);
+		assert(result.bytes > 64 * 1024 ** 2);
 		console.log(JSON.stringify({ ...result, upstream: pinned, chrome: browser.version() }));
 	} else if (process.env.FUKUSHU_LONG_HISTORY === 'verify') {
 		const saved = JSON.parse(await readFile(process.env.FUKUSHU_PERSISTED_STATE, 'utf8'));
