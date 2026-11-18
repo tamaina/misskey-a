@@ -156,8 +156,12 @@ This design requires temporary space for one input and an uninterrupted
 transaction during the database write. It needs no persistent import staging
 or partial-row cleanup. Queue restart can repeat work from the original.
 
-Export writes ordered frames and 256 KiB binary slices from one repeatable-read
-snapshot into a temporary file, then sends the completed file to Drive. Export
+Export fetches up to 32 ordered record headers and JSON values at a time from a
+transaction-local PostgreSQL cursor. It writes the original frame order and
+256 KiB binary slices from the same repeatable-read snapshot into a temporary
+file, then sends the completed file to Drive. A reader or writer failure
+rolls back the transaction and releases the cursor. The page bounds the row
+count; one large JSON value still needs to fit in memory. Export
 requires free temporary space and Drive quota. The library list currently
 returns all bounded metadata. Inline media preview supports individual files
 up to 8 MiB. GIFT updates still use the small archive adapter (8 MiB archive,
@@ -171,6 +175,24 @@ This synthetic input has 5,000 questions and a 24 MiB attachment. The test
 exercises ordinary Drive upload, racing job submissions, polling, review replay
 and a checksummed Drive export. Its reported RSS samples the application PID
 at 100 ms intervals and excludes the client, PostgreSQL and Redis.
+
+### Long review histories
+
+Each upstream review appends the UTF-8 JSON of a log frame and changes the size
+of the current state. The 8 MiB aggregate budget counts both, along with all
+other metadata. The number of reviews that fit depends on the existing material
+and answers. At capacity the transaction rolls back the state, log and receipt.
+
+The export regression seeds a disposable database with over 9 MiB of synthetic
+review text and verifies the complete output digest and maximum fetched row
+count. This exercises only the export path beyond 8 MiB. Before accepting larger
+histories, local/Drive inspection and restore must validate logs without keeping
+every payload in memory. Preserve ID uniqueness and question/deck references
+even when a log precedes its question. Restore can reread the validated Drive
+snapshot inside the existing owner transaction. The library and study queue
+also need paged history and a query for the current study day, preserving the
+4 am local rollover. At that point, ordinary review and re-import can use the
+same revised byte policy.
 
 The pinned app accepts legacy JSON versions 1–3, reconstructs missing source
 metadata and repairs legacy APKG data for versions below 3. Direct JSON restore

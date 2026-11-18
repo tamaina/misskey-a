@@ -23,6 +23,7 @@ import { scanSourceArchive } from '../../shared/source-scan.js';
 import { readUpstreamArchive } from '../../shared/upstream-reader.js';
 import { encodeUpstreamFrames } from '../../backend/pilot/upstream-session.js';
 import { material } from './fixture.js';
+import type { EntitySubscriberInterface } from 'typeorm';
 import type { DriveSnapshot } from '../../backend/backup-drive.js';
 
 const sha = async (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
@@ -328,6 +329,50 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		await expect(store.review('alice', request)).rejects.toThrow('BACKUP_TOO_LARGE');
 		expect(await counts()).toEqual(totals);
 		expect(await sha(await exported(store, 'alice'))).toBe(before);
+	});
+
+	test('exports more than 8 MiB of persisted history in bounded pages without changing source bytes', async () => {
+		await store.restore('alice', await upload('alice'), randomUUID());
+		const baseline = await exported(store, 'alice');
+		const log = (await readUpstreamArchive(baseline, sha)).frames().find(frame => frame.store === 'reviewLogs');
+		if (!log) throw new Error('Expected a source review fixture');
+		const expectedHash = createHash('sha256').update(baseline.subarray(0, -64));
+		const [{ last }] = await db.query('SELECT last FROM fukushu_source_usage WHERE "ownerId" = $1', ['alice']);
+		// Seed only the export reader's input in this disposable DB. Production
+		// restore/review still enforce the cumulative 8 MiB metadata limit.
+		const responseText = 'a'.repeat(64 * 1024);
+		const sourceHash = await sha(bytes);
+		for (let i = 1; i <= 144; i++) {
+			const id = 'long-history-' + i;
+			const value = { ...log.value, id, responseText };
+			const json = Buffer.from(JSON.stringify({ store: 'reviewLogs', value }));
+			const length = Buffer.alloc(4);
+			length.writeUInt32LE(json.length);
+			expectedHash.update(length).update(json);
+			await db.query(`INSERT INTO fukushu_upstream_record ("ownerId", store, key, data, position, "sourceHash")
+				VALUES ($1, 'reviewLogs', $2, $3, $4, $5)`, ['alice', await sha(Buffer.from(JSON.stringify(id))), JSON.stringify(value), last + i, sourceHash]);
+		}
+		const trailer = expectedHash.copy().digest('hex');
+		expectedHash.update(trailer);
+		let largestPage = 0;
+		const subscriber: EntitySubscriberInterface = {
+			afterQuery(event) {
+				const rows = event.rawResults?.rows;
+				if (Array.isArray(rows) && typeof rows[0]?.data === 'string') largestPage = Math.max(largestPage, rows.length);
+			},
+		};
+		db.subscribers.push(subscriber);
+		try {
+			const actual = createHash('sha256');
+			let size = 0;
+			await store.writeExport('alice', async part => { actual.update(part); size += part.length; });
+			expect(size).toBeGreaterThan(9 * 1024 * 1024);
+			expect(actual.digest('hex')).toBe(expectedHash.digest('hex'));
+			expect(largestPage).toBeGreaterThan(0);
+			expect(largestPage).toBeLessThanOrEqual(32);
+		} finally {
+			db.subscribers.splice(db.subscribers.indexOf(subscriber), 1);
+		}
 	});
 
 	test('an export overlapping a review retains its original snapshot', async () => {

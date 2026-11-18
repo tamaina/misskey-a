@@ -220,8 +220,14 @@ export class FukushuUpstreamStore {
 	/** Await each write inside a single snapshot. The caller publishes only after completion. */
 	async writeExport(ownerId: string, write: (bytes: Buffer) => Promise<void>) {
 		await this.db.transaction('REPEATABLE READ', async manager => {
-			const rows: { store: string; key: string; data: string; size: number | null; chunked: boolean }[] = await manager.query(
-				'SELECT store, key, data, COALESCE("chunkedSize", octet_length(blob)) AS size, ("chunkedSize" IS NOT NULL) AS chunked FROM fukushu_upstream_record WHERE "ownerId" = $1 ORDER BY position, store, key', [ownerId]);
+			// A transaction-local cursor keeps one ordered snapshot while bounding the
+			// number of metadata rows delivered to the application at once.
+			await manager.query(`DECLARE fukushu_export NO SCROLL CURSOR FOR
+				SELECT store, key, data, COALESCE("chunkedSize", octet_length(blob)) AS size, ("chunkedSize" IS NOT NULL) AS chunked
+				FROM fukushu_upstream_record WHERE "ownerId" = $1 ORDER BY position, store, key`, [ownerId]);
+			type Row = { store: string; key: string; data: string; size: number | null; chunked: boolean };
+			const nextPage = (): Promise<Row[]> => manager.query('FETCH FORWARD 32 FROM fukushu_export');
+			let rows = await nextPage();
 			if (!rows.length) throw new MaterialError('NO_SUCH_MATERIAL');
 			const digest = createHash('sha256');
 			let total = 64;
@@ -234,21 +240,24 @@ export class FukushuUpstreamStore {
 			}
 
 			await payload(Buffer.from(UPSTREAM_MAGIC));
-			for (const row of rows) {
-				const json = Buffer.from(JSON.stringify({ store: row.store, value: JSON.parse(row.data), ...(row.size === null ? {} : { blobSize: row.size }) }));
-				const header = Buffer.alloc(4);
-				header.writeUInt32LE(json.length);
-				await payload(Buffer.concat([header, json]));
-				const mediaHash = row.store === 'media' ? createHash('sha256') : undefined;
-				for (let offset = 0; offset < (row.size ?? 0); offset += SOURCE_CHUNK_BYTES) {
-					const [result] = row.chunked
-						? await manager.query('SELECT bytes FROM fukushu_upstream_chunk WHERE "ownerId" = $1 AND store = $2 AND key = $3 AND part = $4', [ownerId, row.store, row.key, offset / SOURCE_CHUNK_BYTES])
-						: await manager.query('SELECT substring(blob FROM $4 FOR $5) AS bytes FROM fukushu_upstream_record WHERE "ownerId" = $1 AND store = $2 AND key = $3', [ownerId, row.store, row.key, offset + 1, SOURCE_CHUNK_BYTES]);
-					if (result?.bytes.length !== Math.min(SOURCE_CHUNK_BYTES, Number(row.size) - offset)) throw new BackupError('BACKUP_FAILED');
-					mediaHash?.update(result.bytes);
-					await payload(result.bytes);
+			while (rows.length > 0) {
+				for (const row of rows) {
+					const json = Buffer.from(JSON.stringify({ store: row.store, value: JSON.parse(row.data), ...(row.size === null ? {} : { blobSize: row.size }) }));
+					const header = Buffer.alloc(4);
+					header.writeUInt32LE(json.length);
+					await payload(Buffer.concat([header, json]));
+					const mediaHash = row.store === 'media' ? createHash('sha256') : undefined;
+					for (let offset = 0; offset < (row.size ?? 0); offset += SOURCE_CHUNK_BYTES) {
+						const [result] = row.chunked
+							? await manager.query('SELECT bytes FROM fukushu_upstream_chunk WHERE "ownerId" = $1 AND store = $2 AND key = $3 AND part = $4', [ownerId, row.store, row.key, offset / SOURCE_CHUNK_BYTES])
+							: await manager.query('SELECT substring(blob FROM $4 FOR $5) AS bytes FROM fukushu_upstream_record WHERE "ownerId" = $1 AND store = $2 AND key = $3', [ownerId, row.store, row.key, offset + 1, SOURCE_CHUNK_BYTES]);
+						if (result?.bytes.length !== Math.min(SOURCE_CHUNK_BYTES, Number(row.size) - offset)) throw new BackupError('BACKUP_FAILED');
+						mediaHash?.update(result.bytes);
+						await payload(result.bytes);
+					}
+					if (mediaHash && mediaHash.digest('hex') !== JSON.parse(row.data).id) throw new BackupError('BACKUP_FAILED');
 				}
-				if (mediaHash && mediaHash.digest('hex') !== JSON.parse(row.data).id) throw new BackupError('BACKUP_FAILED');
+				rows = await nextPage();
 			}
 			await write(Buffer.from(digest.digest('hex')));
 		});
