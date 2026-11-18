@@ -8,9 +8,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<form v-if="loaded" class="_gaps_s" :class="$style.form" @input="saved = false" @submit.prevent="save">
 		<label><input v-model="enabled" type="checkbox" :disabled="busy"/> {{ $locale.sfc.enable }}</label>
 		<template v-if="enabled">
-			<label>{{ $locale.sfc.time }} <input v-model="localTime" type="time" required :disabled="busy"/></label>
+			<label><MkInput v-model="localTime" type="time" required :disabled="busy"><template #label>{{ $locale.sfc.time }}</template></MkInput></label>
 			<label><MkInput v-model="zone" required :disabled="busy"><template #label>{{ $locale.sfc.zone }}</template></MkInput></label>
-			<p>{{ $locale.sfc.device }} <MkA to="/settings/notifications">{{ $locale.sfc.deviceSettings }}</MkA></p>
+			<p>{{ $locale.sfc.device }} <MkA :class="$style.link" to="/settings/notifications">{{ $locale.sfc.deviceSettings }}</MkA></p>
 		</template>
 		<div><MkButton type="submit" primary :disabled="busy" :wait="busy">{{ $locale.sfc.save }}</MkButton></div>
 	</form>
@@ -64,6 +64,7 @@ async function save() {
 .panel summary { cursor: pointer; }
 .form { margin-top: 12px; }
 .form p { margin: 0; }
+.link { text-decoration: underline; }
 </style>
 
 <locale locale="ja-JP" lang="json">
