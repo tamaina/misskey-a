@@ -54460,8 +54460,10 @@ export interface operations {
             content: {
                 'application/json': {
                     id: string;
+                    offset?: number;
                 } & ({
                     id: string;
+                    offset?: number;
                 } & unknown);
             };
         };
@@ -54475,6 +54477,7 @@ export interface operations {
                     'application/json': {
                         mimeType: string;
                         base64: string;
+                        totalBytes?: number;
                     };
                 };
             };

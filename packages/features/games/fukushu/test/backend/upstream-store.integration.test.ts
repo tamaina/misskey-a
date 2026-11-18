@@ -426,6 +426,16 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		const [usage] = await db.query('SELECT count, logs, bytes, binaries FROM fukushu_source_usage');
 		expect(usage.logs).toBe(38);
 		expect(usage.binaries + usage.bytes + 4 * usage.count + 81).toBe(new Blob(parts).size);
+		const start = 256 * 1024 - 3;
+		const chunked = await store.media('alice', mediaId, start);
+		expect(chunked.totalBytes).toBe(media.length);
+		const mediaKey = createHash('sha256').update(JSON.stringify(mediaId)).digest('hex');
+		await db.query('DELETE FROM fukushu_upstream_chunk WHERE "ownerId" = $1 AND store = $2 AND key = $3 AND part = 1', ['alice', 'media', mediaKey]);
+		await expect(store.media('alice', mediaId, start)).rejects.toThrow('BACKUP_FAILED');
+		// The same logical media must read identically from a single large bytea.
+		await db.query('UPDATE fukushu_upstream_record SET blob = $4, "chunkedSize" = NULL WHERE "ownerId" = $1 AND store = $2 AND key = $3', ['alice', 'media', mediaKey, media]);
+		expect(await store.media('alice', mediaId, start)).toEqual(chunked);
+		await expect(store.media('bob', mediaId, start)).rejects.toThrow('NO_SUCH_MATERIAL');
 	});
 
 	test('ordinary reviews cross both legacy record ceilings, replay once and round-trip every frame', async () => {

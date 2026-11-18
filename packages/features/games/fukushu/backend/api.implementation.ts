@@ -63,7 +63,7 @@ export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' 
 				throw err;
 			}
 		}),
-		upstreamMedia: procedure(fukushuContract.upstreamMedia).use(principal).handler(({ input, context }) => invoke(() => upstreamStore().media(context.principal.id, input.id))),
+		upstreamMedia: procedure(fukushuContract.upstreamMedia).use(principal).handler(({ input, context }) => invoke(() => upstreamStore().media(context.principal.id, input.id, input.offset))),
 		upstreamUpdateGift: procedure(fukushuContract.upstreamUpdateGift).use(principal).handler(({ input, context }) => invoke(() => {
 			const reader = upstream?.readGift;
 			if (!reader) throw new BackupError('BACKUP_FAILED');

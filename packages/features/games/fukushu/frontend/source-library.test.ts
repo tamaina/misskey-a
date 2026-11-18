@@ -10,6 +10,7 @@ import { chooseDriveFile } from '@features/drive/frontend/utility/drive.js';
 import SourceLibrary from './components/SourceLibrary.vue';
 import SourceContent from './components/SourceContent.vue';
 import SourceStudy from './components/SourceStudy.vue';
+import { loadSourceMedia } from './source-media.js';
 import { queue } from './source-study.js';
 import type { SourceQuestion } from './source-study.js';
 import type { UpstreamRecords } from '../shared/upstream-records.schema.js';
@@ -56,7 +57,7 @@ test('a confirmed byte limit keeps the answer unsaved and avoids retrying the sa
 });
 
 test('renders owned raster media, preserves text, and omits external requests and active markup', async () => {
-	const id = 'b'.repeat(64);
+	const id = '709e80c88487a2411e1ee4dfb9f22a861492d20c4765150c0c794abd70f8147c';
 	vi.mocked(misskeyApi).mockResolvedValue({ mimeType: 'image/png', base64: 'AAAA' } as never);
 	const { container } = render(SourceContent, { global, props: { content: { format: 'html', value: '<strong>apple</strong><img alt="apple" src="fukushu-media:' + id + '"><img src="https://example.invalid/image" alt="diagram"><iframe></iframe><a href="https://example.invalid/">caption</a>' } } });
 	await waitFor(() => expect(container.querySelector('img')?.src).toBe('data:image/png;base64,AAAA'));
@@ -64,11 +65,11 @@ test('renders owned raster media, preserves text, and omits external requests an
 	expect(container.querySelector('a, iframe')).toBeNull();
 	expect(container.querySelectorAll('img')).toHaveLength(1);
 	expect(container.textContent).toContain('diagram');
-	expect(vi.mocked(misskeyApi).mock.calls.map(c => [c[0], c[1]])).toEqual([['fukushu/upstream/media', { id }]]);
+	expect(vi.mocked(misskeyApi).mock.calls.map(c => [c[0], c[1]])).toEqual([['fukushu/upstream/media', { id, offset: 0 }]]);
 });
 
 test('renders imported Markdown structure and owned media while keeping plain cards literal', async () => {
-	const id = 'c'.repeat(64);
+	const id = '709e80c88487a2411e1ee4dfb9f22a861492d20c4765150c0c794abd70f8147c';
 	vi.mocked(misskeyApi).mockResolvedValue({ mimeType: 'image/png', base64: 'AAAA' } as never);
 	const value = [
 		'## Photosynthesis', '', '**Light** and `CO2`.', '', '- Oxygen', '- Sugar',
@@ -89,6 +90,20 @@ test('renders imported Markdown structure and owned media while keeping plain ca
 	await rerender({ content: { format: 'plain', value } });
 	expect(container.textContent).toBe(value);
 	expect(container.querySelector('h2, strong, img, table')).toBeNull();
+});
+
+test('rejects a changed media body and cancels a rate-limited read when the card is closed', async () => {
+	const id = 'b'.repeat(64);
+	const controller = new AbortController();
+	vi.mocked(misskeyApi).mockResolvedValueOnce({ mimeType: 'image/png', base64: 'AAAA', totalBytes: 3 } as never);
+	await expect(loadSourceMedia(id, controller.signal)).rejects.toThrow('Media digest mismatch');
+
+	vi.mocked(misskeyApi).mockRejectedValueOnce({ code: 'RATE_LIMIT_EXCEEDED', info: { resetMs: Date.now() + 60_000 } });
+	const stopped = expect(loadSourceMedia(id, controller.signal)).rejects.toMatchObject({ name: 'AbortError' });
+	await Promise.resolve();
+	controller.abort();
+	await stopped;
+	expect(misskeyApi).toHaveBeenCalledTimes(2);
 });
 
 test('maps the upstream Anki cloze blank, label and hint onto local styles', () => {

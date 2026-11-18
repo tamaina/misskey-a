@@ -120,11 +120,18 @@ separate score and correct flag. Flashcards use self-assessment. An unconfirmed
 save retries its original request ID and revision. Read the current card in the
 deck view and the historical result in the review list.
 
-Images and audio in supported formats are fetched by the owner's media ID.
-The renderer supports basic HTML, ruby, lists, tables, raster images and audio.
-External assets, custom Anki CSS/scripts and active templates do not run here.
-Markdown and math source remain readable as text. The original content, CSS,
-package and binary media remain available in the upstream export.
+Cards render basic HTML and Markdown, text-node math, and selected Anki
+typography in a scriptless frame. The original content and binary attachments
+remain available in the upstream export.
+
+For raster images and audio, the viewer calls `fukushu/upstream/media` with
+the media ID and a byte offset. Each authenticated request checks the owner
+and returns up to 1 MiB before base64 encoding, with the MIME type and total
+byte length. Reading at or past the end returns an empty page. The client
+checks the complete SHA-256 against the ID before displaying the attachment.
+For multi-page files it gives decoded bytes to the browser to build a Blob and
+revokes the object URL when the card closes. Playback and seeking start after
+the download completes. The client respects the existing API rate limit.
 
 For a GIFT deck, choose an owned UTF-8 .gift or .txt file (up to 256 KiB).
 Preview the counts before applying. Source keys match existing IDs. Incompatible
@@ -162,8 +169,8 @@ transaction-local PostgreSQL cursor. It writes the original frame order and
 file, then sends the completed file to Drive. A reader or writer failure
 rolls back the transaction and releases the cursor. The page bounds the row
 count; one large JSON value still needs to fit in memory. Export
-requires free temporary space and Drive quota. The library list requests only material metadata; each selected deck retrieves a separate history page. Inline media preview supports individual files
-up to 8 MiB. A GIFT update accepts up to 256 KiB of UTF-8 text and 1,000 incoming
+requires free temporary space and Drive quota. The library list requests only material metadata; each selected deck retrieves a separate history page. Media preview reads either storage layout. Legacy API calls without an offset
+retain the single-response 8 MiB limit. A GIFT update accepts up to 256 KiB of UTF-8 text and 1,000 incoming
 questions. It reads the owner’s material JSON, checks the resulting relations
 and accounts for the changed frames in the same transaction. Review bodies
 and attachments stay in place. The preview expires after a concurrent edit or review. The native-v1

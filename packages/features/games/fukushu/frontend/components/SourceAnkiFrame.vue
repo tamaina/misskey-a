@@ -16,7 +16,7 @@ const frame = ref<HTMLIFrameElement>();
 const body = shallowRef<HTMLElement>();
 const height = ref(40);
 // This document is constant. Source markup, URLs, and CSS never enter srcdoc.
-const cardDocument = `<!doctype html><html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; media-src data:; base-uri 'none'; form-action 'none'"><style>
+const cardDocument = `<!doctype html><html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data: blob:; media-src data: blob:; base-uri 'none'; form-action 'none'"><style>
 html,body{margin:0}body{box-sizing:border-box;padding:4px;overflow-wrap:anywhere;color:var(--card-fg);background:var(--card-bg)}
 img,audio{max-width:100%}pre{overflow-x:auto}[data-fukushu-cloze=blank]{display:inline-block;border:1px solid;min-width:3em;text-align:center}
 [data-fukushu-cloze=label]{font-weight:bold}[data-fukushu-cloze=hint]{font-size:.75em}

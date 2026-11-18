@@ -663,6 +663,11 @@ test('real authentication, Drive, material maintenance and explanation versions'
 			assert.equal(result.mimeType, m.mimeType);
 			assert.equal(createHash('sha256').update(Buffer.from(result.base64, 'base64')).digest('hex'), m.id);
 			assert.equal((await call('fukushu/upstream/media', { id: m.id, ownerId: alice.id }, bob.token)).status, 404);
+			const tail = ok(await call('fukushu/upstream/media', { id: m.id, offset: 1 }, alice.token));
+			assert.equal(tail.totalBytes, m.size);
+			assert.deepEqual(Buffer.from(tail.base64, 'base64'), Buffer.from(result.base64, 'base64').subarray(1));
+			assert.equal((await call('fukushu/upstream/media', { id: m.id, offset: -1 }, alice.token)).status, 400);
+			assert.equal((await call('fukushu/upstream/media', { id: m.id, offset: 0 })).status, 401);
 		}
 		const form = new FormData();
 		form.set('i', alice.token);
@@ -741,6 +746,24 @@ test('real authentication, Drive, material maintenance and explanation versions'
 			const large = rows.find(r => r.blobSize === 24 * 1024 ** 2);
 			assert.ok(large);
 			assert.equal(createHash('sha256').update(large.binary).digest('hex'), large.value.id);
+			const id = large.value.id;
+			assert.equal((await call('fukushu/upstream/media', { id }, bob.token)).body.error.code, 'BACKUP_TOO_LARGE');
+			assert.equal((await call('fukushu/upstream/media', { id, offset: 0 }, alice.token)).status, 404);
+			const mediaDigest = createHash('sha256');
+			for (let offset = 0; offset < large.binary.length;) {
+				const page = ok(await call('fukushu/upstream/media', { id, offset }, bob.token));
+				const bytes = Buffer.from(page.base64, 'base64');
+				assert.equal(page.totalBytes, large.binary.length);
+				assert.ok(bytes.length > 0 && bytes.length <= 1024 ** 2);
+				assert.deepEqual(bytes, large.binary.subarray(offset, offset + bytes.length));
+				mediaDigest.update(bytes);
+				offset += bytes.length;
+			}
+			assert.equal(mediaDigest.digest('hex'), id);
+			for (const offset of [256 * 1024 - 3, 8 * 1024 ** 2 - 3, large.binary.length - 3, large.binary.length, 2147483647]) {
+				const page = ok(await call('fukushu/upstream/media', { id, offset }, bob.token));
+				assert.deepEqual(Buffer.from(page.base64, 'base64'), large.binary.subarray(offset, offset + 1024 ** 2));
+			}
 			assert.deepEqual(rows.find(r => r.store === 'reviewLogs' && r.value.id === review.record.id).value, review.record);
 			assert.deepEqual(rows.find(r => r.store === 'studyStates' && r.value.questionId === reviewInput.questionId).value.card, review.state.card);
 			console.log(JSON.stringify({ bytes: blob.size, cards: 5000, baselineKiB, peakKiB, uploadMs: uploaded - started, importIncludingPollingMs: restored - uploaded, reviewAndReplayMs: reviewed - restored, exportIncludingPollingMs: exported - reviewed }));

@@ -179,12 +179,38 @@ export class FukushuUpstreamStore {
 		return records;
 	}
 
-	async media(ownerId: string, id: string) {
-		const row = await this.db.getRepository(MiFukushuUpstreamRecord).findOneBy({ ownerId, store: 'media', key: key(id) });
-		if (row?.chunkedSize != null) throw new BackupError('BACKUP_TOO_LARGE');
-		if (!row?.blob) throw new MaterialError('NO_SUCH_MATERIAL');
-		const { mimeType } = JSON.parse(row.data);
-		return { mimeType: String(mimeType), base64: row.blob.toString('base64') };
+	/** With an offset the wire page is independent of the physical layout. An offset past EOF returns an empty page. */
+	async media(ownerId: string, id: string, offset?: number) {
+		const mediaKey = key(id);
+		const start = offset ?? 0;
+		const limit = offset === undefined ? MAX_BACKUP_BYTES : 1024 * 1024;
+		const [row] = await this.db.query<{ data: string; size: number | null; chunked: boolean; bytes: Buffer | null }[]>(`
+			SELECT data, COALESCE("chunkedSize", octet_length(blob)) AS size, "chunkedSize" IS NOT NULL AS chunked,
+				substring(blob FROM least($3::integer, COALESCE(octet_length(blob), 0)) + 1 FOR $4::integer) AS bytes
+			FROM fukushu_upstream_record WHERE "ownerId" = $1 AND store = 'media' AND key = $2`, [ownerId, mediaKey, start, limit]);
+		if (row?.size == null) throw new MaterialError('NO_SUCH_MATERIAL');
+		const size = row.size;
+		if (offset === undefined && size > limit) throw new BackupError('BACKUP_TOO_LARGE');
+		const length = Math.min(limit, Math.max(0, size - start));
+		let bytes = row.bytes;
+		if (row.chunked && length > 0) {
+			const first = Math.floor(start / SOURCE_CHUNK_BYTES);
+			const last = Math.floor((start + length - 1) / SOURCE_CHUNK_BYTES);
+			const parts = await this.db.query<{ part: number; bytes: Buffer }[]>(`
+				SELECT part, bytes FROM fukushu_upstream_chunk
+				WHERE "ownerId" = $1 AND store = 'media' AND key = $2 AND part BETWEEN $3 AND $4
+				ORDER BY part`, [ownerId, mediaKey, first, last]);
+			if (parts.length !== last - first + 1) throw new BackupError('BACKUP_FAILED');
+			const slices = parts.map((part, index) => {
+				const base = (first + index) * SOURCE_CHUNK_BYTES;
+				if (part.part !== first + index || part.bytes.length !== Math.min(SOURCE_CHUNK_BYTES, size - base)) throw new BackupError('BACKUP_FAILED');
+				return part.bytes.subarray(Math.max(0, start - base), start + length - base);
+			});
+			bytes = Buffer.concat(slices, length);
+		}
+		if ((bytes?.length ?? 0) !== length) throw new BackupError('BACKUP_FAILED');
+		return { mimeType: String(JSON.parse(row.data).mimeType), base64: bytes?.toString('base64') ?? '',
+			...(offset === undefined ? {} : { totalBytes: size }) };
 	}
 
 	async updateGift(ownerId: string, deckId: string, fileId: string, readGift: () => Promise<Buffer>, expected?: string) {
