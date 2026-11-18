@@ -20,6 +20,8 @@ import { FukushuUpstreamStore } from '../../backend/upstream-store.js';
 import { FukushuDeckHistoryIndex1794990000000 } from '../../../../../backend/migration/1794990000000-FukushuDeckHistoryIndex.js';
 import { FukushuMaterialBytes1794980000000 } from '../../../../../backend/migration/1794980000000-FukushuMaterialBytes.js';
 import { FukushuSourceChunks1794974400000 } from '../../../../../backend/migration/1794974400000-FukushuSourceChunks.js';
+import { FukushuReminderPilot } from '../../backend/pilot/reminder.js';
+import { FukushuStudyStore } from '../../backend/study-store.js';
 import { FukushuStore } from '../../backend/store.js';
 import { scanSourceArchive } from '../../shared/source-scan.js';
 import { readUpstreamArchive } from '../../shared/upstream-reader.js';
@@ -50,6 +52,7 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 	beforeAll(async () => {
 		await db.initialize(); await db.query('CREATE SCHEMA fukushu_upstream_test');
 		await db.query('CREATE TABLE "user" (id varchar(32) PRIMARY KEY)');
+		await db.query(readFileSync('../features/games/fukushu/backend/pilot/reminder.sql', 'utf8'));
 		await db.query('CREATE TABLE drive_file (id varchar(32) PRIMARY KEY, "userId" varchar(32) REFERENCES "user"(id), "userHost" text, uri text, "isLink" boolean NOT NULL DEFAULT false, size integer NOT NULL, md5 text NOT NULL)');
 		const runner = db.createQueryRunner();
 		try { for (const Migration of [FukushuMaterial1794838800000, FukushuMaterialManagement1794871800000, FukushuQuestionVersions1794880800000, FukushuStudy1794891600000, FukushuUpstreamStore1794924000000, FukushuSourceChunks1794974400000, FukushuMaterialBytes1794980000000, FukushuDeckHistoryIndex1794990000000]) await new Migration().up(runner); } finally { await runner.release(); }
@@ -63,6 +66,115 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		return id;
 	}
 
+	test('checks native due reviews only for their opted-in owner and claims once across workers and restarts', async () => {
+		let now = new Date('2026-11-18T00:00:00Z');
+		const worker = () => new FukushuReminderPilot(db, () => now);
+		const native = new FukushuStore(db);
+		const study = new FukushuStudyStore(db, () => now);
+		await native.create('alice', material());
+		await native.create('bob', material());
+		await study.review('alice', { id: 'deck-original', questionId: 'card-original', questionVersion: 1,
+			expectedStateRevision: 0, requestId: randomUUID(), rating: 'again', durationMs: 100 });
+		const schedule = { localTime: '09:05', zone: 'Asia/Tokyo' };
+		expect(await worker().claimNext()).toBeUndefined();
+		await worker().configure('bob', schedule);
+		await worker().configure('alice', schedule);
+		expect(await worker().claimNext()).toBeUndefined();
+		now = new Date('2026-11-18T00:05:00Z');
+		const claims = await Promise.all([worker().claimNext(), worker().claimNext()]);
+		expect(claims.sort()).toEqual(['alice', null]);
+		expect(await worker().claimNext()).toBeUndefined();
+		await worker().configure('alice', null);
+		await worker().configure('alice', { localTime: '10:00', zone: 'Asia/Tokyo' });
+		now = new Date('2026-11-18T01:00:00Z');
+		expect(await worker().claimNext()).toBeNull();
+		await db.query('UPDATE fukushu_deck SET "archivedAt" = $1 WHERE "ownerId" = $2', [now, 'alice']);
+		now = new Date('2026-11-19T01:00:00Z');
+		expect(await worker().claimNext()).toBeNull(); // Bob's fresh card
+		expect(await worker().claimNext()).toBeNull(); // Alice's archived deck
+		await worker().configure('alice', null);
+		await worker().configure('bob', null);
+		now = new Date('2026-11-20T01:00:00Z');
+		expect(await worker().claimNext()).toBeUndefined();
+	});
+
+	test('checks imported state and eligible questions, tolerates opaque source text and leaves history intact', async () => {
+		let now = new Date('2027-12-01T08:00:00Z');
+		const pilot = new FukushuReminderPilot(db, () => now);
+		await store.restore('alice', await upload('alice'), randomUUID());
+		const original = await exported(store, 'alice');
+		const schedule = { localTime: '08:00', zone: 'UTC' };
+		await pilot.configure('bob', schedule);
+		expect(await pilot.claimNext()).toBeNull();
+		await pilot.configure('alice', schedule);
+		expect(await pilot.claimNext()).toBe('alice');
+		expect(await exported(store, 'alice')).toEqual(original);
+		const states: { key: string; data: string }[] = await db.query("SELECT key, data FROM fukushu_upstream_record WHERE store = 'studyStates'");
+		await db.query("UPDATE fukushu_upstream_record SET data = $1 WHERE store = 'studyStates'", [JSON.stringify({ suspended: false, card: { reps: 0, due: now } })]);
+		const nextDay = async () => {
+			now = new Date(now.getTime() + 86400_000);
+			return pilot.claimNext();
+		};
+		// Bob opts out so his empty schedule can't affect subsequent assertions.
+		await pilot.configure('bob', null);
+		expect(await nextDay()).toBeNull();
+		const key = states[0].key;
+		const write = async (storeName: string, value: unknown) => db.query(
+			'UPDATE fukushu_upstream_record SET data = $1 WHERE store = $2 AND key = $3', [JSON.stringify(value), storeName, key]);
+		const due = { reps: 1, due: now };
+		await write('studyStates', { suspended: true, card: due });
+		expect(await nextDay()).toBeNull();
+		await write('studyStates', { suspended: false, card: { reps: 1, due: '2099-01-01T00:00:00Z' } });
+		expect(await nextDay()).toBeNull();
+		await write('studyStates', { suspended: false, card: due });
+		await write('questions', { enabled: false, kind: 'flashcard' });
+		expect(await nextDay()).toBeNull();
+		await write('questions', { enabled: true, kind: 'unsupported' });
+		expect(await nextDay()).toBeNull();
+		await write('questions', { enabled: true, kind: 'flashcard', text: 'a\0b' });
+		expect(await nextDay()).toBe('alice');
+	});
+
+	test('uses the configured civil time through DST and bounds catch-up after downtime', async () => {
+		let now = new Date('2026-03-07T12:00:00Z');
+		const pilot = new FukushuReminderPilot(db, () => now);
+		const saved = async (): Promise<Date> => (await db.query('SELECT "nextAt" FROM fukushu_reminder'))[0].nextAt;
+		await expect(pilot.configure('alice', { localTime: '24:00', zone: 'UTC' })).rejects.toThrow();
+		await expect(pilot.configure('alice', { localTime: '08:00', zone: 'Unknown/Zone' })).rejects.toThrow();
+		await pilot.configure('alice', { localTime: '02:30', zone: 'America/New_York' });
+		expect(await saved()).toEqual(new Date('2026-03-08T07:30:00Z')); // gap moves forward to 03:30
+		now = await saved();
+		expect(await pilot.claimNext()).toBeNull();
+		expect(await saved()).toEqual(new Date('2026-03-09T06:30:00Z'));
+		now = new Date('2026-10-31T12:00:00Z');
+		await pilot.configure('alice', { localTime: '01:30', zone: 'America/New_York' });
+		expect(await saved()).toEqual(new Date('2026-11-01T06:30:00Z')); // later occurrence
+		await store.restore('alice', await upload('alice'), randomUUID());
+		now = new Date('2027-12-01T07:30:00Z'); // exactly one hour late, no catch-up
+		expect(await pilot.claimNext()).toBeNull();
+		expect(await saved()).toEqual(new Date('2027-12-02T06:30:00Z'));
+		now = new Date('2027-12-03T07:29:59Z'); // latest eligible day only
+		expect(await pilot.claimNext()).toBe('alice');
+		expect(await pilot.claimNext()).toBeUndefined();
+	});
+	test('rolls back a failed claim and preserves the claimed calendar day when the owner moves west', async () => {
+		let now = new Date('2027-12-01T23:00:00Z');
+		const pilot = new FukushuReminderPilot(db, () => now);
+		await store.restore('alice', await upload('alice'), randomUUID());
+		await pilot.configure('alice', { localTime: '08:00', zone: 'Asia/Tokyo' });
+		await db.query('ALTER TABLE fukushu_reminder ADD CONSTRAINT fail_claim CHECK ("lastClaimedAt" IS NULL)');
+		try {
+			await expect(pilot.claimNext()).rejects.toThrow(/fail_claim/);
+		} finally {
+			await db.query('ALTER TABLE fukushu_reminder DROP CONSTRAINT fail_claim');
+		}
+		expect(await pilot.claimNext()).toBe('alice'); // December 2 in Tokyo
+		await pilot.configure('alice', { localTime: '00:01', zone: 'UTC' });
+		now = new Date('2027-12-02T00:01:00Z');
+		expect(await pilot.claimNext()).toBeNull(); // still December 2, even in the new zone
+		now = new Date('2027-12-03T00:01:00Z');
+		expect(await pilot.claimNext()).toBe('alice');
+	});
 	test('retains original records, reset history and binary across persistent export and resumed review', async () => {
 		const original = await readUpstreamArchive(bytes, sha);
 		await store.restore('alice', await upload('alice'), randomUUID());
