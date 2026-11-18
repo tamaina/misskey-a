@@ -22,6 +22,7 @@ type PushNotificationDataSourceMap = {
 		antenna: { id: string; name: string };
 		note: Misskey.entities.Note;
 	};
+	fukushuReminder: { occurrence: number; expiresAt: number };
 	readAllNotifications: undefined;
 	newChatMessage: Misskey.entities.ChatMessage;
 };

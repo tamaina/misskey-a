@@ -108,3 +108,28 @@ Future work: review settings, all-deck sessions, quiz formats, source replacemen
 history-preserving backup merge/import and scheduler upgrades need explicit
 compatibility decisions. Do not infer old question versions absent from upstream
 backups, replay old reviews, or automatically reset FSRS after content edits.
+
+## Daily review reminders
+
+Open **Review reminders** on the material list to opt in, select a local time and
+time zone, and save. Each device must also have an active Misskey Web Push
+subscription. The reminder setting is per account. It uses the signed-in owner
+session for both `fukushu/reminder/show` and `fukushu/reminder/update`. Sending
+`{ "schedule": null }` disables the schedule and cancels pending retries.
+
+The system queue checks every minute. A reminder needs at least one enabled,
+previously studied card due for ordinary review in an active native deck or
+imported library. A DST gap moves the scheduled time forward by the gap and a
+repeated hour uses its later occurrence. After downtime, only the current day's
+slot can be delivered, within one hour of its scheduled time.
+
+PostgreSQL commits the daily claim and pending send together. A worker reserves
+the send for five minutes, checks eligibility again and uses the owner's current
+subscriptions. A transient failure or a worker restart allows retry until expiry.
+A request already submitted to a push provider may arrive after opt-out. The
+service worker checks that the recipient account is saved locally, uses an
+account/occurrence notification tag, and records the last displayed occurrence.
+A retry after display normally stays silent, including after a worker restart.
+A crash between display and recording it can repeat the notification if the
+user has already dismissed it. Local storage removal also resets this record.
+Notifications carry no material names, questions, answers or review counts.

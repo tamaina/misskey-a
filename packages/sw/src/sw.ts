@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { get } from 'idb-keyval';
+import { get, set } from 'idb-keyval';
 import * as Misskey from 'misskey-js';
 import { FETCH_TIMEOUT_MS } from '@/const.js';
 import type { PushNotificationDataMap } from '@/types.js';
@@ -12,6 +12,7 @@ import type { Locale } from 'i18n';
 import { createEmptyNotification, createNotification } from '@/scripts/create-notification.js';
 import { swLang } from '@/scripts/lang.js';
 import * as swos from '@/scripts/operations.js';
+import { getAccountFromId } from '@/scripts/get-account-from-id.js';
 import { respondToShare } from '@/scripts/share.js';
 
 async function respondToNavigation(request: Request): Promise<Response> {
@@ -123,6 +124,20 @@ globalThis.addEventListener('fetch', ev => {
 	//#endregion
 });
 
+// Push retries may reach the same worker concurrently or after it restarts.
+let reminderDisplay = Promise.resolve();
+function displayReminder(data: PushNotificationDataMap['fukushuReminder']) {
+	const display = reminderDisplay.then(async () => {
+		if (Date.now() >= data.body.expiresAt || !await getAccountFromId(data.userId)) return;
+		const key = 'fukushuReminder:' + data.userId;
+		if ((await get<number>(key) ?? 0) >= data.body.occurrence) return;
+		await createNotification(data);
+		await set(key, data.body.occurrence);
+	});
+	reminderDisplay = display.catch(() => {});
+	return display;
+}
+
 globalThis.addEventListener('push', ev => {
 	// クライアント取得
 	ev.waitUntil(globalThis.clients.matchAll({
@@ -132,6 +147,8 @@ globalThis.addEventListener('push', ev => {
 		const data: PushNotificationDataMap[keyof PushNotificationDataMap] = ev.data?.json();
 
 		switch (data.type) {
+			case 'fukushuReminder':
+				return displayReminder(data);
 			// case 'driveFileCreated':
 			case 'notification':
 			case 'unreadAntennaNote':
@@ -142,7 +159,7 @@ globalThis.addEventListener('push', ev => {
 				return createNotification(data);
 			case 'readAllNotifications':
 				await globalThis.registration.getNotifications()
-					.then(notifications => notifications.forEach(n => n.tag !== 'read_notification' && n.close()));
+					.then(notifications => notifications.forEach(n => n.tag !== 'read_notification' && n.data?.type !== 'fukushuReminder' && n.close()));
 				break;
 		}
 
@@ -215,6 +232,9 @@ globalThis.addEventListener('notificationclick', (ev: ServiceWorkerGlobalScopeEv
 			case 'unreadAntennaNote':
 				client = await swos.openAntenna(data.body.antenna.id, loginId);
 				break;
+			case 'fukushuReminder':
+				if (await getAccountFromId(loginId)) client = await swos.openClient('push', '/fukushu', loginId);
+				break;
 			case 'newChatMessage':
 				client = await swos.openChat(data.body, loginId);
 				break;
@@ -222,7 +242,7 @@ globalThis.addEventListener('notificationclick', (ev: ServiceWorkerGlobalScopeEv
 				switch (action) {
 					case 'markAllAsRead':
 						await globalThis.registration.getNotifications()
-							.then(notifications => notifications.forEach(n => n.tag !== 'read_notification' && n.close()));
+							.then(notifications => notifications.forEach(n => n.tag !== 'read_notification' && n.data?.type !== 'fukushuReminder' && n.close()));
 						await get<Pick<Misskey.entities.SignupResponse, 'id' | 'token'>[]>('accounts').then(accounts => {
 							return Promise.all((accounts ?? []).map(async account => {
 								await swos.sendMarkAllAsRead(account.id);

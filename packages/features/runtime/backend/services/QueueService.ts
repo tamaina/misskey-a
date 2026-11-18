@@ -70,6 +70,9 @@ const REPEATABLE_SYSTEM_JOB_DEF = [{
 	name: 'clean',
 	pattern: '0 0 * * *',
 }, {
+	name: 'fukushuReminder',
+	pattern: '* * * * *',
+}, {
 	name: 'checkExpiredMutings',
 	pattern: '*/5 * * * *',
 }, {

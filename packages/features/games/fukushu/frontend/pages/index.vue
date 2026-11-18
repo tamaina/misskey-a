@@ -12,6 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<input v-model="openOnStartup" type="checkbox"/>
 				{{ $locale.sfc.openOnStartup }}
 			</label>
+			<ReminderSettings v-if="!material && !sourceActive"/>
 			<p v-if="error" role="alert" :class="$style.error">{{ error }}</p>
 			<p v-if="notice" role="status">{{ notice }}</p>
 			<MkButton v-if="pendingImportedId" :disabled="busy" @click="showMaterial(pendingImportedId)">{{ $locale.sfc.openImported }}</MkButton>
@@ -111,6 +112,7 @@ import { prefer } from '@features/preferences/frontend/preferences.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import * as os from '@features/ui/frontend/os.js';
+import ReminderSettings from '../components/ReminderSettings.vue';
 import SourceLibrary from '../components/SourceLibrary.vue';
 import UpstreamBackupPanel from '../components/UpstreamBackupPanel.vue';
 import BackupPanel from '../components/BackupPanel.vue';

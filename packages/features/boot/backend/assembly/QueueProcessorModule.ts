@@ -14,6 +14,7 @@ import { McpStreamDeliverProcessorService } from '@features/integrations/backend
 import { UserWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/UserWebhookDeliverProcessorService.js';
 import { SystemWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/SystemWebhookDeliverProcessorService.js';
 import { ArchiveAnnouncementProcessorService } from '@features/announcements/backend/jobs/ArchiveAnnouncementProcessorService.js';
+import { FukushuReminderProcessorService } from '@features/games/fukushu/backend/jobs/FukushuReminderProcessorService.js';
 import { CheckExpiredMutingsProcessorService } from '@features/relationships/backend/jobs/CheckExpiredMutingsProcessorService.js';
 import { BakeBufferedReactionsProcessorService } from '@features/notes/backend/jobs/BakeBufferedReactionsProcessorService.js';
 import { CleanChartsProcessorService } from '@features/statistics/backend/jobs/CleanChartsProcessorService.js';
@@ -58,6 +59,7 @@ import { CoreModule } from './CoreModule.js';
 		TickChartsProcessorService,
 		ResyncChartsProcessorService,
 		CleanChartsProcessorService,
+		FukushuReminderProcessorService,
 		CheckExpiredMutingsProcessorService,
 		BakeBufferedReactionsProcessorService,
 		ArchiveAnnouncementProcessorService,
@@ -92,6 +94,7 @@ import { CoreModule } from './CoreModule.js';
 		DeliverProcessorService,
 		InboxProcessorService,
 		AggregateRetentionProcessorService,
+		FukushuReminderProcessorService,
 		CheckExpiredMutingsProcessorService,
 		CheckModeratorsActivityProcessorService,
 		CleanRemoteNotesProcessorService,

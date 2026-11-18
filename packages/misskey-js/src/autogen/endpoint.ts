@@ -103,6 +103,9 @@ import type {
 	FlashSearchResponse,
 	UsersFlashsRequest,
 	UsersFlashsResponse,
+	FukushuReminderShowRequest,
+	FukushuReminderShowResponse,
+	FukushuReminderUpdateRequest,
 	FukushuStudyQueueRequest,
 	FukushuStudyQueueResponse,
 	FukushuStudyReviewRequest,
@@ -906,6 +909,8 @@ export type Endpoints = {
 	'flash/update': { req: FlashUpdateRequest; res: EmptyResponse };
 	'flash/search': { req: FlashSearchRequest; res: FlashSearchResponse };
 	'users/flashs': { req: UsersFlashsRequest; res: UsersFlashsResponse };
+	'fukushu/reminder/show': { req: FukushuReminderShowRequest; res: FukushuReminderShowResponse };
+	'fukushu/reminder/update': { req: FukushuReminderUpdateRequest; res: EmptyResponse };
 	'fukushu/study/queue': { req: FukushuStudyQueueRequest; res: FukushuStudyQueueResponse };
 	'fukushu/study/review': { req: FukushuStudyReviewRequest; res: FukushuStudyReviewResponse };
 	'fukushu/study/history': { req: FukushuStudyHistoryRequest; res: FukushuStudyHistoryResponse };

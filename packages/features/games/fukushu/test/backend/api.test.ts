@@ -12,6 +12,7 @@ import { fukushuContract } from '../../backend/material.contract.js';
 import { MaterialError } from '../../backend/store.js';
 import { material } from './fixture.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { FukushuReminderStore } from '../../backend/reminder-store.js';
 import type { FukushuStore } from '../../backend/store.js';
 import type { FukushuDriveImporter } from '../../backend/drive-import.js';
 
@@ -224,4 +225,24 @@ describe('Fukushu explanation-only versions authorization and input boundary', (
 			expect(contract['~orpc'].meta).toMatchObject({ requireCredential: true, kind: 'read:account', limit: { duration: 60_000, max: 60 } });
 		}
 	});
+});
+
+test('only the owner session can read or change a reminder, including disabling it', async () => {
+	const f = fixture();
+	const reminders = mockDeep<FukushuReminderStore>();
+	const api = createFukushuRouter(f.store, undefined, undefined, undefined, undefined, reminders);
+	const schedule = { localTime: '08:15', zone: 'Europe/London' };
+	for (const context of [testContext(null), testContext(f.user, { permission: ['read:account', 'write:account'] })]) {
+		await expect(call(api.reminderShow, {}, { context })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
+		await expect(call(api.reminderUpdate, { schedule }, { context })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
+	}
+	expect(reminders.configure).not.toHaveBeenCalled();
+	expect(reminders.settings).not.toHaveBeenCalled();
+	const context = testContext(f.user);
+	reminders.settings.mockResolvedValue(schedule);
+	expect(await call(api.reminderShow, { ownerId: 'bob' } as never, { context })).toEqual({ schedule });
+	expect(reminders.settings).toHaveBeenCalledWith('alice');
+	await call(api.reminderUpdate, { schedule, ownerId: 'bob' } as never, { context });
+	await call(api.reminderUpdate, { schedule: null }, { context });
+	expect(reminders.configure.mock.calls).toEqual([['alice', schedule], ['alice', null]]);
 });

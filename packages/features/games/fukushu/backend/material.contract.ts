@@ -48,7 +48,14 @@ const cardVersionSummarySchema = v.strictObject({
 });
 
 // Keep requestName literal at each declaration: SDK endpoints are keyed by this metadata.
+const reminderSettings = v.strictObject({ localTime: v.pipe(v.string(), v.regex(/^(?:[01]\d|2[0-3]):[0-5]\d$/)), zone: v.pipe(v.string(), v.minLength(1), v.maxLength(128)) });
 export const fukushuContract = {
+	reminderShow: oc.errors(commonErrors).$meta({ ...read, secure: true, requestName: 'fukushu/reminder/show' } as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/fukushu/reminder/show', tags: ['fukushu'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+		.input(objectInput({})).output(v.strictObject({ schedule: v.nullable(reminderSettings) })),
+	reminderUpdate: oc.errors({ ...commonErrors, INVALID_REMINDER_SCHEDULE: { status: 400, data: apiErrorData } }).$meta({ ...write, secure: true, requestName: 'fukushu/reminder/update' } as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/fukushu/reminder/update', tags: ['fukushu'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+		.input(objectInput({ schedule: v.nullable(reminderSettings) })).output(v.void()),
 	...studyContract,
 	...backupContract,
 	...upstreamContract,

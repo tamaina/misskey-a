@@ -17,6 +17,7 @@ import { DI } from '@/di-symbols.js';
 import { UpstreamBackupError } from '../shared/upstream-reader.js';
 import { sourceRestoreJob } from './jobs/ImportFukushuProcessorService.js';
 import { CompatibilitySessionError } from './pilot/upstream-session.js';
+import { FukushuReminderStore } from './reminder-store.js';
 import { FukushuUpstreamStore } from './upstream-store.js';
 import { FukushuBackupRestorer } from './backup-restore.js';
 import { FukushuBackupInspector } from './backup-drive.js';
@@ -43,12 +44,25 @@ async function invoke<T>(operation: () => Promise<T>): Promise<T> {
 	}
 }
 
-export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list' | 'update' | 'archive' | 'updateCardExplanation' | 'listCardVersions' | 'showCardVersion'>, importer?: Pick<FukushuDriveImporter, 'import'>, study?: Pick<FukushuStudyStore, 'queue' | 'review' | 'history'>, backup?: { restorer?: Pick<FukushuBackupRestorer, 'restore'>; store: Pick<FukushuBackupStore, 'assertOwned'>; inspector: Pick<FukushuBackupInspector, 'inspect' | 'inspectUpstream'>; enqueue(ownerId: string, deckId: string): Promise<void> }, upstream?: { store: Pick<FukushuUpstreamStore, 'assertOwned' | 'restore' | 'show' | 'review' | 'media' | 'updateGift'>; restoreJob?(ownerId: string, input: { fileId: string; requestId: string; statusOnly?: boolean }): ReturnType<typeof sourceRestoreJob>; readGift?(ownerId: string, fileId: string): Promise<Buffer>; enqueue(ownerId: string): Promise<void> }) {
+export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list' | 'update' | 'archive' | 'updateCardExplanation' | 'listCardVersions' | 'showCardVersion'>, importer?: Pick<FukushuDriveImporter, 'import'>, study?: Pick<FukushuStudyStore, 'queue' | 'review' | 'history'>, backup?: { restorer?: Pick<FukushuBackupRestorer, 'restore'>; store: Pick<FukushuBackupStore, 'assertOwned'>; inspector: Pick<FukushuBackupInspector, 'inspect' | 'inspectUpstream'>; enqueue(ownerId: string, deckId: string): Promise<void> }, upstream?: { store: Pick<FukushuUpstreamStore, 'assertOwned' | 'restore' | 'show' | 'review' | 'media' | 'updateGift'>; restoreJob?(ownerId: string, input: { fileId: string; requestId: string; statusOnly?: boolean }): ReturnType<typeof sourceRestoreJob>; readGift?(ownerId: string, fileId: string): Promise<Buffer>; enqueue(ownerId: string): Promise<void> }, reminders?: Pick<FukushuReminderStore, 'settings' | 'configure'>) {
 	const procedure = createApiProcedure<MiLocalUser>();
 	const principal = requirePrincipal<MiLocalUser>();
 	const upstreamStore = () => { if (!upstream) throw new BackupError('BACKUP_FAILED'); return upstream.store; };
 	const studyStore = () => { if (!study) throw new StudyError('STUDY_UNAVAILABLE'); return study; };
 	return implement(fukushuContract, { initialInputValidationIndex: Number.POSITIVE_INFINITY }).$context<ApiContext<MiLocalUser>>().router({
+		reminderShow: procedure(fukushuContract.reminderShow).use(principal).handler(async ({ context }) => {
+			if (!reminders) throw new Error('Missing reminder store');
+			return { schedule: await reminders.settings(context.principal.id) };
+		}),
+		reminderUpdate: procedure(fukushuContract.reminderUpdate).use(principal).handler(async ({ context, input }) => {
+			if (!reminders) throw new Error('Missing reminder store');
+			try {
+				await reminders.configure(context.principal.id, input.schedule);
+			} catch (err) {
+				if (err instanceof RangeError || (err instanceof QueryFailedError && err.driverError.code === '22023')) throw apiError({ code: 'INVALID_REMINDER_SCHEDULE', message: 'Invalid reminder time or time zone.', id: '6da79c44-43b2-4bde-be2b-312c20d6657b' });
+				throw err;
+			}
+		}),
 		upstreamMedia: procedure(fukushuContract.upstreamMedia).use(principal).handler(({ input, context }) => invoke(() => upstreamStore().media(context.principal.id, input.id))),
 		upstreamUpdateGift: procedure(fukushuContract.upstreamUpdateGift).use(principal).handler(({ input, context }) => invoke(() => {
 			const reader = upstream?.readGift;
@@ -127,7 +141,7 @@ export class FukushuApiProvider {
 				enqueue: async (ownerId, deckId) => { await this.moduleRef.get(QueueService, { strict: false }).createExportFukushuJob({ id: ownerId }, deckId); },
 			}, { readGift: (owner, file) => inspector.readGift(owner, file), store: sourceStore,
 								restoreJob: (ownerId, input) => sourceRestoreJob(this.moduleRef.get(QueueService, { strict: false }).dbQueue, sourceStore, inspector, ownerId, input),
-								enqueue: async ownerId => { await this.moduleRef.get(QueueService, { strict: false }).createExportFukushuJob({ id: ownerId }, '', true); } });
+								enqueue: async ownerId => { await this.moduleRef.get(QueueService, { strict: false }).createExportFukushuJob({ id: ownerId }, '', true); } }, new FukushuReminderStore(this.moduleRef.get(DI.db, { strict: false })));
 		}
 		return this.router;
 	}

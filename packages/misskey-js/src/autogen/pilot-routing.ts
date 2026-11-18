@@ -3337,6 +3337,115 @@ export default {
 		}
 	},
 	"fukushu": {
+		"reminderShow": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"secure": true,
+					"requestName": "fukushu/reminder/show"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/reminder/show",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"reminderUpdate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"INVALID_REMINDER_SCHEDULE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"secure": true,
+					"requestName": "fukushu/reminder/update"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/reminder/update",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
 		"studyQueue": {
 			"~orpc": {
 				"errorMap": {

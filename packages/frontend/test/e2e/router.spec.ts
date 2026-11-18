@@ -53,6 +53,30 @@ test.describe('Router transition', () => {
 		await expect(library).toHaveCount(0);
 	});
 
+	test('persists the Fukushu reminder time and zone and allows turning it off', async ({ page }) => {
+		const setupClose = page.getByTestId('user-setup-dialog').getByTestId('modal-window-close');
+		await page.addLocatorHandler(setupClose, () => closeUserSetupDialog(page));
+		await page.goto(BASE_URL + '/fukushu');
+		const settings = page.getByText('Review reminders', { exact: true });
+		await settings.click();
+		const enable = page.getByRole('checkbox', { name: 'Notify me on days when cards are due' });
+		await expect(enable).not.toBeChecked();
+		await enable.check();
+		await page.getByLabel('Reminder time').fill('17:35');
+		await page.getByLabel('Time zone (e.g. Europe/London)').fill('Asia/Tokyo');
+		const save = page.getByRole('button', { name: 'Save reminder settings' });
+		await save.click();
+		await expect(page.getByText('Settings saved.')).toBeVisible();
+		await page.reload();
+		await settings.click();
+		await expect(enable).toBeChecked();
+		await expect(page.getByLabel('Reminder time')).toHaveValue('17:35');
+		await expect(page.getByLabel('Time zone (e.g. Europe/London)')).toHaveValue('Asia/Tokyo');
+		await enable.uncheck();
+		await save.click();
+		await expect(page.getByText('Settings saved.')).toBeVisible();
+	});
+
 	test.describe('Redirect', () => {
 		test('redirect to user profile', async ({ page }) => {
 			await page.goto(`${BASE_URL}/redirect-test`);

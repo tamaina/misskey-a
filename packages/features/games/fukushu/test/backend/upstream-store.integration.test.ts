@@ -8,7 +8,7 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { isFukushuBackupFile } from '@features/drive/backend/utility/fukushu-file-type.js';
-import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { DataSource } from 'typeorm';
 import { entities } from '@features/persistence/backend/postgres.js';
 import { FukushuMaterial1794838800000 } from '../../../../../backend/migration/1794838800000-FukushuMaterial.js';
@@ -20,7 +20,8 @@ import { FukushuUpstreamStore } from '../../backend/upstream-store.js';
 import { FukushuDeckHistoryIndex1794990000000 } from '../../../../../backend/migration/1794990000000-FukushuDeckHistoryIndex.js';
 import { FukushuMaterialBytes1794980000000 } from '../../../../../backend/migration/1794980000000-FukushuMaterialBytes.js';
 import { FukushuSourceChunks1794974400000 } from '../../../../../backend/migration/1794974400000-FukushuSourceChunks.js';
-import { FukushuReminderPilot } from '../../backend/pilot/reminder.js';
+import { FukushuReminder1795040000000 } from '../../../../../backend/migration/1795040000000-FukushuReminder.js';
+import { FukushuReminderStore } from '../../backend/reminder-store.js';
 import { FukushuStudyStore } from '../../backend/study-store.js';
 import { FukushuStore } from '../../backend/store.js';
 import { scanSourceArchive } from '../../shared/source-scan.js';
@@ -52,10 +53,9 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 	beforeAll(async () => {
 		await db.initialize(); await db.query('CREATE SCHEMA fukushu_upstream_test');
 		await db.query('CREATE TABLE "user" (id varchar(32) PRIMARY KEY)');
-		await db.query(readFileSync('../features/games/fukushu/backend/pilot/reminder.sql', 'utf8'));
 		await db.query('CREATE TABLE drive_file (id varchar(32) PRIMARY KEY, "userId" varchar(32) REFERENCES "user"(id), "userHost" text, uri text, "isLink" boolean NOT NULL DEFAULT false, size integer NOT NULL, md5 text NOT NULL)');
 		const runner = db.createQueryRunner();
-		try { for (const Migration of [FukushuMaterial1794838800000, FukushuMaterialManagement1794871800000, FukushuQuestionVersions1794880800000, FukushuStudy1794891600000, FukushuUpstreamStore1794924000000, FukushuSourceChunks1794974400000, FukushuMaterialBytes1794980000000, FukushuDeckHistoryIndex1794990000000]) await new Migration().up(runner); } finally { await runner.release(); }
+		try { for (const Migration of [FukushuMaterial1794838800000, FukushuMaterialManagement1794871800000, FukushuQuestionVersions1794880800000, FukushuStudy1794891600000, FukushuUpstreamStore1794924000000, FukushuSourceChunks1794974400000, FukushuMaterialBytes1794980000000, FukushuDeckHistoryIndex1794990000000, FukushuReminder1795040000000]) await new Migration().up(runner); } finally { await runner.release(); }
 	});
 	afterAll(async () => { if (db.isInitialized) { try { await db.query('DROP SCHEMA fukushu_upstream_test CASCADE'); } finally { await db.destroy(); } } });
 	beforeEach(async () => { await db.query('TRUNCATE "user" CASCADE'); await db.query('INSERT INTO "user" VALUES ($1), ($2)', ['alice', 'bob']); files.clear(); });
@@ -68,7 +68,7 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 
 	test('checks native due reviews only for their opted-in owner and claims once across workers and restarts', async () => {
 		let now = new Date('2026-11-18T00:00:00Z');
-		const worker = () => new FukushuReminderPilot(db, () => now);
+		const worker = () => new FukushuReminderStore(db, () => now);
 		const native = new FukushuStore(db);
 		const study = new FukushuStudyStore(db, () => now);
 		await native.create('alice', material());
@@ -102,7 +102,7 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 
 	test('checks imported state and eligible questions, tolerates opaque source text and leaves history intact', async () => {
 		let now = new Date('2027-12-01T08:00:00Z');
-		const pilot = new FukushuReminderPilot(db, () => now);
+		const pilot = new FukushuReminderStore(db, () => now);
 		await store.restore('alice', await upload('alice'), randomUUID());
 		const original = await exported(store, 'alice');
 		const schedule = { localTime: '08:00', zone: 'UTC' };
@@ -139,7 +139,7 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 
 	test('uses the configured civil time through DST and bounds catch-up after downtime', async () => {
 		let now = new Date('2026-03-07T12:00:00Z');
-		const pilot = new FukushuReminderPilot(db, () => now);
+		const pilot = new FukushuReminderStore(db, () => now);
 		const saved = async (): Promise<Date> => (await db.query('SELECT "nextAt" FROM fukushu_reminder'))[0].nextAt;
 		await expect(pilot.configure('alice', { localTime: '24:00', zone: 'UTC' })).rejects.toThrow();
 		await expect(pilot.configure('alice', { localTime: '08:00', zone: 'Unknown/Zone' })).rejects.toThrow();
@@ -161,7 +161,7 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 	});
 	test('rolls back a failed claim and preserves the claimed calendar day when the owner moves west', async () => {
 		let now = new Date('2027-12-01T23:00:00Z');
-		const pilot = new FukushuReminderPilot(db, () => now);
+		const pilot = new FukushuReminderStore(db, () => now);
 		await store.restore('alice', await upload('alice'), randomUUID());
 		await pilot.configure('alice', { localTime: '08:00', zone: 'Asia/Tokyo' });
 		await db.query('ALTER TABLE fukushu_reminder ADD CONSTRAINT fail_claim CHECK ("lastClaimedAt" IS NULL)');
@@ -176,6 +176,56 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		expect(await pilot.claimNext()).toBeNull(); // still December 2, even in the new zone
 		now = new Date('2027-12-03T00:01:00Z');
 		expect(await pilot.claimNext()).toBe('alice');
+	});
+	test('resumes committed claims, retries a leased send with one occurrence, and cancels before retry on opt-out', async () => {
+		let now = new Date('2027-12-01T08:00:00Z');
+		const worker = () => new FukushuReminderStore(db, () => now);
+		const schedule = { localTime: '08:00', zone: 'UTC' };
+		await store.restore('alice', await upload('alice'), randomUUID());
+		await worker().configure('alice', schedule);
+		expect(await worker().settings('alice')).toEqual(schedule);
+		expect(await worker().settings('bob')).toBeNull();
+		expect(await worker().claimNext()).toBe('alice');
+		// The process that claimed the schedule stops before dispatch.
+		const occurrence = now.getTime();
+		const body = { occurrence, expiresAt: occurrence + 3600_000 };
+		const send = vi.fn(async (_owner: string, _body: typeof body) => true);
+		send.mockRejectedValueOnce(new Error('process stopped before acknowledgement'));
+		await expect(worker().deliverNext(send)).rejects.toThrow('before acknowledgement');
+		expect(send).toHaveBeenCalledWith('alice', body);
+		expect(await worker().deliverNext(send)).toBe(false);
+		now = new Date(occurrence + 5 * 60_000);
+		const results = await Promise.all([worker().deliverNext(send), worker().deliverNext(send)]);
+		expect(results.sort()).toEqual([false, true]);
+		expect(send.mock.calls).toEqual([['alice', body], ['alice', body]]);
+		expect(await worker().deliverNext(send)).toBe(false);
+
+		now = new Date('2027-12-02T08:00:00Z');
+		expect(await worker().claimNext()).toBe('alice');
+		send.mockResolvedValueOnce(false);
+		expect(await worker().deliverNext(send)).toBe(true);
+		await worker().configure('alice', null);
+		now = new Date(now.getTime() + 5 * 60_000);
+		expect(await worker().deliverNext(send)).toBe(false);
+		expect(await worker().settings('alice')).toBeNull();
+		expect(send).toHaveBeenCalledTimes(3);
+	});
+
+	test('discards expired delivery and rechecks cards studied or suspended before dispatch', async () => {
+		let now = new Date('2027-12-01T08:00:00Z');
+		const worker = new FukushuReminderStore(db, () => now);
+		const send = vi.fn(async () => true);
+		await store.restore('alice', await upload('alice'), randomUUID());
+		await worker.configure('alice', { localTime: '08:00', zone: 'UTC' });
+		expect(await worker.claimNext()).toBe('alice');
+		now = new Date('2027-12-01T09:00:00Z');
+		expect(await worker.deliverNext(send)).toBe(true);
+		now = new Date('2027-12-02T08:00:00Z');
+		expect(await worker.claimNext()).toBe('alice');
+		await db.query('UPDATE fukushu_upstream_record SET data = $1 WHERE store = $2', [JSON.stringify({ suspended: true }), 'studyStates']);
+		expect(await worker.deliverNext(send)).toBe(true);
+		expect(await worker.deliverNext(send)).toBe(false);
+		expect(send).not.toHaveBeenCalled();
 	});
 	test('retains original records, reset history and binary across persistent export and resumed review', async () => {
 		const original = await readUpstreamArchive(bytes, sha);

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import type { DataSource, EntityManager } from 'typeorm';
-import type { UpstreamRecords } from '../../shared/upstream-records.schema.js';
+import type { UpstreamRecords } from '../shared/upstream-records.schema.js';
 
 interface Schedule {
 	localTime: string;
@@ -61,14 +61,18 @@ async function hasDueReview(manager: EntityManager, ownerId: string, now: Date):
 	}
 }
 
-/** Only for the reminder pilot. The caller supplies the authenticated local owner. */
-export class FukushuReminderPilot {
+export class FukushuReminderStore {
 	constructor(private readonly db: DataSource, private readonly clock = () => new Date()) {}
+
+	async settings(ownerId: string): Promise<Schedule | null> {
+		const rows = await this.db.query<Schedule[]>(`SELECT to_char("localTime", 'HH24:MI') AS "localTime", zone FROM fukushu_reminder WHERE "ownerId" = $1 AND "nextAt" IS NOT NULL`, [ownerId]);
+		return rows[0] ?? null;
+	}
 
 	async configure(ownerId: string, schedule: Schedule | null): Promise<void> {
 		if (!schedule) {
 			// Preserve the claim across opt-out / opt-in on the same day.
-			await this.db.query('UPDATE fukushu_reminder SET "nextAt" = NULL WHERE "ownerId" = $1', [ownerId]);
+			await this.db.query('UPDATE fukushu_reminder SET "nextAt" = NULL, "retryAt" = NULL, "expiresAt" = NULL WHERE "ownerId" = $1', [ownerId]);
 			return;
 		}
 		if (!/^(?:[01]\d|2[0-3]):[0-5]\d$/.test(schedule.localTime)) throw new RangeError('Invalid reminder time');
@@ -80,7 +84,7 @@ export class FukushuReminderPilot {
 			await manager.query(`
 				INSERT INTO fukushu_reminder ("ownerId", "localTime", zone, "nextAt") VALUES ($1, $2, $3, $4)
 				ON CONFLICT ("ownerId") DO UPDATE SET "localTime" = EXCLUDED."localTime",
-					zone = EXCLUDED.zone, "nextAt" = EXCLUDED."nextAt"
+					zone = EXCLUDED.zone, "nextAt" = EXCLUDED."nextAt", "retryAt" = NULL, "expiresAt" = NULL
 				WHERE fukushu_reminder."nextAt" IS NULL OR fukushu_reminder.zone <> EXCLUDED.zone
 					OR fukushu_reminder."localTime" <> EXCLUDED."localTime"
 			`, [ownerId, schedule.localTime, zone, today >= now ? today : tomorrow]);
@@ -104,11 +108,39 @@ export class FukushuReminderPilot {
 			const send = eligible && await hasDueReview(manager, row.ownerId, now);
 			await manager.query(`
 				UPDATE fukushu_reminder SET "nextAt" = $2,
+					"retryAt" = CASE WHEN $3 THEN $4::timestamptz END,
+					"expiresAt" = CASE WHEN $3 THEN $5::timestamptz END,
 					"lastClaimedAt" = CASE WHEN $3 THEN $4::timestamptz ELSE "lastClaimedAt" END,
 					"lastClaimedDay" = CASE WHEN $3 THEN ($4::timestamptz AT TIME ZONE zone)::date ELSE "lastClaimedDay" END
 				WHERE "ownerId" = $1
-			`, [row.ownerId, today > now ? today : tomorrow, send, now]);
+			`, [row.ownerId, today > now ? today : tomorrow, send, now, new Date(today.getTime() + 3600_000)]);
 			return send ? row.ownerId : null;
 		});
+	}
+
+	/** Reserve before network I/O. A crashed worker's reservation becomes eligible again. */
+	async deliverNext(send: (ownerId: string, body: { occurrence: number; expiresAt: number }) => Promise<boolean>): Promise<boolean> {
+		const row = await this.db.transaction(async manager => {
+			const now = this.clock();
+			const rows = await manager.query<{ ownerId: string; expiresAt: Date; lastClaimedAt: Date }[]>(`
+				SELECT "ownerId", "expiresAt", "lastClaimedAt" FROM fukushu_reminder
+				WHERE "retryAt" <= $1 ORDER BY "retryAt", "ownerId" LIMIT 1 FOR UPDATE SKIP LOCKED
+			`, [now]);
+			if (!rows.length) return undefined;
+			const candidate = rows[0];
+			if (candidate.expiresAt <= now || !await hasDueReview(manager, candidate.ownerId, now)) {
+				await manager.query('UPDATE fukushu_reminder SET "retryAt" = NULL, "expiresAt" = NULL WHERE "ownerId" = $1', [candidate.ownerId]);
+				return null;
+			}
+			await manager.query('UPDATE fukushu_reminder SET "retryAt" = $2 WHERE "ownerId" = $1', [candidate.ownerId, new Date(now.getTime() + 5 * 60_000)]);
+			return candidate;
+		});
+		if (row === undefined) return false;
+		if (row !== null) {
+			const delivered = await send(row.ownerId, { occurrence: row.lastClaimedAt.getTime(), expiresAt: row.expiresAt.getTime() });
+			if (!delivered) return true;
+			await this.db.query('UPDATE fukushu_reminder SET "retryAt" = NULL, "expiresAt" = NULL WHERE "ownerId" = $1 AND "lastClaimedAt" = $2', [row.ownerId, row.lastClaimedAt]);
+		}
+		return true;
 	}
 }

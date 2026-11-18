@@ -41,6 +41,7 @@ import { TickChartsProcessorService } from '@features/statistics/backend/jobs/Ti
 import { ResyncChartsProcessorService } from '@features/statistics/backend/jobs/ResyncChartsProcessorService.js';
 import { CleanChartsProcessorService } from '@features/statistics/backend/jobs/CleanChartsProcessorService.js';
 import { ArchiveAnnouncementProcessorService } from '@features/announcements/backend/jobs/ArchiveAnnouncementProcessorService.js';
+import { FukushuReminderProcessorService } from '@features/games/fukushu/backend/jobs/FukushuReminderProcessorService.js';
 import { CheckExpiredMutingsProcessorService } from '@features/relationships/backend/jobs/CheckExpiredMutingsProcessorService.js';
 import { BakeBufferedReactionsProcessorService } from '@features/notes/backend/jobs/BakeBufferedReactionsProcessorService.js';
 import { CleanProcessorService } from '@features/operations/backend/jobs/CleanProcessorService.js';
@@ -139,6 +140,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 		private resyncChartsProcessorService: ResyncChartsProcessorService,
 		private cleanChartsProcessorService: CleanChartsProcessorService,
 		private aggregateRetentionProcessorService: AggregateRetentionProcessorService,
+		private fukushuReminderProcessorService: FukushuReminderProcessorService,
 		private checkExpiredMutingsProcessorService: CheckExpiredMutingsProcessorService,
 		private archiveAnnouncementProcessorService: ArchiveAnnouncementProcessorService,
 		private bakeBufferedReactionsProcessorService: BakeBufferedReactionsProcessorService,
@@ -185,6 +187,7 @@ export class QueueProcessorService implements OnApplicationShutdown {
 					case 'resyncCharts': return this.resyncChartsProcessorService.process();
 					case 'cleanCharts': return this.cleanChartsProcessorService.process();
 					case 'aggregateRetention': return this.aggregateRetentionProcessorService.process();
+					case 'fukushuReminder': return this.fukushuReminderProcessorService.process();
 					case 'checkExpiredMutings': return this.checkExpiredMutingsProcessorService.process();
 					case 'archiveAnnouncement': return this.archiveAnnouncementProcessorService.process(job as Bull.Job<ArchiveAnnouncementJobData>);
 					case 'bakeBufferedReactions': return this.bakeBufferedReactionsProcessorService.process();
