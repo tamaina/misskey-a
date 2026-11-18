@@ -12,6 +12,10 @@ import * as os from '@features/ui/frontend/os.js';
 import Page from './pages/index.vue';
 import type { FukushuMaterial } from '../shared/material.schema.js';
 
+vi.mock('@features/preferences/frontend/preferences.js', async () => {
+	const { ref } = await import('vue');
+	return { prefer: { s: {}, r: {}, model: () => ref(false) } };
+});
 vi.mock('@features/api/frontend/utility/misskey-api.js', () => ({ misskeyApi: vi.fn() }));
 vi.mock('@features/drive/frontend/utility/drive.js', () => ({ chooseDriveFile: vi.fn() }));
 vi.mock('@features/ui/frontend/os.js', () => ({ confirm: vi.fn() }));
@@ -301,7 +305,7 @@ test('locks the library during restore, then reloads the archived destination an
 	await screen.findByText('backup.json');
 	await fireEvent.click(screen.getByRole('button', { name: '書き込まずに検査' }));
 	await screen.findByText('復元する教材');
-	await fireEvent.click(screen.getByRole('checkbox'));
+	await fireEvent.click(screen.getByRole('checkbox', { name: /既存IDと重複/ }));
 	await fireEvent.click(screen.getByRole('button', { name: '教材全体を復元' }));
 	expect((screen.getByRole('button', { name: '再読み込み' }) as HTMLButtonElement).disabled).toBe(true);
 	expect((screen.getByRole('button', { name: 'Drive のファイルを選ぶ' }) as HTMLButtonElement).disabled).toBe(true);

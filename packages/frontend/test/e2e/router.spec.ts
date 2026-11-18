@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { test } from './fixtures.js';
+import { expect, test } from './fixtures.js';
 import {
 	// const
 	BASE_URL,
@@ -27,6 +27,27 @@ test.describe('Router transition', () => {
 		await page.waitForTimeout(1000);
 
 		await closeUserSetupDialogIfVisible(page);
+	});
+
+	test('Fukushu can open over Home on launch and be dismissed or disabled', async ({ page }) => {
+		const preference = page.getByRole('checkbox', { name: 'Open Fukushu when starting Misskey from Home' });
+		const library = page.getByRole('heading', { name: 'Fukushu · Materials' });
+		await page.goto(BASE_URL + '/fukushu');
+		await expect(preference).not.toBeChecked();
+		await preference.check();
+
+		await page.goto(BASE_URL + '/');
+		await expect(library).toBeVisible();
+		await expect(page).toHaveURL(BASE_URL + '/');
+		await page.getByRole('button', { name: 'Close', exact: true }).last().click();
+		await expect(library).toHaveCount(0);
+
+		await page.goto(BASE_URL + '/fukushu');
+		await expect(preference).toBeChecked();
+		await preference.uncheck();
+		await page.goto(BASE_URL + '/');
+		await expect(page.getByTestId('open-post-form').first()).toBeVisible();
+		await expect(library).toHaveCount(0);
 	});
 
 	test.describe('Redirect', () => {

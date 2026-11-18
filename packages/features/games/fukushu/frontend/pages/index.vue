@@ -8,6 +8,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div class="_spacer" style="--MI_SPACER-w: 800px;">
 		<div class="_gaps">
 			<header><h1>{{ $locale.sfc.title }}</h1><p>{{ $locale.sfc.description }}</p></header>
+			<label v-if="!material && !sourceActive" :class="$style.startup">
+				<input v-model="openOnStartup" type="checkbox"/>
+				{{ $locale.sfc.openOnStartup }}
+			</label>
 			<p v-if="error" role="alert" :class="$style.error">{{ error }}</p>
 			<p v-if="notice" role="status">{{ notice }}</p>
 			<MkButton v-if="pendingImportedId" :disabled="busy" @click="showMaterial(pendingImportedId)">{{ $locale.sfc.openImported }}</MkButton>
@@ -103,6 +107,7 @@ import { chooseDriveFile } from '@features/drive/frontend/utility/drive.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import { prefer } from '@features/preferences/frontend/preferences.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import * as os from '@features/ui/frontend/os.js';
@@ -112,6 +117,7 @@ import BackupPanel from '../components/BackupPanel.vue';
 import StudyPanel from '../components/StudyPanel.vue';
 import type { FukushuMaterial } from '../../shared/material.schema.js';
 
+const openOnStartup = prefer.model('fukushu.openOnStartup');
 const decks = ref<Omit<FukushuMaterial['deck'], 'sourceText'>[]>([]);
 type ManagedMaterial = FukushuMaterial & { revision: number; archivedAt: string | null };
 const material = ref<ManagedMaterial | null>(null);
@@ -283,6 +289,14 @@ definePage(() => ({ title: $locale.value.sfc.title, icon: 'ti ti-cards' }));
 </script>
 
 <style lang="scss" module>
+.startup {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: fit-content;
+	cursor: pointer;
+}
+
 .panel { padding: 20px; }
 .panel h2, .panel p { margin: 0; }
 .heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
@@ -304,6 +318,7 @@ definePage(() => ({ title: $locale.value.sfc.title, icon: 'ti ti-cards' }));
 <locale locale="ja-JP" lang="json">
 {
 	"title": "Fukushu · 教材",
+	"openOnStartup": "ホームからの起動時に Fukushu を開く",
 	"description": "自分の教材を保存して、カードの表と裏を確認できます。",
 	"importTitle": "Drive から教材を取り込む",
 	"importDescription": "テキスト教材を先に Drive にアップロードし、ファイルを選んでください。",
@@ -366,6 +381,7 @@ definePage(() => ({ title: $locale.value.sfc.title, icon: 'ti ti-cards' }));
 <locale locale="en-US" lang="json">
 {
 	"title": "Fukushu · Materials",
+	"openOnStartup": "Open Fukushu when starting Misskey from Home",
 	"description": "Save your own materials and preview both sides of each card.",
 	"importTitle": "Import a material from Drive",
 	"importDescription": "Upload a text material to Drive first, then choose its file.",
