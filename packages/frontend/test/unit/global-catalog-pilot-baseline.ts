@@ -15056,7 +15056,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/ui/frontend/components/MkWindow.vue",
-		"currentSha256": "8b79ea75214325a89ddbb2db5cc4d054cfb56a41a4e21760f9ef702b5a85cf63",
+		"currentSha256": "74fa78eca4df3f40e3571e59f72a5eadcdd0c5c054803cc87a2c5c53cda534c9",
 		"baselineSha256": "8751a56c744171748ecf6e98432db7383e20ed5d500de7401aa406a2c67ef172",
 		"keys": [
 			"close"
@@ -15069,14 +15069,20 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 3565,
-				"end": 3565,
+				"start": 2400,
+				"end": 2437,
+				"current": " :aria-label=\"globalLocale.env.close\"",
+				"baseline": ""
+			},
+			{
+				"start": 3602,
+				"end": 3602,
 				"current": "",
 				"baseline": "const globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 3928,
-				"end": 3986,
+				"start": 3965,
+				"end": 4023,
 				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
