@@ -3,9 +3,10 @@ SPDX-FileCopyrightText: misskey-project
 SPDX-License-Identifier: AGPL-3.0-only
 -->
 <template>
-<div :class="$style.content"><RenderContent/></div>
+<div :class="[$style.content, content.format === 'markdown' && $style.markdown]"><RenderContent/></div>
 </template>
 <script setup lang="ts">
+import { marked } from 'marked';
 import { computed, h, shallowRef, watch } from 'vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import type { VNodeChild } from 'vue';
@@ -17,9 +18,11 @@ const blocked = new Set('style script iframe frame object embed link svg math te
 const mediaId = /^fukushu-media:([a-f0-9]{64})$/;
 const mime = /^(?:image\/(?:png|jpeg|gif|webp|avif)|audio\/(?:mpeg|ogg|wav|x-wav|mp4|webm|flac))$/i;
 const parsed = computed(() => {
-	if (props.content.format !== 'html') return null;
+	if (props.content.format !== 'html' && props.content.format !== 'markdown') return null;
 	const template = window.document.createElement('template');
-	template.innerHTML = props.content.value;
+	template.innerHTML = props.content.format === 'markdown'
+		? marked.parse(props.content.value, { async: false })
+		: props.content.value;
 	return template.content;
 });
 const sources = shallowRef(new Map<string, string>());
@@ -66,6 +69,10 @@ function RenderContent(): VNodeChild {
 </script>
 <style module>
 .content { white-space: pre-wrap; overflow-wrap: anywhere; }
+.markdown { white-space: normal; }
+.markdown :global(pre) { overflow-x: auto; white-space: pre; }
+.markdown > :first-child { margin-block-start: 0; }
+.markdown > :last-child { margin-block-end: 0; }
 .content :global(audio) { display: block; margin-block: 6px; }
 .content :global(img), .content :global(audio) { max-width: 100%; }
 </style>

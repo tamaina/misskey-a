@@ -67,6 +67,30 @@ test('renders owned raster media, preserves text, and omits external requests an
 	expect(vi.mocked(misskeyApi).mock.calls.map(c => [c[0], c[1]])).toEqual([['fukushu/upstream/media', { id }]]);
 });
 
+test('renders imported Markdown structure and owned media while keeping plain cards literal', async () => {
+	const id = 'c'.repeat(64);
+	vi.mocked(misskeyApi).mockResolvedValue({ mimeType: 'image/png', base64: 'AAAA' } as never);
+	const value = [
+		'## Photosynthesis', '', '**Light** and `CO2`.', '', '- Oxygen', '- Sugar',
+		'', '| Input | Output |', '| --- | --- |', '| Light | Sugar |',
+		'', '![Diagram](fukushu-media:' + id + ')', '![Outside](https://example.invalid/image)',
+	].join('\n');
+	const { container, rerender } = render(SourceContent, { global, props: { content: { format: 'markdown', value } } });
+	expect(screen.getByRole('heading', { level: 2 }).textContent).toBe('Photosynthesis');
+	expect(container.querySelector('strong')?.textContent).toBe('Light');
+	expect(container.querySelector('code')?.textContent).toBe('CO2');
+	expect(screen.getAllByRole('listitem')).toHaveLength(2);
+	expect(screen.getByRole('columnheader', { name: 'Output' })).toBeTruthy();
+	await waitFor(() => expect(screen.getByRole('img', { name: 'Diagram' }).getAttribute('src')).toBe('data:image/png;base64,AAAA'));
+	expect(screen.queryByRole('img', { name: 'Outside' })).toBeNull();
+	expect(container.textContent).toContain('Outside');
+	expect(misskeyApi).toHaveBeenCalledTimes(1);
+
+	await rerender({ content: { format: 'plain', value } });
+	expect(container.textContent).toBe(value);
+	expect(container.querySelector('h2, strong, img, table')).toBeNull();
+});
+
 test('normal queue respects the 4 am day boundary and reset history; cram includes the reset card', () => {
 	const now = new Date(2026, 5, 3, 3);
 	const records = { settings: [{ maxReviewsPerDay: null, newQuestionsPerDay: 1 }], questions: [question],
