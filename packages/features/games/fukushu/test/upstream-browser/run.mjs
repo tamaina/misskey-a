@@ -72,13 +72,15 @@ try {
 	page.on('pageerror', error => console.error(error));
 	await page.goto(`http://127.0.0.1:${server.address().port}/`);
 	await page.waitForFunction(() => window.compatibility);
-	if (process.env.FUKUSHU_LONG_HISTORY === 'generate') {
+	const large = process.env.FUKUSHU_LONG_HISTORY === 'generate-large';
+	if (large || process.env.FUKUSHU_LONG_HISTORY === 'generate') {
 		await page.locator('#fixture').setInputFiles(join(here, '../backend/fixtures/actual-upstream/actual-upstream.fukushu'));
 		const download = page.waitForEvent('download');
-		const result = await page.evaluate(() => window.compatibility.longHistory());
+		const result = await page.evaluate(large => window.compatibility.longHistory(undefined, large), large);
 		await (await download).saveAs(join(out, 'long-input.fukushu'));
 		assert.equal(result.logs, 9999);
-		assert(result.bytes > 64 * 1024 ** 2);
+		assert(result.bytes > (large ? 64 : 8) * 1024 ** 2);
+		if (!large) assert(result.bytes < 30 * 1024 ** 2);
 		console.log(JSON.stringify({ ...result, upstream: pinned, chrome: browser.version() }));
 	} else if (process.env.FUKUSHU_LONG_HISTORY === 'verify') {
 		const saved = JSON.parse(await readFile(process.env.FUKUSHU_PERSISTED_STATE, 'utf8'));

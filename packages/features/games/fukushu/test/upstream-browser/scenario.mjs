@@ -66,7 +66,7 @@ export async function restoreAndContinue(raw, questionId, reviewedAt = '2026-11-
 }
 
 // Only used in the fresh browser context created by the opt-in test runner.
-async function longHistory(saved) {
+async function longHistory(saved, large = false) {
 	const db = await database();
 	assert(await db.count('decks') === 0, 'Expected an empty disposable database');
 	const file = document.querySelector('#fixture').files[0];
@@ -79,7 +79,7 @@ async function longHistory(saved) {
 		for (let i = logs.length; i < 9999; i++) {
 			await tx.store.add({
 				...template, id: 'synthetic-long-' + i,
-				reviewedAt: new Date(Date.UTC(2024, 0, 1) + i * 864000).toISOString(), responseText: '学習記録'.repeat(560) + i,
+				reviewedAt: new Date(Date.UTC(2024, 0, 1) + i * 864000).toISOString(), responseText: '学習記録'.repeat(large ? 560 : 70) + i,
 			});
 		}
 		await tx.done;
