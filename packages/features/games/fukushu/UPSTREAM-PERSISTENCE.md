@@ -130,6 +130,15 @@ imports are refused. Direct updates from Anki text or a new APKG are pending.
 
 ## Collection size and old backups
 
+The local file chooser can inspect a binary file up to 1 GiB, including large media or
+an original APKG. It reads 256 KiB slices, checks the payload SHA-256 and each media
+digest, and discards binary contents as it goes. It retains validated JSON for
+cross-record references and the history summary. It accepts up to 8 MiB of JSON,
+20,000 records overall, one settings row, 100 decks and 10,000 rows per remaining
+store. The 1 GiB local work budget covers the upstream 600 MiB example. JSON and
+row budgets bound retained objects separately. Closing the page or cancelling
+stops the scan. No local report authorizes server writes.
+
 The pinned app streams the binary archive and allows JSON metadata frames up to
 64 MiB. 9k's current adapter reconstructs a bounded archive for review, update
 and export. Its whole-file limit is 8 MiB, including media and the original
@@ -137,6 +146,26 @@ APKG, with separate limits of 100 decks, 1,000 questions, 1,000 study states
 and 20,000 total frames. When a new review would exceed a limit it rolls back.
 Handling large collections requires incremental reads/writes and a streaming
 export. Raising just the upload limit would leave later reviews unable to save.
+
+| Server stage at #341 | Resource use and next change |
+| --- | --- |
+| Drive recognition and original read | FileInfo reads the candidate into a size-bounded buffer. Internal storage accumulates chunks and concatenates them. For object storage the shared downloader first stages the object on disk. Stream the recognized envelope and enforce actual byte counts, the recorded MD5, local ownership, role quota and download protections. |
+| Inspect and restore | The lossless reader keeps the input, frames, normalized records and binary views. Restore builds insert rows before sending batches of 100. Stage bounded batches and binaries under an owner/job ID, validate all digests, uniqueness and references, then publish in one transaction. Under the owner lock recheck Drive identity, all native/imported ID conflicts and the durable retry receipt. Discard staging on failure or expiry. |
+| Library, media and review | Show reads all owner rows, including blobs, and encodes them again. Review repeats this inside the owner lock. Read paged metadata and the requested state, use owner-scoped media streams, and commit the state revision, history and receipt together. |
+| GIFT update | The 256 KiB UTF-8 source becomes a token/document tree, diagnostics and converted questions. Preview and apply also re-encode the owner's entire archive. Preserve category context and source-key matching across batches and recheck a collection revision when applying the preview. |
+| Export | The repeatable-read snapshot currently becomes a complete encoded buffer before the export worker writes its temporary file. Read ordered metadata and binary chunks from one snapshot, hash as the file is written, publish to Drive only after finishing, and remove partial files on error. |
+
+Enable larger server imports after study and export support the same collection
+size. These server limits originated in the bounded 9k pilots (0e40fced,
+1dc5e2f3 and 9bec1cb1). The upstream binary archive stores raw media and
+opaque APKG bytes. Local inspection never inflates embedded archives. Any
+future APKG expansion needs limits on actual expanded bytes, entry count,
+per-entry bytes and total work before using the extracted data.
+
+To repeat the synthetic Linux time/RSS comparison on an idle machine, from
+`packages/frontend` run `node --import tsx ../features/games/fukushu/test/measure-local-inspection.mjs`.
+Each measurement uses a fresh Node process and a disk-backed file. The script
+cleans up its fixtures. These readings include the runtime and loaded packages.
 
 The pinned app accepts legacy JSON versions 1–3, reconstructs missing source
 metadata and repairs legacy APKG data for versions below 3. Direct JSON restore

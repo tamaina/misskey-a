@@ -10,6 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MkInfo>{{ $locale.sfc.noWrite }}</MkInfo>
 		<p>{{ $locale.sfc.localDescription }}</p>
 		<MkButton :disabled="disabled || busy" @click="localInput?.click()">{{ $locale.sfc.localChoose }}</MkButton>
+		<MkButton v-if="localScan" @click="localScan.abort()">{{ $locale.sfc.cancelScan }}</MkButton>
 		<input ref="localInput" type="file" accept=".fukushu" hidden :disabled="disabled || busy" data-testid="upstream-local-file" @change="inspectLocal">
 		<p>{{ $locale.sfc.drive }} <MkA to="/my/drive">{{ $locale.sfc.openDrive }}</MkA></p>
 		<div class="_buttons">
@@ -45,7 +46,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, ref } from 'vue';
+import { onBeforeUnmount, ref, shallowRef } from 'vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { chooseDriveFile } from '@features/drive/frontend/utility/drive.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -55,6 +56,7 @@ import type { UpstreamInspection } from '../../shared/upstream-backup.schema.js'
 
 const props = defineProps<{ disabled?: boolean }>();
 const localInput = ref<HTMLInputElement>();
+const localScan = shallowRef<AbortController>();
 const localName = ref('');
 const selected = ref<{ id: string; name: string } | null>(null);
 const report = ref<UpstreamInspection | null>(null);
@@ -85,10 +87,18 @@ async function inspectLocal(event: Event) {
 	input.value = '';
 	if (!file || props.disabled || busy.value) return;
 	selection++; busy.value = true; report.value = null; error.value = ''; selected.value = null; localName.value = file.name;
+	const scan = new AbortController();
+	localScan.value = scan;
 	try {
-		const result = await inspectLocalUpstream(file);
-		if (!disposed) report.value = result;
-	} catch (cause) { if (!disposed) error.value = inspectionError(cause); } finally { if (!disposed) busy.value = false; }
+		const result = await inspectLocalUpstream(file, scan.signal);
+		if (!disposed && !scan.signal.aborted) report.value = result;
+	} catch (cause) {
+		if (!disposed && !scan.signal.aborted) error.value = inspectionError(cause);
+	} finally {
+		if (scan.signal.aborted) localName.value = '';
+		localScan.value = undefined;
+		if (!disposed) busy.value = false;
+	}
 }
 
 async function inspect() {
@@ -104,7 +114,7 @@ async function inspect() {
 	} finally { if (!disposed) busy.value = false; }
 }
 
-onBeforeUnmount(() => { disposed = true; selection++; });
+onBeforeUnmount(() => { disposed = true; selection++; localScan.value?.abort(); });
 </script>
 
 <style lang="scss" module>
@@ -119,9 +129,10 @@ onBeforeUnmount(() => { disposed = true; selection++; });
 <locale locale="ja-JP" lang="json">
 {
 	"title": "本家 Fukushu のバックアップを調べる",
-	"scope": "本家の .fukushu バイナリ形式を読み込みます。初回は8 MiB・100教材・1,000カード・10,000履歴まで。旧JSONは対象外です。",
+	"scope": "本家の .fukushu バイナリ形式を検査します。Drive からの検査は 8 MiB・1,000 カードまでです。",
 	"noWrite": "移行前の検査だけを行います。教材・予定・履歴は取り込まず、既存データも変更しません。",
-	"localDescription": "端末内で検査できます。ファイルの内容はサーバーへ送信せず、Drive やブラウザにも保存しません。",
+	"localDescription": "端末内では 1 GiB まで検査できます。教材・履歴などの JSON は合計 8 MiB、全体で 20,000 件、カードは 10,000 件までです。ファイルは送信されません。",
+	"cancelScan": "検査を中止",
 	"localChoose": "端末の .fukushu を検査",
 	"localOnly": "端末内で検査・未送信",
 	"drive": "本人の Drive に保存した原本を選んでください。Drive がバイナリファイルのアップロードを許可しているアカウントで利用できます。公開URLや公開状態は変わりません。",
@@ -156,9 +167,10 @@ onBeforeUnmount(() => { disposed = true; selection++; });
 <locale locale="en-US" lang="json">
 {
 	"title": "Inspect an upstream Fukushu backup",
-	"scope": "Read the upstream .fukushu binary format. This pilot allows 8 MiB, 100 decks, 1,000 cards and 10,000 reviews. Legacy JSON is excluded.",
+	"scope": "Inspect an upstream .fukushu binary backup. Drive inspection supports up to 8 MiB and 1,000 cards.",
 	"noWrite": "Pre-import inspection only. No materials, schedules or history are imported, and existing data is unchanged.",
-	"localDescription": "Inspect on this device. File contents are not sent to the server or saved in Drive or browser storage.",
+	"localDescription": "Inspect up to 1 GiB on this device, with 8 MiB of JSON, 20,000 records in total and up to 10,000 cards. The file stays on your device.",
+	"cancelScan": "Cancel inspection",
 	"localChoose": "Inspect a .fukushu on this device",
 	"localOnly": "Inspected locally · not uploaded",
 	"drive": "Choose an original in your own Drive. Your account must already be allowed to upload binary files. Its public URL and visibility remain unchanged.",

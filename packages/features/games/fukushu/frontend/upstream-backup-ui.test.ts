@@ -83,7 +83,7 @@ test('local selection inspects only in memory without any Drive or API request',
 	const file = new File(['synthetic'], 'local.fukushu');
 	await fireEvent.change(screen.getByTestId('upstream-local-file'), { target: { files: [file] } });
 	await screen.findByText('読み込めた内容');
-	expect(inspectLocalUpstream).toHaveBeenCalledWith(file);
+	expect(inspectLocalUpstream).toHaveBeenCalledWith(file, expect.any(AbortSignal));
 	expect(screen.getByText(/端末内で検査・未送信/)).toBeTruthy();
 	expect(screen.getByText(/回答時のカード内容: 不明/)).toBeTruthy();
 	expect(misskeyApi).not.toHaveBeenCalled(); expect(chooseDriveFile).not.toHaveBeenCalled();
@@ -104,4 +104,18 @@ test('parent operation lock also blocks local inspection', async () => {
 	expect(button('端末の .fukushu を検査').disabled).toBe(true);
 	await fireEvent.change(screen.getByTestId('upstream-local-file'), { target: { files: [new File(['x'], 'x.fukushu')] } });
 	expect(inspectLocalUpstream).not.toHaveBeenCalled(); expect(misskeyApi).not.toHaveBeenCalled();
+});
+
+test('cancels a running local scan without displaying a partial report', async () => {
+	vi.mocked(inspectLocalUpstream).mockImplementationOnce((_file, signal) => {
+		if (!signal) throw new Error('Expected a cancellable scan');
+		return new Promise((_resolve, reject) => signal.addEventListener('abort', () => reject(signal.reason), { once: true }));
+	});
+	mount(); await expand();
+	await fireEvent.change(screen.getByTestId('upstream-local-file'), { target: { files: [new File(['x'], 'large.fukushu')] } });
+	await fireEvent.click(button('検査を中止'));
+	expect(button('端末の .fukushu を検査').disabled).toBe(false);
+	expect(screen.queryByRole('alert')).toBeNull();
+	expect(screen.queryByText('読み込めた内容')).toBeNull();
+	expect(misskeyApi).not.toHaveBeenCalled();
 });

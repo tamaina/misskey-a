@@ -23,7 +23,9 @@ question for its label. `StudyStateRecord` is a current state, not proof of the
 state after any particular historical review. Settings are also current values.
 Never use them to invent missing historical facts, replay FSRS, or regrade answers.
 
-## First implementation
+## First implementation (#334)
+
+This section records the original pilot. For current local and server limits see [collection size and old backups](UPSTREAM-PERSISTENCE.md#collection-size-and-old-backups).
 
 Inspect a user-selected local file entirely in browser memory, or read an
 authenticated owner's Drive original using the existing bounded reader. Both
