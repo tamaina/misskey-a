@@ -137,7 +137,7 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 		['/fukushu/study/history', 'post___fukushu___study___history'],
 	]);
 	const addedFukushuIds = new Set(addedFukushuOperations.values());
-	expect(addedFukushuIds.size).toBe(25);
+	expect(addedFukushuIds.size).toBe(26);
 	for (const [path, operationId] of addedFukushuOperations) {
 		expect(spec.paths?.[path]?.post?.operationId).toBe(operationId);
 		expect(spec.paths?.[path]?.get).toBeUndefined();
