@@ -42,7 +42,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 		</template>
 		<p v-if="error" role="alert">{{ error }}</p>
-		<MkButton v-if="pending && !busy" @click="send">{{ $locale.sfc.retry }}</MkButton>
+		<MkButton v-if="pending && !busy && !capacityReached" @click="send">{{ $locale.sfc.retry }}</MkButton>
 	</template>
 	<p v-else role="status">{{ $locale.sfc.finished }}</p>
 	<MkButton :disabled="busy" @click="emit('close')">{{ $locale.sfc.back }}</MkButton>
@@ -102,6 +102,7 @@ const revealed = ref(false);
 const feedback = ref(false);
 const busy = ref(false);
 const error = ref('');
+const capacityReached = ref(false);
 type Submission = { requestId: string; questionId: string; expectedRevision: number; rating: StudyRating; correct: boolean; answers: string[]; durationMs: number };
 const pending = shallowRef<Submission>();
 let started = Date.now();
@@ -133,7 +134,9 @@ async function send() {
 		selected.value = []; entered.value = ''; matches.value.clear();
 		revealed.value = false; graded.value = undefined; error.value = '';
 	} catch (cause) {
-		error.value = typeof cause === 'object' && cause !== null && 'code' in cause && cause.code === 'STUDY_CONFLICT' ? $locale.value.sfc.conflict : $locale.value.sfc.failed;
+		const code = typeof cause === 'object' && cause !== null && 'code' in cause ? cause.code : null;
+		capacityReached.value = code === 'BACKUP_TOO_LARGE';
+		error.value = capacityReached.value ? $locale.value.sfc.capacity : code === 'STUDY_CONFLICT' ? $locale.value.sfc.conflict : $locale.value.sfc.failed;
 	} finally { busy.value = false; }
 }
 </script>
@@ -153,6 +156,7 @@ async function send() {
 	"finished": "この回の復習は終了です。",
 	"back": "教材に戻る",
 	"retry": "同じ回答の保存を再試行",
+	"capacity": "教材の保存容量の上限に達したため、この回答は保存されませんでした。これまでの履歴は教材に戻って書き出せます。",
 	"failed": "保存結果を確認できませんでした。同じ回答で再試行できます。",
 	"conflict": "このカードは別の操作で更新されました。教材に戻って開き直してください。"
 }
@@ -172,6 +176,7 @@ async function send() {
 	"easy": "Easy",
 	"finished": "This study session is complete.",
 	"back": "Back to deck",
+	"capacity": "This answer could not be saved because the collection reached its byte limit. Return to the library to export your existing history.",
 	"retry": "Retry saving this answer",
 	"failed": "Could not confirm the save. You can retry the same answer.",
 	"conflict": "This card has changed. Return to the deck and reopen it."

@@ -21,7 +21,7 @@ export class FukushuSourceChunks1794974400000 {
 	}
 	async down(queryRunner) {
 		const [used] = await queryRunner.query(`SELECT EXISTS (
-			SELECT 1 FROM fukushu_source_usage WHERE bytes + binaries + count * 4 + 81 > 8388608
+			SELECT 1 FROM fukushu_source_usage WHERE count > 20000 OR logs > 10000 OR bytes + binaries + count * 4 + 81 > 8388608
 			UNION ALL SELECT 1 FROM fukushu_upstream_record WHERE store IN ('questions', 'studyStates')
 				GROUP BY "ownerId", store HAVING COUNT(*) > 1000
 		) AS used`);

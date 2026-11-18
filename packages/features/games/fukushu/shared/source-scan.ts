@@ -5,7 +5,7 @@
 import { sha256 } from '@noble/hashes/sha2.js';
 import { bytesToHex } from '@noble/hashes/utils.js';
 import { MAX_BACKUP_BYTES } from './backup.schema.js';
-import { checkUpstreamRelations, decodeUpstreamRecord, emptyUpstreamRecords, summarizeUpstreamRecords, UPSTREAM_MAGIC, UpstreamBackupError } from './upstream-reader.js';
+import { checkMaterialCount, checkUpstreamRelations, decodeUpstreamRecord, emptyUpstreamRecords, summarizeUpstreamRecords, UPSTREAM_MAGIC, UpstreamBackupError } from './upstream-reader.js';
 
 // The browser and the server use the same archive and metadata limits.
 // Only JSON counts toward the retained metadata budget. APKG/media stay opaque.
@@ -63,7 +63,6 @@ export async function scanSourceArchive(file: Blob, signal?: AbortSignal, onFram
 	let metadataBytes = 0;
 	let binaryBytes = 0;
 	while (cursor.position < end) {
-		if (seen.size >= 20_000) throw new UpstreamBackupError('UPSTREAM_INSPECTION_LIMIT');
 		const prefix = await cursor.read(4);
 		digest.update(prefix);
 		const length = new DataView(prefix.buffer).getUint32(0, true);
@@ -73,8 +72,7 @@ export async function scanSourceArchive(file: Blob, signal?: AbortSignal, onFram
 		const json = await cursor.read(length);
 		digest.update(json);
 		const { store, value, blobSize } = decodeUpstreamRecord(json, seen, records);
-		const limit = store === 'settings' ? 1 : store === 'decks' ? 100 : 10_000;
-		if (records[store].length > limit) throw new UpstreamBackupError('UPSTREAM_INSPECTION_LIMIT');
+		checkMaterialCount(store, records, seen.size, 10_000);
 		onFrame?.({ store, value, blobOffset: cursor.position, blobSize });
 		if (blobSize === undefined) {
 			if (store === 'media') throw new UpstreamBackupError('INVALID_BACKUP');

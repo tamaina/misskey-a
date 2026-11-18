@@ -124,7 +124,7 @@ test.each(['missing-size', 'large-size', 'negative-size', 'media-hash', 'media-l
 	await expect(inspectUpstreamBackup(pack(rows))).rejects.toThrow('INVALID_BACKUP');
 });
 
-test.each([['decks', 101], ['questions', 1001], ['studyStates', 1001], ['reviewLogs', 10_001]] as const)('refuses the complete archive above the %s record limit', async (store, count) => {
+test.each([['decks', 101], ['questions', 1001], ['studyStates', 1001], ['imports', 10_001]] as const)('refuses the complete archive above the %s record limit', async (store, count) => {
 	const rows = frames(); const template = frame(rows, store);
 	const many = Array.from({ length: count }, (_, index) => ({ meta: { ...template.meta, value: { ...template.meta.value, [store === 'studyStates' ? 'questionId' : 'id']: `unique-${index}` } }, blob: template.blob }));
 	await expect(inspectUpstreamBackup(pack([...rows.filter(row => row.meta.store !== store), ...many]))).rejects.toThrow('UPSTREAM_INSPECTION_LIMIT');
@@ -142,11 +142,11 @@ test('limits the history sample without changing total counts or claiming that m
 	expect(result.history[0].id).toBe('review-24'); expect(result.canImport).toBe(false);
 });
 
-test('rejects the combined record limit even when every store fits its own limit', async () => {
-	const rows = frames().filter(row => row.meta.store !== 'reviewLogs' && row.meta.store !== 'imports');
-	for (const store of ['reviewLogs', 'imports']) {
+test('rejects the combined material limit even when every store fits its own limit', async () => {
+	const rows = frames().filter(row => row.meta.store !== 'importSources' && row.meta.store !== 'imports');
+	for (const store of ['importSources', 'imports']) {
 		const template = frame(frames(), store);
-		for (let index = 0; index < 10_000; index++) rows.push({ meta: { ...template.meta, value: { ...template.meta.value, id: `combined-${index}` } }, blob: Buffer.alloc(0) });
+		for (let index = 0; index < 10_000; index++) rows.push({ meta: { ...template.meta, value: { ...template.meta.value, id: `combined-${index}` } }, blob: template.blob });
 	}
 	const bytes = pack(rows);
 	expect(bytes.length).toBeLessThan(MAX_BACKUP_BYTES);

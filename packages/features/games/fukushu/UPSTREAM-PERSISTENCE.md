@@ -54,7 +54,7 @@ The source reader validates the complete archive before persistence. Reviews
 use the target question, current state and global settings. An owner usage row
 tracks the serialized UTF-8 metadata, binary bytes, frame count, log count and
 last position. The review transaction checks and updates these counters before
-appending a log. At the frame, log or byte ceiling a new review fails atomically.
+appending a log. Review history has no count ceiling. At the JSON or archive byte ceiling a new review fails atomically.
 Existing study history remains exportable.
 
 ## API and ordinary-user input
@@ -136,8 +136,8 @@ imports are refused. Direct updates from Anki text or a new APKG are pending.
 ## Collection size and old backups
 
 Local and Drive inspection and queued source imports accept a framed binary
-archive up to 1 GiB, with 8 MiB of JSON, 20,000 total frames, one global
-settings record, 100 decks and up to 10,000 records in each remaining store.
+archive up to 1 GiB, with 8 MiB of JSON, 20,000 frames excluding review history, one global
+settings record, 100 decks and up to 10,000 records in each remaining material store.
 Framing and the checksum also count toward the archive ceiling. Drive role,
 instance, storage and downloader limits can be lower. The default role permits 30 MiB per file. Synchronous restore
 accepts files up to 8 MiB. Source media and APKG bytes remain opaque. The

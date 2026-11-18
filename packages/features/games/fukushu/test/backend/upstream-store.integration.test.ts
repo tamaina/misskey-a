@@ -4,6 +4,10 @@
  */
 import { createHash, randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
+import { isFukushuBackupFile } from '@features/drive/backend/utility/fukushu-file-type.js';
 import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'vitest';
 import { DataSource } from 'typeorm';
 import { entities } from '@features/persistence/backend/postgres.js';
@@ -255,6 +259,71 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		const [usage] = await db.query('SELECT count, logs, bytes, binaries FROM fukushu_source_usage');
 		expect(usage.logs).toBe(38);
 		expect(usage.binaries + usage.bytes + 4 * usage.count + 81).toBe(new Blob(parts).size);
+	});
+
+	test('ordinary reviews cross both legacy record ceilings, replay once and round-trip every frame', async () => {
+		const original = (await readUpstreamArchive(bytes, sha)).frames();
+		const log = original.find(frame => frame.store === 'reviewLogs')!;
+		const imported = original.find(frame => frame.store === 'imports')!;
+		const parts = [bytes.subarray(0, -64)];
+		let total = original.length;
+		function append(template: typeof log, id: string) {
+			const json = Buffer.from(JSON.stringify({ store: template.store, value: { ...template.value, id } }));
+			const length = Buffer.alloc(4);
+			length.writeUInt32LE(json.length);
+			parts.push(length, json);
+			total++;
+		}
+		for (let n = original.filter(frame => frame.store === 'reviewLogs').length; n < 9999; n++) append(log, 'log-' + n);
+		while (total < 20_000) append(imported, 'import-' + total);
+		const payload = Buffer.concat(parts);
+		const input = Buffer.concat([payload, Buffer.from(await sha(payload))]);
+		expect(input.length).toBeLessThan(8 * 1024 * 1024);
+		expect((await store.restore('alice', await upload('alice', input), randomUUID())).records).toBe(20_000);
+		const { reviewedAt: _time, ...request } = expected.reset.request;
+		const first = await store.review('alice', request);
+		const next = { ...request, requestId: randomUUID(), expectedRevision: 1 };
+		const [second, replay] = await Promise.all([store.review('alice', next), store.review('alice', next)]);
+		expect(first.revision).toBe(1);
+		expect(second.revision).toBe(2);
+		expect(replay).toEqual(second);
+		const output = await exported(store, 'alice');
+		const dir = await mkdtemp(join(tmpdir(), 'fukushu-long-history-'));
+		try {
+			const path = join(dir, 'boundary.fukushu');
+			await writeFile(path, output);
+			expect(await isFukushuBackupFile(path)).toBe(true);
+		} finally { await rm(dir, { recursive: true, force: true }); }
+		const inspection = await scanSourceArchive(new Blob([new Uint8Array(output)]));
+		expect(inspection.counts.reviewLogs).toBe(10_001);
+		expect((await readUpstreamArchive(output, sha)).normalizedRecords().reviewLogs).toHaveLength(10_001);
+		await expect(store.show('bob')).rejects.toThrow('NO_SUCH_MATERIAL');
+		expect((await store.restore('bob', await upload('bob', output), randomUUID())).records).toBe(20_002);
+		expect(await sha(await exported(store, 'bob'))).toBe(await sha(output));
+	}, 60_000);
+
+	test('the byte budget still rejects a review atomically even with very few frames', async () => {
+		const frames = (await readUpstreamArchive(bytes, sha)).frames();
+		const log = frames.find(frame => frame.store === 'reviewLogs')!;
+		const record = { store: log.store, value: { ...log.value, id: 'padded-history', responseText: '' } };
+		const metadataBytes = frames.reduce((sum, frame) => sum + Buffer.byteLength(JSON.stringify({
+			store: frame.store,
+			value: frame.value,
+			...(frame.blob === undefined ? {} : { blobSize: frame.blob.length }),
+		})), 0);
+		record.value.responseText = 'a'.repeat(8 * 1024 * 1024 - metadataBytes - Buffer.byteLength(JSON.stringify(record)) - 1);
+		const json = Buffer.from(JSON.stringify(record));
+		const header = Buffer.alloc(4); header.writeUInt32LE(json.length);
+		const payload = Buffer.concat([bytes.subarray(0, -64), header, json]);
+		const input = Buffer.concat([payload, Buffer.from(await sha(payload))]);
+		const fileId = await upload('alice', input);
+		await store.restore('alice', fileId, randomUUID(), { size: input.length, md5: snapshot(input).md5 });
+		const before = await sha(await exported(store, 'alice'));
+		const totals = await counts();
+		const { reviewedAt: _time, ...request } = expected.reset.request;
+		await expect(store.review('alice', request)).rejects.toThrow('BACKUP_TOO_LARGE');
+		expect(await counts()).toEqual(totals);
+		expect(await sha(await exported(store, 'alice'))).toBe(before);
 	});
 
 	test('an export overlapping a review retains its original snapshot', async () => {

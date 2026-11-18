@@ -61,6 +61,13 @@ export function decodeUpstreamRecord(bytes: Uint8Array, seen: Set<string>, recor
 	return record;
 }
 
+/** Count material separately from append-only review history. All JSON still uses the byte budget. */
+export function checkMaterialCount(store: keyof UpstreamRecords, records: UpstreamRecords, total: number, maxCards: number) {
+	if (store === 'reviewLogs') return;
+	const limit = store === 'settings' ? 1 : store === 'decks' ? 100 : store === 'questions' || store === 'studyStates' ? maxCards : 10_000;
+	if (total - records.reviewLogs.length > 20_000 || records[store].length > limit) throw new UpstreamBackupError('UPSTREAM_INSPECTION_LIMIT');
+}
+
 export function checkUpstreamRelations(records: UpstreamRecords, mediaIds: { has(id: string): boolean }) {
 	check(records.settings.length === 1);
 	const deckIds = new Set(records.decks.map(row => row.id));
@@ -101,10 +108,8 @@ export async function readUpstreamArchive(input: Uint8Array, sha256: (bytes: Uin
 	const frames: UpstreamFrame[] = [];
 	const seen = new Set<string>();
 	let offset = UPSTREAM_MAGIC.length;
-	let total = 0;
 	let binaryBytes = 0;
 	while (offset < end) {
-		if (++total > 20_000) throw new UpstreamBackupError('UPSTREAM_INSPECTION_LIMIT');
 		check(offset + 4 <= end);
 		const length = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength).getUint32(offset, true); offset += 4;
 		check(length > 0 && length <= 64 * 1024 * 1024 && length <= end - offset);
@@ -118,8 +123,7 @@ export async function readUpstreamArchive(input: Uint8Array, sha256: (bytes: Uin
 			offset += record.blobSize; binaryBytes += record.blobSize;
 		} else check(record.store !== 'media');
 		frames.push(frame);
-		const limit = record.store === 'settings' ? 1 : record.store === 'decks' ? 100 : record.store === 'questions' || record.store === 'studyStates' ? 1000 : 10_000;
-		if (records[record.store].length > limit) throw new UpstreamBackupError('UPSTREAM_INSPECTION_LIMIT');
+		checkMaterialCount(record.store, records, seen.size, 1000);
 	}
 	check(offset === end);
 	checkUpstreamRelations(records, blobs);

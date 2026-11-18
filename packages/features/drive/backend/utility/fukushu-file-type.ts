@@ -34,7 +34,12 @@ export async function isFukushuBackupFile(path: string): Promise<boolean> {
 		let settings = 0;
 		const seen = new Set<string>();
 		while (offset < end) {
-			if (++count > 20_000 || offset + 4 > end) return false;
+			if (++count > 20_000) {
+				// A long review history can exceed the small envelope detector's frame budget.
+				await scanSourceArchive(await openAsBlob(path));
+				return true;
+			}
+			if (offset + 4 > end) return false;
 			const length = bytes.readUInt32LE(offset); offset += 4;
 			if (!length || offset + length > end) return false;
 			const row = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes.subarray(offset, offset + length)));

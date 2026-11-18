@@ -43,6 +43,18 @@ test('uses grade.correct even at score 100 and retries the original submission u
 	expect(calls[0][1]).toMatchObject({ questionId: 'source-card', expectedRevision: 3, rating: 'again', correct: false, answers: ['a', 'b'] });
 });
 
+test('a confirmed byte limit keeps the answer unsaved and avoids retrying the same request', async () => {
+	vi.mocked(misskeyApi).mockRejectedValueOnce({ code: 'BACKUP_TOO_LARGE' });
+	render(SourceStudy, { global, props: { questions: [question], revisions: new Map([['source-card', 3]]), flashMode: false, immediate: true, shuffle: false } });
+	await fireEvent.click(screen.getAllByRole('checkbox')[0]);
+	await fireEvent.click(screen.getByText('採点する'));
+	await fireEvent.click(screen.getByText('もう一度'));
+	expect((await screen.findByRole('alert')).textContent).toContain('この回答は保存されませんでした');
+	expect(screen.queryByText('同じ回答の保存を再試行')).toBeNull();
+	expect(screen.queryByText('この回の復習は終了です。')).toBeNull();
+	expect(misskeyApi).toHaveBeenCalledTimes(1);
+});
+
 test('renders owned raster media, preserves text, and omits external requests and active markup', async () => {
 	const id = 'b'.repeat(64);
 	vi.mocked(misskeyApi).mockResolvedValue({ mimeType: 'image/png', base64: 'AAAA' } as never);

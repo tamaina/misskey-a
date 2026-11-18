@@ -141,9 +141,9 @@ export class FukushuUpstreamStore {
 	}
 
 	private async read(manager: EntityManager, ownerId: string): Promise<{ archive: UpstreamArchive; rows: MiFukushuUpstreamRecord[] }> {
-		const [budget] = await manager.query('SELECT COUNT(*)::integer AS count, COALESCE(SUM(octet_length(data) + COALESCE("chunkedSize", octet_length(blob), 0)), 0)::text AS bytes FROM fukushu_upstream_record WHERE "ownerId" = $1', [ownerId]);
-		if (budget.count === 0) throw new MaterialError('NO_SUCH_MATERIAL');
-		if (budget.count > 20_000 || Number(budget.bytes) > MAX_BACKUP_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
+		const [budget] = await manager.query('SELECT COUNT(*) FILTER (WHERE store <> \'reviewLogs\')::integer AS material, COALESCE(SUM(octet_length(data) + COALESCE("chunkedSize", octet_length(blob), 0)), 0)::text AS bytes FROM fukushu_upstream_record WHERE "ownerId" = $1', [ownerId]);
+		if (budget.material === 0) throw new MaterialError('NO_SUCH_MATERIAL');
+		if (budget.material > 20_000 || Number(budget.bytes) > MAX_BACKUP_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
 		const rows = await manager.getRepository(MiFukushuUpstreamRecord).find({ where: { ownerId }, order: { position: 'ASC', store: 'ASC', key: 'ASC' } });
 		const frames: UpstreamFrame[] = rows.map(row => ({ store: row.store as UpstreamFrame['store'], value: JSON.parse(row.data), ...(row.blob === null ? {} : { blob: new Uint8Array(row.blob) }) }));
 		return { archive: await encodeUpstreamFrames(frames), rows };
@@ -282,7 +282,7 @@ export class FukushuUpstreamStore {
 			const logData = JSON.stringify(result.record);
 			const jsonBytes = budget.bytes + Buffer.byteLength(data) - Buffer.byteLength(state.data) + Buffer.byteLength(JSON.stringify({ store: 'reviewLogs', value: result.record }));
 			const fileBytes = UPSTREAM_MAGIC.length + 64 + (budget.count + 1) * 4 + Number(budget.binaries) + jsonBytes;
-			if (budget.count >= 20_000 || budget.logs >= 10_000 || jsonBytes > MAX_BACKUP_BYTES || fileBytes > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
+			if (jsonBytes > MAX_BACKUP_BYTES || fileBytes > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
 			await usage.update({ ownerId }, { count: budget.count + 1, last: budget.last + 1, logs: budget.logs + 1, bytes: jsonBytes });
 			await records.update({ ownerId, store: state.store, key: cardKey }, { data, revision: result.revision });
 			await records.insert({ ownerId, store: 'reviewLogs', key: key(id), data: logData, blob: null, revision: 0, position: budget.last + 1, sourceHash: state.sourceHash });
