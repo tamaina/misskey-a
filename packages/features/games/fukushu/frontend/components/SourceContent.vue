@@ -7,12 +7,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 <script setup lang="ts">
 import { marked } from 'marked';
-import { computed, h, shallowRef, watch } from 'vue';
+import { computed, h, shallowRef, useCssModule, watch } from 'vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import type { VNodeChild } from 'vue';
 import type { Content } from '../source-study.js';
 
 const props = defineProps<{ content: Content }>();
+const style = useCssModule();
+const clozeClasses = new Map([
+	['cloze-blank', style.clozeBlank],
+	['cloze-label', style.clozeLabel],
+	['cloze-hint', style.clozeHint],
+]);
 const allowed = new Set('p br b strong mark details summary i em u s sub sup ruby rt rp ul ol li span div table thead tbody tr th td blockquote pre code hr h1 h2 h3 h4 h5 h6'.split(' '));
 const blocked = new Set('style script iframe frame object embed link svg math template noscript form video'.split(' '));
 const mediaId = /^fukushu-media:([a-f0-9]{64})$/;
@@ -60,6 +66,10 @@ function renderNode(node: Node): VNodeChild {
 		return tag === 'img' ? h('img', { src, alt }) : h('audio', { src, controls: true, preload: 'metadata', 'aria-label': alt });
 	}
 	const children = [...node.childNodes].map(renderNode);
+	if (tag === 'span' && el.hasAttribute('class')) {
+		const classes = [...el.classList].map(name => clozeClasses.get(name)).filter(Boolean);
+		return h('span', { class: classes }, children);
+	}
 	return allowed.has(tag) ? h(tag, children) : children;
 }
 
@@ -69,10 +79,29 @@ function RenderContent(): VNodeChild {
 </script>
 <style module>
 .content { white-space: pre-wrap; overflow-wrap: anywhere; }
-.markdown { white-space: normal; }
+.markdown { white-space: normal; max-width: 100%; overflow-x: auto; }
+.markdown > * + * { margin-block-start: .6em; }
+.markdown :global(table) { border-collapse: collapse; }
+.markdown :global(th), .markdown :global(td) {
+	padding: .3em .65em;
+	border: 1px solid var(--MI_THEME-divider);
+	text-align: start;
+}
 .markdown :global(pre) { overflow-x: auto; white-space: pre; }
 .markdown > :first-child { margin-block-start: 0; }
 .markdown > :last-child { margin-block-end: 0; }
+.clozeBlank {
+	display: inline-flex;
+	align-items: baseline;
+	justify-content: center;
+	gap: .35em;
+	min-width: 3em;
+	padding-inline: .4em;
+	border: 1px solid currentColor;
+	border-radius: 2px;
+}
+.clozeLabel { font-weight: bold; }
+.clozeHint { font-size: .75em; }
 .content :global(audio) { display: block; margin-block: 6px; }
 .content :global(img), .content :global(audio) { max-width: 100%; }
 </style>

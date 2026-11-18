@@ -91,6 +91,17 @@ test('renders imported Markdown structure and owned media while keeping plain ca
 	expect(container.querySelector('h2, strong, img, table')).toBeNull();
 });
 
+test('maps the upstream Anki cloze blank, label and hint onto local styles', () => {
+	const value = '<span class="cloze-blank other"><span class="cloze-label">ア</span><span class="cloze-hint">年</span></span><span class="other">年号</span>';
+	const { container } = render(SourceContent, { global, props: { content: { format: 'html', value } } });
+	const spans = [...container.querySelectorAll('span')];
+	expect(spans.map(span => span.textContent)).toEqual(['ア年', 'ア', '年', '年号']);
+	expect(new Set(spans.slice(0, 3).map(span => span.className)).size).toBe(3);
+	expect(spans.slice(0, 3).every(span => span.className.length > 0)).toBe(true);
+	expect(spans[3].className).toBe('');
+	expect(container.querySelector('.other')).toBeNull();
+});
+
 test('normal queue respects the 4 am day boundary and reset history; cram includes the reset card', () => {
 	const now = new Date(2026, 5, 3, 3);
 	const records = { settings: [{ maxReviewsPerDay: null, newQuestionsPerDay: 1 }], questions: [question],
