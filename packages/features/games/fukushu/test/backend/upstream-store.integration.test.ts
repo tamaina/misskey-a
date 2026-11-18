@@ -73,8 +73,10 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		const study = new FukushuStudyStore(db, () => now);
 		await native.create('alice', material());
 		await native.create('bob', material());
-		await study.review('alice', { id: 'deck-original', questionId: 'card-original', questionVersion: 1,
-			expectedStateRevision: 0, requestId: randomUUID(), rating: 'again', durationMs: 100 });
+		await study.review('alice', {
+			id: 'deck-original', questionId: 'card-original', questionVersion: 1,
+			expectedStateRevision: 0, requestId: randomUUID(), rating: 'again', durationMs: 100,
+		});
 		const schedule = { localTime: '09:05', zone: 'Asia/Tokyo' };
 		expect(await worker().claimNext()).toBeUndefined();
 		await worker().configure('bob', schedule);
@@ -109,8 +111,8 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		await pilot.configure('alice', schedule);
 		expect(await pilot.claimNext()).toBe('alice');
 		expect(await exported(store, 'alice')).toEqual(original);
-		const states: { key: string; data: string }[] = await db.query("SELECT key, data FROM fukushu_upstream_record WHERE store = 'studyStates'");
-		await db.query("UPDATE fukushu_upstream_record SET data = $1 WHERE store = 'studyStates'", [JSON.stringify({ suspended: false, card: { reps: 0, due: now } })]);
+		const states = await db.query<{ key: string }[]>('SELECT key FROM fukushu_upstream_record WHERE store = $1', ['studyStates']);
+		await db.query('UPDATE fukushu_upstream_record SET data = $1 WHERE store = $2', [JSON.stringify({ suspended: false, card: { reps: 0, due: now } }), 'studyStates']);
 		const nextDay = async () => {
 			now = new Date(now.getTime() + 86400_000);
 			return pilot.claimNext();

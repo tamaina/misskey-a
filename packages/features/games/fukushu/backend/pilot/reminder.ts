@@ -91,11 +91,12 @@ export class FukushuReminderPilot {
 	async claimNext(): Promise<string | null | undefined> {
 		return this.db.transaction('READ COMMITTED', async manager => {
 			const now = this.clock();
-			const [row] = await manager.query<Pending[]>(`
+			const pending = await manager.query<Pending[]>(`
 				SELECT * FROM fukushu_reminder WHERE "nextAt" <= $1
 				ORDER BY "nextAt", "ownerId" LIMIT 1 FOR UPDATE SKIP LOCKED
 			`, [now]);
-			if (!row) return undefined;
+			if (!pending.length) return undefined;
+			const row = pending[0];
 			const { today, tomorrow, alreadyClaimed } = await slots(manager, row, now, row);
 			const elapsed = now.getTime() - today.getTime();
 			const eligible = elapsed >= 0 && elapsed < 60 * 60_000 && row.nextAt <= today
