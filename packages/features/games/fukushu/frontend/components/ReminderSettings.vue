@@ -37,6 +37,7 @@ const saved = ref(false);
 function toggle(event: Event) {
 	if ((event.currentTarget as HTMLDetailsElement).open && !loaded.value) void load();
 }
+
 async function load() {
 	if (busy.value) return;
 	busy.value = true;
@@ -48,6 +49,7 @@ async function load() {
 		loaded.value = true;
 	} catch { failed.value = true; } finally { busy.value = false; }
 }
+
 async function save() {
 	if (busy.value || !loaded.value) return;
 	busy.value = true;

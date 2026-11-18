@@ -126,6 +126,7 @@ globalThis.addEventListener('fetch', ev => {
 
 // Push retries may reach the same worker concurrently or after it restarts.
 let reminderDisplay = Promise.resolve();
+
 function displayReminder(data: PushNotificationDataMap['fukushuReminder']) {
 	const display = reminderDisplay.then(async () => {
 		if (Date.now() >= data.body.expiresAt || !await getAccountFromId(data.userId)) return;

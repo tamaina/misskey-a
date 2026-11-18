@@ -73,6 +73,7 @@ test('displays a private due reminder once across restarts and opens the matchin
 	const showNotification = vi.fn(async () => {});
 	const openClient = vi.fn(async () => null);
 	const getAccountFromId = vi.fn(async (id: string) => id === 'alice' ? { id } : undefined);
+
 	function boot() {
 		const listeners = new Map<string, (event: Record<string, unknown>) => void>();
 		const modules: Record<string, unknown> = {
@@ -82,6 +83,7 @@ test('displays a private due reminder once across restarts and opens the matchin
 			'@/scripts/get-account-from-id.js': { getAccountFromId },
 			'@/scripts/operations.js': { openClient },
 		};
+
 		function evaluate(source: string) {
 			const output = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } });
 			const exports = {};
@@ -92,6 +94,7 @@ test('displays a private due reminder once across restarts and opens the matchin
 			});
 			return exports;
 		}
+
 		modules['@/scripts/create-notification.js'] = evaluate(notificationSource);
 		evaluate(workerSource);
 		return (name: string, event: Record<string, unknown>) => {
@@ -101,6 +104,7 @@ test('displays a private due reminder once across restarts and opens the matchin
 			return done;
 		};
 	}
+
 	const data = { type: 'fukushuReminder', userId: 'alice', dateTime: Date.now(), body: { occurrence: Date.now(), expiresAt: Date.now() + 60_000 } };
 	const push = { data: { json: () => data } };
 	const event = boot();
