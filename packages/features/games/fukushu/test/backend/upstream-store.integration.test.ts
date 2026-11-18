@@ -263,17 +263,20 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 
 	test('ordinary reviews cross both legacy record ceilings, replay once and round-trip every frame', async () => {
 		const original = (await readUpstreamArchive(bytes, sha)).frames();
-		const log = original.find(frame => frame.store === 'reviewLogs')!;
-		const imported = original.find(frame => frame.store === 'imports')!;
+		const log = original.find(frame => frame.store === 'reviewLogs');
+		const imported = original.find(frame => frame.store === 'imports');
+		if (!log || !imported) throw new Error('Expected source review and import fixtures');
 		const parts = [bytes.subarray(0, -64)];
 		let total = original.length;
-		function append(template: typeof log, id: string) {
+
+		function append(template: (typeof original)[number], id: string) {
 			const json = Buffer.from(JSON.stringify({ store: template.store, value: { ...template.value, id } }));
 			const length = Buffer.alloc(4);
 			length.writeUInt32LE(json.length);
 			parts.push(length, json);
 			total++;
 		}
+
 		for (let n = original.filter(frame => frame.store === 'reviewLogs').length; n < 9999; n++) append(log, 'log-' + n);
 		while (total < 20_000) append(imported, 'import-' + total);
 		const payload = Buffer.concat(parts);
@@ -304,7 +307,8 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 
 	test('the byte budget still rejects a review atomically even with very few frames', async () => {
 		const frames = (await readUpstreamArchive(bytes, sha)).frames();
-		const log = frames.find(frame => frame.store === 'reviewLogs')!;
+		const log = frames.find(frame => frame.store === 'reviewLogs');
+		if (!log) throw new Error('Expected a source review fixture');
 		const record = { store: log.store, value: { ...log.value, id: 'padded-history', responseText: '' } };
 		const metadataBytes = frames.reduce((sum, frame) => sum + Buffer.byteLength(JSON.stringify({
 			store: frame.store,
