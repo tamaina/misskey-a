@@ -145,6 +145,7 @@ async function pickOwnedFile() {
 
 	return undefined;
 }
+
 async function restore() {
 	const file = await pickOwnedFile();
 	if (!file) return;
