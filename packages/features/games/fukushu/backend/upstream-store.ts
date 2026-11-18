@@ -72,14 +72,16 @@ export class FukushuUpstreamStore {
 				if (!file) throw new MaterialError('NO_SUCH_FILE');
 				if (file.userHost !== null || file.uri !== null || file.isLink || file.size !== snapshot.blob.size || file.md5 !== snapshot.md5) throw new BackupError('BACKUP_FAILED');
 				const records = manager.getRepository(MiFukushuUpstreamRecord);
-				const existing = await records.find({ where: { ownerId }, select: { store: true, key: true } });
-				const occupied = new Set(existing.map(row => `${row.store}:${row.key}`));
-				// Native IDs are queried as text; source IDs are never coerced to UUID or truncated.
+				// Native PostgreSQL text IDs cannot contain NUL or unpaired surrogates.
+				// Preserve these in the source JSON; they have no possible native collision.
 				for (const [table, store] of [['fukushu_deck', 'decks'], ['fukushu_question', 'questions'], ['fukushu_review_log', 'reviewLogs']]) {
-					const rows = await manager.query(`SELECT id::text AS id FROM ${table} WHERE "ownerId" = $1`, [ownerId]);
-					for (const row of rows) occupied.add(`${store}:${key(row.id)}`);
+					const ids = frames.filter(frame => frame.store === store).map(frame => frame.value.id)
+						.filter((value): value is string => typeof value === 'string' && !value.includes('\0') && value.isWellFormed());
+					if (!ids.length) continue;
+					const conflict = await manager.query(`SELECT 1 FROM ${table} WHERE "ownerId" = $1 AND id::text = ANY($2::text[]) LIMIT 1`, [ownerId, ids]);
+					if (conflict.length) throw new BackupError('BACKUP_CONFLICT');
 				}
-				for (const frame of frames) if (occupied.has(`${frame.store}:${key(frame.value.id ?? frame.value.questionId)}`)) throw new BackupError('BACKUP_CONFLICT');
+				// The owner/store/key primary key rejects any source collision in the same transaction.
 				// Keep the validated metadata bounded, reread each binary from the immutable snapshot.
 				// A batch never accumulates binary buffers, even for many small media.
 				for (let index = 0; index < frames.length; index += 100) {
