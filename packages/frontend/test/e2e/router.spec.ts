@@ -31,7 +31,8 @@ test.describe('Router transition', () => {
 
 	test('Fukushu can open over Home on launch and be dismissed or disabled', async ({ page }) => {
 		// Account setup can appear after the new document has mounted.
-		await page.addLocatorHandler(page.getByTestId('user-setup-dialog'), () => closeUserSetupDialog(page));
+		const setupClose = page.getByTestId('user-setup-dialog').getByTestId('modal-window-close');
+		await page.addLocatorHandler(setupClose, () => closeUserSetupDialog(page));
 		const preference = page.getByRole('checkbox', { name: 'Open Fukushu when starting Misskey from Home' });
 		const library = page.getByRole('heading', { name: 'Fukushu · Materials' });
 		await page.goto(BASE_URL + '/fukushu');
