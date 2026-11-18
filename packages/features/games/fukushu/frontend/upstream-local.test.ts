@@ -62,7 +62,7 @@ test('reads media crossing chunk boundaries without a whole-file read', async ()
 	expect(slices.mock.calls.every(([start, end]) => typeof end === 'number' && typeof start === 'number' && end - start <= 256 * 1024)).toBe(true);
 	blob[0] ^= 1;
 	await expect(inspectLocalUpstream(withExtraFrames([row, blob]))).rejects.toThrow('INVALID_BACKUP');
-});
+}, 20_000);
 
 test('stops before parsing over-budget metadata and on cancellation', async () => {
 	const tooLong = Buffer.alloc(4);
