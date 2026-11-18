@@ -182,7 +182,7 @@ describe.skipIf(!socket)('atomic native restore PostgreSQL', () => {
 			expect((await backups.export('bob', id)).equals(bytes)).toBe(true);
 		}
 		expect(total).toBe(10020);
-		const stats = await db.query('SELECT "ownerId", COUNT(*)::integer AS count, SUM("byteSize")::integer AS bytes FROM fukushu_review_log GROUP BY "ownerId" ORDER BY "ownerId"');
+		const stats = await db.query<{ ownerId: string; count: number; bytes: number }[]>('SELECT "ownerId", COUNT(*)::integer AS count, SUM("byteSize")::integer AS bytes FROM fukushu_review_log GROUP BY "ownerId" ORDER BY "ownerId"');
 		expect(stats.map(row => row.count)).toEqual([total, total]);
 		expect(stats[0].bytes).toBeGreaterThan(32 * 1024 ** 2);
 		expect(stats[1].bytes).toBe(stats[0].bytes);
