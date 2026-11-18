@@ -45,11 +45,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<h4>{{ $locale.sfc.cards }}</h4>
 			<div v-for="c in cards.slice(page * 10, (page + 1) * 10)" :key="c.id" :class="$style.card">
 				<span v-if="!c.enabled">{{ $locale.sfc.disabled }}</span>
-				<SourceContent :content="c.payload.prompt"/>
+				<SourceContent :anki="c.payload.kind === 'flashcard' ? c.payload : undefined" :content="c.payload.prompt"/>
 				<details @toggle="toggleAnswer(c.id, $event)">
 					<summary>{{ $locale.sfc.answer }}</summary>
 					<template v-if="expanded.has(c.id)">
-						<SourceContent v-for="(a, i) in solution(c.payload, $locale.sfc.yes, $locale.sfc.no)" :key="i" :content="a"/>
+						<SourceContent v-for="(a, i) in solution(c.payload, $locale.sfc.yes, $locale.sfc.no)" :key="i" :anki="c.payload.kind === 'flashcard' ? c.payload : undefined" :content="a"/>
 						<SourceContent v-if="c.payload.explanation" :content="c.payload.explanation"/>
 					</template>
 				</details>

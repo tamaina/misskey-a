@@ -3,16 +3,23 @@ SPDX-FileCopyrightText: misskey-project
 SPDX-License-Identifier: AGPL-3.0-only
 -->
 <template>
-<div :class="[$style.content, content.format === 'markdown' && $style.markdown]"><RenderContent/></div>
+<div :class="[$style.content, content.format === 'markdown' && $style.markdown]">
+	<SourceAnkiFrame v-if="anki && (anki.ankiCss || anki.ankiForceLight)" v-slot="{ isolated }" :css="anki.ankiCss ?? ''" :forceLight="anki.ankiForceLight">
+		<RenderContent :isolated="isolated"/>
+	</SourceAnkiFrame>
+	<RenderContent v-else/>
+</div>
 </template>
 <script setup lang="ts">
 import { marked } from 'marked';
 import { computed, h, shallowRef, watch } from 'vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import SourceAnkiFrame from './SourceAnkiFrame.vue';
+import SourceMathText from './SourceMathText.vue';
 import type { VNodeChild } from 'vue';
 import type { Content } from '../source-study.js';
 
-const props = defineProps<{ content: Content }>();
+const props = defineProps<{ content: Content; anki?: { ankiCss?: string; ankiForceLight?: boolean } }>();
 const clozeRoles = ['blank', 'label', 'hint'] as const;
 const allowed = new Set('p br b strong mark details summary i em u s sub sup ruby rt rp ul ol li span div table thead tbody tr th td blockquote pre code hr h1 h2 h3 h4 h5 h6'.split(' '));
 const blocked = new Set('style script iframe frame object embed link svg math template noscript form video'.split(' '));
@@ -46,8 +53,15 @@ watch(parsed, async (fragment, _, cleanup) => {
 	}
 }, { immediate: true });
 
-function renderNode(node: Node): VNodeChild {
-	if (node.nodeType === Node.TEXT_NODE) return node.textContent;
+function mathText(text: string): VNodeChild {
+	return text.includes('\\(') || text.includes('\\[') || text.includes('$$') ? h(SourceMathText, { text }) : text;
+}
+
+function renderNode(node: Node, isolated: boolean): VNodeChild {
+	if (node.nodeType === Node.TEXT_NODE) {
+		const text = node.textContent ?? '';
+		return node.parentElement?.closest('code,pre') ? text : mathText(text);
+	}
 	if (!(node instanceof Element) && node.nodeType !== Node.ELEMENT_NODE) return null;
 	const el = node as Element;
 	const tag = el.localName.toLowerCase();
@@ -60,16 +74,17 @@ function renderNode(node: Node): VNodeChild {
 		if (!src?.startsWith(tag === 'img' ? 'data:image/' : 'data:audio/')) return h('span', alt);
 		return tag === 'img' ? h('img', { src, alt }) : h('audio', { src, controls: true, preload: 'metadata', 'aria-label': alt });
 	}
-	const children = [...node.childNodes].map(renderNode);
+	const children = [...node.childNodes].map(child => renderNode(child, isolated));
+	const attributes = isolated ? { class: el.getAttribute('class'), id: el.getAttribute('id') } : {};
 	if (tag === 'span' && el.hasAttribute('class')) {
 		const role = clozeRoles.find(role => el.classList.contains('cloze-' + role));
-		return h('span', { 'data-fukushu-cloze': role }, children);
+		return h('span', { ...attributes, 'data-fukushu-cloze': role }, children);
 	}
-	return allowed.has(tag) ? h(tag, children) : children;
+	return allowed.has(tag) ? h(tag, attributes, children) : children;
 }
 
-function RenderContent(): VNodeChild {
-	return parsed.value ? [...parsed.value.childNodes].map(renderNode) : props.content.value;
+function RenderContent({ isolated = false }: { isolated?: boolean }): VNodeChild {
+	return parsed.value ? [...parsed.value.childNodes].map(node => renderNode(node, isolated)) : mathText(props.content.value);
 }
 </script>
 <style module>
