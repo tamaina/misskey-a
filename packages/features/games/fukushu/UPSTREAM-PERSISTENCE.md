@@ -180,8 +180,7 @@ binary .fukushu. Upstream restore replaces that profile's whole learning DB.
 A converted file must still meet the 9k size and record limits.
 See [upstream backup support](https://github.com/tamaina/fukushu/blob/0efee271a13f15096beb8cbaaea25092c5927b29/docs/backup-support.md).
 
- Export preserves source
-values and binaries, not a promise that JSON serialization/order is byte-identical
-to the original whole input after DB persistence. Migration rollback drops these
-new tables; do not run `down` on populated production data. No merge/deployment
-or real-user migration is part of this work.
+Export preserves the stored source fields and binary payloads. JSON serialization
+or record ordering can change the checksum of the complete file. The chunk
+migration refuses a downgrade when an owner's collection exceeds the previous
+reader's limits. The earlier store migration removes its tables on downgrade.

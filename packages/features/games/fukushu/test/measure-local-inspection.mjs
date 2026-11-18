@@ -17,7 +17,7 @@ import { inspectUpstreamBytes } from '../shared/upstream-reader.ts';
 const writerFixture = new URL('./backend/fixtures/upstream-backup.fukushu', import.meta.url);
 const magic = Buffer.from('FUKUSHU-BACKUP-1\n');
 
-async function generate(path, cards, mediaMiB, variedMedia = false) {
+async function generate(path, cards, mediaMiB, forServerStudy = false) {
 	const sample = await readFile(writerFixture);
 	const out = await open(path, 'wx');
 	const digest = createHash('sha256');
@@ -55,11 +55,11 @@ async function generate(path, cards, mediaMiB, variedMedia = false) {
 		for (let i = 2; i < cards; i++) {
 			const id = 'anki:scale:' + i;
 			await frame({ store: 'questions', value: { ...question, id, sourceKey: id, sourceOrder: i + 10, payload: { ...question.payload, id, sourceKey: id } } });
-			await frame({ store: 'studyStates', value: { ...state, questionId: id } });
+			await frame({ store: 'studyStates', value: { ...state, questionId: id, ...(forServerStudy ? { suspended: false } : {}) } });
 		}
 		const chunk = Buffer.alloc(1024 ** 2);
 		// Deterministic nonzero data for the DB test, to exercise actual attachment storage.
-		if (variedMedia) {
+		if (forServerStudy) {
 			let word = 1234567;
 			for (let i = 0; i < chunk.length; i += 4) {
 				word ^= word << 13;

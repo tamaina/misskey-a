@@ -717,6 +717,7 @@ test('real authentication, Drive, material maintenance and explanation versions'
 			assert.equal(await status(alice), 'missing');
 			const restored = performance.now();
 			const reviewInput = { questionId: 'anki:scale:4999', requestId: randomUUID(), expectedRevision: 0, durationMs: 300, answers: ['A'], rating: 'good', correct: true };
+			assert.equal((await call('fukushu/upstream/review', { ...reviewInput, questionId: 'source-card' }, bob.token)).body.error.code, 'STUDY_UNAVAILABLE');
 			const review = ok(await call('fukushu/upstream/review', reviewInput, bob.token));
 			assert.equal(review.revision, 1);
 			assert.deepEqual(ok(await call('fukushu/upstream/review', reviewInput, bob.token)), review);
