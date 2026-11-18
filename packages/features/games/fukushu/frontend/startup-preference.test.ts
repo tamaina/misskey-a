@@ -15,11 +15,13 @@ test('opening Fukushu on startup is opt-in for each account on a shared browser'
 		cloudGetBulk: async () => ({}),
 		cloudSet: async () => {},
 	};
+
 	async function signIn(id: string) {
 		const preferences = new PreferencesManager(io, { id });
 		await preferences.cloudReady;
 		return preferences;
 	}
+
 	const alice = await signIn('alice');
 	expect(alice.s['fukushu.openOnStartup']).toBe(false);
 	alice.commit('fukushu.openOnStartup', true);
