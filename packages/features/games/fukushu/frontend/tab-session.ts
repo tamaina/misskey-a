@@ -72,6 +72,7 @@ export function useTabSession(owner: string | undefined) {
 	const progress = shallowRef<SessionProgress>();
 	const unavailable = ref(false);
 	const key = 'fukushu:study:v1:' + owner;
+
 	function clearStorage() {
 		if (!owner) return;
 		try {
@@ -79,6 +80,7 @@ export function useTabSession(owner: string | undefined) {
 			sessionStorage.removeItem(key + ':plan');
 		} catch { unavailable.value = true; }
 	}
+
 	if (owner) {
 		try {
 			const raw = sessionStorage.getItem(key);
@@ -94,11 +96,13 @@ export function useTabSession(owner: string | undefined) {
 			}
 		} catch { clearStorage(); }
 	}
+
 	function write(next: SessionProgress) {
 		progress.value = next;
 		if (!owner || unavailable.value) return;
 		try { sessionStorage.setItem(key, JSON.stringify(next)); } catch { unavailable.value = true; clearStorage(); }
 	}
+
 	function begin(scope: Plan['scope'], deck: string | null, practice: boolean, cards: SessionCard[]) {
 		const run = crypto.randomUUID();
 		plan.value = { run, owner: owner ?? '', scope, deck, practice, cards };
@@ -108,21 +112,26 @@ export function useTabSession(owner: string | undefined) {
 		}
 		write({ run, answered: 0, correct: 0, state: 'active', pending: null });
 	}
+
 	function prepare(answer: SessionAnswer) {
 		const p = progress.value;
 		if (p) write({ ...p, pending: answer });
 	}
+
 	function confirm(answer: SessionAnswer) {
 		const p = progress.value;
 		if (p?.pending?.requestId === answer.requestId) write({ ...p, pending: null, answered: p.answered + 1, correct: p.correct + Number(p.pending.correct) });
 	}
+
 	function state(value: SessionProgress['state']) {
 		const p = progress.value;
 		if (p) write({ ...p, state: value, pending: value === 'stale' ? null : p.pending });
 	}
+
 	function discard() {
 		clearStorage();
 		plan.value = undefined; progress.value = undefined;
 	}
+
 	return { plan, progress, unavailable, begin, prepare, confirm, state, discard };
 }
