@@ -4,9 +4,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 <template>
 <section class="_panel _gaps" :class="$style.panel" :aria-busy="busy">
-	<h2>{{ today ? (practiceAhead ? $locale.sfc.cramAll : $locale.sfc.today) : session && deck ? deck.name : $locale.sfc.title }}</h2>
-	<TodayStudy v-if="today" :queue="today" :practiceAhead="practiceAhead" @close="closeToday"/>
-	<SourceStudy v-else-if="session && records" :questions="session" :revisions="revisions" :flashMode="deck?.studyMode === 'flashcard'" :shuffle="records.settings[0].shuffleChoices" :immediate="records.settings[0].showImmediateFeedback" @close="closeStudy"/>
+	<h2>{{ today ? (deck?.name ?? (practiceAhead ? $locale.sfc.cramAll : $locale.sfc.today)) : $locale.sfc.title }}</h2>
+	<p v-if="unavailable" role="status">{{ $locale.sfc.noStorage }}</p>
+	<TodayStudy v-if="today && plan" :queue="today" :practiceAhead="practiceAhead" :offset="offset" :total="plan.cards.length" @prepared="journal.prepare" @saved="confirmed" @rejected="journal.state('stale')" @close="pause"/>
+	<StudySummary v-else-if="plan && progress" :progress="progress" :total="plan.cards.length" :busy="busy" :title="summaryTitle" :back="deck ? $locale.sfc.backToDeck : $locale.sfc.backToDecks" @resume="run(resume)" @leave="leave"/>
 	<template v-else>
 		<div v-if="!deck" class="_buttons">
 			<MkButton :disabled="busy" primary @click="run(() => startToday(false))">{{ $locale.sfc.today }}</MkButton>
@@ -80,13 +81,15 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { queue, solution, studyDay } from '../source-study.js';
 import SourceContent from './SourceContent.vue';
-import SourceStudy from './SourceStudy.vue';
+import StudySummary from './StudySummary.vue';
+import { rejectedReview, remainingEntries, sendSessionAnswer, sessionCard, useTabSession } from '../tab-session.js';
+import type { SessionAnswer } from '../tab-session.js';
 import LearningSettings from './LearningSettings.vue';
 import TodayStudy from './TodayStudy.vue';
 import type { TodayQueue } from '../../shared/today.schema.js';
-import type { SourceQuestion } from '../source-study.js';
 import type { LearningSettings as LearningPreferences, UpstreamRecords } from '../../shared/upstream-records.schema.js';
 
+const props = defineProps<{ ownerId?: string }>();
 const emit = defineEmits<{ active: [value: boolean] }>();
 const records = shallowRef<UpstreamRecords>();
 const revisions = shallowRef(new Map<string, number>());
@@ -105,7 +108,14 @@ let loadedDay = '';
 const page = ref(0);
 const expanded = ref(new Set<string>());
 const today = shallowRef<TodayQueue>();
-const session = shallowRef<SourceQuestion[]>();
+const journal = useTabSession(props.ownerId);
+const { plan, progress, unavailable } = journal;
+const offset = ref(0);
+const summaryTitle = computed(() => {
+	if (progress.value?.answered !== plan.value?.cards.length) return $locale.value.sfc.paused;
+	return plan.value?.scope === 'today' && !plan.value.practice ? $locale.value.sfc.dailyFinished : $locale.value.sfc.finished;
+});
+if (plan.value) emit('active', true);
 const loaded = ref(false);
 const busy = ref(false);
 const notice = ref('');
@@ -196,32 +206,104 @@ function toggleAnswer(id: string, event: Event) {
 	if ((event.target as HTMLDetailsElement).open) expanded.value.add(id); else expanded.value.delete(id);
 }
 
-async function start(cram: boolean) {
-	const now = new Date();
-	if (studyDay(now).start !== loadedDay) await load();
-	if (!records.value || !deck.value) return;
-	const items = queue(records.value, deck.value.id, now, cram, reviewedToday);
-	if (items.length) { picker++; session.value = items; emit('active', true); notice.value = ''; } else notice.value = $locale.value.sfc.noneDue;
+function deckQueue(cram: boolean): TodayQueue {
+	if (!records.value || !deck.value) return { items: [], shuffle: false, immediate: true };
+	const selectedDeck = deck.value;
+	const settings = records.value.settings[0];
+	return {
+		shuffle: settings.shuffleChoices, immediate: settings.showImmediateFeedback,
+		items: queue(records.value, selectedDeck.id, new Date(), cram, reviewedToday).map(question => ({
+			origin: 'source', question, deckName: selectedDeck.name, flash: selectedDeck.studyMode === 'flashcard', revision: revisions.value.get(question.id)!,
+		})),
+	};
 }
 
-async function startToday(practice: boolean) {
-	const result = await misskeyApi('fukushu/study/today', { ...studyDay(new Date()), ...(practice ? { practiceAhead: true } : {}) });
+function begin(result: TodayQueue, practice: boolean, id: string | null) {
 	if (!result.items.length) { notice.value = $locale.value.sfc.noneDue; return; }
+	journal.begin(id === null ? 'today' : 'source', id, practice, result.items.map(sessionCard));
+	offset.value = 0;
 	practiceAhead.value = practice;
 	today.value = result;
 	emit('active', true);
 }
 
-function closeToday() {
-	today.value = undefined;
-	emit('active', false);
-	if (loaded.value) void run(load);
+async function start(cram: boolean) {
+	if (studyDay(new Date()).start !== loadedDay) await load();
+	if (deck.value) begin(deckQueue(cram), cram, deck.value.id);
 }
 
-async function closeStudy() {
-	session.value = undefined;
+function fetchToday(practice: boolean) {
+	return misskeyApi('fukushu/study/today', { ...studyDay(new Date()), ...(practice ? { practiceAhead: true } : {}) });
+}
+
+async function startToday(practice: boolean) {
+	begin(await fetchToday(practice), practice, null);
+}
+
+function confirmed(answer: SessionAnswer) {
+	journal.confirm(answer);
+	if (progress.value?.answered === plan.value?.cards.length) today.value = undefined;
+}
+
+function pause() {
+	if (!progress.value?.answered && !progress.value?.pending && progress.value?.state !== 'stale') { leave(); return; }
+	today.value = undefined;
+	if (progress.value?.state !== 'stale') journal.state('paused');
+}
+
+async function resume() {
+	const saved = plan.value;
+	if (!saved || !progress.value || saved.owner !== (props.ownerId ?? '') || progress.value.state === 'stale') return;
+	const pending = progress.value.pending;
+	if (pending) {
+		try {
+			await sendSessionAnswer(saved.cards[progress.value.answered], pending, saved.practice);
+			journal.confirm(pending);
+		} catch (cause) {
+			if (rejectedReview(cause)) { journal.state('stale'); return; }
+			throw cause;
+		}
+	}
+	if (progress.value.answered === saved.cards.length) return;
+	let current: TodayQueue;
+	try {
+		if (saved.scope === 'source' && saved.deck !== null) {
+			await selectDeck(saved.deck);
+			current = deckQueue(true);
+		} else if (saved.scope === 'native' && saved.deck !== null) {
+			const q = await misskeyApi('fukushu/study/queue', { id: saved.deck });
+			current = { shuffle: false, immediate: true, items: q.items.map(item => ({
+				origin: 'native', questionId: item.question.id, deckId: q.deckId, deckName: $locale.value.sfc.nativeDeck,
+				version: item.questionVersion, revision: item.stateRevision,
+			})) };
+		} else {
+			current = await fetchToday(saved.practice);
+		}
+	} catch (cause) {
+		if (rejectedReview(cause)) { journal.state('stale'); return; }
+		throw cause;
+	}
+	const remaining = saved.cards.slice(progress.value.answered);
+	let items = remainingEntries(remaining, current.items);
+	// A newly reduced cap or new due cards can displace an unchanged card.
+	// Recover only the original IDs, in order, keeping the original submission mode.
+	if (!items && saved.scope !== 'source' && !saved.practice) {
+		items = remainingEntries(remaining, (await fetchToday(true)).items);
+	}
+	if (!items) { journal.state('stale'); return; }
+	offset.value = progress.value.answered;
+	journal.state('active');
+	practiceAhead.value = saved.practice;
+	today.value = { ...current, items };
+	emit('active', true);
+}
+
+function leave() {
+	journal.discard();
+	today.value = undefined;
+	if (!deck.value) selected.value = null;
 	emit('active', selected.value !== null);
-	await run(load);
+	if (loaded.value) void run(load);
 }
 
 async function pickOwnedFile() {
@@ -330,6 +412,13 @@ async function updateGift() {
 </style>
 <locale locale="ja-JP" lang="json">
 {
+	"noStorage": "このタブに再開情報を保存できません。再読み込みすると今回の進捗表示が消えます。",
+	"finished": "この回の復習は終了です。",
+	"dailyFinished": "今日の学習を終了しました。",
+	"paused": "このタブの学習",
+	"nativeDeck": "直接作成教材",
+	"backToDeck": "教材に戻る",
+	"backToDecks": "教材一覧に戻る",
 	"title": "Fukushu からの教材",
 	"today": "今日の学習",
 	"createGift": "Drive の GIFT から教材を作成",
@@ -383,6 +472,13 @@ async function updateGift() {
 </locale>
 <locale locale="en-US" lang="json">
 {
+	"noStorage": "This tab cannot store session progress. Reloading will lose this session summary.",
+	"finished": "This practice session is complete.",
+	"dailyFinished": "Today's study session is complete.",
+	"paused": "Study session in this tab",
+	"nativeDeck": "Saved deck",
+	"backToDeck": "Back to deck",
+	"backToDecks": "Back to decks",
 	"title": "Decks from Fukushu",
 	"today": "Study today",
 	"createGift": "Create a deck from a GIFT file in Drive",

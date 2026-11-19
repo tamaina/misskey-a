@@ -4,10 +4,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 <template>
 <section class="_gaps">
-	<p v-if="entry">{{ index + 1 }} / {{ queue.items.length }} · {{ entry.deckName }}</p>
+	<p v-if="entry">{{ offset + index + 1 }} / {{ total }} · {{ entry.deckName }}</p>
 	<SourceStudy v-if="question && entry" :key="index" :practiceAhead="practiceAhead" :questions="[question]" :revisions="new Map([[question.id, entry.revision]])"
 		:flashMode="entry.origin === 'native' || entry.flash" :nativeVersion="entry.origin === 'native' ? entry.version : undefined"
-		:singleStep="true" :immediate="queue.immediate" :shuffle="queue.shuffle" @saved="advance" @close="emit('close')"/>
+		:singleStep="true" :immediate="queue.immediate" :shuffle="queue.shuffle" @prepared="emit('prepared', $event)" @saved="advance" @rejected="emit('rejected')" @close="emit('close')"/>
 	<template v-else>
 		<p v-if="failed" role="alert">{{ $locale.sfc.loadFailed }}</p>
 		<MkButton v-if="failed" @click="load">{{ $locale.sfc.retry }}</MkButton>
@@ -22,11 +22,12 @@ import { computed, onBeforeUnmount, ref, shallowRef } from 'vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import SourceStudy from './SourceStudy.vue';
+import type { SessionAnswer } from '../tab-session.js';
 import type { TodayQueue } from '../../shared/today.schema.js';
 import type { SourceQuestion } from '../source-study.js';
 
-const props = defineProps<{ queue: TodayQueue; practiceAhead: boolean }>();
-const emit = defineEmits<{ close: [] }>();
+const props = defineProps<{ queue: TodayQueue; practiceAhead: boolean; offset: number; total: number }>();
+const emit = defineEmits<{ close: []; prepared: [answer: SessionAnswer]; saved: [answer: SessionAnswer]; rejected: [] }>();
 const index = ref(0);
 const entry = computed(() => props.queue.items[index.value]);
 const question = shallowRef<SourceQuestion>();
@@ -54,7 +55,8 @@ async function load() {
 	}
 }
 
-function advance() {
+function advance(answer: SessionAnswer) {
+	emit('saved', answer);
 	index.value++;
 	void load();
 }

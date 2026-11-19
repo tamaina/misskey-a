@@ -51,8 +51,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script setup lang="ts">
 import { computed, ref, shallowRef } from 'vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { gradeQuestion } from '../../../shared/fukushu-grading.js';
+import { sendSessionAnswer } from '../tab-session.js';
+import type { SessionAnswer } from '../tab-session.js';
 import { shuffled, solution } from '../source-study.js';
 import SourceContent from './SourceContent.vue';
 import type { SourceQuestion } from '../source-study.js';
@@ -60,7 +61,7 @@ import type { GradeResult } from '../../../shared/fukushu-grading.js';
 import type { StudyRating } from '../../shared/study.schema.js';
 
 const props = defineProps<{ questions: SourceQuestion[]; revisions: Map<string, number>; flashMode: boolean; nativeVersion?: number; singleStep?: boolean; practiceAhead?: boolean; immediate: boolean; shuffle: boolean }>();
-const emit = defineEmits<{ close: []; saved: [] }>();
+const emit = defineEmits<{ close: []; prepared: [answer: SessionAnswer]; saved: [answer: SessionAnswer]; rejected: [] }>();
 const ratings = ['again', 'hard', 'good', 'easy'] as const;
 const index = ref(0);
 const item = computed(() => props.questions[index.value]);
@@ -103,8 +104,7 @@ const feedback = ref(false);
 const busy = ref(false);
 const error = ref('');
 const rejected = ref(false);
-type Submission = { requestId: string; questionId: string; expectedRevision: number; rating: StudyRating; correct: boolean; answers: string[]; durationMs: number };
-const pending = shallowRef<Submission>();
+const pending = shallowRef<SessionAnswer>();
 let started = Date.now();
 
 function reveal() {
@@ -120,6 +120,7 @@ async function rate(rating: StudyRating) {
 	pending.value = { requestId: crypto.randomUUID(), questionId: item.value.id, expectedRevision: revision, rating,
 																			correct: selfRated.value ? rating !== 'again' : graded.value!.correct, answers: flash.value ? [] : answers.value.slice(),
 																			durationMs: Math.min(2147483647, Math.max(0, Date.now() - started)) };
+	emit('prepared', pending.value);
 	await send();
 }
 
@@ -128,19 +129,10 @@ async function send() {
 	busy.value = true;
 	try {
 		const answer = pending.value;
-		const signal = AbortSignal.timeout(30_000);
-		if (props.nativeVersion !== undefined) {
-			await misskeyApi('fukushu/study/review', {
-				id: item.value.deckId, questionId: answer.questionId, questionVersion: props.nativeVersion, expectedStateRevision: answer.expectedRevision,
-				...(props.practiceAhead ? { practiceAhead: true } : {}),
-				requestId: answer.requestId, rating: answer.rating, durationMs: Math.min(86400000, answer.durationMs),
-			}, undefined, signal);
-		} else {
-			await misskeyApi('fukushu/upstream/review', answer, undefined, signal);
-		}
+		await sendSessionAnswer({ id: answer.questionId, deck: item.value.deckId, revision: answer.expectedRevision, version: props.nativeVersion ?? null }, answer, !!props.practiceAhead);
 		pending.value = undefined;
 		index.value++;
-		emit('saved');
+		emit('saved', answer);
 		started = Date.now();
 		selected.value = []; entered.value = ''; matches.value.clear();
 		revealed.value = false; graded.value = undefined; error.value = '';
@@ -149,6 +141,7 @@ async function send() {
 		const capacity = code === 'BACKUP_TOO_LARGE' || code === 'STUDY_LIMIT' || code === 'CARD_HISTORY_LIMIT';
 		const unavailable = code === 'STUDY_UNAVAILABLE' || code === 'NO_SUCH_MATERIAL';
 		rejected.value = capacity || unavailable || code === 'STUDY_CONFLICT';
+		if (rejected.value) emit('rejected');
 		if (capacity) error.value = $locale.value.sfc.capacity;
 		else if (unavailable) error.value = $locale.value.sfc.unavailable;
 		else if (code === 'STUDY_CONFLICT') error.value = $locale.value.sfc.conflict;

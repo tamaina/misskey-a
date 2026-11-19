@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<p v-if="notice" role="status">{{ notice }}</p>
 			<MkButton v-if="pendingImportedId" :disabled="busy" @click="showMaterial(pendingImportedId)">{{ $locale.sfc.openImported }}</MkButton>
 			<template v-if="!material">
-				<SourceLibrary @active="sourceActive = $event"/>
+				<SourceLibrary :key="$i?.id" :ownerId="$i?.id" @active="sourceActive = $event"/>
 				<template v-if="!sourceActive">
 					<section class="_panel _gaps" :class="$style.panel">
 						<h2>{{ $locale.sfc.importTitle }}</h2>
@@ -80,7 +80,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<p v-if="reloadRequired">{{ $locale.sfc.reloadNeeded }}</p>
 					<MkButton :disabled="busy || studyActive || studyLocked" @click="reloadMaterial">{{ $locale.sfc.reloadMaterial }}</MkButton>
 				</section>
-				<StudyPanel :key="material.deck.id" :deckId="material.deck.id" :archived="material.archivedAt !== null" :disabled="busy || editing" @active="studyActive = $event" @locked="studyLocked = $event"/>
+				<StudyPanel :key="JSON.stringify([$i?.id, material.deck.id])" :ownerId="$i?.id" :deckId="material.deck.id" :archived="material.archivedAt !== null" :disabled="busy || editing" @active="studyActive = $event" @locked="studyLocked = $event"/>
 				<ol v-if="!studyActive" :class="$style.questions">
 					<li v-for="question in visibleQuestions" :key="question.id" class="_panel _gaps_s" :class="$style.panel">
 						<span v-if="!question.enabled" :class="$style.muted">{{ $locale.sfc.disabled }}</span>
@@ -103,6 +103,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue';
+import { $i } from '@features/auth/frontend/i.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { chooseDriveFile } from '@features/drive/frontend/utility/drive.js';
 import { definePage } from '@features/navigation/frontend/page.js';

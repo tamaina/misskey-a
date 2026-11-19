@@ -150,3 +150,25 @@ Native per-deck v1 backups retain the actual retention of each recorded answer.
 Restoring a native deck keeps the destination account’s current settings. Older
 9k draft readers that required exactly 0.9 cannot read reviews made with another
 value; existing 0.9 backups remain compatible.
+
+### Same-tab study sessions
+
+Reloading the Fukushu page offers to resume the active account’s session.
+The tab stores the ordered card and deck IDs, study mode, revision markers and
+confirmed counts. After a rating, it stores the exact request before sending it
+and clears the pending answer when the server confirms. An uncertain submission
+is replayed only when the learner chooses to retry or resume. The existing server
+receipt or native review ID makes this safe if the first response was lost.
+
+Resume matches the remaining IDs and revisions against currently accessible cards.
+If a card changed or disappeared, the learner can see the confirmed results and
+exit the session. Limits still apply to newly started daily sessions. A directly
+created deck uses its usual flashcard UI when started from the material page;
+after a reload its remaining cards open in the library’s shared study view.
+Closing the results clears the tab’s snapshot. The summary counts confirmed
+answers and uses the quiz grader’s correct flag or the flashcard self-rating.
+
+This is same-tab state, separate from account backups. Unsubmitted drafts, the
+answer-reveal state, mid-session checkpoint screens and sharing individual
+question results are outside this slice. Imported quiz answer text is kept in
+session storage only while its submission awaits confirmation.

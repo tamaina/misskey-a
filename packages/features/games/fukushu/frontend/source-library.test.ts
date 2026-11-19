@@ -23,7 +23,7 @@ vi.mock('@features/ui/frontend/os.js', () => ({ confirm: vi.fn(), inputText: vi.
 const i18n = createInternationalization({ initialLocale: 'ja-JP' });
 const global = { plugins: [i18n] };
 beforeAll(async () => { await i18n.ready; });
-afterEach(() => { cleanup(); vi.resetAllMocks(); });
+afterEach(() => { cleanup(); sessionStorage.clear(); vi.resetAllMocks(); });
 const plain = (value: string) => ({ format: 'plain' as const, value });
 const row = { id: 'source-card', deckId: 'deck', sourceKey: 'stable', kind: 'multiple-choice' as const, enabled: true, enabledKey: 1 as const, createdAt: '', updatedAt: '' };
 const question: SourceQuestion = { ...row, payload: { ...row, categoryPath: [], prompt: plain('Select'), choices: [
@@ -253,4 +253,72 @@ test('today resumes the same native review after a lost response and then grades
 	await fireEvent.click(screen.getByText('もう一度'));
 	await screen.findByText('今日の学習を終了しました。');
 	expect(vi.mocked(misskeyApi).mock.calls.at(-1)?.[1]).toMatchObject({ questionId: question.id, expectedRevision: 1, correct: false, answers: ['a', 'b'] });
+});
+
+test('reload reconciles a committed quiz answer once before resuming the pinned remaining cards', async () => {
+	const next = { ...question, id: 'next', payload: { ...question.payload, id: 'next' } };
+	const first = { origin: 'source', question, revision: 4, deckName: 'Quiz', flash: false };
+	const last = { ...first, question: next };
+	const items = [first, last];
+	let commits = 0;
+	let request: unknown;
+	vi.mocked(misskeyApi).mockImplementation(async (route, input) => {
+		if (route === 'fukushu/study/today') return { items: items.slice(commits), immediate: true, shuffle: false } as never;
+		if (!commits) {
+			commits++; request = structuredClone(input);
+			throw new Error('lost response');
+		}
+		expect(input).toEqual(request);
+		return {} as never;
+	});
+	const view = render(SourceLibrary, { global, props: { ownerId: 'alice' } });
+	await fireEvent.click(screen.getByText('今日の学習'));
+	await fireEvent.click(screen.getAllByRole('checkbox')[0]);
+	await fireEvent.click(screen.getByText('採点する'));
+	await fireEvent.click(screen.getByText('できた'));
+	await screen.findByText('同じ回答の保存を再試行');
+	view.unmount();
+	render(SourceLibrary, { global, props: { ownerId: 'alice' } });
+	await fireEvent.click(screen.getByText('この回の学習を再開'));
+	await screen.findByText('2 / 2 · Quiz');
+	await fireEvent.click(screen.getByRole('button', { name: '教材に戻る' }));
+	await screen.findByText('回答 1 / 2 枚 · 正解 1 枚 · 不正解 0 枚');
+	expect(commits).toBe(1);
+	expect(vi.mocked(misskeyApi).mock.calls.filter(([route]) => route === 'fukushu/upstream/review')).toHaveLength(2);
+	await fireEvent.click(screen.getByText('教材一覧に戻る'));
+	expect(screen.queryByText('この回の学習を再開')).toBeNull();
+});
+
+test('rejects a changed remaining revision after reload without submitting an answer', async () => {
+	const entry = { origin: 'source', question, revision: 3, deckName: 'Quiz', flash: false };
+	const response = { immediate: true, shuffle: false, items: [entry] };
+	vi.mocked(misskeyApi).mockResolvedValueOnce(response as never)
+		.mockResolvedValue({ ...response, items: [{ ...entry, revision: 4 }] } as never);
+	const view = render(SourceLibrary, { global, props: { ownerId: 'alice' } });
+	await fireEvent.click(screen.getByText('今日の学習'));
+	await screen.findByText('1 / 1 · Quiz');
+	view.unmount();
+	render(SourceLibrary, { global, props: { ownerId: 'alice' } });
+	await fireEvent.click(screen.getByText('この回の学習を再開'));
+	expect((await screen.findByRole('alert')).textContent).toContain('カードや学習候補が変わった');
+	expect(screen.queryByText('この回の学習を再開')).toBeNull();
+	expect(vi.mocked(misskeyApi).mock.calls.map(([route]) => route)).toEqual(['fukushu/study/today', 'fukushu/study/today', 'fukushu/study/today']);
+});
+
+test('keeps the original selection when a changed daily cap hides a still-current card', async () => {
+	const entry = { origin: 'source', question, revision: 3, deckName: 'Quiz', flash: false };
+	const response = { immediate: true, shuffle: false, items: [entry] };
+	vi.mocked(misskeyApi).mockResolvedValueOnce(response as never)
+		.mockResolvedValueOnce({ ...response, items: [] } as never).mockResolvedValueOnce(response as never);
+	const view = render(SourceLibrary, { global, props: { ownerId: 'alice' } });
+	await fireEvent.click(screen.getByText('今日の学習'));
+	await screen.findByText('1 / 1 · Quiz');
+	view.unmount();
+	const foreign = render(SourceLibrary, { global, props: { ownerId: 'bob' } });
+	expect(screen.queryByText('この回の学習を再開')).toBeNull();
+	foreign.unmount();
+	render(SourceLibrary, { global, props: { ownerId: 'alice' } });
+	await fireEvent.click(screen.getByText('この回の学習を再開'));
+	await screen.findByText('1 / 1 · Quiz');
+	expect(vi.mocked(misskeyApi).mock.calls.at(-1)?.[1]).toMatchObject({ practiceAhead: true });
 });

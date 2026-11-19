@@ -10,6 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<p :class="$style.muted">{{ $locale.sfc.newHistory }}</p>
 	<MkInfo v-if="archived">{{ $locale.sfc.archived }}</MkInfo>
 	<p v-if="error" role="alert" :class="$style.error">{{ error }}</p>
+	<p v-if="noStorage" role="status">{{ $locale.sfc.noStorage }}</p>
 	<p v-if="queueBusy" role="status">{{ $locale.sfc.loading }}</p>
 	<template v-if="pending && !reviewBusy">
 		<p>{{ $locale.sfc.retryDescription }}</p>
@@ -18,7 +19,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template v-if="needsReload">
 		<MkButton :disabled="disabled || archived || locked" @click="start">{{ $locale.sfc.reloadQueue }}</MkButton>
 	</template>
-	<template v-if="!queue">
+	<StudySummary v-if="summary && progress && plan" :progress="progress" :total="plan.cards.length" :title="progress.answered === plan.cards.length ? $locale.sfc.completed : $locale.sfc.partial" :back="$locale.sfc.dismiss" @resume="continueStudy" @leave="finish"/>
+	<template v-else-if="!queue">
 		<MkButton v-if="!needsReload" primary :disabled="disabled || archived || locked" :wait="queueBusy" @click="start">{{ $locale.sfc.start }}</MkButton>
 		<p :class="$style.muted">{{ $locale.sfc.queuePolicy }}</p>
 	</template>
@@ -96,17 +98,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
+import StudySummary from './StudySummary.vue';
+import { useTabSession } from '../tab-session.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import type { StudyHistoryItem, StudyQueue, StudyRating, StudyReviewInput, StudyReviewResult } from '../../shared/study.schema.js';
 
-const props = defineProps<{ deckId: string; archived: boolean; disabled?: boolean }>();
+const props = defineProps<{ deckId: string; archived: boolean; disabled?: boolean; ownerId?: string }>();
 const emit = defineEmits<{ (event: 'active', value: boolean): void; (event: 'locked', value: boolean): void }>();
 const ratings: StudyRating[] = ['again', 'hard', 'good', 'easy'];
 const queue = ref<StudyQueue | null>(null);
 const position = ref(0);
+const journal = useTabSession(props.ownerId);
+const { plan, progress, unavailable: noStorage } = journal;
+const summary = ref(false);
 const revealed = ref(false);
 const typedAnswer = ref('');
 const queueBusy = ref(false);
@@ -147,6 +154,11 @@ async function start() {
 		const result = await misskeyApi('fukushu/study/queue', { id: props.deckId }, undefined, AbortSignal.timeout(20_000));
 		if (disposed) return;
 		queue.value = result;
+		if (result.items.length) journal.begin('native', props.deckId, false, result.items.map(i => ({
+			id: i.question.id, deck: props.deckId, version: i.questionVersion, revision: i.stateRevision,
+		})));
+		else journal.discard();
+		summary.value = false;
 		position.value = 0;
 		needsReload.value = false;
 		resetCard();
@@ -157,6 +169,22 @@ async function start() {
 
 function stop() {
 	if (disposed || props.disabled || locked.value) return;
+	if (progress.value?.answered) {
+		if (progress.value.state !== 'stale') journal.state('paused');
+		summary.value = true;
+		return;
+	}
+	finish();
+}
+
+function continueStudy() {
+	journal.state('active');
+	summary.value = false;
+}
+
+function finish() {
+	journal.discard();
+	summary.value = false;
 	queue.value = null;
 	position.value = 0;
 	needsReload.value = false;
@@ -183,6 +211,8 @@ async function rate(rating: StudyRating) {
 		expectedStateRevision: current.stateRevision, requestId: crypto.randomUUID(), rating,
 		durationMs: Math.min(86_400_000, Math.max(0, Math.floor(performance.now() - started))),
 	};
+	journal.prepare({ requestId: pending.value.requestId, questionId: current.question.id, expectedRevision: current.stateRevision,
+		rating, correct: rating !== 'again', answers: [], durationMs: pending.value.durationMs });
 	await submitPending();
 }
 
@@ -194,6 +224,8 @@ async function submitPending() {
 	try {
 		const result = await misskeyApi('fukushu/study/review', { ...input }, undefined, AbortSignal.timeout(20_000));
 		if (disposed) return;
+		const answer = progress.value?.pending;
+		if (answer) journal.confirm(answer);
 		saved.value = result;
 		pending.value = null;
 	} catch (cause) {
@@ -201,6 +233,7 @@ async function submitPending() {
 		const code = errorCode(cause);
 		if (code === 'STUDY_CONFLICT' || code === 'STUDY_UNAVAILABLE' || code === 'NO_SUCH_MATERIAL' || code === 'STUDY_LIMIT' || code === 'CARD_HISTORY_LIMIT' || code === 'INVALID_PARAM' || code === 'PERMISSION_DENIED' || code === 'CREDENTIAL_REQUIRED') {
 			pending.value = null;
+			journal.state('stale');
 			needsReload.value = true;
 			error.value = code === 'STUDY_LIMIT' || code === 'CARD_HISTORY_LIMIT' ? $locale.value.sfc.limit : code === 'STUDY_CONFLICT' ? $locale.value.sfc.conflict : $locale.value.sfc.unavailable;
 		} else {
@@ -213,6 +246,7 @@ async function submitPending() {
 function advance() {
 	if (disposed || props.disabled || locked.value || !saved.value) return;
 	position.value++;
+	if (position.value === queue.value?.items.length) summary.value = true;
 	resetCard();
 }
 
@@ -254,6 +288,9 @@ onBeforeUnmount(() => { disposed = true; emit('locked', false); emit('active', f
 
 <locale locale="ja-JP" lang="json">
 {
+	"partial": "ここまでの学習結果",
+	"dismiss": "結果を閉じる",
+	"noStorage": "再開情報をこのタブに保存できません。",
 	"title": "この教材を復習",
 	"description": "答えを確認して自己評価すると、復習予定と記録を保存します。",
 	"newHistory": "学習記録はこのサーバーで新しく保存します。元の Fukushu やブラウザの学習履歴は取り込みません。",
@@ -306,6 +343,9 @@ onBeforeUnmount(() => { disposed = true; emit('locked', false); emit('active', f
 
 <locale locale="en-US" lang="json">
 {
+	"partial": "Session so far",
+	"dismiss": "Close results",
+	"noStorage": "This tab cannot store session progress.",
 	"title": "Study this material",
 	"description": "Reveal the answer and rate yourself to save a review and its next due date.",
 	"newHistory": "New study records are saved on this server. Existing Fukushu or browser study histories are not imported.",

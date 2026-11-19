@@ -7,6 +7,7 @@ import { afterEach, beforeAll, beforeEach, expect, test, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/vue';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { useTabSession } from './tab-session.js';
 import StudyPanel from './components/StudyPanel.vue';
 import type { FukushuMaterial } from '../shared/material.schema.js';
 import type { StudyHistoryItem, StudyQueue, StudyReviewInput, StudyReviewResult } from '../shared/study.schema.js';
@@ -324,4 +325,21 @@ test('a failed queue load stays read-only and can be explicitly retried', async 
 	expect(requests()).toHaveLength(0);
 	await begin();
 	expect(vi.mocked(misskeyApi).mock.calls.map(([endpoint]) => endpoint)).toEqual(['fukushu/study/queue', 'fukushu/study/queue']);
+});
+
+test('direct deck progress is durable immediately after confirmation, before Next', async () => {
+	simpleApi();
+	const view = mount(false, { ownerId: 'native-owner' });
+	await begin();
+	await fireEvent.click(button('答えを開く'));
+	await fireEvent.click(button('もう一度'));
+	await screen.findByText(/記録しました/);
+	await fireEvent.click(button('復習を終了'));
+	await screen.findByText('回答 1 / 2 枚 · 正解 0 枚 · 不正解 1 枚');
+	view.unmount();
+	const restored = useTabSession('native-owner');
+	expect(restored.plan.value).toMatchObject({ scope: 'native', deck: 'deck' });
+	expect(restored.progress.value).toMatchObject({ answered: 1, correct: 0, pending: null });
+	expect(restored.plan.value?.cards[1]).toMatchObject({ id: 'card-b', version: 2, revision: 0 });
+	restored.discard();
 });
