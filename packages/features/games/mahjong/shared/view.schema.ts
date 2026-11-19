@@ -17,6 +17,7 @@ export const mahjongViewSchema = v.object({
 			userId: v.string(), score: v.number(), concealedHand: v.nullable(v.string()), concealedCount: v.number(), melds: v.array(v.string()), discards: v.array(v.string()),
 		})),
 	})),
+	standings: v.optional(v.array(v.object({ userId: v.string(), score: v.number() }))),
 	phase: v.nullable(v.object({ id: uuid, kind: v.string(), deadline: v.number(), submitted: v.boolean(),
 																														actions: v.array(v.object({ id: v.string(), kind: v.picklist(['discard', 'riichi', 'chi', 'pon', 'kan', 'win', 'draw', 'pass', 'continue']), tiles: v.string() })),
 	})),

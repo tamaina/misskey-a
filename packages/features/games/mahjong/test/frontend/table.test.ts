@@ -36,3 +36,19 @@ test('renders only the supplied private hand, emits the offered action, and disa
 		wrapper.unmount();
 	}
 });
+
+test('shows the ordered final scores only for a completed match', async () => {
+	const intl = createInternationalization({ initialLocale: 'ja-JP' });
+	await intl.ready;
+	const wrapper = render(Table, { global: { plugins: [intl] }, props: { view, userId: 'bob', names: { dave: '@dave' }, busy: false, seconds: 0 } });
+	try {
+		expect(wrapper.queryByRole('list', { name: '最終順位' })).toBeNull();
+		const standings = ['dave', 'alice', 'bob', 'carol'].map(userId => ({ userId, score: 25000 }));
+		await wrapper.rerender({ view: { ...view, status: 'ended', phase: null, standings } });
+		expect(wrapper.getByRole('list', { name: '最終順位' })).toBeTruthy();
+		expect(wrapper.getAllByRole('listitem').map(row => row.textContent)).toEqual(['@dave', 'alice', 'bob', 'carol'].map(name => name + (25000).toLocaleString()));
+		expect(wrapper.queryAllByRole('button')).toHaveLength(0);
+	} finally {
+		wrapper.unmount();
+	}
+});

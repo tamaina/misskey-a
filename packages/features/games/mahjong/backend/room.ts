@@ -113,8 +113,18 @@ export function submitRoom(room: RoomState, user: string, phaseId: string, actio
 export function projectRoom(id: string, room: RoomState, user: string, now: number) {
 	const player = participant(room, user);
 	const phase = room.phase;
+	const snapshot = room.views[player] ? structuredClone(room.views[player]) : null;
+	// Core breaks score ties in starting-dealer order. Any leftover riichi
+	// sticks have already been awarded to first place in the final scores.
+	let standings;
+	if (room.status === 'ended' && room.journal && snapshot) {
+		const dealer = room.journal.dealer;
+		const startingSeat = (id: string) => (room.users.indexOf(id) - dealer + 4) % 4;
+		standings = snapshot.seats.map(({ userId, score }) => ({ userId, score }))
+			.sort((a, b) => b.score - a.score || startingSeat(a.userId) - startingSeat(b.userId));
+	}
 	return { id, version: room.version, users: [...room.users], ready: [...room.ready], status: room.status,
-										revision: room.revision, serverTime: now, outcome: room.outcome ? structuredClone(room.outcome) : null, snapshot: room.views[player] ? structuredClone(room.views[player]) : null,
+										revision: room.revision, serverTime: now, outcome: room.outcome ? structuredClone(room.outcome) : null, snapshot, ...(standings ? { standings } : {}),
 										phase: phase ? { id: phase.id, kind: phase.kind, deadline: phase.deadline, submitted: phase.selected[player] !== null,
 																											actions: phase.selected[player] !== null ? [] : phase.menus[player].map(({ id, kind, tiles }) => ({ id, kind, tiles })) } : null };
 }

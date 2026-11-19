@@ -51543,6 +51543,10 @@ export interface operations {
                                 discards: string[];
                             }[];
                         } | null;
+                        standings?: {
+                            userId: string;
+                            score: number;
+                        }[];
                         phase: {
                             /** Format: uuid */
                             id: string;
@@ -52075,6 +52079,10 @@ export interface operations {
                                 discards: string[];
                             }[];
                         } | null;
+                        standings?: {
+                            userId: string;
+                            score: number;
+                        }[];
                         phase: {
                             /** Format: uuid */
                             id: string;
@@ -52365,6 +52373,10 @@ export interface operations {
                                 discards: string[];
                             }[];
                         } | null;
+                        standings?: {
+                            userId: string;
+                            score: number;
+                        }[];
                         phase: {
                             /** Format: uuid */
                             id: string;
@@ -52655,6 +52667,10 @@ export interface operations {
                                 discards: string[];
                             }[];
                         } | null;
+                        standings?: {
+                            userId: string;
+                            score: number;
+                        }[];
                         phase: {
                             /** Format: uuid */
                             id: string;
@@ -52955,6 +52971,10 @@ export interface operations {
                                 discards: string[];
                             }[];
                         } | null;
+                        standings?: {
+                            userId: string;
+                            score: number;
+                        }[];
                         phase: {
                             /** Format: uuid */
                             id: string;

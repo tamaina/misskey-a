@@ -5,7 +5,8 @@ PR #13112; rules/progression use **@kobalab/majiang-core 1.4.1**, pinned as a pr
 
 ## Initial product policy
 
-- Same-server invited four humans; no CPU, public matchmaking, federation, stakes, ranking or spectators.
+- Same-server invited four humans; no CPU, public matchmaking, federation, stakes, public rankings or spectators. Finished games show the four participants their final places
+  and scores, breaking ties in initial-dealer order. Aborted games have no placements.
 - All four must confirm the displayed rules before dealing. Any invitee can decline and cancel a waiting room.
   Any participant may also explicitly abort a started, unrated game after a confirmation dialog.
   This ends play for all four without assigning a winner; it cannot be resumed.

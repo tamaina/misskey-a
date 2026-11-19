@@ -54,6 +54,24 @@ describe('durable invite-only mahjong', () => {
 		expect(() => submitRoom(room, user, phase.id, 'pass:', 'after-abort', 1001)).toThrow('STALE_ACTION');
 		expect(room.revision).toBe(revision);
 	});
+	test('final places use scores and the starting dealer for ties, including rooms saved without placements', () => {
+		const room = started();
+		room.journal!.dealer = 2;
+		expect(projectRoom('id', room, users[0], 0)).not.toHaveProperty('standings');
+		room.status = 'ended';
+		room.phase = null;
+		for (const snapshot of room.views) {
+			for (const seat of snapshot.seats) seat.score = seat.userId === 'bob' ? 28000 : 24000;
+		}
+		const before = structuredClone(room);
+		for (const user of users) {
+			const result = projectRoom('id', room, user, 0);
+			expect(result.standings).toEqual(['bob', 'carol', 'dave', 'alice'].map(userId => ({ userId, score: userId === 'bob' ? 28000 : 24000 })));
+		}
+		expect(room).toEqual(before);
+		room.status = 'cancelled';
+		expect(projectRoom('id', room, users[0], 0)).not.toHaveProperty('standings');
+	});
 	test('an already finished game cannot be changed into an aborted one', () => {
 		const room = started();
 		room.status = 'ended'; room.phase = null;

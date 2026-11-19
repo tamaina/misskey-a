@@ -5,7 +5,13 @@ Seat/felt presentation adapted from upstream PR #13112; see ../../README.md.
 -->
 <template>
 <div :class="$style.table">
-	<div v-if="view.snapshot" :class="$style.summary">
+	<section v-if="view.status === 'ended'" :class="$style.results">
+		<h2>{{ $locale.sfc.ended }}</h2>
+		<ol v-if="view.standings" :aria-label="$locale.sfc.standings">
+			<li v-for="row in view.standings" :key="row.userId"><span>{{ names[row.userId] ?? row.userId }}</span><strong>{{ row.score.toLocaleString() }}</strong></li>
+		</ol>
+	</section>
+	<div v-else-if="view.snapshot" :class="$style.summary">
 		<strong>{{ ['東', '南', '西', '北'][view.snapshot.roundWind] }} {{ view.snapshot.handNumber + 1 }}{{ $locale.sfc.hand }} · {{ view.snapshot.honba }}{{ $locale.sfc.honba }}</strong>
 		<span>{{ $locale.sfc.remaining }} {{ view.snapshot.remainingTiles }} · {{ $locale.sfc.riichiSticks }} {{ view.snapshot.riichiSticks }}</span>
 		<div>{{ $locale.sfc.dora }} <Tile v-for="(tile, i) in view.snapshot.doraIndicators" :key="i" :tile="tile"/></div>
@@ -23,8 +29,7 @@ Seat/felt presentation adapted from upstream PR #13112; see ../../README.md.
 		</section>
 	</div>
 	<div v-if="view.outcome" :class="$style.notice">{{ view.outcome.winner !== null ? names[view.users[view.outcome.winner]] : view.outcome.name }} {{ view.outcome.points || '' }} {{ view.outcome.yaku.join(' · ') }}</div>
-	<div v-if="view.status === 'ended'" :class="$style.notice">{{ $locale.sfc.ended }}</div>
-	<div v-else :class="$style.notice" aria-live="polite">
+	<div v-if="view.status !== 'ended'" :class="$style.notice" aria-live="polite">
 		<span v-if="view.phase?.kind === 'hule'">{{ $locale.sfc.win }}</span><span v-else-if="view.phase?.kind === 'pingju'">{{ $locale.sfc.draw }}</span>
 		<span v-else-if="view.phase?.submitted">{{ $locale.sfc.waiting }}</span><span v-else>{{ $locale.sfc.choose }}</span>
 		<span v-if="view.phase"> · {{ seconds }}{{ $locale.sfc.seconds }}</span>
@@ -47,7 +52,7 @@ defineEmits<{ action: [id: string] }>();
 const seats = computed(() => props.view.snapshot?.seats.map((seat, index) => ({ seat, index })).sort((a, b) => Number(a.seat.userId === props.userId) - Number(b.seat.userId === props.userId)) ?? []);
 </script>
 <locale locale="ja-JP" lang="json">
-{"hand":"局","honba":"本場","remaining":"残り","riichiSticks":"供託","dora":"ドラ表示牌","handTiles":"手牌","discards":"捨て牌","ended":"対局終了 — 牌譜は公開されません","waiting":"他の参加者の操作を待っています","choose":"操作を選んでください","seconds":"秒","discard":"打牌","riichi":"リーチ","chi":"チー","pon":"ポン","kan":"カン","win":"和了","draw":"流局","pass":"見送る","continue":"次へ"}
+{"hand":"局","honba":"本場","remaining":"残り","riichiSticks":"供託","dora":"ドラ表示牌","handTiles":"手牌","discards":"捨て牌","standings":"最終順位","ended":"対局終了 — 牌譜は公開されません","waiting":"他の参加者の操作を待っています","choose":"操作を選んでください","seconds":"秒","discard":"打牌","riichi":"リーチ","chi":"チー","pon":"ポン","kan":"カン","win":"和了","draw":"流局","pass":"見送る","continue":"次へ"}
 </locale>
 <style module>
 .table { padding: 20px; border-radius: 16px; background: radial-gradient(ellipse at top, #286a61, #143e39); color: #fff; box-shadow: inset 0 0 0 1px #ffffff20; }
@@ -63,6 +68,11 @@ const seats = computed(() => props.view.snapshot?.seats.map((seat, index) => ({ 
 .river { display: grid; grid-template-columns: repeat(6, 30px); gap: 2px; min-height: 48px; padding-top: 12px; }
 .riichi { rotate: 90deg; }
 .called { opacity: .4; }
+.results { max-width: 28rem; margin: 0 auto 16px; }
+.results h2 { font-size: 1.05em; text-align: center; }
+.results ol { padding-inline-start: 2.5em; }
+.results li { padding: 5px 0; overflow-wrap: anywhere; }
+.results li strong { margin-inline-start: 12px; font-variant-numeric: tabular-nums; }
 .notice { text-align: center; padding: 20px 0 12px; font-weight: bold; }
 .actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
 .action { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 12px; border: 1px solid #fff5; border-radius: 8px; color: #fff; background: #0003; cursor: pointer; font: inherit; }
