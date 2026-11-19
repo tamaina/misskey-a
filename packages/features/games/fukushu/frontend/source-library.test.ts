@@ -45,6 +45,17 @@ test('uses grade.correct even at score 100 and retries the original submission u
 	expect(calls[0][1]).toMatchObject({ questionId: 'source-card', expectedRevision: 3, rating: 'again', correct: false, answers: ['a', 'b'] });
 });
 
+test('an archived native card keeps its place and offers a return instead of retrying a rejected review', async () => {
+	vi.mocked(misskeyApi).mockRejectedValueOnce({ code: 'STUDY_UNAVAILABLE' });
+	render(SourceStudy, { global, props: { questions: [question], revisions: new Map([[question.id, 2]]), nativeVersion: 1, flashMode: true, immediate: true, shuffle: false } });
+	await fireEvent.click(screen.getByText('答えを見る'));
+	await fireEvent.click(screen.getByText('できた'));
+	expect((await screen.findByRole('alert')).textContent).toContain('現在復習できません');
+	expect(screen.queryByText('同じ回答の保存を再試行')).toBeNull();
+	expect(screen.queryByText('この回の復習は終了です。')).toBeNull();
+	expect(screen.getByRole('button', { name: '教材に戻る' })).toBeDefined();
+});
+
 test('a confirmed byte limit keeps the answer unsaved and avoids retrying the same request', async () => {
 	vi.mocked(misskeyApi).mockRejectedValueOnce({ code: 'BACKUP_TOO_LARGE' });
 	render(SourceStudy, { global, props: { questions: [question], revisions: new Map([['source-card', 3]]), flashMode: false, immediate: true, shuffle: false } });

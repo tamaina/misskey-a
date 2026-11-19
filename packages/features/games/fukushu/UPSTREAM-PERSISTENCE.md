@@ -162,7 +162,7 @@ The upstream limits apply each time a queue is built. Opening a new session
 later that day can select further cards. Each card keeps its original grading
 mode, storage and optimistic revision. The session loads directly saved card
 text on demand at the selected version. An interrupted save retries the same
-review ID; an intervening edit or review is checked by the original write API.
+review ID. The original write API checks for intervening edits and reviews.
 **Practice all active cards across decks** also includes future-due cards and
 ignores both queue limits. An early native review requires explicit practice
 mode. It uses the same FSRS calculation, review ID and native v1 backup fields.

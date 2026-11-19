@@ -42,7 +42,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 		</template>
 		<p v-if="error" role="alert">{{ error }}</p>
-		<MkButton v-if="pending && !busy && !capacityReached" @click="send">{{ $locale.sfc.retry }}</MkButton>
+		<MkButton v-if="pending && !busy && !rejected" @click="send">{{ $locale.sfc.retry }}</MkButton>
 	</template>
 	<p v-else role="status">{{ $locale.sfc.finished }}</p>
 	<MkButton :disabled="busy" @click="emit('close')">{{ $locale.sfc.back }}</MkButton>
@@ -102,7 +102,7 @@ const revealed = ref(false);
 const feedback = ref(false);
 const busy = ref(false);
 const error = ref('');
-const capacityReached = ref(false);
+const rejected = ref(false);
 type Submission = { requestId: string; questionId: string; expectedRevision: number; rating: StudyRating; correct: boolean; answers: string[]; durationMs: number };
 const pending = shallowRef<Submission>();
 let started = Date.now();
@@ -146,8 +146,13 @@ async function send() {
 		revealed.value = false; graded.value = undefined; error.value = '';
 	} catch (cause) {
 		const code = typeof cause === 'object' && cause !== null && 'code' in cause ? cause.code : null;
-		capacityReached.value = code === 'BACKUP_TOO_LARGE' || code === 'STUDY_LIMIT' || code === 'CARD_HISTORY_LIMIT';
-		error.value = capacityReached.value ? $locale.value.sfc.capacity : code === 'STUDY_CONFLICT' ? $locale.value.sfc.conflict : $locale.value.sfc.failed;
+		const capacity = code === 'BACKUP_TOO_LARGE' || code === 'STUDY_LIMIT' || code === 'CARD_HISTORY_LIMIT';
+		const unavailable = code === 'STUDY_UNAVAILABLE' || code === 'NO_SUCH_MATERIAL';
+		rejected.value = capacity || unavailable || code === 'STUDY_CONFLICT';
+		if (capacity) error.value = $locale.value.sfc.capacity;
+		else if (unavailable) error.value = $locale.value.sfc.unavailable;
+		else if (code === 'STUDY_CONFLICT') error.value = $locale.value.sfc.conflict;
+		else error.value = $locale.value.sfc.failed;
 	} finally { busy.value = false; }
 }
 </script>
@@ -169,6 +174,7 @@ async function send() {
 	"retry": "同じ回答の保存を再試行",
 	"capacity": "教材の保存容量の上限に達したため、この回答は保存されませんでした。これまでの履歴は教材に戻って書き出せます。",
 	"failed": "保存結果を確認できませんでした。同じ回答で再試行できます。",
+	"unavailable": "このカードは現在復習できません。教材に戻って開き直してください。",
 	"conflict": "このカードは別の操作で更新されました。教材に戻って開き直してください。"
 }
 </locale>
@@ -190,6 +196,7 @@ async function send() {
 	"capacity": "This answer could not be saved because the collection reached its byte limit. Return to the library to export your existing history.",
 	"retry": "Retry saving this answer",
 	"failed": "Could not confirm the save. You can retry the same answer.",
+	"unavailable": "This card is no longer available for review. Return to the library and start again.",
 	"conflict": "This card has changed. Return to the deck and reopen it."
 }
 </locale>
