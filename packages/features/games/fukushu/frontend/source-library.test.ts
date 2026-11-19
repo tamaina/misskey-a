@@ -8,6 +8,7 @@ import { createInternationalization } from 'virtual:vite-vue-internationalizatio
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { chooseDriveFile } from '@features/drive/frontend/utility/drive.js';
 import * as os from '@features/ui/frontend/os.js';
+import LearningSettings from './components/LearningSettings.vue';
 import SourceLibrary from './components/SourceLibrary.vue';
 import SourceContent from './components/SourceContent.vue';
 import SourceStudy from './components/SourceStudy.vue';
@@ -28,6 +29,32 @@ const row = { id: 'source-card', deckId: 'deck', sourceKey: 'stable', kind: 'mul
 const question: SourceQuestion = { ...row, payload: { ...row, categoryPath: [], prompt: plain('Select'), choices: [
 	{ id: 'a', content: plain('A'), weight: 100 }, { id: 'b', content: plain('B'), weight: 0 },
 ] } };
+
+test('edits caps, preserves fractional retention and reloads a concurrent edit', async () => {
+	const old = { desiredRetention: 0.94567, newQuestionsPerDay: 20, maxReviewsPerDay: 1 };
+	const next = { ...old, newQuestionsPerDay: 0, maxReviewsPerDay: null };
+	const updated = { ...old, desiredRetention: 0.97 };
+	vi.mocked(misskeyApi).mockResolvedValueOnce(old as never)
+		.mockRejectedValueOnce({ code: 'STUDY_CONFLICT' }).mockResolvedValueOnce(updated as never)
+		.mockResolvedValueOnce({ ...next, desiredRetention: 0.97 } as never);
+	const view = render(LearningSettings, { global });
+	const details = view.container.querySelector('details')!;
+	details.open = true;
+	const fresh = await screen.findByRole('spinbutton', { name: /新規カード/ });
+	const reviews = screen.getByRole('spinbutton', { name: /復習カード/ });
+	await fireEvent.update(fresh, '0');
+	await fireEvent.update(reviews, '');
+	await fireEvent.click(screen.getByRole('button', { name: '学習設定を保存' }));
+	expect((await screen.findByRole('alert')).textContent).toContain('別の画面');
+	expect(misskeyApi).toHaveBeenCalledWith('fukushu/study/update-settings', { expected: old, settings: next });
+	await fireEvent.click(screen.getByRole('button', { name: '設定を再読み込み' }));
+	await waitFor(() => expect((screen.getByRole('spinbutton', { name: /目標記憶率/ }) as HTMLInputElement).value).toBe('97'));
+	await fireEvent.update(fresh, '0');
+	await fireEvent.update(reviews, '');
+	await fireEvent.click(screen.getByRole('button', { name: '学習設定を保存' }));
+	expect((await screen.findByRole('status')).textContent).toContain('保存しました');
+	expect(misskeyApi).toHaveBeenLastCalledWith('fukushu/study/update-settings', { expected: updated, settings: { ...next, desiredRetention: 0.97 } });
+});
 
 test('uses grade.correct even at score 100 and retries the original submission unchanged', async () => {
 	vi.mocked(misskeyApi).mockRejectedValueOnce(new Error('unconfirmed')).mockResolvedValueOnce({} as never);

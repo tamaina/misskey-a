@@ -139,7 +139,11 @@ async function verifyNewGift({ source, deckId, state, record }) {
 
 async function today(at) {
 	await restoreBackupFile(document.querySelector('#fixture').files[0]);
-	return (await buildStudyQueue({ now: () => new Date(at) })).map(item => item.question.id);
+	const questions = (await buildStudyQueue({ now: () => new Date(at) })).map(item => item.question.id);
+	const archive = await createBackupArchive();
+	await restoreBackupFile(archive);
+	const { desiredRetention, newQuestionsPerDay, maxReviewsPerDay } = await settingsRepository.get();
+	return { questions, settings: { desiredRetention, newQuestionsPerDay, maxReviewsPerDay }, logs: await (await database()).getAll('reviewLogs') };
 }
 
 Object.assign(window, { compatibility: { generate, restoreAndContinue, longHistory, verifyNewGift, today } });

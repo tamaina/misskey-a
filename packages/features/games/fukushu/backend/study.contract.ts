@@ -7,6 +7,7 @@ import * as v from 'valibot';
 import { oc } from '@orpc/contract';
 import { commonErrors, apiErrorData } from '../../../api/backend/transport/errors.schema.js';
 import { objectInput } from '../../../api/backend/transport/input.schema.js';
+import { learningSettingsSchema } from '../shared/upstream-records.schema.js';
 import { todayQueueSchema } from '../shared/today.schema.js';
 import { sourceIdSchema } from '../shared/material.schema.js';
 import { studyHistoryItemSchema, studyHistoryPageSchema, studyQueueSchema, studySubmissionSchema, studyReviewResultSchema } from '../shared/study.schema.js';
@@ -26,6 +27,12 @@ const base = oc.errors({ ...commonErrors,
 const read = { requireCredential: true, kind: 'read:account', limit: { duration: 60_000, max: 60 } } as const;
 const write = { requireCredential: true, kind: 'write:account', limit: { duration: 60_000, max: 60 } } as const;
 export const studyContract = {
+	studySettings: base.$meta({ ...read, requestName: 'fukushu/study/settings' } as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/fukushu/study/settings', tags: ['fukushu'] })
+		.input(objectInput({})).output(learningSettingsSchema),
+	updateStudySettings: base.errors({ BACKUP_TOO_LARGE: { status: 400, data: apiErrorData } }).$meta({ ...write, requestName: 'fukushu/study/update-settings' } as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/fukushu/study/update-settings', tags: ['fukushu'] })
+		.input(objectInput({ expected: learningSettingsSchema, settings: learningSettingsSchema })).output(learningSettingsSchema),
 	studyToday: base.$meta({ ...read, requestName: 'fukushu/study/today' } as const satisfies Meta & ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/fukushu/study/today', tags: ['fukushu'] })
 		.input(objectInput({ start: v.pipe(v.string(), v.isoTimestamp()), end: v.pipe(v.string(), v.isoTimestamp()), practiceAhead: v.optional(v.literal(true)) })).output(todayQueueSchema),

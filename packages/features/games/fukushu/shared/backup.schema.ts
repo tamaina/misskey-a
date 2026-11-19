@@ -4,6 +4,7 @@
  */
 
 import * as v from 'valibot';
+import { learningSettingsSchema } from './upstream-records.schema.js';
 import { sourceIdSchema, materialSchema, questionSchema } from './material.schema.js';
 import { studyStateRecordSchema, reviewLogRecordSchema, storedFsrsCardSchema, studyReviewInputSchema, studyRequestIdSchema } from './study.schema.js';
 
@@ -21,7 +22,7 @@ export const backupPayloadSchema = v.strictObject({
 	reviews: v.pipe(v.array(v.strictObject({
 		id: studyRequestIdSchema, questionId: sourceIdSchema, questionVersion: positive, stateRevision: positive,
 		reviewedAt: time, data: reviewLogRecordSchema, before: storedFsrsCardSchema, after: storedFsrsCardSchema,
-		request: studyReviewInputSchema, schedulerVersion: v.literal('ts-fsrs@5.4.1'), desiredRetention: v.literal(0.9), enableFuzz: v.literal(false),
+		request: studyReviewInputSchema, schedulerVersion: v.literal('ts-fsrs@5.4.1'), desiredRetention: learningSettingsSchema.entries.desiredRetention, enableFuzz: v.literal(false),
 	})), v.maxLength(10_000)),
 });
 export const backupEnvelopeSchema = v.strictObject({

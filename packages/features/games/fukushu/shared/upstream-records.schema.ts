@@ -158,11 +158,17 @@ const FsrsLogSchema = v.strictObject({
 	scheduledDays: integer(),
 	review: iso(),
 });
-const SettingsSchema = v.strictObject({
-	id: v.literal('global'),
+export const learningSettingsSchema = v.object({
 	desiredRetention: bounded(0.8, 0.97),
 	newQuestionsPerDay: v.pipe(integer(), v.maxValue(200)),
 	maxReviewsPerDay: v.nullable(v.pipe(integer(1), v.maxValue(1000))),
+});
+export type LearningSettings = v.InferOutput<typeof learningSettingsSchema>;
+export const defaultLearningSettings: LearningSettings = { desiredRetention: 0.9, newQuestionsPerDay: 20, maxReviewsPerDay: null };
+
+const SettingsSchema = v.strictObject({
+	id: v.literal('global'),
+	...learningSettingsSchema.entries,
 	checkpointInterval: v.optional(v.pipe(integer(), v.maxValue(1000)), 20),
 	shuffleChoices: v.boolean(),
 	showImmediateFeedback: v.boolean(),

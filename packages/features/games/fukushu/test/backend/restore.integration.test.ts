@@ -10,8 +10,11 @@ import { entities } from '@features/persistence/backend/postgres.js';
 import { FukushuMaterial1794838800000 } from '../../../../../backend/migration/1794838800000-FukushuMaterial.js';
 import { FukushuMaterialManagement1794871800000 } from '../../../../../backend/migration/1794871800000-FukushuMaterialManagement.js';
 import { FukushuQuestionVersions1794880800000 } from '../../../../../backend/migration/1794880800000-FukushuQuestionVersions.js';
+import { FukushuLearningSettings1795053600000 } from '../../../../../backend/migration/1795053600000-FukushuLearningSettings.js';
+import { FukushuUpstreamStore1794924000000 } from '../../../../../backend/migration/1794924000000-FukushuUpstreamStore.js';
 import { FukushuStudy1794891600000 } from '../../../../../backend/migration/1794891600000-FukushuStudy.js';
 import { FukushuStore } from '../../backend/store.js';
+import { review } from '../../backend/fsrs.js';
 import { FukushuStudyStore } from '../../backend/study-store.js';
 import { FukushuBackupStore } from '../../backend/backup-store.js';
 import { FukushuBackupRestorer } from '../../backend/backup-restore.js';
@@ -48,6 +51,8 @@ describe.skipIf(!socket)('atomic native restore PostgreSQL', () => {
 			await new FukushuMaterialManagement1794871800000().up(runner);
 			await new FukushuQuestionVersions1794880800000().up(runner);
 			await new FukushuStudy1794891600000().up(runner);
+			await new FukushuUpstreamStore1794924000000().up(runner);
+			await new FukushuLearningSettings1795053600000().up(runner);
 		} finally { await runner.release(); }
 	});
 	afterAll(async () => {
@@ -72,6 +77,21 @@ describe.skipIf(!socket)('atomic native restore PostgreSQL', () => {
 		for (const table of ['fukushu_deck', 'fukushu_question', 'fukushu_question_version', 'fukushu_study_state', 'fukushu_review_log']) result.push(await db.query(`SELECT to_jsonb(t) AS value FROM ${table} t ORDER BY to_jsonb(t)::text`));
 		return result;
 	}
+
+	test('retains each native review’s own retention on restore and leaves the destination preference alone', async () => {
+		await materials.create('alice', material());
+		const first = await study.review('alice', request());
+		await db.query('INSERT INTO fukushu_learning_settings ("ownerId", data) VALUES ($1, $2)', ['alice', { newQuestionsPerDay: 5, maxReviewsPerDay: null, desiredRetention: 0.97 }]);
+		now = new Date(first.card.due);
+		await study.review('alice', request({ expectedStateRevision: 1 }));
+		const backup = await backups.export('alice', 'deck-original');
+		const original = decodeBackup(backup);
+		expect(original.reviews.map(r => r.desiredRetention)).toEqual([0.9, 0.97]);
+		expect(original.reviews[1].after).toEqual(review(first.card, now, 'good', 0.97).card);
+		await restorer.restore('bob', await upload('bob', backup));
+		expect(decodeBackup(await backups.export('bob', 'deck-original'))).toEqual(original);
+		expect(await db.query('SELECT 1 FROM fukushu_learning_settings WHERE "ownerId" = $1', ['bob'])).toEqual([]);
+	});
 
 	test('restores exact retained versions, schedule, request identities and archived history without replay', async () => {
 		await materials.create('alice', material());

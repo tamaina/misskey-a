@@ -773,6 +773,15 @@ test('real authentication, Drive, material maintenance and explanation versions'
 	});
 	await step('normal owner previews and appends a new GIFT deck, studies it and exports the original source', async () => {
 		const owner = credentials.gift;
+		const expected = ok(await call('fukushu/study/settings', {}, owner.token));
+		const settings = { desiredRetention: 0.945, newQuestionsPerDay: 5, maxReviewsPerDay: 1 };
+		assert.equal((await call('fukushu/study/settings', {})).status, 401);
+		const update = (value, token = owner.token) => call('fukushu/study/update-settings', { expected, settings: value }, token);
+		for (const invalid of [{ desiredRetention: 0.799 }, { newQuestionsPerDay: 201 }, { newQuestionsPerDay: 1.5 }, { maxReviewsPerDay: 0 }, { maxReviewsPerDay: 1001 }]) {
+			assert.equal((await update({ ...settings, ...invalid })).status, 400);
+		}
+		assert.deepEqual(ok(await update(settings)), settings);
+		assert.deepEqual(ok(await call('fukushu/study/settings', { ownerId: owner.id }, credentials.dana.token)), expected);
 		const source = '$CATEGORY: Biology\n\n::leaf:: Leaves absorb light. {TRUE}\n\n::root:: Name the plant part. {=root}';
 		const form = new FormData();
 		form.set('i', owner.token); form.set('file', new Blob([source], { type: 'text/plain' }), 'biology.gift.txt');
@@ -819,7 +828,7 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		const other = ok(await call('fukushu/study/today', { ...day, ownerId: owner.id }, credentials.dana.token));
 		assert.deepEqual(other.items, []);
 		assert.ok(today.items.some(item => item.origin === 'source' && item.question.deckId === input.requestId));
-		await writeFile(join(directory, 'today.json'), JSON.stringify({ at: now.toISOString(), questions: today.items.map(i => i.question.id) }));
+		await writeFile(join(directory, 'today.json'), JSON.stringify({ at: now.toISOString(), settings, record: review.record, questions: today.items.map(i => i.question.id) }));
 		ok(await call('fukushu/materials/create', { material }, owner.token));
 		const combined = ok(await call('fukushu/study/today', day, owner.token));
 		const direct = combined.items.find(item => item.origin === 'native');

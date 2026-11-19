@@ -9,6 +9,8 @@ import { entities } from '@features/persistence/backend/postgres.js';
 import { FukushuMaterial1794838800000 } from '../../../../../backend/migration/1794838800000-FukushuMaterial.js';
 import { FukushuMaterialManagement1794871800000 } from '../../../../../backend/migration/1794871800000-FukushuMaterialManagement.js';
 import { FukushuQuestionVersions1794880800000 } from '../../../../../backend/migration/1794880800000-FukushuQuestionVersions.js';
+import { FukushuLearningSettings1795053600000 } from '../../../../../backend/migration/1795053600000-FukushuLearningSettings.js';
+import { FukushuUpstreamStore1794924000000 } from '../../../../../backend/migration/1794924000000-FukushuUpstreamStore.js';
 import { FukushuStudy1794891600000 } from '../../../../../backend/migration/1794891600000-FukushuStudy.js';
 import { FukushuStore } from '../../backend/store.js';
 import { FukushuStudyStore } from '../../backend/study-store.js';
@@ -37,6 +39,8 @@ describe.skipIf(!socket)('private flashcard study PostgreSQL', () => {
 			await new FukushuMaterialManagement1794871800000().up(runner);
 			await new FukushuQuestionVersions1794880800000().up(runner);
 			await new FukushuStudy1794891600000().up(runner);
+			await new FukushuUpstreamStore1794924000000().up(runner);
+			await new FukushuLearningSettings1795053600000().up(runner);
 		} finally { await runner.release(); }
 	});
 	afterAll(async () => {

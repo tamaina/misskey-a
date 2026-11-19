@@ -75,9 +75,11 @@ try {
 	if (process.env.FUKUSHU_TODAY === 'verify') {
 		const saved = JSON.parse(await readFile(process.env.FUKUSHU_PERSISTED_STATE, 'utf8'));
 		await page.locator('#fixture').setInputFiles(process.env.FUKUSHU_PERSISTED_EXPORT);
-		const questions = await page.evaluate(at => window.compatibility.today(at), saved.at);
+		const { questions, settings, logs } = await page.evaluate(at => window.compatibility.today(at), saved.at);
+		assert.deepEqual(settings, saved.settings);
+		assert.deepEqual(logs, [saved.record]);
 		assert.deepEqual(questions, saved.questions);
-		console.log(JSON.stringify({ upstream: pinned, chrome: browser.version(), matched: questions.length }));
+		console.log(JSON.stringify({ upstream: pinned, chrome: browser.version(), matched: questions.length, settings, reviews: logs.length }));
 	} else if (process.env.FUKUSHU_NEW_GIFT === 'verify') {
 		const saved = JSON.parse(await readFile(process.env.FUKUSHU_PERSISTED_STATE, 'utf8'));
 		await page.locator('#fixture').setInputFiles(process.env.FUKUSHU_PERSISTED_EXPORT);

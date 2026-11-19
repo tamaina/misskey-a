@@ -6,6 +6,7 @@
 // https://github.com/typeorm/typeorm/issues/2400
 import { MiFukushuDeck } from '@features/games/fukushu/backend/models/FukushuDeck.js';
 import { MiFukushuReminder } from '@features/games/fukushu/backend/models/FukushuReminder.js';
+import { MiFukushuLearningSettings } from '@features/games/fukushu/backend/models/FukushuLearningSettings.js';
 import { MiFukushuSourceUsage } from '@features/games/fukushu/backend/models/FukushuSourceUsage.js';
 import { MiFukushuUpstreamChunk } from '@features/games/fukushu/backend/models/FukushuUpstreamChunk.js';
 import { MiFukushuUpstreamRecord } from '@features/games/fukushu/backend/models/FukushuUpstreamRecord.js';
@@ -271,6 +272,7 @@ export const entities = [
 	MiFukushuUpstreamRecord,
 	MiFukushuUpstreamChunk,
 	MiFukushuReminder,
+	MiFukushuLearningSettings,
 	MiFukushuSourceUsage,
 	MiFukushuOperationReceipt,
 	MiFukushuQuestion,

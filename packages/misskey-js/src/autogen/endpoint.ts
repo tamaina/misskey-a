@@ -106,6 +106,10 @@ import type {
 	FukushuReminderShowRequest,
 	FukushuReminderShowResponse,
 	FukushuReminderUpdateRequest,
+	FukushuStudySettingsRequest,
+	FukushuStudySettingsResponse,
+	FukushuStudyUpdateSettingsRequest,
+	FukushuStudyUpdateSettingsResponse,
 	FukushuStudyTodayRequest,
 	FukushuStudyTodayResponse,
 	FukushuStudyQueueRequest,
@@ -915,6 +919,8 @@ export type Endpoints = {
 	'users/flashs': { req: UsersFlashsRequest; res: UsersFlashsResponse };
 	'fukushu/reminder/show': { req: FukushuReminderShowRequest; res: FukushuReminderShowResponse };
 	'fukushu/reminder/update': { req: FukushuReminderUpdateRequest; res: EmptyResponse };
+	'fukushu/study/settings': { req: FukushuStudySettingsRequest; res: FukushuStudySettingsResponse };
+	'fukushu/study/update-settings': { req: FukushuStudyUpdateSettingsRequest; res: FukushuStudyUpdateSettingsResponse };
 	'fukushu/study/today': { req: FukushuStudyTodayRequest; res: FukushuStudyTodayResponse };
 	'fukushu/study/queue': { req: FukushuStudyQueueRequest; res: FukushuStudyQueueResponse };
 	'fukushu/study/review': { req: FukushuStudyReviewRequest; res: FukushuStudyReviewResponse };

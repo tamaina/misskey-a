@@ -44,7 +44,7 @@ async function invoke<T>(operation: () => Promise<T>): Promise<T> {
 	}
 }
 
-export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list' | 'update' | 'archive' | 'updateCardExplanation' | 'listCardVersions' | 'showCardVersion'>, importer?: Pick<FukushuDriveImporter, 'import'>, study?: Pick<FukushuStudyStore, 'queue' | 'review' | 'history'>, backup?: { restorer?: Pick<FukushuBackupRestorer, 'restore'>; store: Pick<FukushuBackupStore, 'assertOwned'>; inspector: Pick<FukushuBackupInspector, 'inspect' | 'inspectUpstream'>; enqueue(ownerId: string, deckId: string): Promise<void> }, upstream?: { store: Pick<FukushuUpstreamStore, 'assertOwned' | 'restore' | 'show' | 'today' | 'review' | 'media' | 'updateGift' | 'createGift'>; restoreJob?(ownerId: string, input: { fileId: string; requestId: string; statusOnly?: boolean }): ReturnType<typeof sourceRestoreJob>; readGift?(ownerId: string, fileId: string): Promise<Buffer>; enqueue(ownerId: string): Promise<void> }, reminders?: Pick<FukushuReminderStore, 'settings' | 'configure'>) {
+export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list' | 'update' | 'archive' | 'updateCardExplanation' | 'listCardVersions' | 'showCardVersion'>, importer?: Pick<FukushuDriveImporter, 'import'>, study?: Pick<FukushuStudyStore, 'queue' | 'review' | 'history'>, backup?: { restorer?: Pick<FukushuBackupRestorer, 'restore'>; store: Pick<FukushuBackupStore, 'assertOwned'>; inspector: Pick<FukushuBackupInspector, 'inspect' | 'inspectUpstream'>; enqueue(ownerId: string, deckId: string): Promise<void> }, upstream?: { store: Pick<FukushuUpstreamStore, 'assertOwned' | 'restore' | 'show' | 'today' | 'settings' | 'updateSettings' | 'review' | 'media' | 'updateGift' | 'createGift'>; restoreJob?(ownerId: string, input: { fileId: string; requestId: string; statusOnly?: boolean }): ReturnType<typeof sourceRestoreJob>; readGift?(ownerId: string, fileId: string): Promise<Buffer>; enqueue(ownerId: string): Promise<void> }, reminders?: Pick<FukushuReminderStore, 'settings' | 'configure'>) {
 	const procedure = createApiProcedure<MiLocalUser>();
 	const principal = requirePrincipal<MiLocalUser>();
 	const upstreamStore = () => { if (!upstream) throw new BackupError('BACKUP_FAILED'); return upstream.store; };
@@ -102,6 +102,8 @@ export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' 
 			if (!backup) throw new BackupError('BACKUP_FAILED');
 			return backup.inspector.inspect(context.principal.id, input.fileId);
 		})),
+		studySettings: procedure(fukushuContract.studySettings).use(principal).handler(({ context }) => invoke(() => upstreamStore().settings(context.principal.id))),
+		updateStudySettings: procedure(fukushuContract.updateStudySettings).use(principal).handler(({ context, input }) => invoke(() => upstreamStore().updateSettings(context.principal.id, input.expected, input.settings))),
 		studyToday: procedure(fukushuContract.studyToday).use(principal).handler(({ context, input }) => invoke(() => upstreamStore().today(context.principal.id, input))),
 		studyQueue: procedure(fukushuContract.studyQueue).use(principal).handler(({ input, context }) => invoke(() => studyStore().queue(context.principal.id, input.id))),
 		studyReview: procedure(fukushuContract.studyReview).use(principal).handler(({ input, context }) => invoke(() => studyStore().review(context.principal.id, input))),

@@ -14,14 +14,14 @@ Reference commit: `tamaina/fukushu@0efee271a13f15096beb8cbaaea25092c5927b29`:
   acceptedAnswer. Flashcard logs store `responseText: ''` and
   `correct: rating !== 'again'`. This slice follows that behavior.
 - [study.ts](https://github.com/tamaina/fukushu/blob/0efee271a13f15096beb8cbaaea25092c5927b29/packages/app/src/application/study.ts)
-  snapshots the queue at session start, due reviews first then up to 20 new cards.
+  snapshots the queue at session start, due reviews first, then new cards, with the owner’s configured limits.
   Again advances to the next queued card; it is not immediately reinserted.
   The default is no daily review cap. The 20-new-card setting is a queue bound,
   not a guaranteed total daily limit in the upstream implementation. New cards
   use question-ID order. Unlike upstream, this first slice does not automatically
   switch an empty queue to early-review cram mode; it shows that nothing is due.
 - [adapter](https://github.com/tamaina/fukushu/blob/0efee271a13f15096beb8cbaaea25092c5927b29/packages/app/src/infrastructure/fsrs/adapter.ts)
-  and lockfile use ts-fsrs 5.4.1. Retention 0.9 and fuzz false are initial values.
+  and lockfile use ts-fsrs 5.4.1. Default retention is 0.9 and fuzz is disabled.
   Preserve its stored Card/ReviewLog field mapping, including the fields it
   omits; do not silently migrate existing records to another scheduler version.
 - [schema](https://github.com/tamaina/fukushu/blob/0efee271a13f15096beb8cbaaea25092c5927b29/packages/app/src/infrastructure/db/schema.ts)
@@ -133,3 +133,20 @@ A retry after display normally stays silent, including after a worker restart.
 A crash between display and recording it can repeat the notification if the
 user has already dismissed it. Local storage removal also resets this record.
 Notifications carry no material names, questions, answers or review counts.
+
+### Learning settings
+
+The library edits the three upstream global settings: 0–200 new cards per
+session, 1–1,000 due reviews (or no cap), and desired retention from 0.80 to
+0.97. Both families of cards use the owner’s current retention when an answer
+is saved. Changing a setting does not reschedule a card or rewrite history.
+A second editor must reload if the three values changed before saving.
+
+Before the first source import, 9k stores the values separately from source IDs.
+Creating a first GIFT carries them into its global settings record. Restoring a
+first upstream archive adopts its backed-up settings. Subsequent edits preserve
+other fields of that record when exporting to the upstream application.
+Native per-deck v1 backups retain the actual retention of each recorded answer.
+Restoring a native deck keeps the destination account’s current settings. Older
+9k draft readers that required exactly 0.9 cannot read reviews made with another
+value; existing 0.9 backups remain compatible.

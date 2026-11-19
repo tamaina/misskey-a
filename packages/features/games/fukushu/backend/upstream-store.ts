@@ -3,16 +3,19 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { createHash } from 'node:crypto';
+import { isDeepStrictEqual } from 'node:util';
 import { In, QueryFailedError } from 'typeorm';
 import * as v from 'valibot';
 import { scanSourceArchive, MAX_SOURCE_ARCHIVE_BYTES, MAX_SOURCE_JSON_BYTES } from '../shared/source-scan.js';
 import { checkMaterialCount, checkUpstreamRelations, emptyUpstreamRecords, UPSTREAM_MAGIC } from '../shared/upstream-reader.js';
-import { upstreamStoreSchemas } from '../shared/upstream-records.schema.js';
+import { learningSettingsSchema, upstreamStoreSchemas } from '../shared/upstream-records.schema.js';
 import { studyRequestIdSchema } from '../shared/study.schema.js';
 import { MAX_BACKUP_BYTES } from '../shared/backup.schema.js';
 import { planGiftUpdate, planNewGift } from './gift-update.js';
 import { BackupError } from './backup-codec.js';
 import { MaterialError } from './store.js';
+import { MiFukushuLearningSettings } from './models/FukushuLearningSettings.js';
+import { initialLearningSettings, readLearningSettings } from './learning-settings.js';
 import { todayQueue } from './today.js';
 import { StudyError } from './study-store.js';
 import { applyUpstreamReview, CompatibilitySessionError } from './pilot/upstream-session.js';
@@ -20,6 +23,7 @@ import { MiFukushuUpstreamRecord } from './models/FukushuUpstreamRecord.js';
 import { MiFukushuSourceUsage } from './models/FukushuSourceUsage.js';
 import { MiFukushuOperationReceipt } from './models/FukushuOperationReceipt.js';
 import { MiFukushuUpstreamChunk } from './models/FukushuUpstreamChunk.js';
+import type { LearningSettings } from '../shared/upstream-records.schema.js';
 import type { DataSource, EntityManager } from 'typeorm';
 import type { UpstreamFrame } from '../shared/upstream-reader.js';
 import type { SourceHistoryPage } from './upstream.contract.js';
@@ -44,6 +48,38 @@ export class FukushuUpstreamStore {
 		const row = await manager.getRepository(MiFukushuOperationReceipt).findOneBy({ ownerId, id });
 		if (row && row.request !== request) throw new StudyError('STUDY_CONFLICT');
 		return row ? JSON.parse(row.result) : undefined;
+	}
+
+	async settings(ownerId: string) {
+		return this.db.transaction('REPEATABLE READ', manager => readLearningSettings(manager, ownerId));
+	}
+
+	async updateSettings(ownerId: string, expected: LearningSettings, input: LearningSettings) {
+		const next = v.parse(learningSettingsSchema, input);
+		return this.db.transaction(async manager => {
+			await this.lock(manager, ownerId);
+			const current = await readLearningSettings(manager, ownerId);
+			if (isDeepStrictEqual(current, next)) return next;
+			if (!isDeepStrictEqual(current, expected)) throw new StudyError('STUDY_CONFLICT');
+			const records = manager.getRepository(MiFukushuUpstreamRecord);
+			const identity = { ownerId, store: 'settings', key: key('global') };
+			const row = await records.findOneBy(identity);
+			if (!row) {
+				await manager.getRepository(MiFukushuLearningSettings).upsert({ ownerId, data: next }, ['ownerId']);
+				return next;
+			}
+			// Keep unedited source fields (including an absent optional field) exactly as imported.
+			const data = JSON.stringify({ ...JSON.parse(row.data), ...next });
+			const delta = Buffer.byteLength(data) - Buffer.byteLength(row.data);
+			const usage = manager.getRepository(MiFukushuSourceUsage);
+			const budget = await usage.findOneByOrFail({ ownerId });
+			const bytes = budget.bytes + delta, materialBytes = budget.materialBytes + delta;
+			if (materialBytes > MAX_BACKUP_BYTES || bytes > MAX_SOURCE_JSON_BYTES ||
+				UPSTREAM_MAGIC.length + 64 + budget.count * 4 + budget.binaries + bytes > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
+			await usage.update({ ownerId }, { bytes, materialBytes });
+			await records.update(identity, { data });
+			return next;
+		});
 	}
 
 	async restored(ownerId: string, fileId: string, requestId: string): Promise<boolean> {
@@ -137,6 +173,7 @@ export class FukushuUpstreamStore {
 					WHERE d."ownerId" = $1 AND d.store = 'decks' AND d.key = n.key`,
 				[ownerId, [...deckCounts.keys()], [...deckCounts.values()]]);
 				await this.refreshUsage(manager, ownerId);
+				await manager.delete(MiFukushuLearningSettings, { ownerId });
 				const result = { restored: true as const, sha256: snapshot.sha256, records: frames.length };
 				await manager.getRepository(MiFukushuOperationReceipt).insert({ ownerId, id, request, result: JSON.stringify(result) });
 				return result;
@@ -261,7 +298,7 @@ export class FukushuUpstreamStore {
 			if (newName !== undefined && (deck || (await manager.query('SELECT 1 FROM fukushu_deck WHERE "ownerId" = $1 AND id = $2', [ownerId, deckId])).length)) throw new BackupError('BACKUP_CONFLICT');
 			const { writes, summary } = newName === undefined
 				? planGiftUpdate(this.materialRecords(frames.values()), deck!.value, deckId, source, this.clock())
-				: planNewGift(deckId, newName, file.name, source, this.clock(), !storedBudget);
+				: planNewGift(deckId, newName, file.name, source, this.clock(), storedBudget ? undefined : await initialLearningSettings(manager, ownerId));
 			const identity = (frame: UpstreamFrame) => frame.store + ':' + key(frame.value.id ?? frame.value.questionId);
 			const written = new Set<string>();
 			let delta = 0;
@@ -300,7 +337,10 @@ export class FukushuUpstreamStore {
 				for (let i = 0; i < inserts.length; i += 100) await repo.insert(inserts.slice(i, i + 100));
 				const totals = { count, last: position, bytes: jsonBytes, materialBytes };
 				if (storedBudget) await usage.update({ ownerId }, totals);
-				else await usage.insert({ ownerId, logs: 0, binaries: 0, ...totals });
+				else {
+					await usage.insert({ ownerId, logs: 0, binaries: 0, ...totals });
+					await manager.delete(MiFukushuLearningSettings, { ownerId });
+				}
 				if (newName !== undefined) await manager.getRepository(MiFukushuOperationReceipt).insert({ ownerId, id: deckId, request, result: JSON.stringify({ ...summary, token, applied: true }) });
 			}
 			return { ...summary, token, applied: expected !== undefined };

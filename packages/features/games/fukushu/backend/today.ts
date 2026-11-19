@@ -5,6 +5,7 @@
 import { In } from 'typeorm';
 import * as v from 'valibot';
 import { upstreamStoreSchemas as schemas } from '../shared/upstream-records.schema.js';
+import { initialLearningSettings } from './learning-settings.js';
 import { MiFukushuUpstreamRecord } from './models/FukushuUpstreamRecord.js';
 import type { EntityManager } from 'typeorm';
 import type { TodayQueue } from '../shared/today.schema.js';
@@ -20,7 +21,7 @@ export async function todayQueue(manager: EntityManager, ownerId: string, now: D
 		select: { store: true, key: true, data: true, revision: true },
 	});
 	const setting = rows.find(r => r.store === 'settings');
-	const settings = setting ? v.parse(schemas.settings, JSON.parse(setting.data)) : { newQuestionsPerDay: 20, maxReviewsPerDay: null, shuffleChoices: true, showImmediateFeedback: true };
+	const settings = setting ? v.parse(schemas.settings, JSON.parse(setting.data)) : { ...await initialLearningSettings(manager, ownerId), shuffleChoices: true, showImmediateFeedback: true };
 	const decks = new Map(rows.filter(r => r.store === 'decks').map(r => {
 		const d = v.parse(schemas.decks, JSON.parse(r.data));
 		return [d.id, d] as const;

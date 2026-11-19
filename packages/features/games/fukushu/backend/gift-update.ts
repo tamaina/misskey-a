@@ -8,7 +8,7 @@ import { randomUUID } from 'node:crypto';
 import { emptyStoredCard } from './fsrs.js';
 import { previewGift } from './gift-preview.js';
 import { BackupError } from './backup-codec.js';
-import type { UpstreamRecords } from '../shared/upstream-records.schema.js';
+import type { LearningSettings, UpstreamRecords } from '../shared/upstream-records.schema.js';
 import type { UpstreamFrame } from '../shared/upstream-reader.js';
 
 type QuizQuestion = UpstreamRecords['questions'][number]['payload'];
@@ -67,7 +67,7 @@ function parseGiftImport(source: string, deckId: string) {
 }
 
 // Matches saveNewDeck and defaultSettings in the pinned Fukushu app.
-export function planNewGift(deckId: string, name: string, fileName: string, source: string, now: Date, first: boolean) {
+export function planNewGift(deckId: string, name: string, fileName: string, source: string, now: Date, initialSettings?: LearningSettings) {
 	const { questions, sourceHash } = parseGiftImport(source, deckId);
 	const time = now.toISOString();
 	const common = { sourceType: 'gift', sourceFileName: fileName, sourceHash, sourceText: source, importedAt: time, updatedAt: time };
@@ -78,7 +78,7 @@ export function planNewGift(deckId: string, name: string, fileName: string, sour
 		{ store: 'decks', value: { ...common, id: deckId, sourceId, name, sourceDeckKey: name, studyMode: 'quiz', questionCount: questions.length, enabledQuestionCount: questions.length } },
 		{ store: 'imports', value: { id: randomUUID(), deckId, importedAt: time, sourceHash, added: questions.length, changed: 0, disabled: 0 } },
 	];
-	if (first) writes.unshift({ store: 'settings', value: { id: 'global', desiredRetention: 0.9, newQuestionsPerDay: 20, maxReviewsPerDay: null, checkpointInterval: 20, shuffleChoices: true, showImmediateFeedback: true, locale: 'ja', theme: 'system' } });
+	if (initialSettings) writes.unshift({ store: 'settings', value: { id: 'global', ...initialSettings, checkpointInterval: 20, shuffleChoices: true, showImmediateFeedback: true, locale: 'ja', theme: 'system' } });
 	for (const [sourceOrder, payload] of questions.entries()) {
 		writes.push({ store: 'questions', value: { id: payload.id, deckId, sourceKey: payload.sourceKey, sourceOrder, kind: payload.kind, payload, enabled: true, enabledKey: 1, createdAt: time, updatedAt: time } });
 		writes.push({ store: 'studyStates', value: { questionId: payload.id, deckId, card: emptyStoredCard(now), suspended: false, suspendedKey: 0, updatedAt: time } });

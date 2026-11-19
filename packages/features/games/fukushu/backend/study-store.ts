@@ -5,7 +5,8 @@
 
 import * as v from 'valibot';
 import { MaterialError } from './store.js';
-import { emptyStoredCard, review, schedulerVersion, desiredRetention, enableFuzz } from './fsrs.js';
+import { emptyStoredCard, review, schedulerVersion, enableFuzz } from './fsrs.js';
+import { readLearningSettings } from './learning-settings.js';
 import { MiFukushuDeck } from './models/FukushuDeck.js';
 import { MiFukushuQuestion } from './models/FukushuQuestion.js';
 import { MiFukushuQuestionVersion } from './models/FukushuQuestionVersion.js';
@@ -48,7 +49,8 @@ export class FukushuStudyStore {
 			// Stable question-ID order for new cards; due cards sort by time then ID.
 			due.sort((a, b) => new Date(a.due).getTime() - new Date(b.due).getTime() || this.compareId(a.question.id, b.question.id));
 			fresh.sort((a, b) => this.compareId(a.question.id, b.question.id));
-			return { deckId: id, serverTime: now.toISOString(), items: [...due, ...fresh.slice(0, 20)] };
+			const settings = await readLearningSettings(manager, ownerId);
+			return { deckId: id, serverTime: now.toISOString(), items: [...due.slice(0, settings.maxReviewsPerDay ?? due.length), ...fresh.slice(0, settings.newQuestionsPerDay)] };
 		});
 	}
 
@@ -81,6 +83,7 @@ export class FukushuStudyStore {
 				|| (state.card.lastReview && new Date(state.card.lastReview).getTime() > now.getTime())) throw new StudyError('STUDY_UNAVAILABLE');
 			if (practiceAhead !== true && state.card.reps > 0 && new Date(state.card.due).getTime() > now.getTime()) throw new StudyError('STUDY_UNAVAILABLE');
 			const before = state.card;
+			const { desiredRetention } = await readLearningSettings(manager, ownerId);
 			const scheduled = review(before, now, request.rating, desiredRetention, enableFuzz);
 			const nextState: StudyStateRecord = { ...state, card: scheduled.card, updatedAt: now.toISOString() };
 			const record: ReviewLogRecord = {

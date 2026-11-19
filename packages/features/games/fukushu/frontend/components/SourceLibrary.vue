@@ -18,6 +18,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkButton :disabled="busy" @click="run(() => startToday(true))">{{ $locale.sfc.cramAll }}</MkButton>
 			<MkButton v-if="records" :disabled="busy" @click="exportBackup">{{ $locale.sfc.export }}</MkButton>
 		</div>
+		<LearningSettings v-if="!deck" @saved="applySettings"/>
 		<p v-if="loaded && !records?.decks.length">{{ $locale.sfc.empty }}</p>
 		<button v-for="d in !deck ? records?.decks : []" :key="d.id" type="button" class="_button" :class="$style.row" :disabled="busy" @click="run(() => selectDeck(d.id))">
 			<strong>{{ d.name }}</strong><span>{{ d.enabledQuestionCount }} {{ $locale.sfc.cards }} ›</span>
@@ -80,10 +81,11 @@ import * as os from '@features/ui/frontend/os.js';
 import { queue, solution, studyDay } from '../source-study.js';
 import SourceContent from './SourceContent.vue';
 import SourceStudy from './SourceStudy.vue';
+import LearningSettings from './LearningSettings.vue';
 import TodayStudy from './TodayStudy.vue';
 import type { TodayQueue } from '../../shared/today.schema.js';
 import type { SourceQuestion } from '../source-study.js';
-import type { UpstreamRecords } from '../../shared/upstream-records.schema.js';
+import type { LearningSettings as LearningPreferences, UpstreamRecords } from '../../shared/upstream-records.schema.js';
 
 const emit = defineEmits<{ active: [value: boolean] }>();
 const records = shallowRef<UpstreamRecords>();
@@ -155,6 +157,10 @@ async function run(action: () => Promise<void>) {
 		const c = code(cause);
 		error.value = c === 'INVALID_BACKUP' ? $locale.value.sfc.invalidFile : c === 'STUDY_CONFLICT' || c === 'BACKUP_CONFLICT' ? $locale.value.sfc.conflict : c === 'BACKUP_TOO_LARGE' || c === 'UPSTREAM_INSPECTION_LIMIT' ? $locale.value.sfc.limit : $locale.value.sfc.error;
 	} finally { busy.value = false; }
+}
+
+function applySettings(settings: LearningPreferences) {
+	if (records.value) records.value = { ...records.value, settings: [{ ...records.value.settings[0], ...settings }] };
 }
 
 async function load(id: string | null = selected.value, stack: (Cursor | undefined)[] = [undefined]) {
@@ -360,7 +366,7 @@ async function updateGift() {
 	"checkImport": "取込状況を確認",
 	"importQueued": "サーバーで取り込んでいます。このタブで取込状況を確認できます。",
 	"importFailed": "取込が完了しませんでした。原本と既存教材との ID 重複を確認して、再度お試しください。",
-	"restoreConfirm": "教材・媒体・復習記録をこのアカウントに保存します。既存IDと重複する場合は取り込みません。",
+	"restoreConfirm": "教材・媒体・復習記録をこのアカウントに保存します。既存IDと重複する場合は取り込みません。初めての取り込みでは、バックアップの学習設定を全教材に適用します。",
 	"restored": "教材を取り込みました。",
 	"visibility": "学習記録も保存されます。Drive の URL を知っている人が取得できる場合があります。",
 	"exported": "書き出しを受け付けました。完了は通知と Drive で確認できます。",
@@ -413,7 +419,7 @@ async function updateGift() {
 	"checkImport": "Check import status",
 	"importQueued": "The server is importing the backup. Check its status from this tab.",
 	"importFailed": "Import did not complete. Check the original file and existing IDs, then try again.",
-	"restoreConfirm": "Save decks, media and study history to your account. Existing IDs prevent the entire import.",
+	"restoreConfirm": "Save decks, media and study history to your account. Existing IDs prevent the entire import. On first import, the backed-up study settings apply to all your decks.",
 	"restored": "Decks imported.",
 	"visibility": "Includes your study history. People who know the Drive file URL may be able to access it.",
 	"exported": "Export requested. Check notifications and Drive for completion.",

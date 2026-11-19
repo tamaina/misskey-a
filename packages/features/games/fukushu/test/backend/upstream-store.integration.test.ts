@@ -14,6 +14,7 @@ import { entities } from '@features/persistence/backend/postgres.js';
 import { FukushuMaterial1794838800000 } from '../../../../../backend/migration/1794838800000-FukushuMaterial.js';
 import { FukushuMaterialManagement1794871800000 } from '../../../../../backend/migration/1794871800000-FukushuMaterialManagement.js';
 import { FukushuQuestionVersions1794880800000 } from '../../../../../backend/migration/1794880800000-FukushuQuestionVersions.js';
+import { FukushuLearningSettings1795053600000 } from '../../../../../backend/migration/1795053600000-FukushuLearningSettings.js';
 import { FukushuStudy1794891600000 } from '../../../../../backend/migration/1794891600000-FukushuStudy.js';
 import { FukushuUpstreamStore1794924000000 } from '../../../../../backend/migration/1794924000000-FukushuUpstreamStore.js';
 import { FukushuUpstreamStore } from '../../backend/upstream-store.js';
@@ -56,7 +57,7 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		await db.query('CREATE TABLE "user" (id varchar(32) PRIMARY KEY)');
 		await db.query('CREATE TABLE drive_file (id varchar(32) PRIMARY KEY, name text NOT NULL DEFAULT \'fixture.gift\', "userId" varchar(32) REFERENCES "user"(id), "userHost" text, uri text, "isLink" boolean NOT NULL DEFAULT false, size integer NOT NULL, md5 text NOT NULL)');
 		const runner = db.createQueryRunner();
-		try { for (const Migration of [FukushuMaterial1794838800000, FukushuMaterialManagement1794871800000, FukushuQuestionVersions1794880800000, FukushuStudy1794891600000, FukushuUpstreamStore1794924000000, FukushuSourceChunks1794974400000, FukushuMaterialBytes1794980000000, FukushuDeckHistoryIndex1794990000000, FukushuReminder1795040000000]) await new Migration().up(runner); } finally { await runner.release(); }
+		try { for (const Migration of [FukushuMaterial1794838800000, FukushuMaterialManagement1794871800000, FukushuQuestionVersions1794880800000, FukushuStudy1794891600000, FukushuUpstreamStore1794924000000, FukushuSourceChunks1794974400000, FukushuMaterialBytes1794980000000, FukushuDeckHistoryIndex1794990000000, FukushuReminder1795040000000, FukushuLearningSettings1795053600000]) await new Migration().up(runner); } finally { await runner.release(); }
 	});
 	afterAll(async () => { if (db.isInitialized) { try { await db.query('DROP SCHEMA fukushu_upstream_test CASCADE'); } finally { await db.destroy(); } } });
 	beforeEach(async () => { await db.query('TRUNCATE "user" CASCADE'); await db.query('INSERT INTO "user" VALUES ($1), ($2)', ['alice', 'bob']); files.clear(); });
@@ -66,6 +67,69 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		await db.query('INSERT INTO drive_file (id,"userId",size,md5) VALUES ($1,$2,$3,$4)', [id, owner, content.length, createHash('md5').update(content).digest('hex')]);
 		return id;
 	}
+
+	test('edits only the three owner settings and round trips old archives with unchanged media, cards, states and logs', async () => {
+		const defaults = await store.settings('alice');
+		expect(defaults).toEqual({ desiredRetention: 0.9, newQuestionsPerDay: 20, maxReviewsPerDay: null });
+		const edited = { desiredRetention: 0.945, newQuestionsPerDay: 0, maxReviewsPerDay: 1000 };
+		await store.updateSettings('alice', defaults, edited);
+		expect(await store.settings('bob')).toEqual(defaults);
+		// Native-only preferences do not create a source record or block the first backup restore.
+		expect(await counts()).toEqual({ records: 0, receipts: 0 });
+		const original = (await readUpstreamArchive(bytes, sha)).frames();
+		await store.restore('alice', await upload('alice'), randomUUID());
+		const imported = await store.settings('alice');
+		expect(imported.desiredRetention).toBe(0.87);
+		await expect(store.updateSettings('alice', defaults, edited)).rejects.toThrow('STUDY_CONFLICT');
+		await store.updateSettings('alice', imported, edited);
+		expect(await store.updateSettings('alice', imported, edited)).toEqual(edited);
+		const archive = await exported(store, 'alice');
+		const frames = (await readUpstreamArchive(archive, sha)).frames();
+		expect(frames).toEqual(original.map(frame => frame.store === 'settings' ? { ...frame, value: { ...frame.value, ...edited } } : frame));
+		await store.restore('bob', await upload('bob', archive), randomUUID());
+		expect(await makeStore().settings('bob')).toEqual(edited);
+		expect(await exported(store, 'bob')).toEqual(archive);
+		const [budget] = await db.query('SELECT bytes, "materialBytes" FROM fukushu_source_usage WHERE "ownerId" = $1', ['alice']);
+		expect((await db.query('SELECT bytes, "materialBytes" FROM fukushu_source_usage WHERE "ownerId" = $1', ['bob']))[0]).toEqual(budget);
+	});
+
+	test('refuses an over-budget settings change atomically and guards downgrade of saved preferences', async () => {
+		const migration = new FukushuLearningSettings1795053600000();
+		const runner = db.createQueryRunner();
+		try {
+			await migration.down(runner);
+			await migration.up(runner);
+			const initial = await store.settings('alice');
+			await store.updateSettings('alice', initial, { ...initial, newQuestionsPerDay: 0 });
+			await expect(migration.down(runner)).rejects.toThrow('must be preserved');
+		} finally { await runner.release(); }
+		await store.restore('alice', await upload('alice'), randomUUID());
+		const settings = await store.settings('alice');
+		const previous = await exported(store, 'alice');
+		await db.query('UPDATE fukushu_source_usage SET "materialBytes" = $1 WHERE "ownerId" = $2', [8 * 1024 * 1024, 'alice']);
+		await expect(store.updateSettings('alice', settings, { ...settings, desiredRetention: 0.87654321 })).rejects.toThrow('BACKUP_TOO_LARGE');
+		expect(await store.settings('alice')).toEqual(settings);
+		expect(await exported(store, 'alice')).toEqual(previous);
+	});
+
+	test('native preferences carry into the first GIFT, constrain today and protect concurrent edits', async () => {
+		const defaults = await store.settings('alice');
+		const off = { ...defaults, desiredRetention: 0.8, newQuestionsPerDay: 0 };
+		await store.updateSettings('alice', defaults, off);
+		await new FukushuStore(db).create('alice', material());
+		const instant = new Date(expected.reset.request.reviewedAt).getTime();
+		const day = { start: new Date(instant - 60_000).toISOString(), end: new Date(instant + 86_300_000).toISOString() };
+		expect((await store.today('alice', day)).items).toEqual([]);
+		const text = Buffer.from('::sample:: A question {TRUE}');
+		const input = { requestId: randomUUID(), fileId: await upload('alice', text), name: 'New GIFT' };
+		const { token } = await store.createGift('alice', input, async () => text);
+		await store.createGift('alice', { ...input, confirmToken: token }, async () => text);
+		expect((await store.show('alice')).records.settings[0]).toMatchObject(off);
+		expect((await store.today('alice', day)).items).toEqual([]);
+		const edits = await Promise.allSettled([0.81, 0.97].map(desiredRetention => store.updateSettings('alice', off, { ...off, desiredRetention })));
+		expect(edits.filter(r => r.status === 'fulfilled')).toHaveLength(1);
+		expect(edits.filter(r => r.status === 'rejected')).toMatchObject([{ reason: { code: 'STUDY_CONFLICT' } }]);
+	});
 
 	test('today combines owner queues once, orders due before fresh, and respects both 04:00 boundaries', async () => {
 		const now = new Date('2026-11-19T04:00:00Z');
@@ -82,7 +146,8 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		const { token } = await source.createGift('alice', input, read);
 		await source.createGift('alice', { ...input, confirmToken: token }, read);
 		const settings = async (fresh: number, reviews: number | null) => {
-			await db.query(`UPDATE fukushu_upstream_record SET data = (data::jsonb || $2::jsonb)::text WHERE "ownerId" = $1 AND store = 'settings'`, ['alice', JSON.stringify({ newQuestionsPerDay: fresh, maxReviewsPerDay: reviews })]);
+			const current = await source.settings('alice');
+			await source.updateSettings('alice', current, { ...current, newQuestionsPerDay: fresh, maxReviewsPerDay: reviews });
 		};
 		await settings(1, 1);
 		expect((await source.today('alice', day)).items).toHaveLength(1);

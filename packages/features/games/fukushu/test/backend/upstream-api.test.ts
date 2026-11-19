@@ -24,6 +24,22 @@ function fixture() {
 	return { upstream, api, user };
 }
 
+test('settings require their own read/write scope and use the authenticated owner on both paths', async () => {
+	const { upstream, api, user } = fixture();
+	const settings = { desiredRetention: 0.87, newQuestionsPerDay: 100, maxReviewsPerDay: null };
+	const input = { expected: settings, settings, ownerId: 'bob' };
+	const read = { context: testContext(user, { permission: ['read:account'] }) };
+	const write = { context: testContext(user, { permission: ['write:account'] }) };
+	await expect(call(api.studySettings, {}, write)).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
+	await expect(call(api.updateStudySettings, input, read)).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
+	upstream.store.settings.mockResolvedValue(settings);
+	upstream.store.updateSettings.mockResolvedValue(settings);
+	await call(api.studySettings, { ownerId: 'bob' } as never, read);
+	await call(api.updateStudySettings, input, write);
+	expect(upstream.store.settings).toHaveBeenCalledExactlyOnceWith('alice');
+	expect(upstream.store.updateSettings).toHaveBeenCalledExactlyOnceWith('alice', settings, settings);
+});
+
 test('today requires account read access and derives its owner from the principal', async () => {
 	const { upstream, api, user } = fixture();
 	const day = { start: '2026-11-19T04:00:00.000Z', end: '2026-11-20T04:00:00.000Z' };

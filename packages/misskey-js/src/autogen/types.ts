@@ -201,6 +201,12 @@ export type paths = {
     '/fukushu/reminder/update': {
         post: operations['fukushu___reminder___update'];
     };
+    '/fukushu/study/settings': {
+        post: operations['fukushu___study___settings'];
+    };
+    '/fukushu/study/update-settings': {
+        post: operations['fukushu___study___update-settings'];
+    };
     '/fukushu/study/today': {
         post: operations['fukushu___study___today'];
     };
@@ -51872,6 +51878,556 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    fukushu___study___settings: {
+        requestBody: {
+            content: {
+                'application/json': Record<string, never> & unknown;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        desiredRetention: number;
+                        newQuestionsPerDay: number;
+                        maxReviewsPerDay: number | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_MATERIAL';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CARD_HISTORY_LIMIT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'STUDY_LIMIT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'NO_SUCH_MATERIAL';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'STUDY_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'STUDY_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    'fukushu___study___update-settings': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    expected: {
+                        desiredRetention: number;
+                        newQuestionsPerDay: number;
+                        maxReviewsPerDay: number | null;
+                    };
+                    settings: {
+                        desiredRetention: number;
+                        newQuestionsPerDay: number;
+                        maxReviewsPerDay: number | null;
+                    };
+                } & ({
+                    expected: {
+                        desiredRetention: number;
+                        newQuestionsPerDay: number;
+                        maxReviewsPerDay: number | null;
+                    };
+                    settings: {
+                        desiredRetention: number;
+                        newQuestionsPerDay: number;
+                        maxReviewsPerDay: number | null;
+                    };
+                } & unknown);
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        desiredRetention: number;
+                        newQuestionsPerDay: number;
+                        maxReviewsPerDay: number | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_MATERIAL';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CARD_HISTORY_LIMIT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'STUDY_LIMIT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BACKUP_TOO_LARGE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'NO_SUCH_MATERIAL';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'STUDY_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'STUDY_UNAVAILABLE';
                             message: string;
                         };
                     };
