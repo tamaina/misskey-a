@@ -137,4 +137,9 @@ async function verifyNewGift({ source, deckId, state, record }) {
 	};
 }
 
-Object.assign(window, { compatibility: { generate, restoreAndContinue, longHistory, verifyNewGift } });
+async function today(at) {
+	await restoreBackupFile(document.querySelector('#fixture').files[0]);
+	return (await buildStudyQueue({ now: () => new Date(at) })).map(item => item.question.id);
+}
+
+Object.assign(window, { compatibility: { generate, restoreAndContinue, longHistory, verifyNewGift, today } });

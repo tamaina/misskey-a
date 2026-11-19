@@ -7,8 +7,9 @@ import * as v from 'valibot';
 import { oc } from '@orpc/contract';
 import { commonErrors, apiErrorData } from '../../../api/backend/transport/errors.schema.js';
 import { objectInput } from '../../../api/backend/transport/input.schema.js';
+import { todayQueueSchema } from '../shared/today.schema.js';
 import { sourceIdSchema } from '../shared/material.schema.js';
-import { studyHistoryItemSchema, studyHistoryPageSchema, studyQueueSchema, studyReviewInputSchema, studyReviewResultSchema } from '../shared/study.schema.js';
+import { studyHistoryItemSchema, studyHistoryPageSchema, studyQueueSchema, studySubmissionSchema, studyReviewResultSchema } from '../shared/study.schema.js';
 import type { ApiProcedureMetadata } from '../../../api/backend/transport/policy.types.js';
 import type { Meta } from '@orpc/contract';
 
@@ -25,12 +26,15 @@ const base = oc.errors({ ...commonErrors,
 const read = { requireCredential: true, kind: 'read:account', limit: { duration: 60_000, max: 60 } } as const;
 const write = { requireCredential: true, kind: 'write:account', limit: { duration: 60_000, max: 60 } } as const;
 export const studyContract = {
+	studyToday: base.$meta({ ...read, requestName: 'fukushu/study/today' } as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/fukushu/study/today', tags: ['fukushu'] })
+		.input(objectInput({ start: v.pipe(v.string(), v.isoTimestamp()), end: v.pipe(v.string(), v.isoTimestamp()), practiceAhead: v.optional(v.literal(true)) })).output(todayQueueSchema),
 	studyQueue: base.$meta({ ...read, requestName: 'fukushu/study/queue' } as const satisfies Meta & ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/fukushu/study/queue', tags: ['fukushu'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 		.input(objectInput({ id: sourceIdSchema })).output(studyQueueSchema),
 	studyReview: base.$meta({ ...write, requestName: 'fukushu/study/review' } as const satisfies Meta & ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/fukushu/study/review', tags: ['fukushu'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
-		.input(objectInput(studyReviewInputSchema.entries)).output(studyReviewResultSchema),
+		.input(objectInput(studySubmissionSchema.entries)).output(studyReviewResultSchema),
 	studyHistory: base.$meta({ ...read, requestName: 'fukushu/study/history' } as const satisfies Meta & ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/fukushu/study/history', tags: ['fukushu'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 		.input(objectInput({ id: sourceIdSchema, ...studyHistoryPageSchema.entries }))

@@ -12,7 +12,7 @@ import SourceLibrary from './components/SourceLibrary.vue';
 import SourceContent from './components/SourceContent.vue';
 import SourceStudy from './components/SourceStudy.vue';
 import { loadSourceMedia } from './source-media.js';
-import { queue } from './source-study.js';
+import { queue, studyDay } from './source-study.js';
 import type { SourceQuestion } from './source-study.js';
 import type { UpstreamRecords } from '../shared/upstream-records.schema.js';
 
@@ -158,25 +158,19 @@ test('cancelling the GIFT preview leaves the deck uncreated', async () => {
 
 test('studies enabled cards across imported decks and preserves the mode and revision of each card', async () => {
 	const other = { ...question, id: 'b', deckId: 'another', payload: { ...question.payload, id: 'b', deckId: 'another' } };
-	const records = {
-		settings: [{ maxReviewsPerDay: 0, newQuestionsPerDay: 0, shuffleChoices: false, showImmediateFeedback: true }],
-		decks: [{ id: 'deck', name: 'Quiz', studyMode: 'quiz' }, { id: 'another', name: 'Flash', studyMode: 'flashcard' }],
-		questions: [question, other], reviewLogs: [],
-		studyStates: [
-			{ questionId: question.id, deckId: 'deck', suspended: false, card: { reps: 1, due: '2099-01-01' } },
-			{ questionId: 'b', deckId: 'another', suspended: false, card: { reps: 0 } },
-		],
-	};
-	const response = { records, revisions: [{ questionId: question.id, revision: 3 }, { questionId: 'b', revision: 0 }] };
+	const response = { shuffle: false, immediate: true, items: [
+		{ origin: 'source', question, revision: 3, deckName: 'Quiz', flash: false },
+		{ origin: 'source', question: other, revision: 0, deckName: 'Flash', flash: true },
+	] };
 	vi.mocked(misskeyApi).mockResolvedValue(response as never);
 	render(SourceLibrary, { global });
-	await fireEvent.click(screen.getByText('取込済み教材を開く'));
-	await fireEvent.click(await screen.findByText('すべての取込済み教材を予定外も含めて復習'));
-	await screen.findByText('· Quiz');
+	await fireEvent.click(await screen.findByText('全教材を予定外も含めて復習'));
+	await screen.findByText('1 / 2 · Quiz');
+	expect(vi.mocked(misskeyApi).mock.calls[0][1]).toMatchObject({ practiceAhead: true });
 	await fireEvent.click(screen.getAllByRole('checkbox')[0]);
 	await fireEvent.click(screen.getByText('採点する'));
 	await fireEvent.click(screen.getByText('できた'));
-	await screen.findByText('· Flash');
+	await screen.findByText('2 / 2 · Flash');
 	await fireEvent.click(screen.getByText('答えを見る'));
 	await fireEvent.click(screen.getByText('できた'));
 	await screen.findByText('この回の復習は終了です。');
@@ -185,6 +179,40 @@ test('studies enabled cards across imported decks and preserves the mode and rev
 		{ questionId: question.id, expectedRevision: 3, correct: true, answers: ['a'] },
 		{ questionId: 'b', expectedRevision: 0, correct: true, answers: [] },
 	]);
-	await fireEvent.click(screen.getByText('教材に戻る'));
+	await fireEvent.click(screen.getByText('教材一覧に戻る'));
 	await screen.findByText('取込済み教材を開く');
+});
+
+test('the local study day changes at 04:00 and uses the next local calendar day', () => {
+	const boundary = new Date(2026, 2, 8, 4);
+	expect(studyDay(boundary)).toEqual({ start: boundary.toISOString(), end: new Date(2026, 2, 9, 4).toISOString() });
+	expect(studyDay(new Date(boundary.getTime() - 1)).end).toBe(boundary.toISOString());
+});
+
+test('today resumes the same native review after a lost response and then grades the quiz', async () => {
+	const native = { ...question, id: 'n', deckId: 'native', kind: 'flashcard', payload: {
+		...question.payload, kind: 'flashcard', prompt: plain('Front'), answer: plain('Back'),
+	} };
+	const today = { shuffle: false, immediate: true, items: [
+		{ origin: 'native', questionId: 'n', deckId: 'native', deckName: 'Native', version: 2, revision: 7 },
+		{ origin: 'source', question, deckName: 'Imported', flash: false, revision: 1 },
+	] };
+	vi.mocked(misskeyApi).mockResolvedValueOnce(today as never)
+		.mockRejectedValueOnce(new Error('load interrupted')).mockResolvedValueOnce({ question: native } as never)
+		.mockRejectedValueOnce(new Error('response interrupted')).mockResolvedValue({} as never);
+	render(SourceLibrary, { global });
+	await fireEvent.click(screen.getByRole('button', { name: '今日の学習' }));
+	await fireEvent.click(await screen.findByText('このカードを再読み込み'));
+	await fireEvent.click(await screen.findByText('答えを見る'));
+	await fireEvent.click(screen.getByText('できた'));
+	await fireEvent.click(await screen.findByText('同じ回答の保存を再試行'));
+	await screen.findByText('2 / 2 · Imported');
+	const nativeCalls = vi.mocked(misskeyApi).mock.calls.filter(c => c[0] === 'fukushu/study/review');
+	expect(nativeCalls.map(c => c[1])).toEqual([nativeCalls[0][1], nativeCalls[0][1]]);
+	expect(nativeCalls[0][1]).toMatchObject({ id: 'native', questionId: 'n', questionVersion: 2, expectedStateRevision: 7 });
+	for (const checkbox of screen.getAllByRole('checkbox')) await fireEvent.click(checkbox);
+	await fireEvent.click(screen.getByText('採点する'));
+	await fireEvent.click(screen.getByText('もう一度'));
+	await screen.findByText('今日の学習を終了しました。');
+	expect(vi.mocked(misskeyApi).mock.calls.at(-1)?.[1]).toMatchObject({ questionId: question.id, expectedRevision: 1, correct: false, answers: ['a', 'b'] });
 });

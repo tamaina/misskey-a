@@ -12,7 +12,7 @@ import { MiFukushuQuestionVersion } from './models/FukushuQuestionVersion.js';
 import { MiFukushuStudyState } from './models/FukushuStudyState.js';
 import { MiFukushuReviewLog } from './models/FukushuReviewLog.js';
 import { questionSchema, sourceIdSchema } from '../shared/material.schema.js';
-import { studyHistoryPageSchema, studyReviewInputSchema, studyStateRecordSchema, reviewLogRecordSchema, storedFsrsCardSchema } from '../shared/study.schema.js';
+import { studyHistoryPageSchema, studySubmissionSchema, studyStateRecordSchema, reviewLogRecordSchema, storedFsrsCardSchema } from '../shared/study.schema.js';
 import type { ReviewLogRecord, StudyHistoryItem, StudyQueue, StudyReviewInput, StudyReviewResult, StudyStateRecord } from '../shared/study.schema.js';
 import type { DataSource, EntityManager } from 'typeorm';
 
@@ -52,10 +52,12 @@ export class FukushuStudyStore {
 		});
 	}
 
-	async review(ownerId: string, input: StudyReviewInput): Promise<StudyReviewResult> {
-		const parsed = v.safeParse(studyReviewInputSchema, input);
+	async review(ownerId: string, input: StudyReviewInput & { practiceAhead?: true }): Promise<StudyReviewResult> {
+		// The mode only controls admission before the due time. The stored review
+		// and its retry identity use the original native backup v1 fields.
+		const parsed = v.safeParse(studySubmissionSchema, input);
 		if (!parsed.success) throw new MaterialError('INVALID_MATERIAL');
-		const request = parsed.output;
+		const { practiceAhead, ...request } = parsed.output;
 		return this.db.transaction(async manager => {
 			await manager.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`fukushu:create:${ownerId}`]);
 			const logs = manager.getRepository(MiFukushuReviewLog);
@@ -77,7 +79,7 @@ export class FukushuStudyStore {
 			const now = this.clock();
 			if (new Date(state.updatedAt).getTime() > now.getTime()
 				|| (state.card.lastReview && new Date(state.card.lastReview).getTime() > now.getTime())) throw new StudyError('STUDY_UNAVAILABLE');
-			if (state.card.reps > 0 && new Date(state.card.due).getTime() > now.getTime()) throw new StudyError('STUDY_UNAVAILABLE');
+			if (practiceAhead !== true && state.card.reps > 0 && new Date(state.card.due).getTime() > now.getTime()) throw new StudyError('STUDY_UNAVAILABLE');
 			const before = state.card;
 			const scheduled = review(before, now, request.rating, desiredRetention, enableFuzz);
 			const nextState: StudyStateRecord = { ...state, card: scheduled.card, updatedAt: now.toISOString() };

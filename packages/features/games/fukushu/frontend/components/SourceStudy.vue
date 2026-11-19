@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <section class="_gaps" :aria-busy="busy">
 	<template v-if="item">
-		<div>{{ index + 1 }} / {{ questions.length }}<span v-if="currentDeck"> · {{ currentDeck.name }}</span></div>
+		<div v-if="!singleStep">{{ index + 1 }} / {{ questions.length }}</div>
 		<SourceContent :anki="item.payload.kind === 'flashcard' ? item.payload : undefined" :content="item.payload.prompt"/>
 		<fieldset v-if="!revealed && (!flash || needsText)" class="_gaps_s">
 			<legend>{{ $locale.sfc.answer }}</legend>
@@ -59,13 +59,12 @@ import type { SourceQuestion } from '../source-study.js';
 import type { GradeResult } from '../../../shared/fukushu-grading.js';
 import type { StudyRating } from '../../shared/study.schema.js';
 
-const props = defineProps<{ questions: SourceQuestion[]; revisions: Map<string, number>; flashMode: boolean; sessionDecks?: ReadonlyMap<string, { name: string; studyMode: string }>; immediate: boolean; shuffle: boolean }>();
-const emit = defineEmits<{ close: [] }>();
+const props = defineProps<{ questions: SourceQuestion[]; revisions: Map<string, number>; flashMode: boolean; nativeVersion?: number; singleStep?: boolean; practiceAhead?: boolean; immediate: boolean; shuffle: boolean }>();
+const emit = defineEmits<{ close: []; saved: [] }>();
 const ratings = ['again', 'hard', 'good', 'easy'] as const;
 const index = ref(0);
 const item = computed(() => props.questions[index.value]);
-const currentDeck = computed(() => props.sessionDecks?.get(item.value?.deckId));
-const flash = computed(() => props.flashMode || currentDeck.value?.studyMode === 'flashcard' || item.value?.kind === 'flashcard');
+const flash = computed(() => props.flashMode || item.value?.kind === 'flashcard');
 const selfRated = computed(() => flash.value || ['essay', 'description'].includes(item.value?.kind));
 const needsText = computed(() => item.value?.payload.kind === 'flashcard' && item.value.payload.typeAnswer);
 const selected = ref<string[]>([]);
@@ -128,15 +127,26 @@ async function send() {
 	if (!pending.value || busy.value) return;
 	busy.value = true;
 	try {
-		await misskeyApi('fukushu/upstream/review', pending.value, undefined, AbortSignal.timeout(30_000));
+		const answer = pending.value;
+		const signal = AbortSignal.timeout(30_000);
+		if (props.nativeVersion !== undefined) {
+			await misskeyApi('fukushu/study/review', {
+				id: item.value.deckId, questionId: answer.questionId, questionVersion: props.nativeVersion, expectedStateRevision: answer.expectedRevision,
+				...(props.practiceAhead ? { practiceAhead: true } : {}),
+				requestId: answer.requestId, rating: answer.rating, durationMs: Math.min(86400000, answer.durationMs),
+			}, undefined, signal);
+		} else {
+			await misskeyApi('fukushu/upstream/review', answer, undefined, signal);
+		}
 		pending.value = undefined;
 		index.value++;
+		emit('saved');
 		started = Date.now();
 		selected.value = []; entered.value = ''; matches.value.clear();
 		revealed.value = false; graded.value = undefined; error.value = '';
 	} catch (cause) {
 		const code = typeof cause === 'object' && cause !== null && 'code' in cause ? cause.code : null;
-		capacityReached.value = code === 'BACKUP_TOO_LARGE';
+		capacityReached.value = code === 'BACKUP_TOO_LARGE' || code === 'STUDY_LIMIT' || code === 'CARD_HISTORY_LIMIT';
 		error.value = capacityReached.value ? $locale.value.sfc.capacity : code === 'STUDY_CONFLICT' ? $locale.value.sfc.conflict : $locale.value.sfc.failed;
 	} finally { busy.value = false; }
 }

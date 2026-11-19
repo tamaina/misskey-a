@@ -13,6 +13,7 @@ import { MAX_BACKUP_BYTES } from '../shared/backup.schema.js';
 import { planGiftUpdate, planNewGift } from './gift-update.js';
 import { BackupError } from './backup-codec.js';
 import { MaterialError } from './store.js';
+import { todayQueue } from './today.js';
 import { StudyError } from './study-store.js';
 import { applyUpstreamReview, CompatibilitySessionError } from './pilot/upstream-session.js';
 import { MiFukushuUpstreamRecord } from './models/FukushuUpstreamRecord.js';
@@ -308,6 +309,17 @@ export class FukushuUpstreamStore {
 
 	async assertOwned(ownerId: string) {
 		if (!await this.db.getRepository(MiFukushuUpstreamRecord).existsBy({ ownerId, store: 'settings' })) throw new MaterialError('NO_SUCH_MATERIAL');
+	}
+
+	async today(ownerId: string, day: { start: string; end: string; practiceAhead?: true }) {
+		return this.db.transaction(async manager => {
+			await this.lock(manager, ownerId);
+			const now = this.clock();
+			const start = Date.parse(day.start), end = Date.parse(day.end);
+			if (!(start <= now.getTime() && now.getTime() < end && end - start <= 26 * 3600000)) throw new MaterialError('INVALID_MATERIAL');
+			if (!day.practiceAhead) await this.indexPendingReviews(manager, ownerId);
+			return todayQueue(manager, ownerId, now, day);
+		});
 	}
 
 	async show(ownerId: string, page?: SourceHistoryPage) {

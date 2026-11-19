@@ -16,6 +16,15 @@ function day(date: Date) {
 	return shifted.toDateString();
 }
 
+export function studyDay(now: Date) {
+	const start = new Date(now);
+	if (start.getHours() < 4) start.setDate(start.getDate() - 1);
+	start.setHours(4, 0, 0, 0);
+	const end = new Date(start);
+	end.setDate(end.getDate() + 1);
+	return { start: start.toISOString(), end: end.toISOString() };
+}
+
 export function shuffled<T>(values: T[]) {
 	const result = values.slice();
 	for (let i = result.length - 1; i > 0; i--) {

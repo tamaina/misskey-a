@@ -4,16 +4,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 <template>
 <section class="_panel _gaps" :class="$style.panel" :aria-busy="busy">
-	<h2>{{ session ? (deck?.name ?? $locale.sfc.cramAll) : $locale.sfc.title }}</h2>
-	<SourceStudy v-if="session && records" :questions="session" :revisions="revisions" :sessionDecks="deck ? undefined : sessionDecks" :flashMode="deck?.studyMode === 'flashcard'" :shuffle="records.settings[0].shuffleChoices" :immediate="records.settings[0].showImmediateFeedback" @close="closeStudy"/>
+	<h2>{{ today ? (practiceAhead ? $locale.sfc.cramAll : $locale.sfc.today) : session && deck ? deck.name : $locale.sfc.title }}</h2>
+	<TodayStudy v-if="today" :queue="today" :practiceAhead="practiceAhead" @close="closeToday"/>
+	<SourceStudy v-else-if="session && records" :questions="session" :revisions="revisions" :flashMode="deck?.studyMode === 'flashcard'" :shuffle="records.settings[0].shuffleChoices" :immediate="records.settings[0].showImmediateFeedback" @close="closeStudy"/>
 	<template v-else>
 		<div v-if="!deck" class="_buttons">
-			<MkButton :disabled="busy" primary @click="run(load)">{{ $locale.sfc.open }}</MkButton>
+			<MkButton :disabled="busy" primary @click="run(() => startToday(false))">{{ $locale.sfc.today }}</MkButton>
+			<MkButton :disabled="busy" @click="run(load)">{{ $locale.sfc.open }}</MkButton>
 			<MkButton v-if="pendingGift" :disabled="busy" @click="run(applyGift)">{{ $locale.sfc.retryGift }}</MkButton>
 			<MkButton v-else :disabled="busy" @click="createGift">{{ $locale.sfc.createGift }}</MkButton>
 			<MkButton v-if="pendingImport" :disabled="busy" @click="run(() => checkImport(true))">{{ $locale.sfc.checkImport }}</MkButton>
 			<MkButton v-else :disabled="busy" @click="restore">{{ $locale.sfc.restore }}</MkButton>
-			<MkButton v-if="records && records.decks.length > 1" :disabled="busy" @click="run(() => start(true))">{{ $locale.sfc.cramAll }}</MkButton>
+			<MkButton :disabled="busy" @click="run(() => startToday(true))">{{ $locale.sfc.cramAll }}</MkButton>
 			<MkButton v-if="records" :disabled="busy" @click="exportBackup">{{ $locale.sfc.export }}</MkButton>
 		</div>
 		<p v-if="loaded && !records?.decks.length">{{ $locale.sfc.empty }}</p>
@@ -75,9 +77,11 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { chooseDriveFile } from '@features/drive/frontend/utility/drive.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import * as os from '@features/ui/frontend/os.js';
-import { queue, solution } from '../source-study.js';
+import { queue, solution, studyDay } from '../source-study.js';
 import SourceContent from './SourceContent.vue';
 import SourceStudy from './SourceStudy.vue';
+import TodayStudy from './TodayStudy.vue';
+import type { TodayQueue } from '../../shared/today.schema.js';
 import type { SourceQuestion } from '../source-study.js';
 import type { UpstreamRecords } from '../../shared/upstream-records.schema.js';
 
@@ -86,7 +90,7 @@ const records = shallowRef<UpstreamRecords>();
 const revisions = shallowRef(new Map<string, number>());
 const selected = ref<string | null>(null);
 const deck = computed(() => records.value?.decks.find(d => d.id === selected.value));
-const sessionDecks = computed(() => new Map(records.value?.decks.map(d => [d.id, d])));
+const practiceAhead = ref(false);
 const cards = computed(() => records.value?.questions.filter(q => q.deckId === selected.value).sort((a, b) => (a.sourceOrder ?? Infinity) - (b.sourceOrder ?? Infinity)) ?? []);
 const cardNames = computed(() => new Map(cards.value.map(q => [q.id, q.payload.name ?? (q.payload.prompt.format === 'plain' ? q.payload.prompt.value : q.sourceKey)])));
 const reviewHistory = computed(() => records.value?.reviewLogs ?? []);
@@ -98,6 +102,7 @@ let reviewedToday = new Set<string>();
 let loadedDay = '';
 const page = ref(0);
 const expanded = ref(new Set<string>());
+const today = shallowRef<TodayQueue>();
 const session = shallowRef<SourceQuestion[]>();
 const loaded = ref(false);
 const busy = ref(false);
@@ -152,15 +157,6 @@ async function run(action: () => Promise<void>) {
 	} finally { busy.value = false; }
 }
 
-function studyDay(now: Date) {
-	const start = new Date(now);
-	if (start.getHours() < 4) start.setDate(start.getDate() - 1);
-	start.setHours(4, 0, 0, 0);
-	const end = new Date(start);
-	end.setDate(end.getDate() + 1);
-	return { start: start.toISOString(), end: end.toISOString() };
-}
-
 async function load(id: string | null = selected.value, stack: (Cursor | undefined)[] = [undefined]) {
 	try {
 		const day = studyDay(new Date());
@@ -197,9 +193,23 @@ function toggleAnswer(id: string, event: Event) {
 async function start(cram: boolean) {
 	const now = new Date();
 	if (studyDay(now).start !== loadedDay) await load();
-	if (!records.value || (!deck.value && !cram)) return;
-	const items = queue(records.value, deck.value?.id, now, cram, reviewedToday);
+	if (!records.value || !deck.value) return;
+	const items = queue(records.value, deck.value.id, now, cram, reviewedToday);
 	if (items.length) { picker++; session.value = items; emit('active', true); notice.value = ''; } else notice.value = $locale.value.sfc.noneDue;
+}
+
+async function startToday(practice: boolean) {
+	const result = await misskeyApi('fukushu/study/today', { ...studyDay(new Date()), ...(practice ? { practiceAhead: true } : {}) });
+	if (!result.items.length) { notice.value = $locale.value.sfc.noneDue; return; }
+	practiceAhead.value = practice;
+	today.value = result;
+	emit('active', true);
+}
+
+function closeToday() {
+	today.value = undefined;
+	emit('active', false);
+	if (loaded.value) void run(load);
 }
 
 async function closeStudy() {
@@ -315,6 +325,7 @@ async function updateGift() {
 <locale locale="ja-JP" lang="json">
 {
 	"title": "Fukushu からの教材",
+	"today": "今日の学習",
 	"createGift": "Drive の GIFT から教材を作成",
 	"retryGift": "確認済みの教材作成を再試行",
 	"deckName": "新しい教材の名前",
@@ -330,7 +341,7 @@ async function updateGift() {
 	"decks": "教材一覧",
 	"study": "予定のカードを復習",
 	"cram": "予定外も含めて復習",
-	"cramAll": "すべての取込済み教材を予定外も含めて復習",
+	"cramAll": "全教材を予定外も含めて復習",
 	"update": "Drive の GIFT で教材を更新",
 	"added": "追加",
 	"changed": "変更",
@@ -367,6 +378,7 @@ async function updateGift() {
 <locale locale="en-US" lang="json">
 {
 	"title": "Decks from Fukushu",
+	"today": "Study today",
 	"createGift": "Create a deck from a GIFT file in Drive",
 	"retryGift": "Retry confirmed deck creation",
 	"deckName": "New deck name",
@@ -382,7 +394,7 @@ async function updateGift() {
 	"decks": "Decks",
 	"study": "Study due cards",
 	"cram": "Study all active cards",
-	"cramAll": "Study all active cards across imported decks",
+	"cramAll": "Practice all active cards across decks",
 	"update": "Update deck from GIFT in Drive",
 	"added": "Added",
 	"changed": "Changed",

@@ -148,6 +148,26 @@ pinned app. Missing questions are disabled; their history stays attached.
 The owner transaction rejects a changed preview or a stale review. Empty
 imports are refused. Direct updates from Anki text or a new APKG are pending.
 
+## Study today
+
+**Study today** opens a normal session across the owner's active directly saved
+flashcards and source decks. As in upstream `buildStudyQueue`, the local study
+day starts at 04:00. Due reviews are ordered by deadline, then fresh cards by
+question ID. A fresh state with a review logged in the current study day is
+skipped, including after a GIFT reset. The source settings select the number
+of review and fresh slots across the whole queue. Without imported settings,
+the upstream defaults are 20 fresh cards and unlimited due reviews.
+
+The upstream limits apply each time a queue is built. Opening a new session
+later that day can select further cards. Each card keeps its original grading
+mode, storage and optimistic revision. The session loads directly saved card
+text on demand at the selected version. An interrupted save retries the same
+review ID; an intervening edit or review is checked by the original write API.
+**Practice all active cards across decks** also includes future-due cards and
+ignores both queue limits. An early native review requires explicit practice
+mode. It uses the same FSRS calculation, review ID and native v1 backup fields.
+Deck-specific study keeps its existing eligibility rules.
+
 ## Collection size and old backups
 
 Local and Drive inspection and queued source imports accept a framed binary

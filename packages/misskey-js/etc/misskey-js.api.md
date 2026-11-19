@@ -1786,6 +1786,8 @@ declare namespace entities {
         FukushuReminderShowRequest,
         FukushuReminderShowResponse,
         FukushuReminderUpdateRequest,
+        FukushuStudyTodayRequest,
+        FukushuStudyTodayResponse,
         FukushuStudyQueueRequest,
         FukushuStudyQueueResponse,
         FukushuStudyReviewRequest,
@@ -3915,6 +3917,12 @@ type FukushuStudyReviewRequest = ContractRequest<'fukushu/study/review'>;
 
 // @public (undocumented)
 type FukushuStudyReviewResponse = ContractResponse<'fukushu/study/review'>;
+
+// @public (undocumented)
+type FukushuStudyTodayRequest = ContractRequest<'fukushu/study/today'>;
+
+// @public (undocumented)
+type FukushuStudyTodayResponse = ContractResponse<'fukushu/study/today'>;
 
 // @public (undocumented)
 type FukushuUpstreamCreateGiftRequest = ContractRequest<'fukushu/upstream/create-gift'>;

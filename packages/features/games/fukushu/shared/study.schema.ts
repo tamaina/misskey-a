@@ -45,6 +45,7 @@ export const studyReviewInputSchema = v.strictObject({
 	expectedStateRevision: integer, requestId: studyRequestIdSchema, rating: studyRatingSchema,
 	durationMs: v.pipe(integer, v.maxValue(86_400_000)),
 });
+export const studySubmissionSchema = v.strictObject({ ...studyReviewInputSchema.entries, practiceAhead: v.optional(v.literal(true)) });
 export const studyHistoryPageSchema = v.strictObject({
 	beforeId: v.optional(studyRequestIdSchema),
 	limit: v.optional(v.pipe(integer, v.minValue(1), v.maxValue(20)), 20),

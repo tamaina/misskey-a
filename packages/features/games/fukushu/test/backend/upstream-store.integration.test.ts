@@ -22,6 +22,7 @@ import { FukushuMaterialBytes1794980000000 } from '../../../../../backend/migrat
 import { FukushuSourceChunks1794974400000 } from '../../../../../backend/migration/1794974400000-FukushuSourceChunks.js';
 import { FukushuReminder1795040000000 } from '../../../../../backend/migration/1795040000000-FukushuReminder.js';
 import { FukushuReminderStore } from '../../backend/reminder-store.js';
+import { FukushuBackupStore } from '../../backend/backup-store.js';
 import { FukushuStudyStore } from '../../backend/study-store.js';
 import { FukushuStore } from '../../backend/store.js';
 import { scanSourceArchive } from '../../shared/source-scan.js';
@@ -65,6 +66,87 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		await db.query('INSERT INTO drive_file (id,"userId",size,md5) VALUES ($1,$2,$3,$4)', [id, owner, content.length, createHash('md5').update(content).digest('hex')]);
 		return id;
 	}
+
+	test('today combines owner queues once, orders due before fresh, and respects both 04:00 boundaries', async () => {
+		const now = new Date('2026-11-19T04:00:00Z');
+		const day = { start: '2026-11-19T04:00:00Z', end: '2026-11-20T04:00:00Z' };
+		const source = new FukushuUpstreamStore(db, reader, () => now);
+		const native = new FukushuStore(db);
+		const study = new FukushuStudyStore(db, () => now);
+		await native.create('alice', material('native', '000-native'));
+		await native.create('bob', material('private', 'bob-only'));
+		expect((await source.today('alice', day)).items).toEqual([{ origin: 'native', questionId: '000-native', deckId: 'native', version: 1, revision: 0, deckName: '教材' }]);
+		const bytes = Buffer.from('::Q:: Q {TRUE}\n\n::R:: R {FALSE}');
+		const input = { requestId: randomUUID(), fileId: await upload('alice', bytes), name: 'GIFT' };
+		const read = async () => bytes;
+		const { token } = await source.createGift('alice', input, read);
+		await source.createGift('alice', { ...input, confirmToken: token }, read);
+		const settings = async (fresh: number, reviews: number | null) => {
+			await db.query(`UPDATE fukushu_upstream_record SET data = (data::jsonb || $2::jsonb)::text WHERE "ownerId" = $1 AND store = 'settings'`, ['alice', JSON.stringify({ newQuestionsPerDay: fresh, maxReviewsPerDay: reviews })]);
+		};
+		await settings(1, 1);
+		expect((await source.today('alice', day)).items).toHaveLength(1);
+		await settings(3, 1);
+		const plan = await source.today('alice', day);
+		const first = plan.items.find(item => item.origin === 'source')!;
+		expect(plan.items.map(item => item.origin).sort()).toEqual(['native', 'source', 'source']);
+		expect((await source.today('bob', day)).items).toHaveLength(1);
+		if (first.origin !== 'source') throw new Error('Expected a quiz');
+		const nativeRequest = { id: 'native', questionId: '000-native', expectedStateRevision: 0, questionVersion: 1, requestId: randomUUID(), rating: 'good' as const, durationMs: 30 };
+		const quizRequest = { questionId: first.question.id, expectedRevision: 0, requestId: randomUUID(), rating: 'good' as const, correct: true, answers: ['true'], durationMs: 30 };
+		const saved = await study.review('alice', nativeRequest);
+		expect(await study.review('alice', nativeRequest)).toEqual(saved);
+		const quiz = await source.review('alice', quizRequest);
+		expect(await source.review('alice', quizRequest)).toEqual(quiz);
+		// Move beyond both due times, preserving actual recorded schedules and history.
+		now.setTime(Math.max(Date.parse(saved.card.due), Date.parse(quiz.state.card.due)) + 1);
+		const dueDay = { start: new Date(now.getTime() - 3600000).toISOString(), end: new Date(now.getTime() + 23 * 3600000).toISOString() };
+		const limited = (await source.today('alice', dueDay)).items;
+		expect(limited).toHaveLength(2);
+		const earlier = Date.parse(saved.card.due) <= Date.parse(quiz.state.card.due) ? 'native' : 'source';
+		expect(limited[0]).toMatchObject({ origin: earlier, revision: 1 });
+		expect(limited[1].revision).toBe(0);
+		await settings(0, null);
+		expect((await source.today('alice', dueDay)).items.map(i => i.revision)).toEqual([1, 1]);
+		await native.archive('alice', 'native', 1, true);
+		expect((await source.today('alice', dueDay)).items.map(i => i.origin)).toEqual(['source']);
+		// Incompatible GIFT update resets its state and retains the original review.
+		now.setTime(Date.parse('2026-11-19T04:00:00Z'));
+		const changed = Buffer.from('::Q:: Q {FALSE}\n\n::R:: R {TRUE}');
+		const changedFile = await upload('alice', changed);
+		const preview = await source.updateGift('alice', input.requestId, changedFile, async () => changed);
+		await source.updateGift('alice', input.requestId, changedFile, async () => changed, preview.token);
+		await settings(3, null);
+		const ids = async (window: typeof day) => (await source.today('alice', window)).items.flatMap(i => i.origin === 'source' ? [i.question.id] : []);
+		const time = now.getTime();
+		await expect(ids({ start: now.toISOString(), end: new Date(time + 86400000).toISOString() })).resolves.not.toContain(first.question.id);
+		now.setTime(time - 1);
+		await expect(ids({ start: new Date(time - 86400000).toISOString(), end: new Date(time).toISOString() })).resolves.toContain(first.question.id);
+		await expect(source.today('alice', { start: day.end, end: day.start })).rejects.toThrow('INVALID_MATERIAL');
+	});
+
+	test('practice ahead includes both families, retains native v1 history and still requires the owner and current revision', async () => {
+		const now = new Date('2026-11-19T08:00:00Z');
+		const day = { start: '2026-11-19T04:00:00Z', end: '2026-11-20T04:00:00Z' };
+		const source = new FukushuUpstreamStore(db, reader, () => now);
+		const native = new FukushuStore(db);
+		const study = new FukushuStudyStore(db, () => now);
+		await native.create('alice', material());
+		const input = { id: 'deck-original', questionId: 'card-original', requestId: randomUUID(), questionVersion: 1, expectedStateRevision: 0, rating: 'good' as const, durationMs: 500 };
+		await study.review('alice', input);
+		expect((await study.queue('alice', input.id)).items).toEqual([]);
+		expect((await source.today('alice', day)).items).toEqual([]);
+		expect((await source.today('alice', { ...day, practiceAhead: true })).items[0]).toMatchObject({ origin: 'native', revision: 1 });
+		const retry = { ...input, requestId: randomUUID(), expectedStateRevision: 1 };
+		await expect(study.review('alice', retry)).rejects.toThrow('STUDY_UNAVAILABLE');
+		const practice = { ...retry, practiceAhead: true as const };
+		await expect(study.review('bob', practice)).rejects.toThrow('NO_SUCH_MATERIAL');
+		const response = await study.review('alice', practice);
+		expect(await study.review('alice', practice)).toEqual(response);
+		await expect(study.review('alice', { ...practice, requestId: randomUUID() })).rejects.toThrow('STUDY_CONFLICT');
+		expect((await study.history('alice', input.id))).toHaveLength(2);
+		expect((await new FukushuBackupStore(db, () => now).export('alice', input.id)).length).toBeGreaterThan(0);
+	});
 
 	test('checks native due reviews only for their opted-in owner and claims once across workers and restarts', async () => {
 		let now = new Date('2026-11-18T00:00:00Z');

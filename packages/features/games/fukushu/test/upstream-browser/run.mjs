@@ -72,7 +72,13 @@ try {
 	page.on('pageerror', error => console.error(error));
 	await page.goto(`http://127.0.0.1:${server.address().port}/`);
 	await page.waitForFunction(() => window.compatibility);
-	if (process.env.FUKUSHU_NEW_GIFT === 'verify') {
+	if (process.env.FUKUSHU_TODAY === 'verify') {
+		const saved = JSON.parse(await readFile(process.env.FUKUSHU_PERSISTED_STATE, 'utf8'));
+		await page.locator('#fixture').setInputFiles(process.env.FUKUSHU_PERSISTED_EXPORT);
+		const questions = await page.evaluate(at => window.compatibility.today(at), saved.at);
+		assert.deepEqual(questions, saved.questions);
+		console.log(JSON.stringify({ upstream: pinned, chrome: browser.version(), matched: questions.length }));
+	} else if (process.env.FUKUSHU_NEW_GIFT === 'verify') {
 		const saved = JSON.parse(await readFile(process.env.FUKUSHU_PERSISTED_STATE, 'utf8'));
 		await page.locator('#fixture').setInputFiles(process.env.FUKUSHU_PERSISTED_EXPORT);
 		const result = await page.evaluate(input => window.compatibility.verifyNewGift(input), saved);

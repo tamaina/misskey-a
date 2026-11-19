@@ -24,6 +24,16 @@ function fixture() {
 	return { upstream, api, user };
 }
 
+test('today requires account read access and derives its owner from the principal', async () => {
+	const { upstream, api, user } = fixture();
+	const day = { start: '2026-11-19T04:00:00.000Z', end: '2026-11-20T04:00:00.000Z' };
+	await expect(call(api.studyToday, day, { context: testContext(null) })).rejects.toMatchObject({ code: 'CREDENTIAL_REQUIRED' });
+	await expect(call(api.studyToday, day, { context: testContext(user, { permission: ['write:account'] }) })).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
+	upstream.store.today.mockResolvedValue({ shuffle: true, immediate: true, items: [] });
+	await call(api.studyToday, { ...day, ownerId: 'bob' } as never, { context: testContext(user, { permission: ['read:account'] }) });
+	expect(upstream.store.today).toHaveBeenCalledExactlyOnceWith('alice', day);
+});
+
 test('source import/export require normal login; show/review separate read/write scopes', async () => {
 	const { upstream, api, user } = fixture();
 	for (const context of [testContext(null), testContext(user, { permission: ['read:account', 'write:account', 'read:drive', 'write:drive'] })]) {

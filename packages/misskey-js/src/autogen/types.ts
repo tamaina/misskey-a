@@ -201,6 +201,9 @@ export type paths = {
     '/fukushu/reminder/update': {
         post: operations['fukushu___reminder___update'];
     };
+    '/fukushu/study/today': {
+        post: operations['fukushu___study___today'];
+    };
     '/fukushu/study/queue': {
         post: operations['fukushu___study___queue'];
     };
@@ -51918,6 +51921,737 @@ export interface operations {
             };
         };
     };
+    fukushu___study___today: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    /** Format: date-time */
+                    start: string;
+                    /** Format: date-time */
+                    end: string;
+                    /** @constant */
+                    practiceAhead?: true;
+                } & ({
+                    /** Format: date-time */
+                    start: string;
+                    /** Format: date-time */
+                    end: string;
+                    /** @constant */
+                    practiceAhead?: true;
+                } & unknown);
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        shuffle: boolean;
+                        immediate: boolean;
+                        items: ({
+                            /** @constant */
+                            origin: 'source';
+                            deckName: string;
+                            revision: number;
+                            flash: boolean;
+                            question: {
+                                id: string;
+                                deckId: string;
+                                sourceKey: string;
+                                sourceOrder?: number;
+                                /** @enum {string} */
+                                kind: 'single-choice' | 'multiple-choice' | 'true-false' | 'short-answer' | 'numerical' | 'matching' | 'essay' | 'description' | 'flashcard' | 'unsupported';
+                                payload: {
+                                    id: string;
+                                    deckId: string;
+                                    sourceKey: string;
+                                    name?: string;
+                                    prompt: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    categoryPath: string[];
+                                    explanation?: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    sourceRange?: {
+                                        start: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                        end: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                    };
+                                    shuffleChoices?: boolean;
+                                    /** @constant */
+                                    kind: 'single-choice';
+                                    choices: {
+                                        id: string;
+                                        content: {
+                                            /** @enum {string} */
+                                            format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                            value: string;
+                                        };
+                                        weight: number;
+                                        feedback?: {
+                                            /** @enum {string} */
+                                            format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                            value: string;
+                                        };
+                                    }[];
+                                } | {
+                                    id: string;
+                                    deckId: string;
+                                    sourceKey: string;
+                                    name?: string;
+                                    prompt: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    categoryPath: string[];
+                                    explanation?: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    sourceRange?: {
+                                        start: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                        end: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                    };
+                                    shuffleChoices?: boolean;
+                                    /** @constant */
+                                    kind: 'multiple-choice';
+                                    choices: {
+                                        id: string;
+                                        content: {
+                                            /** @enum {string} */
+                                            format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                            value: string;
+                                        };
+                                        weight: number;
+                                        feedback?: {
+                                            /** @enum {string} */
+                                            format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                            value: string;
+                                        };
+                                    }[];
+                                } | {
+                                    id: string;
+                                    deckId: string;
+                                    sourceKey: string;
+                                    name?: string;
+                                    prompt: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    categoryPath: string[];
+                                    explanation?: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    sourceRange?: {
+                                        start: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                        end: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                    };
+                                    shuffleChoices?: boolean;
+                                    /** @constant */
+                                    kind: 'true-false';
+                                    correctAnswer: boolean;
+                                    trueFeedback?: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    falseFeedback?: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                } | {
+                                    id: string;
+                                    deckId: string;
+                                    sourceKey: string;
+                                    name?: string;
+                                    prompt: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    categoryPath: string[];
+                                    explanation?: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    sourceRange?: {
+                                        start: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                        end: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                    };
+                                    shuffleChoices?: boolean;
+                                    /** @constant */
+                                    kind: 'short-answer';
+                                    answers: {
+                                        value: string;
+                                        weight: number;
+                                        feedback?: {
+                                            /** @enum {string} */
+                                            format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                            value: string;
+                                        };
+                                    }[];
+                                } | {
+                                    id: string;
+                                    deckId: string;
+                                    sourceKey: string;
+                                    name?: string;
+                                    prompt: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    categoryPath: string[];
+                                    explanation?: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    sourceRange?: {
+                                        start: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                        end: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                    };
+                                    shuffleChoices?: boolean;
+                                    /** @constant */
+                                    kind: 'numerical';
+                                    answers: ({
+                                        /** @constant */
+                                        type: 'exact';
+                                        value: number;
+                                        weight: number;
+                                        feedback?: {
+                                            /** @enum {string} */
+                                            format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                            value: string;
+                                        };
+                                    } | {
+                                        /** @constant */
+                                        type: 'tolerance';
+                                        value: number;
+                                        tolerance: number;
+                                        weight: number;
+                                        feedback?: {
+                                            /** @enum {string} */
+                                            format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                            value: string;
+                                        };
+                                    } | {
+                                        /** @constant */
+                                        type: 'range';
+                                        min: number;
+                                        max: number;
+                                        weight: number;
+                                        feedback?: {
+                                            /** @enum {string} */
+                                            format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                            value: string;
+                                        };
+                                    })[];
+                                } | {
+                                    id: string;
+                                    deckId: string;
+                                    sourceKey: string;
+                                    name?: string;
+                                    prompt: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    categoryPath: string[];
+                                    explanation?: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    sourceRange?: {
+                                        start: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                        end: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                    };
+                                    shuffleChoices?: boolean;
+                                    /** @constant */
+                                    kind: 'matching';
+                                    pairs: {
+                                        id: string;
+                                        left: {
+                                            /** @enum {string} */
+                                            format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                            value: string;
+                                        };
+                                        right: {
+                                            /** @enum {string} */
+                                            format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                            value: string;
+                                        };
+                                    }[];
+                                } | {
+                                    id: string;
+                                    deckId: string;
+                                    sourceKey: string;
+                                    name?: string;
+                                    prompt: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    categoryPath: string[];
+                                    explanation?: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    sourceRange?: {
+                                        start: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                        end: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                    };
+                                    shuffleChoices?: boolean;
+                                    /** @constant */
+                                    kind: 'essay';
+                                } | {
+                                    id: string;
+                                    deckId: string;
+                                    sourceKey: string;
+                                    name?: string;
+                                    prompt: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    categoryPath: string[];
+                                    explanation?: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    sourceRange?: {
+                                        start: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                        end: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                    };
+                                    shuffleChoices?: boolean;
+                                    /** @constant */
+                                    kind: 'description';
+                                } | {
+                                    id: string;
+                                    deckId: string;
+                                    sourceKey: string;
+                                    name?: string;
+                                    prompt: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    categoryPath: string[];
+                                    explanation?: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    sourceRange?: {
+                                        start: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                        end: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                    };
+                                    shuffleChoices?: boolean;
+                                    /** @constant */
+                                    kind: 'flashcard';
+                                    answer: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    typeAnswer?: boolean;
+                                    acceptedAnswer?: string;
+                                    ankiNoteType?: string;
+                                    ankiTags?: string[];
+                                    ankiCss?: string;
+                                    ankiForceLight?: boolean;
+                                    /** @enum {string} */
+                                    ankiTemplateMode?: 'native' | 'isolated';
+                                    ankiSource?: {
+                                        guid?: string;
+                                        noteId: string;
+                                        cardId: string;
+                                        notetypeId: string;
+                                        ordinal: number;
+                                        qfmt: string;
+                                        afmt: string;
+                                        css: string;
+                                    };
+                                } | {
+                                    id: string;
+                                    deckId: string;
+                                    sourceKey: string;
+                                    name?: string;
+                                    prompt: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    categoryPath: string[];
+                                    explanation?: {
+                                        /** @enum {string} */
+                                        format: 'plain' | 'html' | 'markdown' | 'moodle' | 'auto';
+                                        value: string;
+                                    };
+                                    sourceRange?: {
+                                        start: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                        end: {
+                                            offset: number;
+                                            line: number;
+                                            column: number;
+                                        };
+                                    };
+                                    shuffleChoices?: boolean;
+                                    /** @constant */
+                                    kind: 'unsupported';
+                                    /** @enum {string} */
+                                    sourceKind: 'matching' | 'essay' | 'description';
+                                };
+                                enabled: boolean;
+                                enabledKey: 0 | 1;
+                                /** Format: date-time */
+                                createdAt: string;
+                                /** Format: date-time */
+                                updatedAt: string;
+                            };
+                        } | {
+                            /** @constant */
+                            origin: 'native';
+                            deckName: string;
+                            revision: number;
+                            deckId: string;
+                            questionId: string;
+                            version: number;
+                        })[];
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_MATERIAL';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CARD_HISTORY_LIMIT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'STUDY_LIMIT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'NO_SUCH_MATERIAL';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'STUDY_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'STUDY_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     fukushu___study___queue: {
         requestBody: {
             content: {
@@ -52244,6 +52978,8 @@ export interface operations {
                     /** @enum {string} */
                     rating: 'again' | 'hard' | 'good' | 'easy';
                     durationMs: number;
+                    /** @constant */
+                    practiceAhead?: true;
                 } & ({
                     id: string;
                     questionId: string;
@@ -52254,6 +52990,8 @@ export interface operations {
                     /** @enum {string} */
                     rating: 'again' | 'hard' | 'good' | 'easy';
                     durationMs: number;
+                    /** @constant */
+                    practiceAhead?: true;
                 } & unknown);
             };
         };
