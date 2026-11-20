@@ -68,10 +68,13 @@ export class UserSearchService {
 		opts?: {
 			limit?: number,
 			detail?: boolean,
+			preferLocalExactMatch?: boolean,
 		},
 		me?: MiUser | null,
 	): Promise<NativeUser[]> {
-		const queries = me ? this.buildSearchUserQueries(me, params) : this.buildSearchUserNoLoginQueries(params);
+		const localExact = me && opts?.preferLocalExactMatch && params.host &&
+			['.', this.config.hostname, this.config.host].includes(params.host.toLowerCase()) ? params.username?.toLowerCase() : null;
+		const queries = me ? this.buildSearchUserQueries(me, localExact ? { ...params, host: '.' } : params) : this.buildSearchUserNoLoginQueries(params);
 
 		let resultSet = new Set<MiUser['id']>();
 		const limit = opts?.limit ?? 10;
@@ -89,11 +92,18 @@ export class UserSearchService {
 			}
 		}
 
-		return this.userEntityService.packMany(
-			[...resultSet].slice(0, limit),
-			me,
-			{ schema: opts?.detail ? 'UserDetailed' : 'UserLite' },
-		);
+		const schema = opts?.detail ? 'UserDetailed' : 'UserLite';
+		const suggestions = await this.userEntityService.packMany([...resultSet].slice(0, limit), me, { schema });
+		if (!localExact) return suggestions;
+
+		const exact = await this.generateUserQueryBuilder({ host: '.' })
+			.andWhere('user.usernameLower = :username', { username: localExact })
+			.andWhere('user.isDeleted = FALSE')
+			.getOne();
+		if (!exact) return suggestions;
+
+		const match = suggestions.find(user => user.id === exact.id) ?? await this.userEntityService.pack(exact, me, { schema });
+		return [match, ...suggestions.filter(user => user.id !== exact.id)].slice(0, limit);
 	}
 
 	/**
