@@ -3,9 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { cleanup, fireEvent, render } from '@testing-library/vue';
 import { nextTick } from 'vue';
+import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { preferState } from '../setup.unit.js';
 import MkLightboxItem from '@features/drive/frontend/components/MkLightbox.item.vue';
 import type { Content } from '@features/drive/frontend/components/MkLightbox.item.vue';
@@ -23,6 +24,11 @@ vi.mock('@features/drive/frontend/components/MkLightbox.item.controls.vue', () =
 vi.mock('@features/drive/frontend/components/MkLightbox.item.fileinfo.vue', () => ({ default: { template: '<div />' } }));
 vi.mock('@features/drive/frontend/components/MkBlurhash.vue', () => ({ default: { template: '<div />' } }));
 
+const internationalization = createInternationalization({ initialLocale: 'ja-JP' });
+beforeAll(async () => {
+	await internationalization.ready;
+});
+
 function setup(content: Partial<Content> = {}) {
 	const result = render(MkLightboxItem, {
 		props: {
@@ -30,7 +36,7 @@ function setup(content: Partial<Content> = {}) {
 			activated: true,
 			pixelatedZoom: false,
 		},
-		global: { stubs: { MkLoading: true, MkCondensedLine: { template: '<span><slot /></span>' } } },
+		global: { plugins: [internationalization], stubs: { MkLoading: true, MkCondensedLine: { template: '<span><slot /></span>' } } },
 	});
 	const root = result.container.firstElementChild as HTMLElement;
 	const main = root.firstElementChild as HTMLElement;
