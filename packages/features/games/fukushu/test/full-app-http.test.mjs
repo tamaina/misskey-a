@@ -108,7 +108,7 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		// An ordinary ZIP containing just hello.txt, unrelated to Anki.
 		const zip = Buffer.from('UEsDBBQAAAAAALGhdF3l4enCCgAAAAoAAAAJAAAAaGVsbG8udHh0SnVzdCBhIFpJUFBLAQIUAxQAAAAAALGhdF3l4enCCgAAAAoAAAAJAAAAAAAAAAAAAACAAQAAAABoZWxsby50eHRQSwUGAAAAAAEAAQA3AAAAMQAAAAAA', 'base64');
 		const legacy = await readFile(new URL('./backend/fixtures/apkg/basic-anki21.apkg', import.meta.url));
-		const current = await readFile(new URL('./backend/fixtures/apkg/basic-21b.apkg', import.meta.url));
+		const current = await readFile(new URL('./backend/fixtures/apkg/basic-ja-21b.apkg', import.meta.url));
 		for (const bytes of [zip, current.subarray(0, -7)]) {
 			const rejected = await upload(bytes, 'fake.apkg', mime);
 			assert.equal(rejected.status, 400);
@@ -142,7 +142,10 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		assert.equal(decks.length, 1);
 		assert.equal(decks[0].sourceType, 'anki-apkg');
 		assert.equal(decks[0].sourceHash, createHash('sha256').update(current).digest('hex'));
-		assert.equal(decks[0].questionCount, 2);
+		assert.equal(decks[0].questionCount, 1);
+		const material = ok(await call('fukushu/materials/show', { id: decks[0].id }, owner.token));
+		assert.equal(material.questions[0].payload.prompt.value, '日本の首都は？');
+		assert.equal(material.questions[0].payload.answer.value, '東京');
 	});
 	let file;
 	const source = '\uFEFF#html:false\n#notetype:Basic\n#deck:実 Drive の教材\n日本の首都は？\t東京\nフランスの首都は？\tパリ\n';

@@ -6,7 +6,7 @@ Drive checks the bounded ZIP envelope, Anki metadata, and the collection signatu
 
 ### What is supported
 
-* One populated deck with 1–1,000 untagged, unflagged, stock Basic cards (English `Front`/`Back` template with literal text). The exact packaged examples were exported with Anki 25.09, both legacy (anki21) and current (21b).
+* One populated deck with 1–1,000 untagged, unflagged, stock Basic cards with literal text (English `Front`/`Back` or Japanese `表面`/`裏面` and the corresponding stock template). The exact packaged examples were exported with Anki 25.09, both legacy (anki21) and current (21b).
 * Copy question/answer text and the deck name. Start fresh in Fukushu: no Anki due dates, scheduling settings, suspended/buried state, FSRS state or review replay. Empty deck hierarchy, unused note types and Anki collection settings are not copied.
 * Refuse the whole import for custom templates, HTML, media, tags, multiple populated decks or review history. Do not silently remove unsupported cards to make the package fit.
 * The input cap is the reader's 256 MiB compressed limit, not a split size; existing Drive and native-material bounds (including 1 MiB of validated material) also apply.

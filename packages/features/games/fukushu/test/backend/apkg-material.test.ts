@@ -30,6 +30,22 @@ test.each(['basic-anki21.apkg', 'basic-21b.apkg'])('imports stock Basic cards fr
 	expect(retry.questions.map(row => row.id)).toEqual(material.questions.map(row => row.id));
 });
 
+test.each(['basic-ja-anki21.apkg', 'basic-ja-21b.apkg'])('imports Anki’s stock Japanese Basic template: %s', async name => {
+	const { bytes, digest } = await fixture(name);
+	const material = await readApkgMaterial(bytes, name, digest);
+	expect(material.deck).toMatchObject({ name: '日本語版 標準テスト', sourceType: 'anki-apkg', questionCount: 1 });
+	expect(material.questions.map(row => row.payload)).toEqual([expect.objectContaining({
+		prompt: { format: 'plain', value: '日本の首都は？' },
+		answer: { format: 'plain', value: '東京' },
+	})]);
+});
+
+test('rejects an altered stock Japanese template with the answer field on the front', async () => {
+	const name = 'custom-ja-21b.apkg';
+	const { bytes, digest } = await fixture(name);
+	await expect(readApkgMaterial(bytes, name, digest)).rejects.toMatchObject({ code: 'APKG_UNSUPPORTED' });
+});
+
 test.each(['tagged-21b.apkg', 'generated-anki-25.09.apkg'])('refuses an export with unsupported contents rather than dropping them: %s', async name => {
 	const { bytes, digest } = await fixture(name);
 	await expect(readApkgMaterial(bytes, name, digest)).rejects.toMatchObject({ code: 'APKG_UNSUPPORTED' });

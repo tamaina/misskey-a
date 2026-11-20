@@ -44,11 +44,14 @@ function isStockBasic(model: Row): boolean {
 	const { type, flds, tmpls, css } = model;
 	if (type !== 0 || !Array.isArray(flds) || flds.length !== 2 || !Array.isArray(tmpls) || tmpls.length !== 1
 		|| typeof css !== 'string' || css.replace(/\s+/g, '') !== STOCK_CSS) return false;
-	if (asRecord(flds[0]).name !== 'Front' || asRecord(flds[1]).name !== 'Back') return false;
+	// Anki localizes the two stock field labels, but not the special FrontSide token.
+	const front = asRecord(flds[0]).name;
+	const back = asRecord(flds[1]).name;
+	if (!((front === 'Front' && back === 'Back') || (front === '表面' && back === '裏面'))) return false;
 	const template = asRecord(tmpls[0]);
-	return template.ord === 0 && typeof template.qfmt === 'string' && template.qfmt.trim() === '{{Front}}'
+	return template.ord === 0 && typeof template.qfmt === 'string' && template.qfmt.trim() === `{{${front}}}`
 		&& typeof template.afmt === 'string'
-		&& /^\s*\{\{FrontSide\}\}\s*<hr id=(?:"answer"|'answer'|answer)>\s*\{\{Back\}\}\s*$/.test(template.afmt);
+		&& /^\s*\{\{FrontSide\}\}\s*<hr id=(?:"answer"|'answer'|answer)>\s*\{\{(Back|裏面)\}\}\s*$/.exec(template.afmt)?.[1] === back;
 }
 
 // This pilot copies literal fields, not rendered HTML. Reject markup, HTML
