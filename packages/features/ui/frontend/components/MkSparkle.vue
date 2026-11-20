@@ -83,6 +83,7 @@ function animateParticle(el: SVGPathElement | null, particle: Particle) {
 		easing: 'linear',
 	}).finished.then(removeParticle, removeParticle);
 }
+
 const el = useTemplateRef('el');
 const width = ref(0);
 const height = ref(0);
