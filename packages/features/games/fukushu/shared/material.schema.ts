@@ -23,7 +23,7 @@ export const deckSchema = v.strictObject({
 	name: v.pipe(text(256), v.minLength(1)),
 	description: v.optional(text(4096)),
 	studyMode: v.literal('flashcard'),
-	sourceType: v.picklist(['gift', 'anki-text']),
+	sourceType: v.picklist(['gift', 'anki-text', 'anki-apkg']),
 	sourceFileName: v.optional(text(256)),
 	sourceHash: text(256),
 	sourceText: v.optional(text(131_072)),

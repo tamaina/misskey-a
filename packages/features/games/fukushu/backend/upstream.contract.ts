@@ -29,8 +29,8 @@ const base = oc.errors({ ...commonErrors,
 export const upstreamContract = {
 	upstreamRestoreJob: base.$meta({ ...backup, requestName: 'fukushu/upstream/restore-job', limit: { duration: 60000, max: 30 } } as const satisfies Meta & ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/fukushu/upstream/restore-job', tags: ['fukushu'] })
-		.input(objectInput({ fileId: v.pipe(v.string(), v.metadata({ format: 'misskey:id' })), requestId: studyRequestIdSchema, confirmRestore: v.literal(true), statusOnly: v.optional(v.boolean()) }))
-		.output(v.object({ status: v.picklist(['waiting', 'running', 'completed', 'failed', 'missing']) })),
+		.input(objectInput({ fileId: v.pipe(v.string(), v.metadata({ format: 'misskey:id' })), requestId: studyRequestIdSchema, confirmRestore: v.literal(true), statusOnly: v.optional(v.boolean()), format: v.optional(v.literal('anki-apkg')) }))
+		.output(v.object({ status: v.picklist(['waiting', 'running', 'completed', 'failed', 'missing']), reason: v.optional(v.picklist(['unsupported', 'invalid'])) })),
 	upstreamMedia: base.$meta({ requireCredential: true, kind: 'read:account', requestName: 'fukushu/upstream/media', limit: { duration: 60000, max: 120 } } as const satisfies Meta & ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/fukushu/upstream/media', tags: ['fukushu'] })
 		.input(objectInput({ id: v.pipe(v.string(), v.regex(/^[a-f0-9]{64}$/)), offset: v.optional(integer) }))

@@ -180,6 +180,51 @@ test('a dismissed or stale Drive picker leaves the library usable and cannot res
 	expect(vi.mocked(misskeyApi).mock.calls.map(call => call[0])).toEqual(['fukushu/upstream/show']);
 });
 
+test('confirms an Anki export before enqueueing and preserves the format on status checks', async () => {
+	vi.mocked(chooseDriveFile).mockResolvedValue([{ id: 'anki-file', name: 'Sample.APKG', size: 12_000 } as never]);
+	vi.mocked(os.confirm).mockResolvedValue({ canceled: false });
+	vi.mocked(misskeyApi).mockResolvedValueOnce({ status: 'waiting' } as never)
+		.mockResolvedValueOnce({ status: 'failed', reason: 'unsupported' } as never);
+	render(SourceLibrary, { global });
+	await fireEvent.click(screen.getByText('Drive の Anki デッキ (.apkg) を取り込む'));
+	expect((await screen.findByRole('status')).textContent).toContain('取込状況');
+	expect(os.confirm).toHaveBeenCalledWith(expect.objectContaining({ text: expect.stringContaining('復習予定は引き継がれません') }));
+	const submit = vi.mocked(misskeyApi).mock.calls[0];
+	expect(submit).toEqual(['fukushu/upstream/restore-job', {
+		fileId: 'anki-file', requestId: expect.any(String), confirmRestore: true, format: 'anki-apkg', statusOnly: false,
+	}]);
+	await fireEvent.click(screen.getByText('取込状況を確認'));
+	expect((await screen.findByRole('alert')).textContent).toContain('メディアと復習履歴');
+	expect(misskeyApi).toHaveBeenLastCalledWith('fukushu/upstream/restore-job', {
+		fileId: 'anki-file', requestId: (submit[1] as { requestId: string }).requestId, confirmRestore: true, format: 'anki-apkg', statusOnly: true,
+	});
+});
+
+test('a completed Anki job refreshes the native materials instead of the source library', async () => {
+	vi.mocked(chooseDriveFile).mockResolvedValue([{ id: 'anki-file', name: 'sample.apkg' } as never]);
+	vi.mocked(os.confirm).mockResolvedValue({ canceled: false });
+	vi.mocked(misskeyApi).mockResolvedValueOnce({ status: 'completed' } as never);
+	const view = render(SourceLibrary, { global });
+	await fireEvent.click(screen.getByText('Drive の Anki デッキ (.apkg) を取り込む'));
+	expect((await screen.findByRole('status')).textContent).toContain('教材を取り込みました');
+	expect(view.emitted('ankiImported')).toEqual([[]]);
+	expect(misskeyApi).toHaveBeenCalledTimes(1);
+});
+
+test('rejects a different extension and does not enqueue an Anki export after dismissal', async () => {
+	vi.mocked(chooseDriveFile).mockResolvedValueOnce([{ id: 'wrong-file', name: 'different.zip' } as never])
+		.mockResolvedValueOnce([{ id: 'anki-file', name: 'sample.apkg' } as never]);
+	vi.mocked(os.confirm).mockResolvedValue({ canceled: true });
+	render(SourceLibrary, { global });
+	const pick = screen.getByText('Drive の Anki デッキ (.apkg) を取り込む');
+	await fireEvent.click(pick);
+	expect((await screen.findByRole('alert')).textContent).toContain('ファイルを読み取れません');
+	expect(os.confirm).not.toHaveBeenCalled();
+	await fireEvent.click(pick);
+	await waitFor(() => expect(os.confirm).toHaveBeenCalledOnce());
+	expect(misskeyApi).not.toHaveBeenCalled();
+});
+
 test('cancelling the GIFT preview leaves the deck uncreated', async () => {
 	vi.mocked(chooseDriveFile).mockResolvedValue([{ id: 'gift-file', name: 'seasons.gift' } as never]);
 	vi.mocked(os.inputText).mockResolvedValue({ canceled: false, result: 'Seasons' });

@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<p v-if="notice" role="status">{{ notice }}</p>
 			<MkButton v-if="pendingImportedId" :disabled="busy" @click="showMaterial(pendingImportedId)">{{ $locale.sfc.openImported }}</MkButton>
 			<template v-if="!material">
-				<SourceLibrary :key="$i?.id" :ownerId="$i?.id" @active="sourceActive = $event"/>
+				<SourceLibrary :key="$i?.id" :ownerId="$i?.id" @active="sourceActive = $event" @ankiImported="filterList(false)"/>
 				<template v-if="!sourceActive">
 					<section class="_panel _gaps" :class="$style.panel">
 						<h2>{{ $locale.sfc.importTitle }}</h2>
@@ -328,7 +328,7 @@ definePage(() => ({ title: $locale.value.sfc.title, icon: 'ti ti-cards' }));
 	"openDrive": "Drive を開く",
 	"formatTitle": "対応形式と記入例",
 	"formatDescription": "UTF-8 の TSV・CSV・TXT、最大128 KiB・1,000枚。表と裏の2列で、#html:false が必要です。下の例では列の間にタブを入れます。",
-	"unsupported": "Basic の通常カードのみ対応しています。HTML、画像・音声、穴埋め、逆向きカード、APKG、GIFT、バックアップは未対応です。カード内容の更新・完全削除は未対応です。",
+	"unsupported": "このテキスト取込は Basic の通常カードのみ対応しています。HTML、画像・音声、穴埋め、逆向きカードは未対応です。APKG は上の Anki デッキ取込ボタンを使用してください。GIFT とバックアップには別の取込ボタンがあります。カード内容の更新・完全削除は未対応です。",
 	"privacy": "保存した教材は自分だけが閲覧できます。元の Drive ファイルの公開 URL や公開状態は変わりません。",
 	"choose": "Drive のファイルを選ぶ",
 	"import": "教材として保存",
@@ -391,7 +391,7 @@ definePage(() => ({ title: $locale.value.sfc.title, icon: 'ti ti-cards' }));
 	"openDrive": "Open Drive",
 	"formatTitle": "Supported format and example",
 	"formatDescription": "UTF-8 TSV, CSV or TXT, up to 128 KiB and 1,000 cards. Use two columns for the front and back, with #html:false. The example separates columns with tabs.",
-	"unsupported": "Only ordinary Basic cards are supported. HTML, images, audio, cloze, reversed cards, APKG, GIFT and backups are not supported. Card content updates and permanent deletion are not available.",
+	"unsupported": "The text importer supports only ordinary Basic cards, without HTML, images, audio, cloze or reversed cards. For APKG, use the Anki deck import button above. GIFT and backups have separate import controls. Card content updates and permanent deletion are not available.",
 	"privacy": "Saved materials are visible only to you. The original Drive file’s public URL and visibility remain unchanged.",
 	"choose": "Choose a Drive file",
 	"import": "Save as a material",

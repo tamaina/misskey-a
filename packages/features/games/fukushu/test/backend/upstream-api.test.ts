@@ -18,7 +18,10 @@ const input = { fileId: '9x5n8yd9', requestId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaa
 const review = { requestId: input.requestId, questionId: 'anki:source-card', expectedRevision: 0, rating: 'good' as const, correct: false, answers: ['answer'], durationMs: 100 };
 
 function fixture() {
-	const upstream = { store: mockDeep<FukushuUpstreamStore>(), enqueue: vi.fn(async () => {}) };
+	const upstream = {
+		store: mockDeep<FukushuUpstreamStore>(), enqueue: vi.fn(async () => {}),
+		restoreJob: vi.fn(async () => ({ status: 'failed' as const, reason: 'unsupported' as const })),
+	};
 	const api = createFukushuRouter(mockDeep<FukushuStore>(), undefined, undefined, undefined, upstream);
 	const user = mockDeep<MiLocalUser>({ id: 'alice', isSuspended: false, movedToUri: null });
 	return { upstream, api, user };
@@ -62,6 +65,20 @@ test('source import/export require normal login; show/review separate read/write
 	await expect(call(api.upstreamShow, {}, { context: testContext(user, { permission: ['write:account'] }) })).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
 	await expect(call(api.upstreamReview, review, { context: testContext(user, { permission: ['read:account'] }) })).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
 	expect(upstream.store.restore).not.toHaveBeenCalled(); expect(upstream.store.review).not.toHaveBeenCalled(); expect(upstream.enqueue).not.toHaveBeenCalled();
+});
+test('Anki restore jobs require confirmation and a native account, and forward only the owner and selected input', async () => {
+	const { upstream, api, user } = fixture();
+	const params = { ...input, format: 'anki-apkg' as const, statusOnly: true };
+	const context = testContext(user);
+	for (const denied of [testContext(null), testContext(user, { permission: ['read:drive', 'write:account'] })]) {
+		await expect(call(api.upstreamRestoreJob, params, { context: denied })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
+	}
+	await expect(call(api.upstreamRestoreJob, { ...params, confirmRestore: false } as never, { context })).rejects.toThrow();
+	await expect(call(api.upstreamRestoreJob, { ...params, format: 'zip' } as never, { context })).rejects.toThrow();
+	expect(upstream.restoreJob).not.toHaveBeenCalled();
+	await expect(call(api.upstreamRestoreJob, { ...params, ownerId: 'bob' } as never, { context }))
+		.resolves.toEqual({ status: 'failed', reason: 'unsupported' });
+	expect(upstream.restoreJob).toHaveBeenCalledExactlyOnceWith('alice', params);
 });
 test('binds identities and server time, preserves non-UUID source IDs, and requires confirmations', async () => {
 	const { upstream, api, user } = fixture(); const context = testContext(user);

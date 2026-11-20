@@ -55459,6 +55459,8 @@ export interface operations {
                     /** @constant */
                     confirmRestore: true;
                     statusOnly?: boolean;
+                    /** @constant */
+                    format?: 'anki-apkg';
                 } & ({
                     /** Format: misskey:id */
                     fileId: string;
@@ -55467,6 +55469,8 @@ export interface operations {
                     /** @constant */
                     confirmRestore: true;
                     statusOnly?: boolean;
+                    /** @constant */
+                    format?: 'anki-apkg';
                 } & unknown);
             };
         };
@@ -55480,6 +55484,8 @@ export interface operations {
                     'application/json': {
                         /** @enum {string} */
                         status: 'waiting' | 'running' | 'completed' | 'failed' | 'missing';
+                        /** @enum {string} */
+                        reason?: 'unsupported' | 'invalid';
                     };
                 };
             };
@@ -58537,7 +58543,7 @@ export interface operations {
                         /** @constant */
                         studyMode: 'flashcard';
                         /** @enum {string} */
-                        sourceType: 'gift' | 'anki-text';
+                        sourceType: 'gift' | 'anki-text' | 'anki-apkg';
                         sourceFileName?: string;
                         sourceHash: string;
                         /** Format: date-time */
@@ -58833,7 +58839,7 @@ export interface operations {
                             /** @constant */
                             studyMode: 'flashcard';
                             /** @enum {string} */
-                            sourceType: 'gift' | 'anki-text';
+                            sourceType: 'gift' | 'anki-text' | 'anki-apkg';
                             sourceFileName?: string;
                             sourceHash: string;
                             sourceText?: string;
@@ -59161,7 +59167,7 @@ export interface operations {
                             /** @constant */
                             studyMode: 'flashcard';
                             /** @enum {string} */
-                            sourceType: 'gift' | 'anki-text';
+                            sourceType: 'gift' | 'anki-text' | 'anki-apkg';
                             sourceFileName?: string;
                             sourceHash: string;
                             sourceText?: string;
@@ -59225,7 +59231,7 @@ export interface operations {
                             /** @constant */
                             studyMode: 'flashcard';
                             /** @enum {string} */
-                            sourceType: 'gift' | 'anki-text';
+                            sourceType: 'gift' | 'anki-text' | 'anki-apkg';
                             sourceFileName?: string;
                             sourceHash: string;
                             sourceText?: string;
@@ -59298,7 +59304,7 @@ export interface operations {
                             /** @constant */
                             studyMode: 'flashcard';
                             /** @enum {string} */
-                            sourceType: 'gift' | 'anki-text';
+                            sourceType: 'gift' | 'anki-text' | 'anki-apkg';
                             sourceFileName?: string;
                             sourceHash: string;
                             sourceText?: string;
@@ -59639,7 +59645,7 @@ export interface operations {
                             /** @constant */
                             studyMode: 'flashcard';
                             /** @enum {string} */
-                            sourceType: 'gift' | 'anki-text';
+                            sourceType: 'gift' | 'anki-text' | 'anki-apkg';
                             sourceFileName?: string;
                             sourceHash: string;
                             sourceText?: string;

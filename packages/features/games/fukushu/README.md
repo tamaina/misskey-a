@@ -6,6 +6,8 @@ concurrency/retry protocol, capacity limits and the intentionally bounded UI.
 The earlier sections below describe the material/import boundaries; previews
 still never record a review. Existing browser history is not imported or reset.
 
+For the separate queued Anki package import, supported Basic subset, Drive role restrictions and retry behavior, see [APKG-IMPORT.md](APKG-IMPORT.md).
+
 Refs #310. `fukushu/materials/create` and `fukushu/materials/show` store and return
 the authenticated user's private material. Both are POST endpoints, using the
 existing `write:account` and `read:account` permissions respectively. There is no

@@ -7,9 +7,12 @@ import * as v from 'valibot';
 import { IsNull, LessThan, Not, QueryFailedError } from 'typeorm';
 import { cardVersionPageSchema, explanationUpdateSchema, metadataSchema, revisionSchema } from './material.contract.js';
 import { materialSchema, questionSchema, sourceIdSchema } from '../shared/material.schema.js';
+import { studyRequestIdSchema } from '../shared/study.schema.js';
 import { MiFukushuDeck } from './models/FukushuDeck.js';
 import { MiFukushuQuestion } from './models/FukushuQuestion.js';
 import { MiFukushuQuestionVersion } from './models/FukushuQuestionVersion.js';
+import { MiFukushuOperationReceipt } from './models/FukushuOperationReceipt.js';
+import type { FukushuMaterial } from '../shared/material.schema.js';
 import type { DataSource, EntityManager } from 'typeorm';
 
 export class MaterialError extends Error {
@@ -25,29 +28,60 @@ export class FukushuStore {
 		const parsed = v.safeParse(materialSchema, input);
 		if (!parsed.success) throw new MaterialError('INVALID_MATERIAL');
 		const material = parsed.output;
+		await this.createTransaction(ownerId, manager => this.insertMaterial(manager, ownerId, material, options.deduplicateSource));
+		return material;
+	}
+
+	async createFromApkg(ownerId: string, fileId: string, requestId: string, identity: { size: number; md5: string }, input: FukushuMaterial): Promise<void> {
+		const material = v.safeParse(materialSchema, input);
+		const id = v.parse(studyRequestIdSchema, requestId);
+		if (!material.success || material.output.deck.sourceType !== 'anki-apkg') throw new MaterialError('INVALID_MATERIAL');
+		const request = JSON.stringify({ operation: 'anki-apkg', fileId });
+		await this.createTransaction(ownerId, async manager => {
+			const receipts = manager.getRepository(MiFukushuOperationReceipt);
+			const previous = await receipts.findOneBy({ ownerId, id });
+			if (previous) {
+				if (previous.request !== request) throw new MaterialError('MATERIAL_CONFLICT');
+				return;
+			}
+			// Lock the Drive record until the cards and completion receipt commit together.
+			const [source] = await manager.query('SELECT name, "userHost", uri, "isLink", size, md5 FROM drive_file WHERE id = $1 AND "userId" = $2 FOR SHARE', [fileId, ownerId]) as
+				{ name: string; userHost: string | null; uri: string | null; isLink: boolean; size: number; md5: string }[];
+			if (!source) throw new MaterialError('NO_SUCH_FILE');
+			if (source.userHost !== null || source.uri !== null || source.isLink || !/\.apkg$/i.test(source.name)
+				|| source.size !== identity.size || source.md5 !== identity.md5) throw new MaterialError('IMPORT_FAILED');
+			await this.insertMaterial(manager, ownerId, material.output, true);
+			await receipts.insert({ ownerId, id, request, result: JSON.stringify({ imported: true, deckId: material.output.deck.id }) });
+		});
+	}
+
+	private async createTransaction(ownerId: string, work: (manager: EntityManager) => Promise<void>) {
 		try {
 			await this.db.transaction(async manager => {
-				// Enforce the owner quota atomically across server workers.
+				// Enforce owner quotas atomically with other native and imported-source writers.
 				await manager.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`fukushu:create:${ownerId}`]);
-				const decks = manager.getRepository(MiFukushuDeck);
-				if (await decks.existsBy({ ownerId, id: material.deck.id })) throw new MaterialError('MATERIAL_EXISTS');
-				if (options.deduplicateSource && await decks.createQueryBuilder('deck')
-					.where('deck.ownerId = :ownerId', { ownerId })
-					.andWhere("deck.data ->> 'sourceType' = :sourceType", { sourceType: material.deck.sourceType })
-					.andWhere("deck.data ->> 'sourceHash' = :sourceHash", { sourceHash: material.deck.sourceHash })
-					.getExists()) throw new MaterialError('MATERIAL_EXISTS');
-				if (await decks.countBy({ ownerId }) >= 100) throw new MaterialError('MATERIAL_LIMIT');
-				await decks.insert({ ownerId, id: material.deck.id, data: material.deck });
-				await manager.getRepository(MiFukushuQuestion).insert(material.questions.map((data, position) => ({
-					ownerId, id: data.id, deckId: data.deckId, position, data,
-				})));
+				await work(manager);
 			});
 		} catch (error) {
-			// A card ID belongs to exactly one deck for each owner. Never overwrite it.
+			// PostgreSQL rejects native ID collisions, including with upstream imported records.
 			if (error instanceof QueryFailedError && error.driverError.code === '23505') throw new MaterialError('MATERIAL_EXISTS');
 			throw error;
 		}
-		return material;
+	}
+
+	private async insertMaterial(manager: EntityManager, ownerId: string, material: FukushuMaterial, deduplicateSource = false): Promise<void> {
+		const decks = manager.getRepository(MiFukushuDeck);
+		if (await decks.existsBy({ ownerId, id: material.deck.id })) throw new MaterialError('MATERIAL_EXISTS');
+		if (deduplicateSource && await decks.createQueryBuilder('deck')
+			.where('deck.ownerId = :ownerId', { ownerId })
+			.andWhere("deck.data ->> 'sourceType' = :sourceType", { sourceType: material.deck.sourceType })
+			.andWhere("deck.data ->> 'sourceHash' = :sourceHash", { sourceHash: material.deck.sourceHash })
+			.getExists()) throw new MaterialError('MATERIAL_EXISTS');
+		if (await decks.countBy({ ownerId }) >= 100) throw new MaterialError('MATERIAL_LIMIT');
+		await decks.insert({ ownerId, id: material.deck.id, data: material.deck });
+		await manager.getRepository(MiFukushuQuestion).insert(material.questions.map((data, position) => ({
+			ownerId, id: data.id, deckId: data.deckId, position, data,
+		})));
 	}
 
 	async list(ownerId: string, options: { archived?: boolean } = {}) {

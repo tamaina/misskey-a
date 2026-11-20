@@ -35,6 +35,7 @@ export default defineConfig((args) => {
 		'aws-sdk',
 		'nock',
 		'sharp',
+		'@aqz/anki-reader/archive',
 		'jsdom',
 		're2',
 		'ipaddr.js',
@@ -62,7 +63,7 @@ export default defineConfig((args) => {
 	if (isE2E) {
 		return {
 			onLog,
-			input: './test-server/entry.ts',
+			input: { entry: './test-server/entry.ts', 'fukushu-apkg-worker': '../features/games/fukushu/backend/jobs/apkg-worker.ts' },
 			platform: 'node',
 			tsconfig: './test-server/tsconfig.json',
 			plugins: [
@@ -95,6 +96,7 @@ export default defineConfig((args) => {
 			input: {
 				entry: '../features/boot/backend/node/entry.mts',
 				cli: '../features/boot/backend/node/cli.mts',
+				'fukushu-apkg-worker': '../features/games/fukushu/backend/jobs/apkg-worker.ts',
 				config: './src/config.ts',
 				postgres: '../features/persistence/backend/postgres.ts',
 				'gen-spec': '../features/api/backend/transport/openapi/gen-spec.ts',

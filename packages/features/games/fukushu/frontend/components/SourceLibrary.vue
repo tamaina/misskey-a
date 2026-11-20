@@ -15,7 +15,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkButton v-if="pendingGift" :disabled="busy" @click="run(applyGift)">{{ $locale.sfc.retryGift }}</MkButton>
 			<MkButton v-else :disabled="busy" @click="createGift">{{ $locale.sfc.createGift }}</MkButton>
 			<MkButton v-if="pendingImport" :disabled="busy" @click="run(() => checkImport(true))">{{ $locale.sfc.checkImport }}</MkButton>
-			<MkButton v-else :disabled="busy" @click="restore">{{ $locale.sfc.restore }}</MkButton>
+			<template v-else>
+				<MkButton :disabled="busy" @click="restore">{{ $locale.sfc.restore }}</MkButton>
+				<MkButton :disabled="busy" @click="importApkg">{{ $locale.sfc.importApkg }}</MkButton>
+			</template>
 			<MkButton :disabled="busy" @click="run(() => startToday(true))">{{ $locale.sfc.cramAll }}</MkButton>
 			<MkButton v-if="records" :disabled="busy" @click="exportBackup">{{ $locale.sfc.export }}</MkButton>
 		</div>
@@ -90,7 +93,7 @@ import type { TodayQueue } from '../../shared/today.schema.js';
 import type { LearningSettings as LearningPreferences, UpstreamRecords } from '../../shared/upstream-records.schema.js';
 
 const props = defineProps<{ ownerId?: string }>();
-const emit = defineEmits<{ active: [value: boolean] }>();
+const emit = defineEmits<{ active: [value: boolean]; ankiImported: [] }>();
 const records = shallowRef<UpstreamRecords>();
 const revisions = shallowRef(new Map<string, number>());
 const selected = ref<string | null>(null);
@@ -124,12 +127,14 @@ let picker = 0;
 onBeforeUnmount(() => { picker++; });
 const retryRestore = new Map<string, string>();
 
-type PendingImport = { fileId: string; requestId: string };
+type PendingImport = { fileId: string; requestId: string; format?: 'anki-apkg' };
 const trackingKey = 'fukushu:import:' + $i?.id;
 const pendingImport = shallowRef<PendingImport>();
 try {
 	const saved = JSON.parse(sessionStorage.getItem(trackingKey) ?? 'null');
-	if (typeof saved?.fileId === 'string' && typeof saved.requestId === 'string') pendingImport.value = saved;
+	if (typeof saved?.fileId === 'string' && typeof saved.requestId === 'string' && (saved.format === undefined || saved.format === 'anki-apkg')) {
+		pendingImport.value = { fileId: saved.fileId, requestId: saved.requestId, ...(saved.format ? { format: saved.format } : {}) };
+	}
 } catch { /* Tracking still works in memory when session storage is unavailable. */ }
 
 function trackImport(job?: PendingImport) {
@@ -147,12 +152,16 @@ async function checkImport(statusOnly: boolean) {
 	if (result.status === 'completed') {
 		trackImport();
 		retryRestore.delete(job.fileId);
-		await load();
+		if (job.format === 'anki-apkg') emit('ankiImported');
+		else await load();
 		notice.value = $locale.value.sfc.restored;
 	} else if (result.status === 'failed' || result.status === 'missing') {
 		trackImport();
 		retryRestore.delete(job.fileId);
-		error.value = $locale.value.sfc.importFailed;
+		if (job.format !== 'anki-apkg') error.value = $locale.value.sfc.importFailed;
+		else if (result.reason === 'unsupported') error.value = $locale.value.sfc.apkgUnsupported;
+		else if (result.reason === 'invalid') error.value = $locale.value.sfc.invalidFile;
+		else error.value = $locale.value.sfc.apkgFailed;
 	} else {
 		notice.value = $locale.value.sfc.importQueued;
 	}
@@ -335,6 +344,33 @@ async function restore() {
 	});
 }
 
+async function importApkg() {
+	const file = await pickOwnedFile();
+	if (!file) return;
+	await run(async () => {
+		if (!/\.apkg$/i.test(file.name)) {
+			error.value = $locale.value.sfc.invalidFile;
+			return;
+		}
+		const ticket = picker;
+		const confirmation = await os.confirm({
+			type: 'question',
+			title: $locale.value.sfc.importApkg,
+			text: file.name + '\n' + $locale.value.sfc.apkgConfirm,
+		});
+		if (confirmation.canceled || ticket !== picker) return;
+		trackImport({ fileId: file.id, requestId: crypto.randomUUID(), format: 'anki-apkg' });
+		try {
+			await checkImport(false);
+		} catch (cause) {
+			const c = code(cause);
+			if (c !== 'BACKUP_TOO_LARGE' && c !== 'INVALID_BACKUP' && c !== 'NO_SUCH_FILE') throw cause;
+			trackImport();
+			error.value = c === 'BACKUP_TOO_LARGE' ? $locale.value.sfc.apkgLimit : $locale.value.sfc.invalidFile;
+		}
+	});
+}
+
 async function exportBackup() {
 	await run(async () => {
 		if ((await os.confirm({ type: 'warning', title: $locale.value.sfc.export, text: $locale.value.sfc.visibility })).canceled) return;
@@ -430,6 +466,11 @@ async function updateGift() {
 	"no": "誤り",
 	"open": "取込済み教材を開く",
 	"restore": "Drive の .fukushu を取り込む",
+	"importApkg": "Drive の Anki デッキ (.apkg) を取り込む",
+	"apkgConfirm": "標準の基本カード（フィールド名が Front / Back、内容はプレーンテキスト、最大1,000枚）だけの1デッキを、新しい教材として保存します。メディア・タグ・復習履歴付きのファイルは取り込めません。復習予定は引き継がれません。通常の Drive 設定では .apkg をアップロードできません。",
+	"apkgLimit": "Anki のファイルは 256 MiB まで取り込めます。",
+	"apkgFailed": "Anki の取り込みが完了しませんでした。原本と接続を確認して、再度お試しください。",
+	"apkgUnsupported": "未対応の Anki デッキです。未変更の基本カードのみ・1デッキに絞り、メディアと復習履歴を含めずに書き出した原本か確認してください。タグ付きのカードも未対応です。",
 	"export": "本家形式で Drive に書き出す",
 	"empty": "取込済みの教材はありません。",
 	"cards": "カード",
@@ -490,6 +531,11 @@ async function updateGift() {
 	"no": "False",
 	"open": "Open imported decks",
 	"restore": "Import a .fukushu file from Drive",
+	"importApkg": "Import an Anki deck (.apkg) from Drive",
+	"apkgConfirm": "Save one deck of up to 1,000 standard Basic cards with plain text in fields named Front and Back as a new deck. Files with media, tags, or review history are not supported. Scheduling information is not carried over. Default Drive settings do not allow .apkg uploads.",
+	"apkgLimit": "Anki files up to 256 MiB can be imported.",
+	"apkgFailed": "Anki import did not complete. Check the original file and your connection, then try again.",
+	"apkgUnsupported": "Unsupported Anki deck. Check that the original export has one deck of unmodified Basic cards, and excludes media, tags, and review history.",
 	"export": "Export to Drive in Fukushu format",
 	"empty": "No imported decks yet.",
 	"cards": "Cards",
@@ -513,7 +559,7 @@ async function updateGift() {
 	"conflict": "An ID already exists or this deck changed. Reopen the deck.",
 	"limit": "Import limit exceeded. Backups support up to 1 GiB with 64 MiB total JSON, 8 MiB outside review history and 8 MiB per record. GIFT updates support up to 256 KiB.",
 	"checkImport": "Check import status",
-	"importQueued": "The server is importing the backup. Check its status from this tab.",
+	"importQueued": "The server is importing the file. Check its status from this tab.",
 	"importFailed": "Import did not complete. Check the original file and existing IDs, then try again.",
 	"restoreConfirm": "Save decks, media and study history to your account. Existing IDs prevent the entire import. On first import, the backed-up study settings apply to all your decks.",
 	"restored": "Decks imported.",

@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { Readable } from 'node:stream';
 import { isFukushuBackupFile } from '@features/drive/backend/utility/fukushu-file-type.js';
 import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { DataSource } from 'typeorm';
@@ -18,6 +19,9 @@ import { FukushuLearningSettings1795053600000 } from '../../../../../backend/mig
 import { FukushuStudy1794891600000 } from '../../../../../backend/migration/1794891600000-FukushuStudy.js';
 import { FukushuUpstreamStore1794924000000 } from '../../../../../backend/migration/1794924000000-FukushuUpstreamStore.js';
 import { FukushuUpstreamStore } from '../../backend/upstream-store.js';
+import { FukushuBackupInspector } from '../../backend/backup-drive.js';
+import { processApkgJob } from '../../backend/jobs/ImportFukushuProcessorService.js';
+import { decodeStagedApkg } from '../../backend/jobs/apkg-process.mjs';
 import { FukushuDeckHistoryIndex1794990000000 } from '../../../../../backend/migration/1794990000000-FukushuDeckHistoryIndex.js';
 import { FukushuMaterialBytes1794980000000 } from '../../../../../backend/migration/1794980000000-FukushuMaterialBytes.js';
 import { FukushuSourceChunks1794974400000 } from '../../../../../backend/migration/1794974400000-FukushuSourceChunks.js';
@@ -31,6 +35,8 @@ import { readUpstreamArchive } from '../../shared/upstream-reader.js';
 import { encodeUpstreamFrames } from '../../backend/pilot/upstream-session.js';
 import { material } from './fixture.js';
 import type { EntitySubscriberInterface } from 'typeorm';
+import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
+import type { InternalStorageService } from '@features/runtime/backend/services/InternalStorageService.js';
 import type { DriveSnapshot } from '../../backend/backup-drive.js';
 
 const sha = async (bytes: Uint8Array) => createHash('sha256').update(bytes).digest('hex');
@@ -67,6 +73,89 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		await db.query('INSERT INTO drive_file (id,"userId",size,md5) VALUES ($1,$2,$3,$4)', [id, owner, content.length, createHash('md5').update(content).digest('hex')]);
 		return id;
 	}
+
+	function nativeApkgMaterial(deckId = 'imported-apkg', questionId = 'apkg-question') {
+		const value = material(deckId, questionId);
+		value.deck.sourceType = 'anki-apkg';
+		value.deck.sourceHash = 'a'.repeat(64);
+		return value;
+	}
+
+	test('commits native APKG cards and their receipt only once across concurrent delivery', async () => {
+		const id = await upload('alice');
+		await db.query('UPDATE drive_file SET name = $1 WHERE id = $2', ['original.apkg', id]);
+		const identity = snapshot(bytes);
+		const original = nativeApkgMaterial();
+		const requestId = randomUUID();
+		const save = () => new FukushuStore(db).createFromApkg('alice', id, requestId, { size: bytes.length, md5: identity.md5 }, original);
+		await Promise.all([save(), save()]);
+		const native = new FukushuStore(db);
+		expect(await native.show('alice', original.deck.id)).toMatchObject(original);
+		expect(await counts()).toEqual({ records: 0, receipts: 1 });
+		expect(await native.list('bob')).toEqual([]);
+		await expect(native.createFromApkg('alice', id, randomUUID(), { size: bytes.length, md5: identity.md5 }, nativeApkgMaterial('new-deck', 'new-card')))
+			.rejects.toThrow('MATERIAL_EXISTS');
+		await expect(native.createFromApkg('alice', 'different-file', requestId, { size: bytes.length, md5: identity.md5 }, original))
+			.rejects.toThrow('MATERIAL_CONFLICT');
+		expect(await native.list('alice')).toHaveLength(1);
+	});
+
+	test('rejects foreign and changed originals and rolls back cards and receipt on upstream collision', async () => {
+		const apkgId = await upload('alice');
+		await db.query('UPDATE drive_file SET name = $1 WHERE id = $2', ['original.apkg', apkgId]);
+		const native = new FukushuStore(db);
+		const requestId = randomUUID();
+		const identity = { size: bytes.length, md5: snapshot(bytes).md5 };
+		const deck = nativeApkgMaterial();
+		await expect(native.createFromApkg('bob', apkgId, requestId, identity, deck)).rejects.toThrow('NO_SUCH_FILE');
+		await expect(native.createFromApkg('alice', apkgId, requestId, { ...identity, size: 1 }, deck)).rejects.toThrow('IMPORT_FAILED');
+		const key = createHash('sha256').update(JSON.stringify(deck.questions[0].id)).digest('hex');
+		await db.query('INSERT INTO fukushu_upstream_record ("ownerId", store, key, data, position, "sourceHash") VALUES ($1, $2, $3, $4, $5, $6)',
+			['alice', 'questions', key, '{}', 0, deck.deck.sourceHash]);
+		await expect(native.createFromApkg('alice', apkgId, requestId, identity, deck)).rejects.toThrow('MATERIAL_EXISTS');
+		expect(await native.list('alice')).toEqual([]);
+		expect(await counts()).toEqual({ records: 1, receipts: 0 });
+	});
+
+	// Opt in after building backend so the test executes the production child entry.
+	test.skipIf(!process.env.FUKUSHU_TEST_APKG_WORKER)('runs the real APKG worker, commits cards, and skips decoding on redelivery', async () => {
+		const entry = new URL('../../../../../backend/built/fukushu-apkg-worker.js', import.meta.url);
+		const archive = readFileSync(new URL('./fixtures/apkg/basic-21b.apkg', import.meta.url));
+		const fileId = await upload('alice', archive);
+		const file = {
+			id: fileId, userId: 'alice', userHost: null, uri: null, isLink: false,
+			name: 'from-Anki.apkg', size: archive.length, md5: snapshot(archive).md5,
+			storedInternal: true, accessKey: 'original',
+		} as MiDriveFile;
+		await db.query('UPDATE drive_file SET name = $1 WHERE id = $2', [file.name, fileId]);
+		const read = vi.fn(() => Readable.from([archive]) as ReturnType<InternalStorageService['read']>);
+		const native = new FukushuStore(db);
+		const inspector = new FukushuBackupInspector({
+			findOneBy: async where => !Array.isArray(where) && where.userId === 'alice' && where.id === fileId ? file : null,
+		}, { read }, { downloadUrl: async () => { throw new Error('Must read the local original'); } }, new FukushuBackupStore(db));
+		const job = { ownerId: 'alice', fileId, requestId: randomUUID(), format: 'anki-apkg' as const, ...await inspector.sourceIdentity('alice', fileId, 'anki-apkg') };
+		const progress = vi.fn(async (_percent: number) => {});
+		const run = () => processApkgJob(job, {
+			restored: (owner, id, request) => store.restored(owner, id, request, 'anki-apkg'),
+			withApkg: inspector.withApkg.bind(inspector),
+			decode: source => decodeStagedApkg(source, entry),
+			commit: native.createFromApkg.bind(native),
+			progress,
+		});
+		await run();
+		const [deck] = await native.list('alice');
+		expect(deck).toMatchObject({ name: '取込テスト', questionCount: 2, sourceType: 'anki-apkg', sourceHash: await sha(archive) });
+		expect((await native.show('alice', deck.id)).questions[0].payload.prompt.format).toBe('plain');
+		expect(await native.list('bob')).toEqual([]);
+		expect(await store.restored('alice', fileId, job.requestId, 'anki-apkg')).toBe(true);
+		expect(await counts()).toEqual({ records: 0, receipts: 1 });
+		expect(await db.query('SELECT name, size, md5 FROM drive_file WHERE id = $1', [fileId]))
+			.toEqual([{ name: file.name, size: file.size, md5: file.md5 }]);
+		await run();
+		expect(read).toHaveBeenCalledTimes(1);
+		expect(await native.list('alice')).toEqual([deck]);
+		expect(await counts()).toEqual({ records: 0, receipts: 1 });
+	});
 
 	test('edits only the three owner settings and round trips old archives with unchanged media, cards, states and logs', async () => {
 		const defaults = await store.settings('alice');

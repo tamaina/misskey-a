@@ -82,8 +82,8 @@ export class FukushuUpstreamStore {
 		});
 	}
 
-	async restored(ownerId: string, fileId: string, requestId: string): Promise<boolean> {
-		return Boolean(await this.receipt(this.db.manager, ownerId, requestId, JSON.stringify({ operation: 'restore', fileId })));
+	async restored(ownerId: string, fileId: string, requestId: string, format?: 'anki-apkg'): Promise<boolean> {
+		return Boolean(await this.receipt(this.db.manager, ownerId, requestId, JSON.stringify({ operation: format ?? 'restore', fileId })));
 	}
 
 	async restore(ownerId: string, fileId: string, requestId: string, accepted?: { size: number; md5: string }): Promise<{ restored: true; sha256: string; records: number }> {

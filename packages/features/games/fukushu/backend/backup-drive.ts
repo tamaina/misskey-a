@@ -10,10 +10,16 @@ import { MAX_BACKUP_BYTES } from '../shared/backup.schema.js';
 import { BackupError, decodeBackup } from './backup-codec.js';
 import { readDriveOriginal, withDriveOriginalPath } from './drive-original.js';
 import { MaterialError } from './store.js';
-import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { DriveFilesRepository, MiDriveFile } from '@features/persistence/backend/repositories/models.js';
 import type { InternalStorageService } from '@features/runtime/backend/services/InternalStorageService.js';
 import type { DownloadService } from '@features/runtime/backend/services/DownloadService.js';
 import type { FukushuBackupStore } from './backup-store.js';
+
+// Matches the compressed input limit of @aqz/anki-reader 0.1.0 (not a chunk size).
+const MAX_APKG_BYTES = 256 * 1024 ** 2;
+
+type DriveIdentity = { size: number; md5: string };
+export type StagedApkg = { path: string; name: string; sha256: string };
 
 export type DriveSnapshot = { blob: Blob; md5: string; sha256: string };
 export type WithSource = <T>(ownerId: string, fileId: string, use: (snapshot: DriveSnapshot) => Promise<T>, maximum?: number) => Promise<T>;
@@ -34,13 +40,32 @@ export class FukushuBackupInspector {
 		return this.withSource(ownerId, fileId, snapshot => scanSourceArchive(snapshot.blob));
 	}
 
-	async sourceIdentity(ownerId: string, fileId: string) {
-		const file = await this.ownedFile(ownerId, fileId, /\.(json|fukushu)$/i, MAX_SOURCE_ARCHIVE_BYTES);
+	async sourceIdentity(ownerId: string, fileId: string, format?: 'anki-apkg') {
+		const file = format === 'anki-apkg'
+			? await this.ownedFile(ownerId, fileId, /\.apkg$/i, MAX_APKG_BYTES)
+			: await this.ownedFile(ownerId, fileId, /\.(json|fukushu)$/i, MAX_SOURCE_ARCHIVE_BYTES);
 		return { size: file.size, md5: file.md5 };
 	}
 
 	async withSource<T>(ownerId: string, fileId: string, use: (snapshot: DriveSnapshot) => Promise<T>, maximum = MAX_SOURCE_ARCHIVE_BYTES) {
 		const file = await this.ownedFile(ownerId, fileId, /\.(json|fukushu)$/i, maximum);
+		return this.withSnapshot(file, ({ blob, md5, sha256 }) => use({ blob, md5, sha256 }));
+	}
+
+	/** The job carries identity only. A staged path is valid only during this callback. */
+	async withApkg<T>(ownerId: string, fileId: string, accepted: DriveIdentity, use: (source: StagedApkg) => Promise<T>) {
+		const file = await this.ownedFile(ownerId, fileId, /\.apkg$/i, MAX_APKG_BYTES);
+		if (file.size !== accepted.size || file.md5 !== accepted.md5) throw new BackupError('BACKUP_FAILED');
+		return this.withSnapshot(file, async snapshot => {
+			// Only a cheap container check. The reader must still validate ZIP, SQLite and Anki schema.
+			const signature = Buffer.from(await snapshot.blob.slice(0, 4).arrayBuffer());
+			if (!signature.equals(Buffer.from([0x50, 0x4b, 0x03, 0x04]))) throw new BackupError('INVALID_BACKUP');
+			return use({ path: snapshot.path, name: file.name, sha256: snapshot.sha256 });
+		});
+	}
+
+	private async withSnapshot<T>(file: MiDriveFile,
+		use: (snapshot: DriveSnapshot & { path: string }) => Promise<T>) {
 		let usingSnapshot = false;
 		try {
 			return await withDriveOriginalPath(file, this.storage, this.download, file.size, async path => {
@@ -51,7 +76,7 @@ export class FukushuBackupInspector {
 				for await (const chunk of createReadStream(path)) { md5.update(chunk); sha.update(chunk); }
 				if (md5.digest('hex') !== file.md5) throw new Error('Original digest changed');
 				usingSnapshot = true;
-				return use({ blob, md5: file.md5, sha256: sha.digest('hex') });
+				return use({ path, blob, md5: file.md5, sha256: sha.digest('hex') });
 			});
 		} catch (error) {
 			if (usingSnapshot) throw error;
