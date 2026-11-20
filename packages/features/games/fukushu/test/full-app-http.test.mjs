@@ -78,7 +78,7 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		const password = `Fukushu-${randomUUID()}`;
 		const admin = ok(await call('admin/accounts/create', { username: 'fukushu_admin', password, setupPassword: credentials.setupPassword }));
 		credentials.admin = { username: 'fukushu_admin', password, token: admin.token, id: admin.id };
-		for (const username of ['fukushu_alice', 'fukushu_bob', 'fukushu_carol', 'fukushu_dana', 'fukushu_gift']) {
+		for (const username of ['fukushu_alice', 'fukushu_bob', 'fukushu_carol', 'fukushu_dana', 'fukushu_gift', 'fukushu_apkg']) {
 			ok(await call('admin/accounts/create', { username, password }, admin.token));
 			// Keep the real IP rate limiter enabled: password logins are at least 1s apart.
 			await setTimeout(1100);
@@ -94,6 +94,56 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		bob = credentials.bob;
 	});
 	assert.ok(alice && bob, 'Authentication setup must complete before Drive checks');
+	await step('ordinary Drive upload recognizes Anki exports without allowing arbitrary ZIPs, then imports through the queue', async () => {
+		const owner = credentials.apkg; // Separate non-moderator with a fresh native library.
+		const mime = 'application/x-anki-package';
+		const upload = async (bytes, filename, type) => {
+			const form = new FormData();
+			form.set('i', owner.token);
+			form.set('file', new Blob([bytes], { type }), filename);
+			return readResponse(await fetch(`${origin}/api/drive/files/create`, {
+				method: 'POST', body: form, headers: { origin }, redirect: 'error', signal: AbortSignal.timeout(10_000),
+			}));
+		};
+		// An ordinary ZIP containing just hello.txt, unrelated to Anki.
+		const zip = Buffer.from('UEsDBBQAAAAAALGhdF3l4enCCgAAAAoAAAAJAAAAaGVsbG8udHh0SnVzdCBhIFpJUFBLAQIUAxQAAAAAALGhdF3l4enCCgAAAAoAAAAJAAAAAAAAAAAAAACAAQAAAABoZWxsby50eHRQSwUGAAAAAAEAAQA3AAAAMQAAAAAA', 'base64');
+		const legacy = await readFile(new URL('./backend/fixtures/apkg/basic-anki21.apkg', import.meta.url));
+		const current = await readFile(new URL('./backend/fixtures/apkg/basic-21b.apkg', import.meta.url));
+		for (const bytes of [zip, current.subarray(0, -7)]) {
+			const rejected = await upload(bytes, 'fake.apkg', mime);
+			assert.equal(rejected.status, 400);
+			assert.equal(rejected.body.error.code, 'UNALLOWED_FILE_TYPE');
+		}
+		let modern;
+		for (const [filename, bytes] of [['legacy.apkg', legacy], ['current.APKG', current]]) {
+			const file = ok(await upload(bytes, filename, 'application/octet-stream'));
+			assert.equal(file.type, mime);
+			assert.equal(file.name, filename);
+			const downloaded = await fetch(file.url, { redirect: 'error', signal: AbortSignal.timeout(10_000) });
+			assert.equal(downloaded.status, 200);
+			assert.match(downloaded.headers.get('content-type') ?? '', /^application\/octet-stream(?:;|$)/i);
+			assert.match(downloaded.headers.get('content-disposition') ?? '', /^attachment(?:;|$)/i);
+			assert.deepEqual(Buffer.from(await downloaded.arrayBuffer()), bytes);
+			modern = file;
+		}
+		const endpoint = 'fukushu/upstream/restore-job';
+		const input = { fileId: modern.id, format: 'anki-apkg', requestId: randomUUID(), confirmRestore: true };
+		const foreign = await call(endpoint, input, bob.token);
+		assert.equal(foreign.status, 404);
+		assert.equal(foreign.body.error.code, 'NO_SUCH_FILE');
+		let status = ok(await call(endpoint, input, owner.token)).status;
+		for (let attempts = 0; status !== 'completed' && attempts < 18; attempts++) {
+			assert.ok(['waiting', 'running'].includes(status), `Unexpected APKG job status: ${status}`);
+			await setTimeout(1000);
+			status = ok(await call(endpoint, { ...input, statusOnly: true }, owner.token)).status;
+		}
+		assert.equal(status, 'completed');
+		const decks = ok(await call('fukushu/materials/list', {}, owner.token));
+		assert.equal(decks.length, 1);
+		assert.equal(decks[0].sourceType, 'anki-apkg');
+		assert.equal(decks[0].sourceHash, createHash('sha256').update(current).digest('hex'));
+		assert.equal(decks[0].questionCount, 2);
+	});
 	let file;
 	const source = '\uFEFF#html:false\n#notetype:Basic\n#deck:実 Drive の教材\n日本の首都は？\t東京\nフランスの首都は？\tパリ\n';
 	await step('upload and list go through real Drive storage and owner authentication', async () => {

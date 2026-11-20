@@ -9,7 +9,7 @@ import { expect, test } from 'vitest';
 import { readApkgMaterial } from '../../backend/apkg-material.js';
 
 async function fixture(name: string) {
-	const bytes = await readFile(new URL(`./fixtures/apkg/${name}`, import.meta.url));
+	const bytes = await readFile(`../features/games/fukushu/test/backend/fixtures/apkg/${name}`);
 	const digest = createHash('sha256').update(bytes).digest('hex');
 	return { bytes, digest };
 }

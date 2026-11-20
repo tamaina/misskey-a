@@ -1,6 +1,8 @@
 # Import a new material from Anki (#359)
 
-Upload an Anki `.apkg` to your Drive, then select **Import an Anki deck (.apkg) from Drive** in Fukushu. Confirm to copy the cards as a **new** private study material. The original remains in Drive; this is not a backup restore or a merge into an existing deck. **Default ordinary-user Drive roles do not allow `application/zip`, the MIME detected for Anki exports.** This feature can use an already-owned original; it does not change upload permissions, disguise files, or enable arbitrary ZIP uploads.
+Upload an Anki `.apkg` to your Drive, then select **Import an Anki deck (.apkg) from Drive** in Fukushu. Confirm to copy the cards as a **new** private study material. The original remains in Drive; this is not a backup restore or a merge into an existing deck. The default Drive policy allows recognized Anki packages as `application/x-anki-package`; custom server/role upload policies and size/quota limits still apply. Arbitrary ZIPs remain blocked by default.
+
+Drive checks the bounded ZIP envelope, Anki metadata, and the collection signature before classifying a `.apkg` upload. Use the original Anki export, not a repacked, encrypted, split or ZIP64 archive. The filename or multipart media type alone is not sufficient. Stored objects and Drive responses use binary attachment downloads rather than previews. Full archive validation and the supported-card checks run in the import job, so a successful Drive upload does **not** promise that the deck is importable.
 
 ### What is supported
 

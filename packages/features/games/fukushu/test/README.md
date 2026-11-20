@@ -67,6 +67,15 @@ card for a subsequent real-browser study check; `credentials.studyOwner` records
 the owned test account for that check. PostgreSQL tests separately cover concurrent mutations, total quota (including archived materials), source
 deduplication and migration round trips.
 
+## Anki Drive upload
+
+The same disposable HTTP scenario signs in as a dedicated ordinary user and uploads
+genuine Anki 25.09 anki21/21b exports with a generic multipart MIME type. It verifies
+that renamed ordinary ZIPs and truncated archives are rejected even if the sender
+claims the Anki MIME type. Successful originals round-trip byte-for-byte as
+octet-stream attachments. It then checks foreign-owner denial and runs the real
+import queue, verifying that the final deck has the expected SHA-256 and cards.
+
 ## Pinned FSRS compatibility fixture
 
 `backend/fixtures/upstream-fsrs.json` was generated independently from the exact

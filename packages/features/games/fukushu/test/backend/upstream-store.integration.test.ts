@@ -6,7 +6,8 @@ import { createHash, randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { Readable } from 'node:stream';
 import { isFukushuBackupFile } from '@features/drive/backend/utility/fukushu-file-type.js';
 import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
@@ -119,8 +120,8 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 
 	// Opt in after building backend so the test executes the production child entry.
 	test.skipIf(!process.env.FUKUSHU_TEST_APKG_WORKER)('runs the real APKG worker, commits cards, and skips decoding on redelivery', async () => {
-		const entry = new URL('../../../../../backend/built/fukushu-apkg-worker.js', import.meta.url);
-		const archive = readFileSync(new URL('./fixtures/apkg/basic-21b.apkg', import.meta.url));
+		const entry = pathToFileURL(resolve('built/fukushu-apkg-worker.js'));
+		const archive = readFileSync('../features/games/fukushu/test/backend/fixtures/apkg/basic-21b.apkg');
 		const fileId = await upload('alice', archive);
 		const file = {
 			id: fileId, userId: 'alice', userHost: null, uri: null, isLink: false,

@@ -17,6 +17,8 @@ import * as fileType from 'file-type';
 import { createTempDir } from '@features/runtime/backend/io/create-temp.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
+import { ANKI_PACKAGE_MIME } from '../file-types.js';
+import { isAnkiPackageFile } from '../utility/anki-package-file-type.js';
 import { FUKUSHU_MIME, isFukushuBackupFile } from '../utility/fukushu-file-type.js';
 import { isMimeImage } from '../utility/is-mime-image.js';
 import type { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
@@ -77,6 +79,9 @@ export class FileInfoService {
 
 		let type = await this.detectType(path);
 
+		if (type.mime === 'application/zip' && opts.fileName && /\.apkg$/i.test(opts.fileName) && await isAnkiPackageFile(path)) {
+			type = { mime: ANKI_PACKAGE_MIME, ext: 'apkg' };
+		}
 		if (type.mime === TYPE_OCTET_STREAM.mime && opts.fileName != null) {
 			const ext = opts.fileName.split('.').pop()?.toLowerCase();
 			if (ext === 'fukushu' && await isFukushuBackupFile(path)) {

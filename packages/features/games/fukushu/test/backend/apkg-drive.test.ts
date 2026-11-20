@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { access, readFile, stat, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { Readable } from 'node:stream';
 import { expect, test, vi } from 'vitest';
 import { FukushuBackupInspector } from '../../backend/backup-drive.js';
 
-const archive = await readFile(new URL('./fixtures/apkg/generated-anki-25.09.apkg', import.meta.url));
+const archive = readFileSync('../features/games/fukushu/test/backend/fixtures/apkg/generated-anki-25.09.apkg');
 const md5 = (bytes: Buffer) => createHash('md5').update(bytes).digest('hex');
 
 function setup(bytes = archive) {
