@@ -8073,7 +8073,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/markup/frontend/components/MkUrlPreview.vue",
-		"currentSha256": "ca00c863f3a544fc9a7a4d15eb4bea2ea7c2e55a602d4a77782cfa141200fc38",
+		"currentSha256": "46ce2e391a771d04ac617c8136ea7ad9bc80362adfb5e1862ed626f56f1ddc43",
 		"baselineSha256": "7e04cff4305ae0b40dc1948f47d40e5b30b2bfef432512bccb3477068e21cc9d",
 		"keys": [
 			"close"
@@ -8088,28 +8088,82 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 3949,
-				"end": 3949,
-				"current": "",
-				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+				"start": 1694,
+				"end": 1761,
+				"current": "\t\t<MkButton :small=\"true\" inline @click=\"setTweetExpanded(false)\">\n",
+				"baseline": "\t\t<MkButton :small=\"true\" inline @click=\"tweetExpanded = false\">\n"
 			},
 			{
-				"start": 4185,
-				"end": 4185,
+				"start": 3283,
+				"end": 3350,
+				"current": "\t\t\t<MkButton :small=\"true\" inline @click=\"setTweetExpanded(true)\">\n",
+				"baseline": "\t\t\t<MkButton :small=\"true\" inline @click=\"tweetExpanded = true\">\n"
+			},
+			{
+				"start": 3953,
+				"end": 4053,
+				"current": "import { computed, defineAsyncComponent, onActivated, onDeactivated, onUnmounted, ref } from 'vue';\n",
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport { computed, defineAsyncComponent, onDeactivated, onUnmounted, ref } from 'vue';\n"
+			},
+			{
+				"start": 4202,
+				"end": 4202,
 				"current": "",
 				"baseline": "import type { SummalyResult } from '@misskey-dev/summaly';\n"
 			},
 			{
-				"start": 4679,
-				"end": 4832,
+				"start": 4696,
+				"end": 4849,
 				"current": "import type { SummalyResult } from '@misskey-dev/summaly';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			},
 			{
-				"start": 5937,
-				"end": 6004,
-				"current": "const playerEnabled = ref(prefer.s.expandUrlPreviewAutomatically);\n",
+				"start": 5954,
+				"end": 6014,
+				"current": "const playerEnabled = ref(false); // 初期値はsummaly取り終わったあとに設定\n",
 				"baseline": "const playerEnabled = ref(false);\n"
+			},
+			{
+				"start": 6056,
+				"end": 6149,
+				"current": "const tweetExpanded = ref(false); // 初期値はsummaly取り終わったあとに設定\nlet tweetExpandedByUser = false;\n",
+				"baseline": "const tweetExpanded = ref(props.detail);\n"
+			},
+			{
+				"start": 6280,
+				"end": 6356,
+				"current": "let isDeactivated = false;\n\nonActivated(() => {\n\tisDeactivated = false;\n});\n",
+				"baseline": ""
+			},
+			{
+				"start": 6379,
+				"end": 6402,
+				"current": "\tisDeactivated = true;\n",
+				"baseline": ""
+			},
+			{
+				"start": 7285,
+				"end": 7393,
+				"current": "\t.catch(err => {\n\t\tif (_DEV_) {\n\t\t\tconsole.warn('Failed to fetch url preview', err);\n\t\t}\n\t\treturn null;\n\t})\n",
+				"baseline": ""
+			},
+			{
+				"start": 7524,
+				"end": 7546,
+				"current": "\t\t\tautoExpandTweet();\n",
+				"baseline": ""
+			},
+			{
+				"start": 7647,
+				"end": 7818,
+				"current": "\n\t\tif (!info.sensitive) {\n\t\t\tautoExpandTweet();\n\t\t\tif (!isDeactivated) {\n\t\t\t\tplayerEnabled.value = (props.showActions && prefer.s.expandUrlPreviewAutomatically);\n\t\t\t}\n\t\t}\n",
+				"baseline": ""
+			},
+			{
+				"start": 7823,
+				"end": 8077,
+				"current": "\nfunction setTweetExpanded(expanded: boolean) {\n\ttweetExpandedByUser = true;\n\ttweetExpanded.value = expanded;\n}\n\nfunction autoExpandTweet() {\n\tif (!isDeactivated && props.showActions && props.detail && !tweetExpandedByUser) tweetExpanded.value = true;\n}\n",
+				"baseline": ""
 			}
 		]
 	},
