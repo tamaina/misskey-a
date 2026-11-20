@@ -415,6 +415,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <locale lang="json" locale="ja-JP">
 {
+	"cannotUploadBecauseNoSuchFolder": "アップロード先のフォルダが見つかりません。既定アップロード先の設定を確認してください。",
 	"describeFile": "キャプションを付ける",
 	"_uploader": {
 		"editImage": "画像の編集"

@@ -102,6 +102,12 @@ export function uploadFile(file: File | Blob, options: {
 							title: FeatureLocaleMessages.$locale.failedToUpload,
 							text: FeatureLocaleMessages.$locale.cannotUploadBecauseNoFreeSpace,
 						});
+					} else if (res.error?.id === 'b9adda75-abe9-4c6d-bf12-b5575833960d') {
+						os.alert({
+							type: 'error',
+							title: FeatureLocaleMessages.$locale.failedToUpload,
+							text: FeatureLocaleMessages.$locale.cannotUploadBecauseNoSuchFolder,
+						});
 					} else if (res.error?.id === '4becd248-7f2c-48c4-a9f0-75edc4f9a1ea') {
 						os.alert({
 							type: 'error',

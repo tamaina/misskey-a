@@ -478,10 +478,21 @@ async function renameFolder(folderToRename: Misskey.entities.DriveFolder) {
 	globalEvents.emit('driveFoldersUpdated', [updatedFolder]);
 }
 
-function deleteFolder(folderToDelete: Misskey.entities.DriveFolder) {
+async function deleteFolder(folderToDelete: Misskey.entities.DriveFolder) {
+	if (prefer.s.uploadFolder === folderToDelete.id) {
+		const { canceled } = await os.confirm({
+			type: 'warning',
+			text: $locale.value.sfc.uploadFolderDeletionConfirm,
+		});
+		if (canceled) return;
+	}
+
 	misskeyApi('drive/folders/delete', {
 		folderId: folderToDelete.id,
 	}).then(() => {
+		if (prefer.s.uploadFolder === folderToDelete.id) {
+			prefer.commit('uploadFolder', null);
+		}
 		// 削除時に親フォルダに移動
 		cd(folderToDelete.parentId);
 		globalEvents.emit('driveFoldersDeleted', [folderToDelete]);
@@ -1257,6 +1268,7 @@ onBeforeUnmount(() => {
 
 <locale locale="ja-JP" lang="json">
 {
+	"uploadFolderDeletionConfirm": "このフォルダは既定アップロード先に指定されています。削除すると、既定アップロード先は解除され、ファイルはルートにアップロードされます。",
 	"unableToProcess": "操作を完了できません",
 	"circularReferenceFolder": "移動先のフォルダーは、移動するフォルダーのサブフォルダーです。",
 	"uploadFromUrl": "URLアップロード",

@@ -155,7 +155,7 @@ test('registry persistence binds JSON and null separately for insert and update'
 	for (const existing of [null, { id: 'existing1' }]) {
 		for (const value of [null, reservedValue()]) {
 			const calls = [];
-			const query = { where() { return this; }, andWhere() { return this; }, getOne: async () => existing };
+			const query = { where() { return this; }, andWhere() { return this; }, limit(n) { assert.equal(n, 1); return this; }, getOne: async () => existing };
 			const repository = { createQueryBuilder: () => query, query: async (sql, params) => { calls.push([sql, params]); } };
 			const events = [];
 			const service = new RegistryApiService(repository, { gen: () => 'new1' }, { publishMainStream: (...args) => events.push(args) });
