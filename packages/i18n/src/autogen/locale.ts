@@ -1218,6 +1218,10 @@ export interface Locale extends ILocale {
     "_deck": {
         "_columns": {
             /**
+             * メール
+             */
+            "mail": string;
+            /**
              * メイン
              */
             "main": string;
@@ -1635,4 +1639,258 @@ export interface Locale extends ILocale {
      * 隠す
      */
     "hide": string;
+    "_mail": {
+        /**
+         * メール
+         */
+        "title": string;
+        /**
+         * メールを利用するにはログインしてください。
+         */
+        "loginRequired": string;
+        /**
+         * 受信箱
+         */
+        "inbox": string;
+        /**
+         * 作成
+         */
+        "compose": string;
+        /**
+         * 送信状況
+         */
+        "sent": string;
+        /**
+         * 設定
+         */
+        "settings": string;
+        /**
+         * 更新
+         */
+        "refresh": string;
+        /**
+         * ウィンドウで開く
+         */
+        "openWindow": string;
+        /**
+         * このサーバーではメール機能が設定されていません。
+         */
+        "unavailable": string;
+        /**
+         * 使用容量
+         */
+        "usage": string;
+        /**
+         * メール受信・送信は無効です。設定で有効にできます。
+         */
+        "disabled": string;
+        /**
+         * 一覧に戻る
+         */
+        "back": string;
+        /**
+         * 未読にする
+         */
+        "markUnread": string;
+        /**
+         * 既読にする
+         */
+        "markRead": string;
+        /**
+         * 削除
+         */
+        "delete": string;
+        /**
+         * このメールを削除しますか？元に戻せません。
+         */
+        "deleteConfirm": string;
+        /**
+         * 元のメールをダウンロード
+         */
+        "raw": string;
+        /**
+         * （件名なし）
+         */
+        "noSubject": string;
+        /**
+         * 解析待ちです。更新すると最新の状態を確認できます。
+         */
+        "pending": string;
+        /**
+         * 失敗
+         */
+        "failed": string;
+        /**
+         * ローカルの本文は保存されていません。
+         */
+        "notStored": string;
+        /**
+         * HTML表示
+         */
+        "showHtml": string;
+        /**
+         * 安全のため、画像・外部コンテンツ・リンク・スクリプトは無効です。
+         */
+        "htmlSafety": string;
+        /**
+         * メールはありません。
+         */
+        "empty": string;
+        /**
+         * もっと見る
+         */
+        "more": string;
+        /**
+         * 宛先（カンマ区切り）
+         */
+        "to": string;
+        /**
+         * Cc（カンマ区切り）
+         */
+        "cc": string;
+        /**
+         * Bcc（カンマ区切り）
+         */
+        "bcc": string;
+        /**
+         * 件名
+         */
+        "subject": string;
+        /**
+         * 形式
+         */
+        "format": string;
+        /**
+         * プレーンテキスト
+         */
+        "text": string;
+        /**
+         * 本文
+         */
+        "body": string;
+        /**
+         * MFMはメール向けに変換されます。プレビューで確認してください。添付ファイルの送信には対応していません。
+         */
+        "composeHelp": string;
+        /**
+         * プレビュー
+         */
+        "preview": string;
+        /**
+         * 送信
+         */
+        "send": string;
+        /**
+         * 以下の宛先にメールを送信しますか？
+         */
+        "sendConfirm": string;
+        /**
+         * 送信サーバーによる受付は、相手への最終配達を保証しません。
+         */
+        "deliveryWarning": string;
+        /**
+         * 応答が得られない場合は送信状況を確認してください。同じ内容の再試行には同じ識別子を使用します。
+         */
+        "uncertainRetry": string;
+        /**
+         * 送信待ち
+         */
+        "queued": string;
+        /**
+         * 送信処理中
+         */
+        "sending": string;
+        /**
+         * 送信サーバー受付済み（最終配達は未確認）
+         */
+        "submitted": string;
+        /**
+         * 送信結果不明（重複送信に注意）
+         */
+        "unknown": string;
+        /**
+         * キャンセル済み
+         */
+        "cancelled": string;
+        /**
+         * 受付済み宛先
+         */
+        "accepted": string;
+        /**
+         * 拒否された宛先
+         */
+        "rejected": string;
+        /**
+         * 処理できませんでした。設定と送信状況を確認してから再試行してください。
+         */
+        "error": string;
+        /**
+         * メールを有効にする
+         */
+        "enabled": string;
+        /**
+         * 外部メールへの転送
+         */
+        "forwarding": string;
+        /**
+         * 転送先なし
+         */
+        "noForwarding": string;
+        /**
+         * 確認済み
+         */
+        "verified": string;
+        /**
+         * 未確認
+         */
+        "unverified": string;
+        /**
+         * 転送先を変更すると再確認が必要です。確認が完了するまで転送しません。ローカルコピーを保存しない場合、転送後に受信箱の本文を取得できなくなります。
+         */
+        "forwardingHelp": string;
+        /**
+         * 転送先メールアドレス（空欄で転送を解除）
+         */
+        "destination": string;
+        /**
+         * ローカルコピーを保存する
+         */
+        "keepLocalCopy": string;
+        /**
+         * 転送設定を保存
+         */
+        "saveForwarding": string;
+        /**
+         * 転送先へ届いた確認コード
+         */
+        "confirmToken": string;
+        /**
+         * 転送先を確認
+         */
+        "confirm": string;
+        /**
+         * 転送先に確認メールを送信しました。確認コードを入力してください。
+         */
+        "verificationSent": string;
+        /**
+         * 転送を解除しました。
+         */
+        "forwardingDisabled": string;
+        /**
+         * 設定リビジョン
+         */
+        "revision": string;
+        /**
+         * 転送有効
+         */
+        "forwardingEnabled": string;
+        /**
+         * 容量不足のためローカルコピーを保存できませんでした。
+         */
+        "quotaError": string;
+        /**
+         * この送信記録を削除しますか？送信待ちの場合はキャンセルします。すでに受け付けられたメールは取り消せません。
+         */
+        "deleteSentConfirm": string;
+    };
 }

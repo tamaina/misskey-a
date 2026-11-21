@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { UserMailRuntime } from '@features/email/backend/services/UserMailRuntime.js';
 import { NestFactory } from '@nestjs/core';
 import { init } from 'slacc';
 import { createProcessRoles } from '@features/boot/backend';
@@ -38,6 +39,7 @@ export async function acquireLegacyRole(name: RoleName): Promise<ProcessRole> {
 	});
 	try {
 		const resources = app.get(GlobalModule);
+		const userMail = app.get(UserMailRuntime);
 		const queues = app.get(QueueModule);
 		const charts = app.get(ChartManagementService);
 		const notes = app.get(NoteCreateService);
@@ -48,6 +50,7 @@ export async function acquireLegacyRole(name: RoleName): Promise<ProcessRole> {
 		const serverStats = name === 'server' ? app.get(ServerStatsService) : undefined;
 		return {
 			async start() {
+				await userMail.start(name);
 				if (!envOption.noDaemons) {
 					await charts.start();
 					queueStats?.start();
@@ -63,7 +66,7 @@ export async function acquireLegacyRole(name: RoleName): Promise<ProcessRole> {
 			async drain() {
 				charts.stop();
 				await settleRoleTasks([
-					() => serverService?.drain(), () => queue?.stop(),
+					() => userMail.stop(), () => serverService?.drain(), () => queue?.stop(),
 					() => queueStats?.dispose(), () => serverStats?.dispose(),
 				]);
 			},

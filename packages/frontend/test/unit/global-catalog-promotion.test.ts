@@ -42,6 +42,18 @@ test('keeps independently pinned raw and effective catalog history for every lan
 	expect(flattenCatalog(locales['ja-JP']).map(([key]) => key).sort()).toEqual(retention.retainedPaths);
 });
 
+test('keeps new mail labels in production without rewriting historical catalog hashes', () => {
+	for (const language of languages) {
+		const historicalPaths = new Set(flattenCatalog(historicalRawLocale(language)).map(([key]) => key));
+		for (const path of history.addedAfterBaseline) {
+			expect(historicalPaths.has(path), `${language}:${path}`).toBe(false);
+			expect(valueAt(locales[language], path), `${language}:${path}`).toBeTruthy();
+		}
+	}
+	expect(valueAt(locales['ja-JP'], '_mail.title')).toBe('メール');
+	expect(valueAt(locales['ja-JP'], '_deck._columns.mail')).toBe('メール');
+});
+
 /** Promoted keys kept in the SFC so the settings-search static indexer can resolve `$locale.sfc.*`. */
 const settingsSearchLocalKeys: Record<string, readonly string[]> = {
 	'packages/features/drive/frontend/pages/settings/drive.vue': ['drive'],

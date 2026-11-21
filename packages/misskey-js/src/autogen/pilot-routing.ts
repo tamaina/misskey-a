@@ -2,6 +2,983 @@
 import type { AnyContractRouter } from '@orpc/contract';
 
 export default {
+	"email": {
+		"state": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"MAIL_DISABLED": {
+						"status": 403
+					},
+					"MAIL_NOT_FOUND": {
+						"status": 404
+					},
+					"MAIL_INVALID_INPUT": {
+						"status": 400
+					},
+					"MAIL_QUOTA_EXCEEDED": {
+						"status": 400
+					},
+					"MAIL_CONFLICT": {
+						"status": 409
+					},
+					"MAIL_RATE_LIMITED": {
+						"status": 429
+					},
+					"MAIL_UNAVAILABLE": {
+						"status": 503
+					}
+				},
+				"meta": {
+					"requestName": "email/state",
+					"requireCredential": true,
+					"secure": true,
+					"prohibitMoved": false,
+					"limit": {
+						"key": "email/state",
+						"duration": 60000,
+						"max": 120
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/email/state",
+					"tags": [
+						"email"
+					]
+				}
+			}
+		},
+		"configure": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"MAIL_DISABLED": {
+						"status": 403
+					},
+					"MAIL_NOT_FOUND": {
+						"status": 404
+					},
+					"MAIL_INVALID_INPUT": {
+						"status": 400
+					},
+					"MAIL_QUOTA_EXCEEDED": {
+						"status": 400
+					},
+					"MAIL_CONFLICT": {
+						"status": 409
+					},
+					"MAIL_RATE_LIMITED": {
+						"status": 429
+					},
+					"MAIL_UNAVAILABLE": {
+						"status": 503
+					}
+				},
+				"meta": {
+					"requestName": "email/configure",
+					"requireCredential": true,
+					"secure": true,
+					"prohibitMoved": false,
+					"limit": {
+						"key": "email/configure",
+						"duration": 60000,
+						"max": 10
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/email/configure",
+					"tags": [
+						"email"
+					]
+				}
+			}
+		},
+		"list": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"MAIL_DISABLED": {
+						"status": 403
+					},
+					"MAIL_NOT_FOUND": {
+						"status": 404
+					},
+					"MAIL_INVALID_INPUT": {
+						"status": 400
+					},
+					"MAIL_QUOTA_EXCEEDED": {
+						"status": 400
+					},
+					"MAIL_CONFLICT": {
+						"status": 409
+					},
+					"MAIL_RATE_LIMITED": {
+						"status": 429
+					},
+					"MAIL_UNAVAILABLE": {
+						"status": 503
+					}
+				},
+				"meta": {
+					"requestName": "email/list",
+					"requireCredential": true,
+					"secure": true,
+					"prohibitMoved": false,
+					"limit": {
+						"key": "email/list",
+						"duration": 60000,
+						"max": 120
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/email/list",
+					"tags": [
+						"email"
+					]
+				}
+			}
+		},
+		"show": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"MAIL_DISABLED": {
+						"status": 403
+					},
+					"MAIL_NOT_FOUND": {
+						"status": 404
+					},
+					"MAIL_INVALID_INPUT": {
+						"status": 400
+					},
+					"MAIL_QUOTA_EXCEEDED": {
+						"status": 400
+					},
+					"MAIL_CONFLICT": {
+						"status": 409
+					},
+					"MAIL_RATE_LIMITED": {
+						"status": 429
+					},
+					"MAIL_UNAVAILABLE": {
+						"status": 503
+					}
+				},
+				"meta": {
+					"requestName": "email/show",
+					"requireCredential": true,
+					"secure": true,
+					"prohibitMoved": false,
+					"limit": {
+						"key": "email/show",
+						"duration": 60000,
+						"max": 120
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/email/show",
+					"tags": [
+						"email"
+					]
+				}
+			}
+		},
+		"read": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"MAIL_DISABLED": {
+						"status": 403
+					},
+					"MAIL_NOT_FOUND": {
+						"status": 404
+					},
+					"MAIL_INVALID_INPUT": {
+						"status": 400
+					},
+					"MAIL_QUOTA_EXCEEDED": {
+						"status": 400
+					},
+					"MAIL_CONFLICT": {
+						"status": 409
+					},
+					"MAIL_RATE_LIMITED": {
+						"status": 429
+					},
+					"MAIL_UNAVAILABLE": {
+						"status": 503
+					}
+				},
+				"meta": {
+					"requestName": "email/read",
+					"requireCredential": true,
+					"secure": true,
+					"prohibitMoved": false,
+					"limit": {
+						"key": "email/read",
+						"duration": 60000,
+						"max": 120
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/email/read",
+					"tags": [
+						"email"
+					]
+				}
+			}
+		},
+		"delete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"MAIL_DISABLED": {
+						"status": 403
+					},
+					"MAIL_NOT_FOUND": {
+						"status": 404
+					},
+					"MAIL_INVALID_INPUT": {
+						"status": 400
+					},
+					"MAIL_QUOTA_EXCEEDED": {
+						"status": 400
+					},
+					"MAIL_CONFLICT": {
+						"status": 409
+					},
+					"MAIL_RATE_LIMITED": {
+						"status": 429
+					},
+					"MAIL_UNAVAILABLE": {
+						"status": 503
+					}
+				},
+				"meta": {
+					"requestName": "email/delete",
+					"requireCredential": true,
+					"secure": true,
+					"prohibitMoved": false,
+					"limit": {
+						"key": "email/delete",
+						"duration": 60000,
+						"max": 120
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/email/delete",
+					"tags": [
+						"email"
+					]
+				}
+			}
+		},
+		"raw": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"MAIL_DISABLED": {
+						"status": 403
+					},
+					"MAIL_NOT_FOUND": {
+						"status": 404
+					},
+					"MAIL_INVALID_INPUT": {
+						"status": 400
+					},
+					"MAIL_QUOTA_EXCEEDED": {
+						"status": 400
+					},
+					"MAIL_CONFLICT": {
+						"status": 409
+					},
+					"MAIL_RATE_LIMITED": {
+						"status": 429
+					},
+					"MAIL_UNAVAILABLE": {
+						"status": 503
+					}
+				},
+				"meta": {
+					"requestName": "email/raw",
+					"requireCredential": true,
+					"secure": true,
+					"prohibitMoved": false,
+					"limit": {
+						"key": "email/raw",
+						"duration": 60000,
+						"max": 10
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/email/raw",
+					"tags": [
+						"email"
+					]
+				}
+			}
+		},
+		"attachment": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"MAIL_DISABLED": {
+						"status": 403
+					},
+					"MAIL_NOT_FOUND": {
+						"status": 404
+					},
+					"MAIL_INVALID_INPUT": {
+						"status": 400
+					},
+					"MAIL_QUOTA_EXCEEDED": {
+						"status": 400
+					},
+					"MAIL_CONFLICT": {
+						"status": 409
+					},
+					"MAIL_RATE_LIMITED": {
+						"status": 429
+					},
+					"MAIL_UNAVAILABLE": {
+						"status": 503
+					}
+				},
+				"meta": {
+					"requestName": "email/attachment",
+					"requireCredential": true,
+					"secure": true,
+					"prohibitMoved": false,
+					"limit": {
+						"key": "email/attachment",
+						"duration": 60000,
+						"max": 30
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/email/attachment",
+					"tags": [
+						"email"
+					]
+				}
+			}
+		},
+		"send": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"MAIL_DISABLED": {
+						"status": 403
+					},
+					"MAIL_NOT_FOUND": {
+						"status": 404
+					},
+					"MAIL_INVALID_INPUT": {
+						"status": 400
+					},
+					"MAIL_QUOTA_EXCEEDED": {
+						"status": 400
+					},
+					"MAIL_CONFLICT": {
+						"status": 409
+					},
+					"MAIL_RATE_LIMITED": {
+						"status": 429
+					},
+					"MAIL_UNAVAILABLE": {
+						"status": 503
+					}
+				},
+				"meta": {
+					"requestName": "email/send",
+					"requireCredential": true,
+					"secure": true,
+					"prohibitMoved": true,
+					"limit": {
+						"key": "email/send",
+						"duration": 60000,
+						"max": 10
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/email/send",
+					"tags": [
+						"email"
+					]
+				}
+			}
+		},
+		"preview": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"MAIL_DISABLED": {
+						"status": 403
+					},
+					"MAIL_NOT_FOUND": {
+						"status": 404
+					},
+					"MAIL_INVALID_INPUT": {
+						"status": 400
+					},
+					"MAIL_QUOTA_EXCEEDED": {
+						"status": 400
+					},
+					"MAIL_CONFLICT": {
+						"status": 409
+					},
+					"MAIL_RATE_LIMITED": {
+						"status": 429
+					},
+					"MAIL_UNAVAILABLE": {
+						"status": 503
+					}
+				},
+				"meta": {
+					"requestName": "email/preview",
+					"requireCredential": true,
+					"secure": true,
+					"prohibitMoved": false,
+					"limit": {
+						"key": "email/preview",
+						"duration": 60000,
+						"max": 30
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/email/preview",
+					"tags": [
+						"email"
+					]
+				}
+			}
+		},
+		"sent": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"MAIL_DISABLED": {
+						"status": 403
+					},
+					"MAIL_NOT_FOUND": {
+						"status": 404
+					},
+					"MAIL_INVALID_INPUT": {
+						"status": 400
+					},
+					"MAIL_QUOTA_EXCEEDED": {
+						"status": 400
+					},
+					"MAIL_CONFLICT": {
+						"status": 409
+					},
+					"MAIL_RATE_LIMITED": {
+						"status": 429
+					},
+					"MAIL_UNAVAILABLE": {
+						"status": 503
+					}
+				},
+				"meta": {
+					"requestName": "email/sent",
+					"requireCredential": true,
+					"secure": true,
+					"prohibitMoved": false,
+					"limit": {
+						"key": "email/sent",
+						"duration": 60000,
+						"max": 120
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/email/sent",
+					"tags": [
+						"email"
+					]
+				}
+			}
+		},
+		"configureForwarding": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"MAIL_DISABLED": {
+						"status": 403
+					},
+					"MAIL_NOT_FOUND": {
+						"status": 404
+					},
+					"MAIL_INVALID_INPUT": {
+						"status": 400
+					},
+					"MAIL_QUOTA_EXCEEDED": {
+						"status": 400
+					},
+					"MAIL_CONFLICT": {
+						"status": 409
+					},
+					"MAIL_RATE_LIMITED": {
+						"status": 429
+					},
+					"MAIL_UNAVAILABLE": {
+						"status": 503
+					}
+				},
+				"meta": {
+					"requestName": "email/forwarding/configure",
+					"requireCredential": true,
+					"secure": true,
+					"prohibitMoved": true,
+					"limit": {
+						"key": "email/forwarding/configure",
+						"duration": 60000,
+						"max": 3
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/email/forwarding/configure",
+					"tags": [
+						"email"
+					]
+				}
+			}
+		},
+		"confirmForwarding": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"MAIL_DISABLED": {
+						"status": 403
+					},
+					"MAIL_NOT_FOUND": {
+						"status": 404
+					},
+					"MAIL_INVALID_INPUT": {
+						"status": 400
+					},
+					"MAIL_QUOTA_EXCEEDED": {
+						"status": 400
+					},
+					"MAIL_CONFLICT": {
+						"status": 409
+					},
+					"MAIL_RATE_LIMITED": {
+						"status": 429
+					},
+					"MAIL_UNAVAILABLE": {
+						"status": 503
+					}
+				},
+				"meta": {
+					"requestName": "email/forwarding/confirm",
+					"requireCredential": true,
+					"secure": true,
+					"prohibitMoved": true,
+					"limit": {
+						"key": "email/forwarding/confirm",
+						"duration": 60000,
+						"max": 10
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/email/forwarding/confirm",
+					"tags": [
+						"email"
+					]
+				}
+			}
+		}
+	},
 	"clearBrowserCache": {
 		"~orpc": {
 			"errorMap": {},

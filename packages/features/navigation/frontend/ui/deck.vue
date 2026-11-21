@@ -109,6 +109,7 @@ import XTlColumn from '@features/timelines/frontend/ui/deck/tl-column.vue';
 import XAntennaColumn from '@features/timelines/frontend/ui/deck/antenna-column.vue';
 import XListColumn from '@features/relationships/frontend/ui/deck/list-column.vue';
 import XChannelColumn from '@features/channels/frontend/ui/deck/channel-column.vue';
+import XMailColumn from '@features/email/frontend/components/mail-column.vue';
 import XNotificationsColumn from '@features/notifications/frontend/ui/deck/notifications-column.vue';
 import XWidgetsColumn from '@features/navigation/frontend/ui/deck/widgets-column.vue';
 import XMentionsColumn from '@features/relationships/frontend/ui/deck/mentions-column.vue';
@@ -133,6 +134,7 @@ const XAnnouncements = defineAsyncComponent(() => import('@features/announcement
 
 const columnComponents = {
 	main: XMainColumn,
+	mail: XMailColumn,
 	widgets: XWidgetsColumn,
 	notifications: XNotificationsColumn,
 	tl: XTlColumn,

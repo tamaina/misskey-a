@@ -3,9 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import '@features/markup/frontend/shared/mfm.css';
+import { host } from '@features/boot/frontend/shared/config.js';
 import { createMfmRenderer } from '@features/markup/frontend/shared/mfm-renderer.js';
-import type { MfmBaseProps } from '@features/markup/frontend/shared/mfm-renderer.js';
-import type { MkABehavior } from '@features/navigation/frontend/components/global/MkA.vue';
 import MkUrl from '@features/markup/frontend/components/global/MkUrl.vue';
 import MkTime from '@features/ui/frontend/components/global/MkTime.vue';
 import MkLink from '@features/navigation/frontend/components/MkLink.vue';
@@ -18,6 +18,8 @@ import MkGoogle from '@features/integrations/frontend/components/MkGoogle.vue';
 import MkSparkle from '@features/ui/frontend/components/MkSparkle.vue';
 import MkA from '@features/navigation/frontend/components/global/MkA.vue';
 import { prefer } from '@features/preferences/frontend/preferences.js';
+import type { MkABehavior } from '@features/navigation/frontend/components/global/MkA.vue';
+import type { MfmBaseProps } from '@features/markup/frontend/shared/mfm-renderer.js';
 
 type MfmProps = MfmBaseProps & {
 	enableEmojiMenu?: boolean;
@@ -27,6 +29,7 @@ type MfmProps = MfmBaseProps & {
 
 // eslint-disable-next-line import/no-default-export
 export default createMfmRenderer<MfmProps>({
+	host,
 	components: () => ({
 		Url: MkUrl,
 		Link: MkLink,

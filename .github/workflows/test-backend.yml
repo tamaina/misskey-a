@@ -10,6 +10,7 @@ on:
       - packages/features/federation/**
       - packages/features/auth/**
       - packages/features/mcp/**
+      - packages/features/email/**
       - packages/features/relationships/**
       # for permissions
       - packages/misskey-js/**
@@ -23,6 +24,7 @@ on:
       - packages/features/federation/**
       - packages/features/auth/**
       - packages/features/mcp/**
+      - packages/features/email/**
       - packages/features/relationships/**
       # for permissions
       - packages/misskey-js/**
@@ -119,6 +121,8 @@ jobs:
       run: MISSKEY_AUTH_TOKEN_REGENERATION_FIXTURE=1 node packages/features/auth/test/run-fresh-password-change-fixture.mjs
     - name: Test email change HTTP with isolated PostgreSQL and Redis
       run: MISSKEY_AUTH_EMAIL_CHANGE_FIXTURE=1 node packages/features/auth/test/run-fresh-password-change-fixture.mjs
+    - name: Test mail concurrency with isolated PostgreSQL
+      run: node packages/features/email/test/run-postgres-fixture.mjs
     - name: Test MCP with disposable PostgreSQL
       run: node packages/features/mcp/test/run-postgres-fixture.mjs
     - name: Upload to Codecov

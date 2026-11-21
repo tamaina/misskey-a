@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { EmailApiProvider } from '@features/email/backend/api.implementation.js';
 import type { Provider } from '@nestjs/common';
 import { ApiRouterProvider } from './api.implementation.js';
 import { RolesApiProvider } from '@features/roles/backend/api.implementation.js';
@@ -34,6 +35,7 @@ import { RelationshipsApiProvider } from '@features/relationships/backend/api.im
 import { CollectionsApiProvider } from '@features/collections/backend/api.implementation.js';
 import { DriveApiProvider } from '@features/drive/backend/api.implementation.js';
 export const featureProviders: Provider[] = [
+	EmailApiProvider,
 	ApiRouterProvider,
 	RolesApiProvider,
 	ModerationApiProvider,

@@ -47,6 +47,12 @@ export const navbarItemDef = reactive<{
 		}),
 		to: '/my/notifications',
 	},
+	mail: {
+		get title() { return messages.value.mail; },
+		icon: 'ti ti-mail',
+		show: computed(() => $i != null),
+		to: '/my/mail',
+	},
 	drive: {
 		get title() {
 			return messages.value.drive;

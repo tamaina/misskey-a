@@ -50,6 +50,12 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	expect(spec.paths?.['/i/sessions']?.post?.operationId).toBe('post___i___sessions');
 	expect(spec.paths?.['/i/sessions/revoke']?.post?.operationId).toBe('post___i___sessions___revoke');
 	expect(spec.paths?.['/i/signout']?.post?.operationId).toBe('post___i___signout');
+	const addedEmailPaths = ['state', 'configure', 'list', 'show', 'read', 'delete', 'raw', 'attachment', 'send', 'preview', 'sent', 'forwarding/configure', 'forwarding/confirm'];
+	const addedEmailIds = new Set(addedEmailPaths.map(path => `post___email___${path.replaceAll('/', '___')}`));
+	expect(addedEmailIds.size).toBe(13);
+	for (const path of addedEmailPaths) {
+		expect(spec.paths?.[`/email/${path}`]?.post?.operationId).toBe(`post___email___${path.replaceAll('/', '___')}`);
+	}
 	expect(spec.paths?.['/i/regenerate-token/passkey/start']?.post?.operationId).toBe('post___i___regenerate-token___passkey___start');
 	expect(spec.paths?.['/i/regenerate-token/passkey/complete']?.post?.operationId).toBe('post___i___regenerate-token___passkey___complete');
 	expect(spec.paths?.['/i/update-email/passkey/start']?.post?.operationId).toBe('post___i___update-email___passkey___start');
@@ -108,9 +114,9 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	for (const path of addedSecurityPaths) {
 		expect(spec.paths?.[path]?.post?.operationId).toBe(`post___${path.slice(1).replaceAll('/', '___')}`);
 	}
-	// Exclude the fifteen deferred SSO routes from the preceding API count.
-	expect(identifiers.filter(id => !addedSecurityIds.has(id!))).toHaveLength(481);
-	expect(identifiers).toHaveLength(481 + 27);
+	// Preserve the pre-security/mail API count, excluding the fifteen deferred SSO routes.
+	expect(identifiers.filter(id => !addedSecurityIds.has(id!) && !addedEmailIds.has(id!))).toHaveLength(481);
+	expect(identifiers).toHaveLength(481 + 27 + 13);
 	expect(new Set(identifiers).size).toBe(identifiers.length);
 });
 

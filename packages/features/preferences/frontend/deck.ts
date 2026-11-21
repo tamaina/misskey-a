@@ -38,6 +38,7 @@ type ColumnWidget = {
 export const columnTypes = [
 	'main',
 	'widgets',
+	'mail',
 	'notifications',
 	'tl',
 	'antenna',

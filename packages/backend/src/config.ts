@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import type { UserMailConfig } from '@features/email/backend/mail/settings.js';
 import * as fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
@@ -34,6 +35,7 @@ type SentryBackendConfig = {
  * 設定ファイルの型
  */
 type Source = {
+	userMail?: UserMailConfig;
 	url?: string;
 	port?: number;
 	socket?: string;
@@ -133,6 +135,7 @@ type Source = {
 };
 
 export type Config = {
+	userMail?: UserMailConfig;
 	url: string;
 	port: number;
 	socket: string | undefined;
@@ -292,6 +295,7 @@ export function loadConfig(): Config {
 	const redis = convertRedisOptions(config.redis, host);
 
 	return {
+		userMail: config.userMail,
 		version,
 		publishTarballInsteadOfProvideRepositoryUrl: !!config.publishTarballInsteadOfProvideRepositoryUrl,
 		setupPassword: config.setupPassword,
