@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { Buffer } from 'node:buffer';
 import { test, expect, vi } from 'vitest';
 import { linkWallet, WalletLinkCancelled } from '../../frontend/wallet-link.js';
 import type { WalletClient } from '../../frontend/wallet-client.js';
 
 const address = '0x0000000000000000000000000000000000000001';
 const chain = { chainId: 123456, name: 'Test', nativeCurrencyName: 'Test', nativeCurrencySymbol: 'TEST', nativeCurrencyDecimals: 18, blockExplorerUrl: null };
-const challenge = { nonce: 'nonce0001', message: 'Synthetic ownership proof; no transfer' };
+const challenge = { nonce: 'nonce0001', message: 'Synthetic ownership proof;\nno transfer' };
 const wallet = { id: 'wallet1', chainId: chain.chainId, address, label: null, createdAt: 1, updatedAt: 1 };
 
 function fixture() {
@@ -38,7 +39,7 @@ function fixture() {
 test('source linking flow signs the exact server message after verified switch, without transfer requests', async () => {
 	const f = fixture(); expect(await linkWallet(f.input)).toEqual(wallet);
 	expect(f.calls).toEqual(['eth_requestAccounts', 'eth_chainId', 'wallet_switchEthereumChain', 'eth_chainId', 'begin', 'personal_sign', 'verify']);
-	expect(f.request).toHaveBeenCalledWith({ method: 'personal_sign', params: [challenge.message, address] });
+	expect(f.request).toHaveBeenCalledWith({ method: 'personal_sign', params: [`0x${Buffer.from(challenge.message, 'utf8').toString('hex')}`, address] });
 	expect(f.client.verify).toHaveBeenCalledWith({ ...challenge, signature: '0x1234' });
 	expect(f.input.connected).toHaveBeenCalledWith({ address, chainId: 123456, connectorId: 'synthetic' });
 });

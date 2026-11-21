@@ -62,6 +62,8 @@ export function createWalletProof(native: Pick<HttpRequestService, 'send'>) {
 		async verify(challenge: WalletChallenge, signature: Hex, rpcUrl: string, now: number): Promise<boolean> {
 			try {
 				const client = createPublicClient({ transport: http(rpcUrl, { retryCount: 0, timeout: WALLET_RPC_TIMEOUT, fetchFn }) });
+				// Contract-wallet signatures must be checked on the chain named by the SIWE message.
+				if (await client.getChainId() !== challenge.chainId) return false;
 				return await verifySiweMessage(client, { address: getAddress(challenge.address), domain: challenge.domain,
 																																							message: challenge.message, nonce: challenge.nonce, signature, time: new Date(now) });
 			} catch { return false; } // Never propagate viem errors containing private RPC URLs.

@@ -47,7 +47,9 @@ export async function linkWallet(input: {
 	const challenge = await input.client.begin({ chainId: input.chain.chainId, address, ...auth });
 	check();
 	input.progress('sign');
-	const signature = await provider.request({ method: 'personal_sign', params: [challenge.message, address] });
+	// personal_sign uses hex-encoded UTF-8 bytes; send the original plaintext back to Misskey.
+	const message = `0x${Array.from(new TextEncoder().encode(challenge.message), byte => byte.toString(16).padStart(2, '0')).join('')}`;
+	const signature = await provider.request({ method: 'personal_sign', params: [message, address] });
 	check();
 	if (typeof signature !== 'string' || !/^0x(?:[0-9a-fA-F]{2})+$/.test(signature)) throw new Error('Invalid wallet signature');
 	input.progress('verify');
