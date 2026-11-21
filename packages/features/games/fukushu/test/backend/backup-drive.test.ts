@@ -5,10 +5,12 @@
 
 import { createHash } from 'node:crypto';
 import { Readable } from 'node:stream';
-import { access, readFile, stat, writeFile } from 'node:fs/promises';
+import { access, mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { expect, test, vi } from 'vitest';
 import { FukushuBackupInspector } from '../../backend/backup-drive.js';
-import { encodeBackup } from '../../backend/backup-codec.js';
+import { BackupError, encodeBackup } from '../../backend/backup-codec.js';
 import { exportFukushuBackup } from '../../backend/jobs/ExportFukushuProcessorService.js';
 import { MAX_BACKUP_BYTES } from '../../shared/backup.schema.js';
 import { backupFixture } from './backup-fixture.js';
@@ -93,7 +95,7 @@ function exportFixture() {
 		return { id: 'saved-backup' };
 	}) };
 	const notifications = { createNotification: vi.fn(async () => {}) };
-	const execute = () => exportFukushuBackup({ user: { id: 'alice' }, deckId: 'deck-original' }, { users, store, drive, notifications } as never);
+	const execute = (finalAttempt = false) => exportFukushuBackup({ user: { id: 'alice' }, deckId: 'deck-original' }, { users, store, drive, notifications } as never, finalAttempt);
 	return { users, store, drive, notifications, execute, path: () => path };
 }
 
@@ -106,13 +108,45 @@ test('saves the complete backup before notifying, then always removes its privat
 	await expect(access(f.path())).rejects.toThrow();
 });
 
-test('does not save or notify for missing/deleted users or a snapshot failure', async () => {
+test('does not save or notify for missing/deleted users or before the last failed attempt', async () => {
 	for (const deleted of [false, true]) {
 		const f = exportFixture(); f.users.findOneBy.mockResolvedValue(deleted ? { id: 'alice', host: null, isDeleted: true } : null as never);
-		await f.execute(); expect(f.store.export).not.toHaveBeenCalled(); expect(f.drive.addFile).not.toHaveBeenCalled();
+		await f.execute(true); expect(f.store.export).not.toHaveBeenCalled(); expect(f.drive.addFile).not.toHaveBeenCalled();
+		expect(f.notifications.createNotification).not.toHaveBeenCalled();
 	}
 	const f = exportFixture(); f.store.export.mockRejectedValue(new Error('BACKUP_TOO_LARGE'));
 	await expect(f.execute()).rejects.toThrow('BACKUP_TOO_LARGE'); expect(f.drive.addFile).not.toHaveBeenCalled(); expect(f.notifications.createNotification).not.toHaveBeenCalled();
+});
+
+test.each([
+	[new BackupError('BACKUP_TOO_LARGE'), 'The backup exceeds the size or record limit.'],
+	[new Error('private deck contents and storage details'), 'The backup could not be exported.'],
+] as const)('notifies only the owner of a terminal native export failure, without passing through the error', async (failure, message) => {
+	const temporaryRoot = await mkdtemp(join(tmpdir(), 'fukushu-export-test-'));
+	vi.stubEnv('TMPDIR', temporaryRoot);
+	vi.stubEnv('TEMP', temporaryRoot);
+	const f = exportFixture();
+	try {
+		f.store.export.mockRejectedValue(failure);
+		await expect(f.execute(true)).rejects.toBe(failure);
+		expect(f.drive.addFile).not.toHaveBeenCalled();
+		expect(f.notifications.createNotification).toHaveBeenCalledExactlyOnceWith('alice', 'app', {
+			customHeader: 'Fukushu', customBody: expect.stringContaining(message), customIcon: null, appAccessTokenId: null,
+		});
+		expect(JSON.stringify(f.notifications.createNotification.mock.calls)).not.toContain(failure.message);
+		expect(await readdir(temporaryRoot)).toEqual([]);
+	} finally {
+		vi.unstubAllEnvs();
+		await rm(temporaryRoot, { recursive: true, force: true });
+	}
+});
+
+test('does not send terminal failure to an account deleted while the backup was running', async () => {
+	const f = exportFixture();
+	f.users.findOneBy.mockResolvedValueOnce({ id: 'alice', host: null, isDeleted: false }).mockResolvedValue({ id: 'alice', host: null, isDeleted: true });
+	f.store.export.mockRejectedValue(new BackupError('BACKUP_TOO_LARGE'));
+	await expect(f.execute(true)).rejects.toThrow('BACKUP_TOO_LARGE');
+	expect(f.notifications.createNotification).not.toHaveBeenCalled();
 });
 
 test('rechecks deleted users after snapshot and emits no false success when Drive fails', async () => {
@@ -126,7 +160,8 @@ test('rechecks deleted users after snapshot and emits no false success when Driv
 
 test('retains the Drive file when notification fails and still removes temporary plaintext', async () => {
 	const f = exportFixture(); f.notifications.createNotification.mockRejectedValue(new Error('Notification unavailable'));
-	await expect(f.execute()).rejects.toThrow('Notification unavailable');
+	await expect(f.execute(true)).rejects.toThrow('Notification unavailable');
+	expect(f.notifications.createNotification).toHaveBeenCalledTimes(1);
 	expect(f.drive.addFile).toHaveBeenCalledTimes(1); await expect(access(f.path())).rejects.toThrow();
 });
 
