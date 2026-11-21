@@ -5,8 +5,9 @@
 
 // https://github.com/typeorm/typeorm/issues/2400
 import pg from 'pg';
-import { DataSource, Logger, type QueryRunner } from 'typeorm';
+import { DataSource, Logger, type DataSourceOptions, type QueryRunner } from 'typeorm';
 import { entities as charts } from '@features/statistics/backend/charts/registry.js';
+import { assertTestDatabaseOptions } from '@features/operations/backend/utility/reset-db.js';
 import { Config } from '@/config.js';
 import { Logger as MisskeyLogger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
@@ -264,7 +265,8 @@ export const entities = [
 const log = process.env.NODE_ENV !== 'production';
 
 export function createPostgresDataSource(config: Config) {
-	return new DataSource({
+	const isTest = process.env.NODE_ENV === 'test';
+	const options: DataSourceOptions = {
 		type: 'postgres',
 		host: config.db.host,
 		port: config.db.port,
@@ -297,9 +299,9 @@ export function createPostgresDataSource(config: Config) {
 				})),
 			},
 		} : {}),
-		synchronize: process.env.NODE_ENV === 'test',
-		dropSchema: process.env.NODE_ENV === 'test',
-		cache: !config.db.disableCache && process.env.NODE_ENV !== 'test' ? { // dbをcloseしても何故かredisのコネクションが内部的に残り続けるようで、テストの際に支障が出るため無効にする(キャッシュも含めてテストしたいため本当は有効にしたいが...)
+		synchronize: isTest,
+		dropSchema: isTest,
+		cache: !config.db.disableCache && !isTest ? { // dbをcloseしても何故かredisのコネクションが内部的に残り続けるようで、テストの際に支障が出るため無効にする(キャッシュも含めてテストしたいため本当は有効にしたいが...)
 			type: 'ioredis',
 			options: {
 				...config.redis,
@@ -317,5 +319,11 @@ export function createPostgresDataSource(config: Config) {
 		maxQueryExecutionTime: 300,
 		entities: entities,
 		migrations: ['../../migration/*.js'],
-	});
+	};
+
+	// TypeORM acts on these flags at initialize(), before the reset-db API is available.
+	if (options.dropSchema || options.synchronize) {
+		assertTestDatabaseOptions(options, 'createPostgresDataSource');
+	}
+	return new DataSource(options);
 }

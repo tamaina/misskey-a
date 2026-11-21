@@ -15,6 +15,7 @@ import * as htmlParser from 'node-html-parser';
 import { DataSource, IsNull } from 'typeorm';
 import Fastify from 'fastify';
 import { entities } from '@features/persistence/backend/postgres.js';
+import { assertTestDatabaseOptions } from '@features/operations/backend/utility/reset-db.js';
 import { loadConfig } from '@/config.js';
 import type * as misskey from 'misskey-js';
 import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';
@@ -662,7 +663,7 @@ export async function testPaginationConsistency<Entity extends { id: string, cre
 export async function initTestDb(justBorrow = false, initEntities?: any[]) {
 	if (process.env.NODE_ENV !== 'test') throw new Error('NODE_ENV is not a test');
 
-	const db = new DataSource({
+	const options: DataSource['options'] = {
 		type: 'postgres',
 		host: config.db.host,
 		port: config.db.port,
@@ -672,8 +673,10 @@ export async function initTestDb(justBorrow = false, initEntities?: any[]) {
 		synchronize: !justBorrow,
 		dropSchema: !justBorrow,
 		entities: initEntities ?? entities,
-	});
+	};
 
+	assertTestDatabaseOptions(options);
+	const db = new DataSource(options);
 	await db.initialize();
 
 	return db;

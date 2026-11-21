@@ -19,6 +19,7 @@ import { entity as TestChartEntity } from '@features/statistics/backend/charts/d
 import { entity as TestGroupedChartEntity } from '@features/statistics/backend/charts/definitions/test-grouped.js';
 import { entity as TestUniqueChartEntity } from '@features/statistics/backend/charts/definitions/test-unique.js';
 import { entity as TestIntersectionChartEntity } from '@features/statistics/backend/charts/definitions/test-intersection.js';
+import { assertTestDatabase } from '@features/operations/backend/utility/reset-db.js';
 import { loadConfig } from '@/config.js';
 import { Logger } from '@features/runtime/backend/logging/logger.js';
 
@@ -63,6 +64,7 @@ describe('Chart', () => {
 			migrations: ['../../migration/*.js'],
 		});
 
+		assertTestDatabase(db);
 		await db.initialize();
 
 		const logger = new Logger('chart'); // TODO: モックにする

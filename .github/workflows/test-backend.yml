@@ -10,6 +10,8 @@ on:
       - packages/features/federation/**
       - packages/features/auth/**
       - packages/features/mcp/**
+      - packages/features/operations/**
+      - packages/features/persistence/**
       - packages/features/relationships/**
       # for permissions
       - packages/misskey-js/**
@@ -23,6 +25,8 @@ on:
       - packages/features/federation/**
       - packages/features/auth/**
       - packages/features/mcp/**
+      - packages/features/operations/**
+      - packages/features/persistence/**
       - packages/features/relationships/**
       # for permissions
       - packages/misskey-js/**
