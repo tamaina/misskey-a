@@ -30,7 +30,7 @@ test('switch defaults off and persists through a new preference manager', async 
 	const Placeholder = defineComponent({ render: () => h('span') });
 	const renderer = createMfmRenderer({ components: () => ({ Url: Placeholder, Link: Placeholder, Mention: Placeholder, A: Placeholder, Time: Placeholder, Emoji: Placeholder, CustomEmoji: Placeholder }), getOptions: () => ({ advancedMfm: false, animatedMfm: false, disableNyaize: prefer.r.disableNoteNyaize.value }) });
 	const Preview = defineComponent({ render: () => h('div', { 'data-testid': 'preview' }, [renderer({ text: 'なな', author: { isCat: true } as MfmBaseProps['author'], nyaize: 'respect' }, { emit: vi.fn() })]) });
-	render(defineComponent({ render: () => h('div', [h(MkNyaizePreference), h(Preview)]) }), { global: { plugins: [locale], directives: { tooltip: {} }, stubs: { SearchMarker: { template: '<div><slot /></div>' }, SearchLabel: { template: '<span><slot /></span>' } } } });
+	render(defineComponent({ render: () => h('div', [h(MkNyaizePreference, { label: 'Disable cat speech' }), h(Preview)]) }), { global: { plugins: [locale], directives: { tooltip: {} }, stubs: { SearchMarker: { template: '<div><slot /></div>' }, SearchLabel: { template: '<span><slot /></span>' } } } });
 	await screen.findByText('Disable cat speech');
 	expect(screen.getByTestId('preview').textContent).toBe('にゃにゃ');
 	await fireEvent.click(screen.getByTestId('switch-toggle'));

@@ -19,7 +19,7 @@ const props = { text, author: { isCat: true }, nyaize: 'respect' };
 const runtime = createInternationalization({ initialLocale: 'en-US' });
 await runtime.ready; await runtime.loadLocale('en-US');
 const app = createApp(defineComponent({ render: () => h('main', [
-	mixed ? h('section', { id: 'viewer-settings' }, [h('div', { id: 'cat-setting' }, [h(MkNyaizePreference)]), h('div', { id: 'search-setting' }, [h(MkMfmSearchPreference)])]) : null,
+	mixed ? h('section', { id: 'viewer-settings' }, [h('div', { id: 'cat-setting' }, [h(MkNyaizePreference, { label: 'Disable cat speech' })]), h('div', { id: 'search-setting' }, [h(MkMfmSearchPreference, { label: 'MFM search engine' })])]) : null,
 	h(Suspense, {}, { default: () => h('div', { id: 'settings' }, [h(Branding)]), fallback: () => h('span', 'Loading settings') }),
 	h('h2', 'Main renderer'), h('div', { id: 'normal' }, [h(Mfm, props)]),
 	h('h2', 'Embed renderer'), h('div', { id: 'embed' }, [h(EmbedMfm, props)]),

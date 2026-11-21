@@ -105,9 +105,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</MkPreferenceContainer>
 							</SearchMarker>
 
-							<MkNyaizePreference/>
+							<SearchMarker :label="$locale.sfc.disableNoteNyaize" :keywords="['cat', 'neko', 'nyaize', 'mfm', 'text']">
+								<MkNyaizePreference :label="$locale.sfc.disableNoteNyaize"/>
+							</SearchMarker>
 
-							<MkMfmSearchPreference/>
+							<SearchMarker :label="$locale.sfc.mfmSearchEngine" :keywords="['mfm', 'search', 'engine', 'google', 'yahoo', 'bing', 'duckduckgo', 'custom']">
+								<MkMfmSearchPreference :label="$locale.sfc.mfmSearchEngine"/>
+							</SearchMarker>
 
 							<SearchMarker :keywords="['mfm', 'enable', 'show', 'advanced']">
 								<MkPreferenceContainer k="advancedMfm">
@@ -1972,6 +1976,8 @@ definePage(() => ({
 	"alwaysConfirmFollow": "Always confirm when following",
 	"highlightSensitiveMedia": "Highlight sensitive media",
 	"confirmWhenRevealingSensitiveMedia": "Confirm when revealing sensitive media",
+	"disableNoteNyaize": "Disable cat speech",
+	"mfmSearchEngine": "MFM search engine",
 	"enableAdvancedMfm": "Enable advanced MFM",
 	"enableInfiniteScroll": "Automatically load more",
 	"native": "Native",
@@ -2763,6 +2769,8 @@ definePage(() => ({
 	"alwaysConfirmFollow": "フォローの際常に確認する",
 	"highlightSensitiveMedia": "メディアがセンシティブであることを分かりやすく表示",
 	"confirmWhenRevealingSensitiveMedia": "センシティブなメディアを表示するとき確認する",
+	"disableNoteNyaize": "ネコの文字置換を無効にする",
+	"mfmSearchEngine": "MFM の検索エンジン",
 	"enableAdvancedMfm": "高度なMFMを有効にする",
 	"enableInfiniteScroll": "自動でもっと見る",
 	"native": "ネイティブ",

@@ -4,7 +4,7 @@
  */
 import { defineComponent, h } from 'vue';
 import { beforeAll, beforeEach, afterEach, expect, test, vi } from 'vitest';
-import { cleanup, fireEvent, render, screen } from '@testing-library/vue';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/vue';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import MkGoogle from '@features/integrations/frontend/components/MkGoogle.vue';
 import * as os from '@features/ui/frontend/os.js';
@@ -29,9 +29,9 @@ afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
 test('custom setting saves, restores, updates the real search button and safely opens the edited query', async () => {
 	const openWindow = vi.spyOn(window, 'open').mockReturnValue(null);
-	render(defineComponent({ render: () => h('div', [h(MkMfmSearchPreference), h(MkGoogle, { q: 'original query' })]) }), { global });
-	await screen.findByRole('button', { name: 'Search with Google' });
-	await fireEvent.mouseDown(screen.getByText('Google', { exact: true }));
+	render(defineComponent({ render: () => h('div', [h('section', { 'data-testid': 'mfm-search-preference' }, [h(MkMfmSearchPreference, { label: 'MFM search engine' })]), h(MkGoogle, { q: 'original query' })]) }), { global });
+	await screen.findByRole('button', { name: 'Search (Google)' });
+	await fireEvent.mouseDown(within(screen.getByTestId('mfm-search-preference')).getByText('Google', { exact: true }));
 	const item = vi.mocked(os.popupMenu).mock.calls[0][0].find(candidate => candidate != null && typeof candidate === 'object' && 'text' in candidate && candidate.text === 'Custom');
 	if (item == null || typeof item !== 'object' || !('action' in item)) throw new Error('Custom option missing');
 	item.action(new PointerEvent('click'));
@@ -39,9 +39,9 @@ test('custom setting saves, restores, updates the real search button and safely 
 	await fireEvent.update(field, 'https://example.com/?q={query}');
 	expect(prefer.s.mfmSearchEngineCustomUrl).toBe('');
 	await fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-	await screen.findByRole('button', { name: 'Search with example.com' });
+	await screen.findByRole('button', { name: 'Search (example.com)' });
 	await fireEvent.update(screen.getByRole('searchbox'), '日本語 &other=1');
-	await fireEvent.click(screen.getByRole('button', { name: 'Search with example.com' }));
+	await fireEvent.click(screen.getByRole('button', { name: 'Search (example.com)' }));
 	expect(openWindow).toHaveBeenCalledWith('https://example.com/?q=%E6%97%A5%E6%9C%AC%E8%AA%9E%20%26other%3D1', '_blank', 'noopener');
 	const io: StorageProvider = { load: () => fixture.profile, save: () => {}, cloudGetBulk: async () => ({}), cloudGet: async () => null, cloudSet: async () => {} };
 	const restored = new PreferencesManager(io, null); await restored.cloudReady;
@@ -55,6 +55,6 @@ test('invalid imported custom URL falls back to Google and q prop changes retain
 	const view = render(MkGoogle, { props: { q: 'old' }, global });
 	await view.rerender({ q: 'new & data' });
 	expect((screen.getByRole('searchbox') as HTMLInputElement).value).toBe('new & data');
-	await fireEvent.click(await screen.findByRole('button', { name: 'Search with Google' }));
+	await fireEvent.click(await screen.findByRole('button', { name: 'Search (Google)' }));
 	expect(openWindow).toHaveBeenCalledWith('https://www.google.com/search?q=new%20%26%20data', '_blank', 'noopener');
 });

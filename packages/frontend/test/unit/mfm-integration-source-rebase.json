@@ -1,19 +1,31 @@
 [
   {
     "file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
-    "currentSha256": "b592f2193153d14c062a30ed3a00151195269cd58f50835616ef6a232b13c775",
+    "currentSha256": "e6681a373094f3ef8c01d95920f6e1a2a624716d486da65a907d530dbdee388e",
     "baselineSha256": "29749ad8071bdf46376d8f2de1de901371d6a262e6586e58ea3e39d783428593",
     "edits": [
       {
         "start": 5226,
-        "end": 5289,
-        "current": "\n\t\t\t\t\t\t\t<MkNyaizePreference/>\n\n\t\t\t\t\t\t\t<MkMfmSearchPreference/>\n",
+        "end": 5677,
+        "current": "\n\t\t\t\t\t\t\t<SearchMarker :label=\"$locale.sfc.disableNoteNyaize\" :keywords=\"['cat', 'neko', 'nyaize', 'mfm', 'text']\">\n\t\t\t\t\t\t\t\t<MkNyaizePreference :label=\"$locale.sfc.disableNoteNyaize\"/>\n\t\t\t\t\t\t\t</SearchMarker>\n\n\t\t\t\t\t\t\t<SearchMarker :label=\"$locale.sfc.mfmSearchEngine\" :keywords=\"['mfm', 'search', 'engine', 'google', 'yahoo', 'bing', 'duckduckgo', 'custom']\">\n\t\t\t\t\t\t\t\t<MkMfmSearchPreference :label=\"$locale.sfc.mfmSearchEngine\"/>\n\t\t\t\t\t\t\t</SearchMarker>\n",
         "baseline": ""
       },
       {
-        "start": 41956,
-        "end": 42160,
+        "start": 42344,
+        "end": 42548,
         "current": "import MkNyaizePreference from '@features/preferences/frontend/components/MkNyaizePreference.vue';\nimport MkMfmSearchPreference from '@features/preferences/frontend/components/MkMfmSearchPreference.vue';\n",
+        "baseline": ""
+      },
+      {
+        "start": 102925,
+        "end": 103010,
+        "current": "\t\"disableNoteNyaize\": \"Disable cat speech\",\n\t\"mfmSearchEngine\": \"MFM search engine\",\n",
+        "baseline": ""
+      },
+      {
+        "start": 153468,
+        "end": 153542,
+        "current": "\t\"disableNoteNyaize\": \"ネコの文字置換を無効にする\",\n\t\"mfmSearchEngine\": \"MFM の検索エンジン\",\n",
         "baseline": ""
       }
     ],
@@ -123,6 +135,52 @@
       "163cbb78352869c8d23922eb353c1cf565a2c6cddcfbea16c5ac476658248c46",
       "3033e1f961632b9971a55ae621d6f60390567baf8644937903463b529f44cdaa",
       "fea540f7251299411be142842333bbbf58f31fdb3aeceb7bbe50360f95759d45"
+    ]
+  },
+  {
+    "file": "packages/features/instance/frontend/pages/admin/branding.vue",
+    "currentSha256": "caa48bcde912e208f5ab54a8458879ac185b3eea40d040bda6a164d2c503c0bf",
+    "baselineSha256": "8034f4e174eb867b6d09ef350a285b0a9dc7c872e163141baac95687cb2601a8",
+    "edits": [
+      {
+        "start": 385,
+        "end": 611,
+        "current": "\t\t\t\t<SearchMarker :label=\"$locale.sfc.mfmFormulaRendering\" :keywords=\"['latex', 'katex', 'formula', 'math', 'mfm']\">\n\t\t\t\t\t<MkFormulaSetting v-model=\"latexEnabled\" :label=\"$locale.sfc.mfmFormulaRendering\"/>\n\t\t\t\t</SearchMarker>\n",
+        "baseline": ""
+      },
+      {
+        "start": 7983,
+        "end": 8158,
+        "current": "import MkFormulaSetting from '@features/markup/frontend/components/MkFormulaSetting.vue';\nimport { isLatexEnabled } from '@features/markup/frontend/shared/formula-safety.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 8298,
+        "end": 8360,
+        "current": "const latexEnabled = ref(isLatexEnabled(meta.clientOptions));\n",
+        "baseline": ""
+      },
+      {
+        "start": 9553,
+        "end": 9590,
+        "current": "\t\t\tlatexEnabled: latexEnabled.value,\n",
+        "baseline": ""
+      },
+      {
+        "start": 18157,
+        "end": 18206,
+        "current": "\t\"mfmFormulaRendering\": \"MFM formula rendering\",\n",
+        "baseline": ""
+      },
+      {
+        "start": 25496,
+        "end": 25533,
+        "current": "\t\"mfmFormulaRendering\": \"MFM の数式表示\",\n",
+        "baseline": ""
+      }
+    ],
+    "individualSha256": [
+      "2072842b426e3bf1f99e6442b5ffd4e568b667e480cbcd017b64fe681432954d"
     ]
   }
 ]

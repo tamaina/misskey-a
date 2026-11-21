@@ -8,7 +8,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div class="_spacer" style="--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 32px;">
 		<SearchMarker path="/admin/branding" :label="$locale.sfc.branding" :keywords="['branding']" icon="ti ti-paint">
 			<div class="_gaps_m">
-				<MkFormulaSetting v-model="latexEnabled"/>
+				<SearchMarker :label="$locale.sfc.mfmFormulaRendering" :keywords="['latex', 'katex', 'formula', 'math', 'mfm']">
+					<MkFormulaSetting v-model="latexEnabled" :label="$locale.sfc.mfmFormulaRendering"/>
+				</SearchMarker>
 				<SearchMarker :keywords="['entrance', 'welcome', 'landing', 'front', 'home', 'page', 'style']">
 					<MkRadios
 						v-model="entrancePageStyle"
@@ -374,6 +376,7 @@ definePage(() => ({
 <locale lang="json" locale="en-US">
 {
 	"branding": "Branding",
+	"mfmFormulaRendering": "MFM formula rendering",
 	"serverSettingsEntrancePageStyle": "Entrance page style",
 	"serverSettingsShowTimelineForVisitor": "Show timeline",
 	"serverSettingsShowActivitiesForVisitor": "Show activities",
@@ -504,6 +507,7 @@ definePage(() => ({
 <locale lang="json" locale="ja-JP">
 {
 	"branding": "ブランディング",
+	"mfmFormulaRendering": "MFM の数式表示",
 	"serverSettingsEntrancePageStyle": "エントランスページのスタイル",
 	"serverSettingsShowTimelineForVisitor": "タイムラインを表示する",
 	"serverSettingsShowActivitiesForVisitor": "アクティビティを表示する",

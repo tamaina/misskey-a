@@ -3,22 +3,20 @@ SPDX-FileCopyrightText: syuilo and misskey-project
 SPDX-License-Identifier: AGPL-3.0-only
 -->
 <template>
-<SearchMarker :keywords="['mfm', 'search', 'engine', 'google', 'yahoo', 'bing', 'duckduckgo', 'custom']">
-	<div class="_gaps_s">
-		<MkPreferenceContainer k="mfmSearchEngine">
-			<MkSelect v-model="engine" :items="[...builtinItems, { label: $locale.sfc.custom, value: 'custom' as const }]">
-				<template #label><SearchLabel>{{ $locale.sfc.label }}</SearchLabel></template>
-				<template #caption>{{ $locale.sfc.caption }}</template>
-			</MkSelect>
-		</MkPreferenceContainer>
-		<MkPreferenceContainer v-if="engine === 'custom'" k="mfmSearchEngineCustomUrl">
-			<MkInput v-model="customUrl" type="url" placeholder="https://example.com/search?q={query}" manualSave>
-				<template #label>{{ $locale.sfc.customUrl }}</template>
-				<template #caption>{{ valid || customUrl === '' ? $locale.sfc.customHint : $locale.sfc.invalid }}</template>
-			</MkInput>
-		</MkPreferenceContainer>
-	</div>
-</SearchMarker>
+<div class="_gaps_s">
+	<MkPreferenceContainer k="mfmSearchEngine">
+		<MkSelect v-model="engine" :items="[...builtinItems, { label: $locale.sfc.custom, value: 'custom' as const }]">
+			<template #label>{{ label }}</template>
+			<template #caption>{{ $locale.sfc.caption }}</template>
+		</MkSelect>
+	</MkPreferenceContainer>
+	<MkPreferenceContainer v-if="engine === 'custom'" k="mfmSearchEngineCustomUrl">
+		<MkInput v-model="customUrl" type="url" placeholder="https://example.com/search?q={query}" manualSave>
+			<template #label>{{ $locale.sfc.customUrl }}</template>
+			<template #caption>{{ valid || customUrl === '' ? $locale.sfc.customHint : $locale.sfc.invalid }}</template>
+		</MkInput>
+	</MkPreferenceContainer>
+</div>
 </template>
 <script lang="ts" setup>
 import { computed } from 'vue';
@@ -27,6 +25,7 @@ import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { SEARCH_ENGINES, SEARCH_ENGINE_IDS, isValidCustomSearchUrl } from '@features/integrations/frontend/utility/mfm-search-engines.js';
 import MkPreferenceContainer from './MkPreferenceContainer.vue';
+defineProps<{ label: string }>();
 const engine = prefer.model('mfmSearchEngine');
 const customUrl = prefer.model('mfmSearchEngineCustomUrl');
 const builtinItems = SEARCH_ENGINE_IDS.map(value => ({ label: SEARCH_ENGINES[value].name, value }));
@@ -34,7 +33,6 @@ const valid = computed(() => isValidCustomSearchUrl(customUrl.value));
 </script>
 <locale locale="ja-JP" lang="json">
 {
- "label": "MFM の検索エンジン",
  "caption": "ノート内の検索窓から開く検索サービスを選びます。",
  "custom": "カスタム",
  "customUrl": "カスタム検索 URL",
@@ -44,7 +42,6 @@ const valid = computed(() => isValidCustomSearchUrl(customUrl.value));
 </locale>
 <locale locale="en-US" lang="json">
 {
- "label": "MFM search engine",
  "caption": "Choose the service opened by search boxes in notes.",
  "custom": "Custom",
  "customUrl": "Custom search URL",
