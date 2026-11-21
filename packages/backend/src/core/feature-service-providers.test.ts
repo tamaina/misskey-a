@@ -135,7 +135,7 @@ describe('feature service composition adapter', () => {
 			discovery: ['services/UserSearchService', 'serializers/HashtagEntityService'],
 			drive: ['serializers/DriveFolderEntityService', 'services/media', 'services/ImageProcessingService', 'services/VideoProcessingService', 'services/SensitiveMediaDetectionService', 'services/FileInfoService'],
 			emojis: ['serializers/EmojiEntityService'],
-			games: ['serializers/ReversiGameEntityService'],
+			'games/reversi': ['serializers/ReversiGameEntityService'],
 			instance: ['serializers/InstanceEntityService', 'serializers/MetaEntityService'],
 			integrations: ['serializers/SystemWebhookEntityService'],
 			markup: ['services/MfmService'],

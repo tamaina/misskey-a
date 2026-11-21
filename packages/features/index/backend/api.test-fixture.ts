@@ -15,7 +15,7 @@ import { createIntegrationsRouter } from '@features/integrations/backend/api.imp
 import { createOperationsRouter } from '@features/operations/backend/api.implementation.js';
 import { createFederationRouter } from '@features/federation/backend/api.implementation.js';
 import { createFukushuRouter } from '@features/games/fukushu/backend/api.implementation.js';
-import { createGamesRouter } from '@features/games/backend/api.implementation.js';
+import { createGamesRouter } from '@features/games/index/backend/api.implementation.js';
 import { createPlayRouter } from '@features/play/backend/api.implementation.js';
 import { createPagesRouter } from '@features/pages/backend/api.implementation.js';
 import { createChannelsRouter } from '@features/channels/backend/api.implementation.js';

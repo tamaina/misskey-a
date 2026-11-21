@@ -9,6 +9,7 @@ import { resolve } from 'node:path';
 import { parse } from 'vue/compiler-sfc';
 import { locales } from 'i18n';
 import escapes from './shared-global-locale-escapes.json';
+import { restoreCrowdin18171Baseline } from './upstream-develop-source-rebase.js';
 import type { RuntimeLocaleDictionary } from 'vite-vue-internationalization/runtime';
 
 // Independently pinned source hashes; translation values remain in locales/*.yml.
@@ -6343,7 +6344,7 @@ export const globalCatalogPilotOwners = [
 		]
 	},
 	{
-		"file": "packages/features/games/frontend/pages/drop-and-fusion.game.vue",
+		"file": "packages/features/games/bubble-game/frontend/pages/drop-and-fusion.game.vue",
 		"currentSha256": "90c67bfe8cb4b3c0d7f76f337e2e94c02c307abe0b0565c3710dfe6886bb22d9",
 		"baselineSha256": "63de8fb5dc1136e056aed7810c19b01d66b17bb3cc9ed852b34d50e12075abe5",
 		"keys": [
@@ -6396,8 +6397,8 @@ export const globalCatalogPilotOwners = [
 		]
 	},
 	{
-		"file": "packages/features/games/frontend/pages/drop-and-fusion.vue",
-		"currentSha256": "93e52d9216c5789f32b867951d3094e9bb959d9dddf7d75da924a1c9e6ca47aa",
+		"file": "packages/features/games/bubble-game/frontend/pages/drop-and-fusion.vue",
+		"currentSha256": "4130c09be3727672bb40f739860226312157a185a080865a8aacc1f6878acf50",
 		"baselineSha256": "5052e29eed186284c15ff6a20d8a1f159271e1697cca2d7d354cc7397ed8d091",
 		"keys": [
 			"mute"
@@ -6423,15 +6424,21 @@ export const globalCatalogPilotOwners = [
 				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
 			},
 			{
-				"start": 3832,
-				"end": 3926,
+				"start": 3246,
+				"end": 3258,
+				"current": "/bubble-game",
+				"baseline": ""
+			},
+			{
+				"start": 3844,
+				"end": 3938,
 				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}
 		]
 	},
 	{
-		"file": "packages/features/games/frontend/pages/reversi/game.board.vue",
+		"file": "packages/features/games/reversi/frontend/pages/game.board.vue",
 		"currentSha256": "2368069b5e2053731d52c9e2682a05883dfcdd7fa4bfc2208d0aa9bb352e76eb",
 		"baselineSha256": "0e2b6ce27589f6d3dee1a75115e6094a9be049293fe30b2659a61278d3884509",
 		"keys": [
@@ -6478,7 +6485,7 @@ export const globalCatalogPilotOwners = [
 		]
 	},
 	{
-		"file": "packages/features/games/frontend/pages/reversi/game.setting.vue",
+		"file": "packages/features/games/reversi/frontend/pages/game.setting.vue",
 		"currentSha256": "41926f8958e661df93c183c15835c921fbc7e4ad74d63706789bbed11f88e125",
 		"baselineSha256": "35fdacf60dc929274358141904d5ba32623828fa80cfdcfa8b246dbfa1f6fe63",
 		"keys": [
@@ -6585,7 +6592,7 @@ export const globalCatalogPilotOwners = [
 		]
 	},
 	{
-		"file": "packages/features/games/frontend/pages/reversi/index.vue",
+		"file": "packages/features/games/reversi/frontend/pages/index.vue",
 		"currentSha256": "a62609a4c23aace4563411f326dfd0a6d04200ce68e850b39cb43650fce3c2ef",
 		"baselineSha256": "bd8239ba57f55c964c40bfb9ffcd6e14f79eb0c38d8c5237877e8f591ce60823",
 		"keys": [
@@ -17028,6 +17035,7 @@ const globalValue = (dictionary: unknown, key: string): unknown => {
 
 /** Replay the pre-pilot source only after verifying both complete source boundaries. */
 export function restoreGlobalCatalogPilotSource(file: string, source: string): string {
+	source = restoreCrowdin18171Baseline(file, source);
 	const owner = globalCatalogPilotOwners.find(owner => owner.file === file);
 	if (!owner || sha256(source) === owner.baselineSha256) return source;
 	if (sha256(source) !== owner.currentSha256) throw new Error(`Global catalog pilot source differs: ${file}`);
@@ -17075,7 +17083,7 @@ export function restoreGlobalCatalogPilotDictionary(file: string, language: stri
 	for (const key of owner.keys) {
 		if (JSON.stringify(globalValue(global, key)) !== JSON.stringify(globalValue(locales[language], key))) throw new Error(`Global catalog pilot shared label differs: ${language}:${key}`);
 	}
-	const beforeFollowup = { ...dictionary };
+	const beforeFollowup = collect(restoreCrowdin18171Baseline(file, source));
 	if ('dictionaryEdits' in owner) {
 		for (const edit of owner.dictionaryEdits) {
 			if (edit.language !== language) continue;
