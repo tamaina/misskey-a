@@ -19,6 +19,9 @@ Seat/felt presentation adapted from upstream PR #13112; see ../../README.md.
 	<div :class="$style.seats">
 		<section v-for="entry in seats" :key="entry.seat.userId" :class="[$style.seat, { [$style.turn]: entry.index === view.snapshot?.turnSeat, [$style.mine]: entry.seat.userId === userId }]">
 			<header><strong>{{ ['東', '南', '西', '北'][entry.index] }} · {{ names[entry.seat.userId] ?? entry.seat.userId }}</strong><b>{{ entry.seat.score.toLocaleString() }}</b></header>
+			<div v-if="entry.delta !== undefined" :class="$style.delta">
+				{{ $locale.sfc.scoreChange }} <strong>{{ deltaFormatter.format(entry.delta) }}</strong>
+			</div>
 			<div :class="$style.tiles" :aria-label="$locale.sfc.handTiles">
 				<Tile v-for="(tile, i) in entry.seat.concealedHand ? handTiles(entry.seat.concealedHand) : Array(entry.seat.concealedCount).fill('_')" :key="i" :tile="tile"/>
 			</div>
@@ -61,10 +64,17 @@ function hasSameTileAlternative(action: Action): boolean {
 	return props.view.phase?.actions.some(other => other.kind === action.kind && other.tiles === alternate) ?? false;
 }
 
-const seats = computed(() => props.view.snapshot?.seats.map((seat, index) => ({ seat, index })).sort((a, b) => Number(a.seat.userId === props.userId) - Number(b.seat.userId === props.userId)) ?? []);
+const deltaFormatter = new Intl.NumberFormat(undefined, { signDisplay: 'exceptZero' });
+const seats = computed(() => {
+	const { phase, snapshot, outcome } = props.view;
+	// Result deltas are in core seat order, before this table moves the viewer's seat last.
+	const deltas = phase?.kind === 'hule' || phase?.kind === 'pingju' ? outcome?.deltas : undefined;
+	return snapshot?.seats.map((seat, index) => ({ seat, index, delta: deltas?.[index] }))
+		.sort((a, b) => Number(a.seat.userId === props.userId) - Number(b.seat.userId === props.userId)) ?? [];
+});
 </script>
 <locale locale="ja-JP" lang="json">
-{"hand":"局","honba":"本場","remaining":"残り","riichiSticks":"供託","dora":"ドラ表示牌","handTiles":"手牌","discards":"捨て牌","standings":"最終順位","ended":"対局終了 — 牌譜は公開されません","waiting":"他の参加者の操作を待っています","choose":"操作を選んでください","seconds":"秒","discard":"打牌","riichi":"リーチ","handDiscard":"手出し","drawnDiscard":"ツモ切り","chi":"チー","pon":"ポン","kan":"カン","win":"和了","draw":"流局","pass":"見送る","continue":"次へ"}
+{"hand":"局","honba":"本場","remaining":"残り","riichiSticks":"供託","dora":"ドラ表示牌","handTiles":"手牌","discards":"捨て牌","scoreChange":"点数増減","standings":"最終順位","ended":"対局終了 — 牌譜は公開されません","waiting":"他の参加者の操作を待っています","choose":"操作を選んでください","seconds":"秒","discard":"打牌","riichi":"リーチ","handDiscard":"手出し","drawnDiscard":"ツモ切り","chi":"チー","pon":"ポン","kan":"カン","win":"和了","draw":"流局","pass":"見送る","continue":"次へ"}
 </locale>
 <style module>
 .table { padding: 20px; border-radius: 16px; background: radial-gradient(ellipse at top, #286a61, #143e39); color: #fff; box-shadow: inset 0 0 0 1px #ffffff20; }
@@ -73,6 +83,7 @@ const seats = computed(() => props.view.snapshot?.seats.map((seat, index) => ({ 
 .seats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .seat { min-width: 0; padding: 12px; border: 2px solid transparent; border-radius: 10px; background: #0003; }
 .seat > header { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 12px; font-size: .85em; overflow-wrap: anywhere; }
+.delta { margin-bottom: 8px; font-size: .85em; font-variant-numeric: tabular-nums; }
 .turn { border-color: #f6d78c; }
 .mine { background: #ffffff12; }
 .tiles { display: flex; flex-wrap: wrap; gap: 1px; }
