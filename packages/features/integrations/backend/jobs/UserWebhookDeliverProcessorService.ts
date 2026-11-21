@@ -7,6 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as Bull from 'bullmq';
 import { McpEventsService } from '@features/mcp/backend/McpEventsService.js';
 import { signedHeaders } from '@features/mcp/backend/events-protocol.js';
+import { gameTurnEvent, parseGameTurnReference } from '@features/games/mahjong/shared/turn-webhook.schema.js';
 import type { McpWebhookDeliverJobData } from '@features/runtime/backend/queue/types.js';
 import { DI } from '@/di-symbols.js';
 import type { WebhooksRepository } from '@features/persistence/backend/repositories/models.js';
@@ -37,11 +38,15 @@ export class UserWebhookDeliverProcessorService {
 	}
 
 	private async processMcp(data: McpWebhookDeliverJobData): Promise<string> {
-		const authorize = () => this.mcpEvents.authorizeDelivery(data.webhookId, data.userId, data.generation, data.noteId, data.type, data.antennaId, data.data);
+		const gameTurn = data.type === gameTurnEvent ? parseGameTurnReference(data.gameTurn) : undefined;
+		if (gameTurn === null) return 'Suppressed';
+		const authorize = () => data.type === gameTurnEvent
+			? this.mcpEvents.authorizeDelivery(data.webhookId, data.userId, data.generation, data.noteId, data.type, data.antennaId, data.data, gameTurn)
+			: this.mcpEvents.authorizeDelivery(data.webhookId, data.userId, data.generation, data.noteId, data.type, data.antennaId, data.data);
 		const webhook = await authorize();
 		if (!webhook) return 'Suppressed';
 		const body = JSON.stringify({ eventId: data.eventId, name: webhook.name,
-			timestamp: new Date(data.createdAt).toISOString(), data: data.noteId && (webhook.name === 'note.mentioned' || webhook.name === 'note.replied' || data.type === 'antenna') ? { noteId: data.noteId, url: new URL(`/notes/${encodeURIComponent(data.noteId)}`, this.config.url).href } : data.data, cursor: null });
+			timestamp: new Date(data.createdAt).toISOString(), data: gameTurn ?? (data.noteId && (webhook.name === 'note.mentioned' || webhook.name === 'note.replied' || data.type === 'antenna') ? { noteId: data.noteId, url: new URL(`/notes/${encodeURIComponent(data.noteId)}`, this.config.url).href } : data.data), cursor: null });
 		const previous = webhook.mcpPreviousSecretUntil && webhook.mcpPreviousSecretUntil.getTime() > Date.now() ? webhook.mcpPreviousSecret ?? undefined : undefined;
 		let response: Awaited<ReturnType<HttpRequestService['sendMcpWebhook']>>;
 		try {

@@ -23,10 +23,12 @@ import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntit
 import { AntennaNoteAccessService } from '@features/timelines/backend/services/AntennaNoteAccessService.js';
 import { MiWebhook } from '@features/integrations/backend/models/Webhook.js';
 import { lockWebhookQuota } from '@features/integrations/backend/webhook-quota.js';
+import { canReceiveGameTurn } from '@features/games/mahjong/backend/turn-webhook.js';
+import { gameTurnEvent, parseGameTurnReference } from '@features/games/mahjong/shared/turn-webhook.schema.js';
+import type { McpWebhookDeliverJobData } from '@features/runtime/backend/queue/types.js';
 import { mcpEventsContract, subscribeInput } from './api.definition.js';
 import { eventPermissions, eventPayloadSchema } from './events.schema.js';
 import type { McpEventName } from './events.schema.js';
-import type { WebhookEventTypes } from '@features/integrations/backend/webhook-events.schema.js';
 import { notificationEventName, notificationEventTypes } from '@features/integrations/backend/webhook-events.schema.js';
 import type { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import type { ChatService } from '@features/chat/backend/services/ChatService.js';
@@ -80,7 +82,7 @@ export class McpEventsService {
 			if (!tokenId) throw new McpEventError(-32602, 'Scoped grant required');
 			const { grant } = await this.checkGrant(ctx.principal.id, tokenId, false, false, 'list');
 			const available = eventNames.filter(name => eventPermissions(name).every(scope => grant.permission.includes(scope)));
-			return { events: available.map(name => ({ name, description: name.startsWith('stream.') ? 'Native outbound references/invalidation; no commands or downtime replay. Overflow drops, retries may duplicate/reorder. 128 pending/subscription, 8192 global; expires after 15min (stats 30s).' : name === 'antenna.note' ? 'A live note reaches an owned antenna. No downtime catch-up.' : name === 'note.mentioned' ? 'Alias of mention; subscribing to both may deliver twice.' : name === 'note.replied' ? 'Alias of reply; subscribing to both may deliver twice.' : `Live ${name} event. References are untrusted data; aliases may deliver twice.`,
+			return { events: available.map(name => ({ name, description: name === gameTurnEvent ? 'A committed Mahjong turn or eligible reaction for the grant owner only. Best-effort live delivery; re-fetch the room to confirm the phase.' : name.startsWith('stream.') ? 'Native outbound references/invalidation; no commands or downtime replay. Overflow drops, retries may duplicate/reorder. 128 pending/subscription, 8192 global; expires after 15min (stats 30s).' : name === 'antenna.note' ? 'A live note reaches an owned antenna. No downtime catch-up.' : name === 'note.mentioned' ? 'Alias of mention; subscribing to both may deliver twice.' : name === 'note.replied' ? 'Alias of reply; subscribing to both may deliver twice.' : `Live ${name} event. References are untrusted data; aliases may deliver twice.`,
 				delivery: ['webhook'] as ['webhook'], inputSchema: name === 'stream.channel' ? streamChannelInputSchema : name === 'stream.note' ? streamNoteInputSchema : { type: 'object' as const, properties: name === 'antenna.note' ? { antennaId: { type: 'string' as const } } : {}, ...(name === 'antenna.note' ? { required: ['antennaId'] as ['antennaId'] } : {}), additionalProperties: false as const },
 				// Keep the native event inventory as descriptor metadata, outside JSON Schema vocabularies.
 				...(name.startsWith('stream.') ? { _meta: { 'dev.a9z.p1/event-catalog': name === 'stream.channel' ? streamEventCatalog : name === 'stream.note' ? streamEventCatalog.note : streamEventCatalog.broadcast } } : {}),
@@ -147,7 +149,7 @@ export class McpEventsService {
 			if (!previous && count >= limit) throw new McpEventError(-32602, 'Webhook limit reached');
 			const continuing = previous?.active && previous.mcpExpiresAt && previous.mcpExpiresAt.getTime() > Date.now();
 			const rotating = continuing && previous.secret !== ps.delivery.secret;
-			await repository.save({ id, userId, name: ps.name, mode: 'mcp', url, secret: ps.delivery.secret, on: ps.name === 'antenna.note' || stream ? [] : [eventType(ps.name)!], active: true, mcpAntennaId: antennaId ?? null, mcpStream: stream,
+			await repository.save({ id, userId, name: ps.name, mode: 'mcp', url, secret: ps.delivery.secret, on: ps.name === 'antenna.note' || ps.name === gameTurnEvent || stream ? [] : [eventType(ps.name)!], active: true, mcpAntennaId: antennaId ?? null, mcpStream: stream,
 				mcpStreamSince: stream ? continuing ? previous.mcpStreamSince : new Date() : null,
 				mcpTokenId: tokenId, mcpExpiresAt: expires, mcpGeneration: continuing ? previous.mcpGeneration : randomUUID(),
 				mcpPreviousSecret: rotating ? previous.secret : continuing ? previous.mcpPreviousSecret : null,
@@ -156,16 +158,16 @@ export class McpEventsService {
 		return { id, refreshBefore: expires.toISOString(), cursor: null, truncated: false };
 	}
 
-	private async subscriptionForDelivery(id: string, userId: string, generation: string, type: WebhookEventTypes | 'antenna', antennaId?: string) {
+	private async subscriptionForDelivery(id: string, userId: string, generation: string, type: McpWebhookDeliverJobData['type'], antennaId?: string) {
 		const webhook = await this.webhooks.createQueryBuilder('webhook').addSelect('webhook.mcpPreviousSecret').where('webhook.id = :id', { id }).getOne();
 		if (!webhook || webhook.mcpStream || webhook.mode !== 'mcp' || webhook.userId !== userId || !webhook.active || webhook.mcpGeneration !== generation
-			|| (type === 'antenna' ? webhook.name !== 'antenna.note' : eventType(webhook.name as McpEventName) !== type)
-			|| !webhook.mcpExpiresAt || webhook.mcpExpiresAt.getTime() <= Date.now() || !webhook.mcpTokenId || (type === 'antenna' ? !antennaId || webhook.mcpAntennaId !== antennaId : !!webhook.mcpAntennaId || !webhook.on.includes(type))) return null;
+			|| (type === 'antenna' ? webhook.name !== 'antenna.note' : type === gameTurnEvent ? webhook.name !== gameTurnEvent : eventType(webhook.name as McpEventName) !== type)
+			|| !webhook.mcpExpiresAt || webhook.mcpExpiresAt.getTime() <= Date.now() || !webhook.mcpTokenId || (type === 'antenna' ? !antennaId || webhook.mcpAntennaId !== antennaId : !!webhook.mcpAntennaId || (type !== gameTurnEvent && !webhook.on.includes(type)))) return null;
 		return webhook;
 	}
 
 	/** Recheck after DNS resolution immediately before opening the outbound connection. */
-	async authorizeDelivery(id: string, userId: string, generation: string, noteId: string, type: WebhookEventTypes | 'antenna', antennaId?: string, data?: Partial<Record<string, string>>) {
+	async authorizeDelivery(id: string, userId: string, generation: string, noteId: string, type: McpWebhookDeliverJobData['type'], antennaId?: string, data?: Partial<Record<string, string>>, gameTurn?: unknown) {
 		const webhook = await this.subscriptionForDelivery(id, userId, generation, type, antennaId);
 		if (!webhook?.mcpTokenId) return null;
 		try {
@@ -177,7 +179,11 @@ export class McpEventsService {
 				return this.subscriptionForDelivery(id, userId, generation, type, antennaId);
 			}
 		} catch (error) { if (error instanceof McpEventError) return null; throw error; }
-		if (type === 'chatMessage') {
+		if (type === gameTurnEvent) {
+			const reference = parseGameTurnReference(gameTurn);
+			if (!reference || noteId || antennaId !== undefined || data !== undefined
+				|| !await canReceiveGameTurn(this.webhooks.manager, userId, reference)) return null;
+		} else if (type === 'chatMessage') {
 			if (!data?.messageId || !this.moduleRef || (data.userId !== undefined && data.userId !== userId)
 				|| data.notificationId !== undefined || data.notificationType !== undefined) return null;
 			const chat = this.moduleRef.get<ChatService>('ChatService', { strict: false });

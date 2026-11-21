@@ -18,6 +18,10 @@ import { streamEventCatalog } from '../../backend/stream-catalog.js';
 import { modernRequest } from '../../backend/modern-request.js';
 import { UserWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/UserWebhookDeliverProcessorService.js';
 import { MiWebhook } from '@features/integrations/backend/models/Webhook.js';
+import { MiMahjongRoom } from '@features/games/mahjong/backend/models/MahjongRoom.js';
+import { gameTurnEvent } from '@features/games/mahjong/shared/turn-webhook.schema.js';
+import type { RoomState } from '@features/games/mahjong/backend/room.js';
+import type { Repository } from 'typeorm';
 import { UserWebhookService, type UserWebhookPayload } from '@features/integrations/backend/services/UserWebhookService.js';
 import type { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import type * as Redis from 'ioredis';
@@ -280,7 +284,7 @@ it('advertises strict antenna arguments separately from empty mention/reply argu
 it('advertises object input schemas for all available event definitions', async () => {
 	permission.push('read:account');
 	const result = await service.invoke('events/list', {}, context()) as { events: { name: string; inputSchema: unknown }[] };
-	expect(result.events).toHaveLength(27);
+	expect(result.events).toHaveLength(28);
 	for (const event of result.events) expect(ToolSchema.shape.inputSchema.safeParse(event.inputSchema).success, event.name).toBe(true);
 });
 
@@ -311,8 +315,8 @@ it.each([
 	{ scopes: ['read:notifications'], names: [...notificationNames, 'note.mentioned', 'note.replied'] },
 	{ scopes: ['read:chat'], names: ['chatMessage'] },
 	{ scopes: ['read:following'], names: ['unfollow', 'follow'] },
-	{ scopes: ['read:account'], names: ['note', 'stream.channel', 'stream.broadcast', 'stream.note'] },
-	{ scopes: ['read:notifications', 'read:account'], names: ['note', ...notificationNames.slice(0, -2), 'login', 'createToken', 'app', 'test', 'note.mentioned', 'note.replied', 'antenna.note', 'stream.channel', 'stream.broadcast', 'stream.note'] },
+	{ scopes: ['read:account'], names: ['note', gameTurnEvent, 'stream.channel', 'stream.broadcast', 'stream.note'] },
+	{ scopes: ['read:notifications', 'read:account'], names: ['note', ...notificationNames.slice(0, -2), 'login', 'createToken', 'app', 'test', 'note.mentioned', 'note.replied', 'antenna.note', gameTurnEvent, 'stream.channel', 'stream.broadcast', 'stream.note'] },
 ])('lists only events admitted by current native scopes: $scopes', async ({ scopes, names }) => {
 	permission = ['access:mcp', ...scopes];
 	const result = await service.invoke('events/list', {}, context()) as { events: { name: string }[] };
@@ -331,9 +335,9 @@ it.each([
 it('rechecks native scope changes between event discoveries', async () => {
 	const list = async () => (await service.invoke('events/list', {}, context()) as { events: { name: string }[] }).events.map(event => event.name);
 	permission = ['access:mcp', 'read:notifications', 'read:account'];
-	expect(await list()).toHaveLength(27);
+	expect(await list()).toHaveLength(28);
 	permission = ['access:mcp', 'read:account'];
-	expect(await list()).toEqual(['note', 'stream.channel', 'stream.broadcast', 'stream.note']);
+	expect(await list()).toEqual(['note', gameTurnEvent, 'stream.channel', 'stream.broadcast', 'stream.note']);
 	permission = ['access:mcp', 'read:notifications'];
 	expect(await list()).toEqual([...notificationNames, 'note.mentioned', 'note.replied']);
 	permission = ['access:mcp'];
@@ -345,7 +349,7 @@ it('filters using current app permissions rather than the token/context scope sn
 	deps.tokens.findOneBy.mockResolvedValue({ id: 'grant', userId: actor.id, appId: 'app', permission } as never);
 	deps.apps.findOneBy.mockResolvedValue({ id: 'app', permission: ['access:mcp', 'read:account'] } as never);
 	const list = async () => (await service.invoke('events/list', {}, context()) as { events: { name: string }[] }).events.map(event => event.name);
-	expect(await list()).toEqual(['note', 'stream.channel', 'stream.broadcast', 'stream.note']);
+	expect(await list()).toEqual(['note', gameTurnEvent, 'stream.channel', 'stream.broadcast', 'stream.note']);
 	deps.apps.findOneBy.mockResolvedValue({ id: 'app', permission: ['access:mcp', 'read:notifications'] } as never);
 	expect(await list()).toEqual([...notificationNames, 'note.mentioned', 'note.replied']);
 	deps.apps.findOneBy.mockResolvedValue(null);
@@ -473,4 +477,94 @@ it('suppresses a notification removed after DNS without sending the callback', a
 	expect(await worker.process(job)).toBe('Suppressed');
 	expect(getNotification).toHaveBeenCalledTimes(2);
 	expect(sent).toBe(false);
+});
+
+it('lists and accepts game.turn only through an owner grant with no room or recipient filter', async () => {
+	const game = { ...input, name: gameTurnEvent };
+	expect((await service.invoke('events/list', {}, context()) as { events: { name: string }[] }).events.some(event => event.name === gameTurnEvent)).toBe(false);
+	await expect(subscribe(game)).rejects.toBeDefined();
+	expect(deps.http.sendMcpWebhook).not.toHaveBeenCalled();
+	permission = ['access:mcp', 'read:account'];
+	for (const args of [{ userId: 'other' }, { roomId: 'private-room' }]) {
+		expect(v.safeParse(subscribeInput, { ...game, arguments: args }).success).toBe(false);
+	}
+	const listed = (await service.invoke('events/list', {}, context()) as { events: { name: string }[] }).events.find(event => event.name === gameTurnEvent);
+	expect(listed).toMatchObject({ delivery: ['webhook'], payloadSchema: { required: ['roomId', 'phaseId', 'revision'], additionalProperties: false } });
+	const { id } = await subscribe(game);
+	expect(rows.get(id)).toMatchObject({ name: gameTurnEvent, userId: 'account', mcpTokenId: 'grant', mode: 'mcp', on: [] });
+});
+
+it('signs only the committed turn reference and suppresses inactive subscriptions or no-longer-actionable phases', async () => {
+	permission = ['access:mcp', 'read:account'];
+	const { id } = await subscribe({ ...input, name: gameTurnEvent });
+	const sub = rows.get(id)!;
+	const gameTurn = { roomId: '50000000-0000-4000-8000-000000000001', phaseId: '50000000-0000-4000-8000-000000000002', revision: 7 };
+	const userId = 'account';
+	const phase: NonNullable<RoomState['phase']> = {
+		id: gameTurn.phaseId, kind: 'dapai', deadline: Date.now() + 10000,
+		menus: [[{ kind: 'win', id: 'win:', tiles: '', reply: { hule: true } }], [], [], []], selected: [null, {}, {}, {}],
+	};
+	const state: RoomState = {
+		version: '9k-invite-v1', revision: 7, status: 'playing', users: [userId, 'p2', 'p3', 'p4'], phase,
+		ready: [true, true, true, true], journal: null, views: [], outcome: null, receipts: [],
+	};
+	const rooms = mockDeep<Repository<MiMahjongRoom>>();
+	const query = mockDeep<ReturnType<Repository<MiMahjongRoom>['createQueryBuilder']>>();
+	rooms.createQueryBuilder.mockReturnValue(query);
+	query.select.mockReturnValue(query);
+	query.where.mockReturnValue(query);
+	query.getOne.mockResolvedValue({ state } as MiMahjongRoom);
+	deps.webhooks.manager.getRepository.mockImplementation(target => {
+		expect(target).toBe(MiMahjongRoom);
+		return rooms as never;
+	});
+	const logger = mockDeep<QueueLoggerService>();
+	logger.logger.createSubLogger.mockReturnValue({ debug: vi.fn() } as never);
+	const worker = new UserWebhookDeliverProcessorService({ url: 'https://misskey.example' } as Config, deps.webhooks, deps.http, service, logger);
+	const data = { mode: 'mcp', type: gameTurnEvent, webhookId: id, userId, generation: sub.mcpGeneration!, noteId: '', gameTurn, createdAt: 1000, eventId: 'stable-turn' } as const;
+	const job = (override = {}) => ({ data: { ...data, ...override } }) as Bull.Job<UserWebhookDeliverJobData>;
+	deps.http.sendMcpWebhook.mockClear();
+	deps.http.sendMcpWebhook.mockImplementation(async (_url, body, headers, _signal, beforeSend) => {
+		await beforeSend?.();
+		expect(headers['webhook-id']).toBe('stable-turn');
+		expect(headers['webhook-signature']).toBe(signedHeaders('stable-turn', id, secret, body, undefined, Number(headers['webhook-timestamp']) * 1000)['webhook-signature']);
+		expect(JSON.parse(body)).toEqual({ eventId: 'stable-turn', name: gameTurnEvent, timestamp: '1970-01-01T00:00:01.000Z', data: gameTurn, cursor: null });
+		return { ok: true, status: 200, text: '' };
+	});
+	expect(await worker.process(job())).toBe('Success');
+	expect(query.where).toHaveBeenCalledWith('room.id = :id AND :userId = ANY(room."userIds")', { id: gameTurn.roomId, userId });
+	expect(query.getOne).toHaveBeenCalledTimes(2); // including re-check immediately before send
+	expect(await worker.process(job({ userId: 'outsider' }))).toBe('Suppressed');
+	expect(await worker.process(job({ gameTurn: { ...gameTurn, tiles: ['private'] } }))).toBe('Suppressed');
+	expect(await worker.process(job({ generation: 'old-generation' }))).toBe('Suppressed');
+	expect(await worker.process(job({ gameTurn: { ...gameTurn, revision: gameTurn.revision + 1 } }))).toBe('Suppressed');
+	phase.selected[0] = {};
+	expect(await worker.process(job())).toBe('Suppressed');
+	phase.selected[0] = null;
+	const reaction = phase.menus[0];
+	for (const kind of ['pass', 'continue'] as const) {
+		phase.menus[0] = [{ kind, id: `${kind}:`, tiles: '', reply: {} }];
+		expect(await worker.process(job())).toBe('Suppressed');
+	}
+	phase.menus[0] = reaction;
+	phase.deadline = Date.now() - 1;
+	expect(await worker.process(job())).toBe('Suppressed');
+	phase.deadline = Date.now() + 10000;
+	sub.active = false;
+	expect(await worker.process(job())).toBe('Suppressed');
+	sub.active = true;
+	permission = ['access:mcp'];
+	expect(await worker.process(job())).toBe('Suppressed');
+	expect(deps.http.sendMcpWebhook).toHaveBeenCalledTimes(1);
+
+	permission = ['access:mcp', 'read:account'];
+	let opened = false;
+	deps.http.sendMcpWebhook.mockImplementationOnce(async (_url, _body, _headers, _signal, beforeSend) => {
+		phase.selected[0] = {}; // The action was submitted while resolving the callback.
+		await beforeSend?.();
+		opened = true;
+		return { ok: true, status: 200, text: '' };
+	});
+	expect(await worker.process(job())).toBe('Suppressed');
+	expect(opened).toBe(false);
 });
