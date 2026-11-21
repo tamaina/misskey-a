@@ -89,3 +89,24 @@ test('animated false renders sparkle as readable text without any animated wrapp
 	expect(body).not.toContain('mfm-sparkle');
 	expect(body).not.toContain('animation:');
 });
+
+test('accepts the app’s legacy Kabyle locale, with or without a timestamp', async () => {
+	expect((await renderStandaloneMfm('plain text', { ...options, locale: 'kab-KAB' })).html).toContain('plain text');
+	const locale = await renderStandaloneMfm('$[unixtime 0]', { ...options, locale: 'kab-KAB' });
+	const canonical = await renderStandaloneMfm('$[unixtime 0]', { ...options, locale: 'kab' });
+	expect(locale.html).toBe(canonical.html);
+	expect(locale.html).toContain('datetime="1970-01-01T00:00:00.000Z"');
+});
+
+test('renders an ISO timestamp when locale or timezone formatting fails', async () => {
+	for (const invalid of [{ locale: 'xx_YY' }, { timeZone: 'Not/AZone' }]) {
+		const result = await renderStandaloneMfm('$[unixtime 0]', { ...options, ...invalid });
+		expect(result.html).toContain('<time datetime="1970-01-01T00:00:00.000Z">1970-01-01T00:00:00.000Z</time>');
+	}
+});
+
+test('inlines the initial blur while preserving the hover override', async () => {
+	const result = await renderStandaloneMfm('$[blur obscured]', options);
+	expect(result.html).toMatch(/<span class="_mfm_blur_" style="[^"]*filter:\s*blur\(6px\);?[^"]*">obscured/);
+	expect(result.css).toMatch(/\._mfm_blur_:hover\s*\{\s*filter:\s*blur\(0\)\s*!important/);
+});

@@ -77,10 +77,22 @@ export async function renderStandaloneMfm(text: string, options: StandaloneMfmOp
 		const href = validHost ? safeUrl(`${props.host === instance.host ? base : `https://${props.host}`}/@${encodeURIComponent(props.username)}`) : undefined;
 		return h(href ? 'a' : 'span', { href, class: 'mfm-mention', rel: 'nofollow noopener noreferrer' }, `@${props.username}${props.host === instance.host ? '' : `@${props.host}`}`);
 	};
-	const dateFormat = new Intl.DateTimeFormat(options.locale ?? 'en-US', { dateStyle: 'long', timeStyle: 'medium', timeZone: options.timeZone ?? 'UTC' });
+	let dateFormat: Intl.DateTimeFormat | null | undefined;
 	const Time: FunctionalComponent<{ time: number }> = props => {
 		const date = new Date(props.time);
-		return Number.isFinite(date.valueOf()) ? h('time', { datetime: date.toISOString() }, dateFormat.format(date)) : h('span', '?');
+		if (!Number.isFinite(date.valueOf())) return h('span', '?');
+		if (dateFormat === undefined) {
+			// Misskey's locale catalog includes the legacy, non-BCP-47 Kabyle tag.
+			const locale = options.locale?.toLowerCase() === 'kab-kab' ? 'kab' : options.locale ?? 'en-US';
+			try {
+				dateFormat = new Intl.DateTimeFormat(locale, { dateStyle: 'long', timeStyle: 'medium', timeZone: options.timeZone ?? 'UTC' });
+			} catch (error) {
+				if (!(error instanceof RangeError)) throw error;
+				dateFormat = null;
+			}
+		}
+		const iso = date.toISOString();
+		return h('time', { datetime: iso }, dateFormat?.format(date) ?? iso);
 	};
 	const Code: FunctionalComponent<{ code: string; lang?: string }> = props => h('pre', { class: 'mfm-code' }, [h('code', [codeByKey.get(JSON.stringify([props.code, props.lang ?? ''])) ?? props.code])]);
 	const CodeInline: FunctionalComponent<{ code: string }> = props => h('code', { class: 'mfm-code-inline' }, props.code);
@@ -104,6 +116,8 @@ export async function renderStandaloneMfm(text: string, options: StandaloneMfmOp
 .misskey-mfm .mfm-code { display: block; padding: 1em; border: 1px solid var(--MI_THEME-divider); white-space: pre-wrap; overflow-wrap: anywhere; }
 .misskey-mfm .mfm-code-inline { padding: .1em .3em; border-radius: .3em; background: #eeeeee; color: #333333; }
 .misskey-mfm .mfm-mention { font-weight: bold; }
+/* Juice inlines the default filter. Hover must still override it in previews. */
+.misskey-mfm ._mfm_blur_:hover { filter: blur(0) !important; }
 .misskey-mfm .mfm-sparkle { position: relative; display: inline-block; }
 .misskey-mfm .mfm-sparkle::before, .misskey-mfm .mfm-sparkle::after { content: '✦'; position: absolute; color: #ffcc00; pointer-events: none; animation: mfm-sparkle 1.5s ease-in-out infinite; }
 .misskey-mfm .mfm-sparkle::before { top: -.5em; left: 0; }
