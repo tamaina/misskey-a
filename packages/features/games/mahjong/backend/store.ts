@@ -38,7 +38,7 @@ export class MahjongStore {
 	async list(user: string) {
 		const rows = await this.db.getRepository(MiMahjongRoom).createQueryBuilder('room')
 			.select(['room.id', 'room.userIds', 'room.status', 'room.createdAt'])
-			.where(':user = ANY(room."userIds")', { user })
+			.where('room."userIds" @> ARRAY[:user]::varchar[]', { user })
 			// Always expose the creator's three occupied slots, even beneath newer invitations.
 			.orderBy('CASE WHEN room.status IN (\'waiting\', \'playing\') THEN 0 ELSE 1 END', 'ASC')
 			.addOrderBy('CASE WHEN room."ownerId" = :user THEN 0 ELSE 1 END', 'ASC')

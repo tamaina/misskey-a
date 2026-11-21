@@ -3,13 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { afterAll, beforeAll, beforeEach, describe, expect, test } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { DataSource } from 'typeorm';
 import { call } from '@orpc/server';
 import { mockDeep } from 'vitest-mock-extended';
 import { entities } from '@features/persistence/backend/postgres.js';
 import { testContext } from '@features/auth/test/backend/native-context.js';
 import { Mahjong1794828000000 } from '../../../../../backend/migration/1794828000000-mahjong.js';
+import { MahjongRoomMemberIndex1795320000318 } from '../../../../../backend/migration/1795320000318-MahjongRoomMemberIndex.js';
 import { MahjongStore } from '../../backend/store.js';
 import { MiMahjongRoom } from '../../backend/models/MahjongRoom.js';
 import { createMahjongProcedures } from '../../backend/endpoints/mahjong.js';
@@ -18,17 +19,21 @@ import type { MiLocalUser } from '@features/users/backend/models/User.js';
 const socket = process.env.MAHJONG_TEST_SOCKET;
 const users = ['alice', 'bob', 'carol', 'dave'];
 describe.skipIf(!socket)('isolated PostgreSQL mahjong transport and concurrency', () => {
-	const db = new DataSource({ type: 'postgres', host: socket, port: 55473, username: 'mahjong', database: 'postgres', entities, synchronize: false });
+	const db = new DataSource({
+		type: 'postgres', host: socket, port: 55473, username: 'mahjong', database: 'postgres', entities, synchronize: false,
+		migrations: [Mahjong1794828000000, MahjongRoomMemberIndex1795320000318],
+		migrationsTransactionMode: process.env.MISSKEY_MIGRATION_CREATE_INDEX_CONCURRENTLY === '1' ? 'each' : 'all',
+	});
 	const store = new MahjongStore(db);
-	const migration = new Mahjong1794828000000();
 	beforeAll(async () => {
 		await db.initialize();
 		await db.query('CREATE TABLE "user" (id varchar(32) PRIMARY KEY, host varchar NULL, "isSuspended" boolean NOT NULL DEFAULT false, "isDeleted" boolean NOT NULL DEFAULT false)');
 		await db.query('CREATE TABLE blocking (id varchar PRIMARY KEY, "blockerId" varchar, "blockeeId" varchar)');
-		const runner = db.createQueryRunner();
-		try {
-			await migration.up(runner); await migration.down(runner); await migration.up(runner);
-		} finally { await runner.release(); }
+		expect(await db.runMigrations()).toHaveLength(2);
+		await db.undoLastMigration();
+		expect(await db.query('SELECT to_regclass($1) AS index_name', ['"IDX_mahjong_room_user_ids_gin"'])).toEqual([{ index_name: null }]);
+		await db.undoLastMigration();
+		expect(await db.runMigrations()).toHaveLength(2);
 	});
 	afterAll(async () => { if (db.isInitialized) await db.destroy(); });
 	beforeEach(async () => {
@@ -128,24 +133,52 @@ describe.skipIf(!socket)('isolated PostgreSQL mahjong transport and concurrency'
 		const repo = db.getRepository(MiMahjongRoom);
 		const template = await repo.findOneByOrFail({ id: room.id });
 		await repo.update(room.id, { createdAt: new Date(0) });
-		for (let index = 0; index < 35; index++) {
-			await repo.insert({ ...template, id: crypto.randomUUID(), ownerId: 'bob', createdAt: new Date(Date.now() + index) });
+		const now = Date.now();
+		const invitations = Array.from({ length: 35 }, () => crypto.randomUUID());
+		for (const [index, id] of invitations.entries()) {
+			await repo.insert({ ...template, id, ownerId: 'bob', createdAt: new Date(now + index) });
 		}
+		await repo.insert({
+			...template, id: crypto.randomUUID(), ownerId: 'bob', userIds: ['alice2', 'bob', 'carol', 'dave'],
+			createdAt: new Date(now + invitations.length),
+		});
 		const listed = await store.list('alice');
 		expect(listed).toHaveLength(30);
-		expect(listed[0].id).toBe(room.id);
+		expect(listed.map(row => row.id)).toEqual([room.id, ...invitations.slice(-29).reverse()]);
 		await store.access('alice', room.id, 'cancel');
-		expect((await store.list('alice')).every(row => row.status === 'playing')).toBe(true);
+		const after = await store.list('alice');
+		expect(after.every(row => row.status === 'playing')).toBe(true);
+		expect(after.map(row => row.id)).toEqual(invitations.slice(-30).reverse());
+	});
+	test('the lobby membership query can use the GIN index', async () => {
+		await store.create('alice', users.slice(1));
+		const log = vi.spyOn(db.logger, 'logQuery');
+		try {
+			await store.list('alice');
+			const call = log.mock.calls.find(([sql]) => sql.includes('FROM "mahjong_room"'));
+			if (!call) throw new Error('Expected a lobby query');
+			const [sql, parameters] = call;
+			await db.transaction(async manager => {
+				// The fixture is small enough that a table scan is normally cheaper.
+				await manager.query('SET LOCAL enable_seqscan = off');
+				const plan = await manager.query(`EXPLAIN (FORMAT JSON) ${sql}`, parameters);
+				expect(JSON.stringify(plan)).toContain('IDX_mahjong_room_user_ids_gin');
+			});
+		} finally { log.mockRestore(); }
 	});
 	test('real procedures authenticate, deny spectators, and serialize only the requesting seat', async () => {
 		const room = await start();
 		const api = createMahjongProcedures({ mahjong: store });
+		await expect(call(api.mahjongRooms, {}, { context: testContext(null) })).rejects.toThrow();
 		await expect(call(api.mahjongShow, { roomId: room.id }, { context: testContext(null) })).rejects.toThrow();
 		for (const id of [...users, 'outsider']) {
 			const context = testContext(mockDeep<MiLocalUser>({ id, isSuspended: false, movedToUri: null }));
+			const listed = await call(api.mahjongRooms, {}, { context });
 			if (id === 'outsider') {
+				expect(listed).toEqual([]);
 				await expect(call(api.mahjongShow, { roomId: room.id }, { context })).rejects.toMatchObject({ code: 'NO_SUCH_ROOM' });
 			} else {
+				expect(listed).toEqual([{ id: room.id, users, status: 'playing', createdAt: expect.any(String) }]);
 				const view = await call(api.mahjongShow, { roomId: room.id }, { context });
 				expect(view.snapshot!.seats.filter(seat => seat.concealedHand !== null).map(seat => seat.userId)).toEqual([id]);
 				expect(JSON.stringify(view)).not.toMatch(/journal|walls|_paipu|reply/);

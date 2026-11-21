@@ -8,6 +8,7 @@ import { MiUser } from '@features/users/backend/models/User.js';
 import { id } from '@features/persistence/backend/models/util/id.js';
 import type { RoomState } from '../room.js';
 
+@Index('IDX_mahjong_room_user_ids_gin', { synchronize: false }) // GIN, managed by the migration.
 @Entity('mahjong_room')
 export class MiMahjongRoom {
 	@PrimaryColumn('uuid', { primaryKeyConstraintName: 'PK_mahjong_room' })
