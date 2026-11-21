@@ -149,6 +149,7 @@ export const usersSearchByUsernameAndHostContract = oc.$meta({
 } as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/users/search-by-username-and-host', tags: ['users'], description: 'Search for a user by username and/or host.' })
 	.errors({ ...commonErrors }).input(v.pipe(objectInput({
 		username: v.exactOptional(v.nullable(v.string())), host: v.exactOptional(v.nullable(v.string())),
+		preferLocalExactMatch: v.optional(v.boolean()),
 		limit: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)), 10), detail: v.optional(v.boolean(), true),
 	}),
 		v.check(input => 'username' in input || 'host' in input, 'Username or host is required.'))).output(v.array(packedUserSchema));

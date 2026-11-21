@@ -95,17 +95,22 @@ const recentUsers = ref<Misskey.entities.UserDetailed[]>([]);
 const selected = ref<Misskey.entities.UserLite | null>(null);
 const dialogEl = useTemplateRef('dialogEl');
 
+let searchGeneration = 0;
+
 function search() {
-	if (username.value === '' && host.value === '') {
-		users.value = [];
-		return;
-	}
+	const generation = ++searchGeneration;
+	users.value = [];
+	selected.value = null;
+	if (username.value === '' && host.value === '') return;
+	const local = computedLocalOnly.value || ['.', hostname, currentHost].includes(host.value.toLowerCase());
 	misskeyApi('users/search-by-username-and-host', {
 		username: username.value,
-		host: computedLocalOnly.value ? '.' : host.value,
+		host: local ? '.' : host.value,
+		...(local && username.value && (props.includeSelf || username.value.toLowerCase() !== $i?.username.toLowerCase()) ? { preferLocalExactMatch: true } : {}),
 		limit: 10,
 		detail: false,
 	}).then(_users => {
+		if (generation !== searchGeneration) return;
 		users.value = _users.filter((u) => {
 			if (props.includeSelf) {
 				return true;
@@ -137,6 +142,7 @@ function cancel() {
 }
 
 onMounted(() => {
+	if (store.s.recentlyUsedUsers.length === 0) return;
 	misskeyApi('users/show', {
 		userIds: store.s.recentlyUsedUsers,
 	}).then(foundUsers => {

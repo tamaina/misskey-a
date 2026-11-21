@@ -5,7 +5,6 @@
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { describe, beforeEach, beforeAll, afterEach, afterAll, vi, test, expect } from 'vitest';
-import { In } from 'typeorm';
 import { FollowingsRepository, MiUser, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import type { Config } from '@/config.js';
@@ -23,6 +22,14 @@ describe('UserSearchService', () => {
 	let followingsRepository: FollowingsRepository;
 	let idService: IdService;
 	let userProfilesRepository: UserProfilesRepository;
+
+	const accounts = new Map<string, MiUser>();
+	const packUsers = (ids: string[]) => ids.map(id => {
+		const user = accounts.get(id);
+		if (!user) throw new Error(`Missing fixture account: ${id}`);
+		return user;
+	});
+	const packMany = vi.fn(packUsers);
 
 	let root: MiUser;
 	let alice: MiUser;
@@ -48,6 +55,7 @@ describe('UserSearchService', () => {
 			userId: user.id,
 		});
 
+		accounts.set(user.id, user);
 		return user;
 	}
 
@@ -99,8 +107,8 @@ describe('UserSearchService', () => {
 					},
 					{
 						provide: UserEntityService, useFactory: vi.fn(() => ({
-							// とりあえずIDが返れば確認が出来るので
-							packMany: (value: any) => value,
+							packMany,
+							pack: (user: MiUser) => user,
 						})),
 					},
 					IdService,
@@ -134,6 +142,7 @@ describe('UserSearchService', () => {
 
 	afterEach(async () => {
 		await usersRepository.createQueryBuilder().delete().execute();
+		accounts.clear();
 	});
 
 	afterAll(async () => {
@@ -141,6 +150,46 @@ describe('UserSearchService', () => {
 	});
 
 	describe('searchByUsernameAndHost', () => {
+		test('pins only the exact local username for an authenticated picker and respects the limit', async () => {
+			const remote = await createUser({ username: 'Bob', usernameLower: 'bob', host: 'example.com' });
+			const bobcat = await createUser({ username: 'Bobcat', usernameLower: 'bobcat' });
+			await setActive([bobbi, bobcat, remote]);
+			await createFollowings(root, [bobcat]);
+			const picker = { limit: 2, preferLocalExactMatch: true };
+			const search = async (username: string, host: string, opts = picker, me: MiUser | null = root) =>
+				(await service.searchByUsernameAndHost({ username, host }, opts, me)).map(user => user.id);
+
+			expect(await search('BOB', '.')).toEqual([bob.id, bobcat.id]);
+			expect(await search('bob', app.get<Config>(DI.config).hostname, { ...picker, limit: 1 })).toEqual([bob.id]);
+			expect(await search('bob', app.get<Config>(DI.config).host.toUpperCase(), { ...picker, limit: 1 })).toEqual([bob.id]);
+			expect(await search('bo', '.')).toEqual([bobcat.id, bobbi.id]);
+			expect(await search('bob', '.', { ...picker, preferLocalExactMatch: false })).toEqual([bobcat.id, bobbi.id]);
+			expect(await search('bob', 'example.com')).toEqual([remote.id]);
+			expect(await search('bob', '')).toEqual(await search('bob', '', { ...picker, preferLocalExactMatch: false }));
+			expect(await search('bob', '.', picker, null)).toEqual(await search('bob', '.', { ...picker, preferLocalExactMatch: false }, null));
+
+			await setActive([bob]);
+			expect(await search('bob', '.', { ...picker, limit: 3 })).toEqual([bob.id, bobcat.id, bobbi.id]);
+		});
+
+		test.each(['isSuspended', 'isRemoteSuspended', 'isDeleted'] as const)('the extra exact lookup excludes %s', async flag => {
+			await usersRepository.update(bob.id, { [flag]: true });
+			const matches = await service.searchByUsernameAndHost({ username: 'bob', host: '.' }, { preferLocalExactMatch: true }, root);
+			expect(matches).toEqual([]);
+		});
+
+		test('keeps higher-ranked suggestions within the limit when packing changes their order', async () => {
+			const bobcat = await createUser({ username: 'Bobcat', usernameLower: 'bobcat' });
+			await setActive([bobbi, bobcat]);
+			await createFollowings(root, [bobcat]);
+			// The production packer can return the fetched rows in a different order.
+			packMany.mockImplementationOnce(ids => packUsers(ids.toReversed()));
+
+			const users = await service.searchByUsernameAndHost({ username: 'bob', host: '.' }, { limit: 2, preferLocalExactMatch: true }, root);
+			expect(users.map(user => user.id)).toEqual([bob.id, bobcat.id]);
+			expect(packMany).toHaveBeenLastCalledWith([bob.id, bobcat.id], root, { schema: 'UserLite' });
+		});
+
 		test('フォロー中のアクティブユーザのうち、"al"から始まる人が全員ヒットする', async () => {
 			await createFollowings(root, [alice, alyce, alycia, alysha, alyson, alyssa, bob, bobbi, bobbie, bobby]);
 			await setActive([alice, alyce, alyssa, bob, bobbi, bobbie, bobby]);
@@ -153,7 +202,7 @@ describe('UserSearchService', () => {
 			);
 
 			// alycia, alysha, alysonは非アクティブなので後ろに行く
-			expect(result).toEqual([alice, alyce, alyssa, alycia, alysha, alyson].map(x => x.id));
+			expect(result.map(user => user.id)).toEqual([alice, alyce, alyssa, alycia, alysha, alyson].map(x => x.id));
 		});
 
 		test('フォロー中の非アクティブユーザのうち、"al"から始まる人が全員ヒットする', async () => {
@@ -167,7 +216,7 @@ describe('UserSearchService', () => {
 			);
 
 			// alice, alyceはフォローしていないので後ろに行く
-			expect(result).toEqual([alycia, alysha, alyson, alyssa, alice, alyce].map(x => x.id));
+			expect(result.map(user => user.id)).toEqual([alycia, alysha, alyson, alyssa, alice, alyce].map(x => x.id));
 		});
 
 		test('フォローしていないアクティブユーザのうち、"al"から始まる人が全員ヒットする', async () => {
@@ -181,7 +230,7 @@ describe('UserSearchService', () => {
 			);
 
 			// alice, alyce, alyciaは非アクティブなので後ろに行く
-			expect(result).toEqual([alysha, alyson, alyssa, alice, alyce, alycia].map(x => x.id));
+			expect(result.map(user => user.id)).toEqual([alysha, alyson, alyssa, alice, alyce, alycia].map(x => x.id));
 		});
 
 		test('フォローしていない非アクティブユーザのうち、"al"から始まる人が全員ヒットする', async () => {
@@ -193,7 +242,7 @@ describe('UserSearchService', () => {
 				root,
 			);
 
-			expect(result).toEqual([alice, alyce, alycia, alysha, alyson, alyssa].map(x => x.id));
+			expect(result.map(user => user.id)).toEqual([alice, alyce, alycia, alysha, alyson, alyssa].map(x => x.id));
 		});
 
 		test('フォロー（アクティブ）、フォロー（非アクティブ）、非フォロー（アクティブ）、非フォロー（非アクティブ）混在時の優先順位度確認', async () => {
@@ -215,7 +264,7 @@ describe('UserSearchService', () => {
 			// フォローしてて非アクティブなので次: alyson, bobbie
 			// フォローしてないけどアクティブなので次: alyce, alycia, root(アルファベット順的にここになる)
 			// フォローしてないし非アクティブなので最後: alice, alysha, bobby
-			expect(result).toEqual([alyssa, bob, bobbi, alyson, bobbie, alyce, alycia, root, alice, alysha, bobby].map(x => x.id));
+			expect(result.map(user => user.id)).toEqual([alyssa, bob, bobbi, alyson, bobbie, alyce, alycia, root, alice, alysha, bobby].map(x => x.id));
 		});
 
 		test('[非ログイン] アクティブユーザのうち、"al"から始まる人が全員ヒットする', async () => {
@@ -228,7 +277,7 @@ describe('UserSearchService', () => {
 			);
 
 			// alice, alyce, alyciaは非アクティブなので後ろに行く
-			expect(result).toEqual([alysha, alyson, alyssa, alice, alyce, alycia].map(x => x.id));
+			expect(result.map(user => user.id)).toEqual([alysha, alyson, alyssa, alice, alyce, alycia].map(x => x.id));
 		});
 
 		test('[非ログイン] 非アクティブユーザのうち、"al"から始まる人が全員ヒットする', async () => {
@@ -239,7 +288,7 @@ describe('UserSearchService', () => {
 				{ limit: 100 },
 			);
 
-			expect(result).toEqual([alice, alyce, alycia, alysha, alyson, alyssa].map(x => x.id));
+			expect(result.map(user => user.id)).toEqual([alice, alyce, alycia, alysha, alyson, alyssa].map(x => x.id));
 		});
 
 		test('フォロー中のアクティブユーザのうち、"al"から始まり"example.com"にいる人が全員ヒットする', async () => {
@@ -252,7 +301,7 @@ describe('UserSearchService', () => {
 				root,
 			);
 
-			expect(result).toEqual([alyson, alyssa].map(x => x.id));
+			expect(result.map(user => user.id)).toEqual([alyson, alyssa].map(x => x.id));
 		});
 
 		test('サスペンド済みユーザは出ない', async () => {
@@ -265,7 +314,7 @@ describe('UserSearchService', () => {
 				root,
 			);
 
-			expect(result).toEqual([alysha, alyson, alyssa].map(x => x.id));
+			expect(result.map(user => user.id)).toEqual([alysha, alyson, alyssa].map(x => x.id));
 		});
 	});
 });

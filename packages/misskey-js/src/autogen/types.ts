@@ -108216,6 +108216,7 @@ export interface operations {
                 'application/json': {
                     username?: string | null;
                     host?: string | null;
+                    preferLocalExactMatch?: boolean;
                     /** @default 10 */
                     limit?: number;
                     /** @default true */
@@ -108223,6 +108224,7 @@ export interface operations {
                 } & ({
                     username?: string | null;
                     host?: string | null;
+                    preferLocalExactMatch?: boolean;
                     /** @default 10 */
                     limit?: number;
                     /** @default true */

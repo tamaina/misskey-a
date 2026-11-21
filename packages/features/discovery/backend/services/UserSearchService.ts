@@ -68,10 +68,13 @@ export class UserSearchService {
 		opts?: {
 			limit?: number,
 			detail?: boolean,
+			preferLocalExactMatch?: boolean,
 		},
 		me?: MiUser | null,
 	): Promise<NativeUser[]> {
-		const queries = me ? this.buildSearchUserQueries(me, params) : this.buildSearchUserNoLoginQueries(params);
+		const localExact = me && opts?.preferLocalExactMatch && params.host &&
+			['.', this.config.hostname, this.config.host].includes(params.host.toLowerCase()) ? params.username?.toLowerCase() : null;
+		const queries = me ? this.buildSearchUserQueries(me, localExact ? { ...params, host: '.' } : params) : this.buildSearchUserNoLoginQueries(params);
 
 		let resultSet = new Set<MiUser['id']>();
 		const limit = opts?.limit ?? 10;
@@ -89,11 +92,20 @@ export class UserSearchService {
 			}
 		}
 
-		return this.userEntityService.packMany(
-			[...resultSet].slice(0, limit),
-			me,
-			{ schema: opts?.detail ? 'UserDetailed' : 'UserLite' },
-		);
+		const schema = opts?.detail ? 'UserDetailed' : 'UserLite';
+		const rankedIds = [...resultSet].slice(0, limit);
+		const exact = localExact ? await this.generateUserQueryBuilder({ host: '.' })
+			.select('user.id')
+			.andWhere('user.usernameLower = :username', { username: localExact })
+			.andWhere('user.isDeleted = FALSE')
+			.getRawOne<{ user_id: MiUser['id'] }>() : undefined;
+		if (!exact) return this.userEntityService.packMany(rankedIds, me, { schema });
+
+		// Apply the limit to ranked IDs first. packMany fetches rows without preserving input order.
+		const ids = [exact.user_id, ...rankedIds.filter(id => id !== exact.user_id)].slice(0, limit);
+		const users = await this.userEntityService.packMany(ids, me, { schema });
+		const usersById = new Map(users.map(user => [user.id, user]));
+		return ids.flatMap(id => usersById.get(id) ?? []);
 	}
 
 	/**

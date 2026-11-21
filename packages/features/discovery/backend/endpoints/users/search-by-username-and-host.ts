@@ -20,6 +20,7 @@ export function createUsersSearchByUsernameAndHostProcedure<Actor extends MiLoca
 		}, {
 			limit: ps.limit,
 			detail: ps.detail,
+			preferLocalExactMatch: ps.preferLocalExactMatch,
 		}, me);
 		return users.map(user => toPackedUser(user));
 	};
