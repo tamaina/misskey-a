@@ -72,6 +72,33 @@ legal action buttons and remaining time. Keyboard buttons and a narrow-screen la
 Existing game URLs and DI identities are unchanged. Six authenticated `mahjong/*` POST endpoints
 are composed through the games API host; SDK routing is generated from portable contracts.
 
+## MCP Events Webhook
+
+The authenticated MCP mount advertises `game.turn` in `events/list` when the
+grant has `access:mcp` and `read:account`. Subscribe with the existing
+`events/subscribe` Webhook delivery and empty `arguments`: no room ID, other
+user ID, or custom legacy Webhook endpoint can be registered for a game.
+Use the existing HTTPS challenge, expiry, unsubscribe and signed delivery.
+
+The event is an **actionable phase hint**, received only by the participant
+who can discard, play a legal action, or respond to a legal reaction. It does
+not signal pass-only seats or result confirmations. The signed body contains
+the standard MCP envelope (`eventId`, `name`, timestamp, `data`, null cursor).
+Consumers dispatch on the common `data.game` discriminator. Mahjong's data is
+exactly `{game: "mahjong", roomId, phaseId, revision}`; see the
+[Reversi variant](../reversi/README.md) for the other supported game. Fetch the current room with
+the usual authenticated `mahjong/show` if needed (the native Mahjong API
+currently requires `write:account`; the event grant alone cannot play).
+Hidden tiles, opponents, options and even the receiver's hand are not in the event.
+
+Only a new phase from a committed transaction can enqueue. Stable event IDs
+are per subscription generation, game kind and room/phase; consumers should deduplicate
+retries. Delivery also rechecks the active grant, membership, phase validity
+and whether the recipient still has an outstanding action. Enqueue is
+best-effort after commit, not a persistent outbox: downtime, transient queue
+failure, or advancing past a phase may drop the hint. The room API remains the
+authority and there is no replay. Ordinary User Webhooks are unchanged.
+
 ## Upstream sources and licenses
 
 - Engine: [kobalab/majiang-core 1.4.1](https://github.com/kobalab/majiang-core/tree/7e964296dd8eb5ff5a32f8182acdc6a0c2a81cbb), MIT, Satoshi Kobayashi.

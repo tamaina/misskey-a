@@ -11,6 +11,7 @@ import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { DI } from '@/di-symbols.js';
+import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
 import { createBubbleGameRankingProcedure, createBubbleGameRankingGetProcedure } from '../../bubble-game/backend/endpoints/ranking.js';
 import { gamesContract } from './endpoints/games.contract.js';
 import type { BubbleGameRankingDependencies } from '../../bubble-game/backend/endpoints/ranking.js';
@@ -75,7 +76,8 @@ export class GamesApiProvider {
 	compose(): Router {
 		if (this.router !== undefined) return this.router;
 		this.router = createGamesRouter({
-			mahjong: new MahjongStore(this.moduleRef.get(DI.db, { strict: false })),
+			mahjong: new MahjongStore(this.moduleRef.get(DI.db, { strict: false }), (userId, turn, createdAt) =>
+				this.moduleRef.get(UserWebhookService, { strict: false }).enqueueGameTurn(userId, turn, createdAt)),
 			bubbleGameRecordsRepository: this.moduleRef.get<BubbleGameRecordsRepository>(DI.bubbleGameRecordsRepository, { strict: false }),
 			userEntityService: this.moduleRef.get(UserEntityService, { strict: false }),
 			idService: this.moduleRef.get(IdService, { strict: false }),
