@@ -61,3 +61,6 @@ jobs:
       - run: pnpm --filter frontend exec playwright install --with-deps chromium
       - run: pnpm --filter frontend exec node --import tsx test/browser-feature/run.mjs
       - run: pnpm --filter frontend exec node --import tsx test/browser-feature/error-log.mjs
+
+      - name: Check media visibility in Chromium
+        run: pnpm --filter frontend exec node --import tsx test/browser-feature/media.mjs

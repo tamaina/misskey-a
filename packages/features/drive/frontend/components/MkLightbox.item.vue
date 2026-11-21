@@ -223,8 +223,10 @@ const props = withDefaults(defineProps<{
 	user?: Misskey.entities.User | null; // DriveFileのuserはnullになることがある。その場合に使用する所有者情報
 	activated: boolean;
 	initiallyRevealed?: boolean;
+	initiallyHidden?: boolean;
 }>(), {
 	initiallyRevealed: false,
+	initiallyHidden: false,
 });
 
 const emit = defineEmits<{
@@ -376,15 +378,18 @@ const hiddenStyle = computed(() => {
 
 function shouldHideInGallery(content: Content): boolean {
 	if (content.file == null) return false;
-	const hiddenByDefault = shouldHideFileByDefault(content.file, true);
-	if (!hiddenByDefault) return false;
 
 	// 呼び出し元で既にぼかしが解除されているものは初期表示で隠さない
 	if (props.initiallyRevealed) {
 		return false;
 	}
 
-	return true;
+	if (shouldHideFileByDefault(content.file, true)) {
+		return true;
+	}
+
+	// Match the caller's manual hiding even for non-sensitive files.
+	return props.initiallyHidden;
 }
 
 function isValidRect(rect: Rect | null): rect is Rect {
