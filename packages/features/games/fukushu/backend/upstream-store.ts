@@ -98,7 +98,7 @@ export class FukushuUpstreamStore {
 			const usage = manager.getRepository(MiFukushuSourceUsage);
 			const budget = await usage.findOneByOrFail({ ownerId });
 			const bytes = budget.bytes + delta, materialBytes = budget.materialBytes + delta;
-			if (materialBytes > MAX_BACKUP_BYTES || bytes > MAX_SOURCE_JSON_BYTES ||
+			if (materialBytes > MAX_BACKUP_BYTES ||
 				UPSTREAM_MAGIC.length + 64 + budget.count * 4 + budget.binaries + bytes > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
 			await usage.update({ ownerId }, { bytes, materialBytes });
 			await records.update(identity, { data });
