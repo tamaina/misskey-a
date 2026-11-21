@@ -81,7 +81,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"unmarkAsSensitiveConfirm": "Vols deixar de marcar com a sensible aquest contingut?",
 	"markAsSensitiveConfirm": "Vols marcar aquest contingut com a sensible?",
 	"moderation": "Moderació",
-	"sensitiveMediaRevealConfirm": "Aquest contingut potser sensible. Segur que ho vols revelar?"
+	"sensitiveMediaRevealConfirm": "Aquest contingut potser sensible. Segur que ho vols revelar?",
+	"cannotUploadBecauseNoSuchFolder": "No es pot trobar la carpeta de pujada. Si us plau, comproveu la configuració de la ubicació de pujada per defecte."
 }
 </locale>
 
@@ -409,7 +410,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"unmarkAsSensitiveConfirm": "Vuoi davvero indicare come non esplicito il contenuto multimediale?",
 	"markAsSensitiveConfirm": "Vuoi davvero indicare questo contenuto multimediale come esplicito?",
 	"moderation": "Moderazione",
-	"sensitiveMediaRevealConfirm": "Questo allegato è esplicito, vuoi vederlo?"
+	"sensitiveMediaRevealConfirm": "Questo allegato è esplicito, vuoi vederlo?",
+	"cannotUploadBecauseNoSuchFolder": "Impossibile trovare la cartella predefinita per i caricamenti. Controllare le impostazioni."
 }
 </locale>
 
@@ -615,7 +617,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"unmarkAsSensitiveConfirm": "이 미디어의 민감한 미디어 지정을 해제하시겠습니까?",
 	"markAsSensitiveConfirm": "이 미디어를 민감한 미디어로 설정하시겠습니까?",
 	"moderation": "조정",
-	"sensitiveMediaRevealConfirm": "민감한 미디어입니다. 표시할까요?"
+	"sensitiveMediaRevealConfirm": "민감한 미디어입니다. 표시할까요?",
+	"cannotUploadBecauseNoSuchFolder": "업로드할 폴더를 찾을 수 없습니다. 기본 업로드 위치 설정을 확인해 주세요."
 }
 </locale>
 

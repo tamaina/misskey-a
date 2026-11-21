@@ -8,7 +8,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { load } from 'js-yaml';
 import { parse } from 'vue/compiler-sfc';
-import { createInternationalization, setActiveInternationalization } from 'virtual:vite-vue-internationalization';
+import { createInternationalization, setActiveInternationalization, useLocale } from 'virtual:vite-vue-internationalization';
 import { getNoteSummary } from '@features/notes/frontend/utility/get-note-summary.js';
 import { languages, locales } from 'i18n';
 import { expect, test } from 'vitest';
@@ -92,4 +92,16 @@ test.each(['ja-JP', 'en-US', 'fr-FR'])('reads promoted note-summary labels after
 	setActiveInternationalization(internationalization);
 	expect(getNoteSummary({ id: 'deleted-note', deletedAt: '2026-01-01' } as entities.Note)).toBe(`(${locales[language].deletedNote})`);
 	expect(getNoteSummary({ text: 'Hello', files: [{}, {}], poll: {} } as entities.Note)).toBe(`Hello (${locales[language].withNFiles.replace('{n}', '2')}) (${locales[language].poll})`);
+});
+
+test.each([
+	['ca-ES', '/features/preferences/frontend/pages/settings/preferences.vue', 'expandUrlPreviewAutomatically', 'Expandir automàticament les previsualitzacions d\'URL'],
+	['de-DE', '/features/collections/frontend/ui/deck/clip-column.vue', 'selectClip', 'Clip auswählen'],
+	['it-IT', '/features/users/frontend/pages/settings/profile.vue', 'cannotSelectSensitiveMedia', 'Impossibile selezionare il media esplicito'],
+	['ko-KR', '/features/drive/frontend/ts-messages.vue', 'cannotUploadBecauseNoSuchFolder', '업로드할 폴더를 찾을 수 없습니다. 기본 업로드 위치 설정을 확인해 주세요.'],
+	['zh-CN', '/features/instance/frontend/pages/admin/email-settings.vue', 'emptyToDisableSmtpAuth', '将用户名和密码留空可以禁用 SMTP 验证'],
+])('loads a #18171 owner translation from VVI for %s', async (language, owner, key, value) => {
+	const internationalization = createInternationalization({ initialLocale: language });
+	await internationalization.ready;
+	expect(useLocale(owner, internationalization).value.sfc[key]).toBe(value);
 });
