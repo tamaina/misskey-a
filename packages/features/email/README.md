@@ -73,7 +73,7 @@ collector は受信・送信・転送タスクの raw 参照を確認し、処�
 
 HTML は保守的にサニタイズし、remote image、CSS、script、iframe、form、CID 読み込みや clickable link を許可しない。
 表示時は `iframe.srcdoc` と空の sandbox 属性を使い、allow-scripts/allow-same-origin を付けない。CSP も併用する。
-原文・添付の所有者認証付きダウンロード API/UI は接続済み。添付は原文を bounded worker thread で再解析して取得し、DB の JSON に binary を保存しない。添付解析は API プロセスごとに同時 1 件に制限する。CID は metadata のみ保持し、本文へのインライン表示は引き続き許可しない。
+原文・添付の所有者認証付きダウンロード API/UI は接続済み。添付は原文を bounded worker thread で再解析して取得し、DB の JSON に binary を保存しない。取得と解析を合わせて API プロセスごとに同時 1 件に制限し、混雑時は原文を読み込まず 429、原文ストレージや解析処理の障害は 503、該当の原文・添付がない場合は 404 を返す。CID は metadata のみ保持し、本文へのインライン表示は引き続き許可しない。
 
 ## 送信の契約
 

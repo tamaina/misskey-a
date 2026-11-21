@@ -11,7 +11,7 @@ import type { Config } from '@/config.js';
 import { buildTextMail, UserMailTransport } from '../mail/outgoing.js';
 import { MailStoreError } from '../mail/store.js';
 import { validateForwardDestination } from '../mail/forwarding.js';
-import { readMailAttachmentIsolated } from '../mail/isolated-parser.mjs';
+import { MailAttachmentError, readMailAttachmentIsolated } from '../mail/isolated-parser.mjs';
 import { UserMailRuntime } from './UserMailRuntime.js';
 import type { DataSource, EntityManager } from 'typeorm';
 import type { OnModuleInit, OnApplicationShutdown } from '@nestjs/common';
@@ -114,7 +114,13 @@ export class UserMailboxService implements EmailServicePort, OnModuleInit, OnApp
 	async attachment(userId: string, id: string, attachmentId: number): Promise<EmailOutputs['attachment']> {
 		await this.delivery(userId, id); const { store } = await this.context();
 		let attachment;
-		try { attachment = await readMailAttachmentIsolated(await store.readRaw(userId, id), attachmentId); } catch { throw new MailboxError('NOT_FOUND'); }
+		try {
+			attachment = await readMailAttachmentIsolated(() => store.readRaw(userId, id), attachmentId);
+		} catch (error) {
+			if (error instanceof MailAttachmentError) throw new MailboxError(error.code === 'BUSY' ? 'RATE_LIMITED' : 'NOT_FOUND');
+			if (error instanceof MailStoreError && error.code === 'NOT_FOUND') throw new MailboxError('NOT_FOUND');
+			throw new MailboxError('UNAVAILABLE');
+		}
 		return { filename: attachment.filename, mimeType: attachment.mimeType, data: Buffer.from(attachment.content).toString('base64') };
 	}
 	async preview(userId: string, input: EmailInputs['preview']): Promise<EmailOutputs['preview']> {

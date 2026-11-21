@@ -11,7 +11,12 @@ import { createMailHtmlDocument } from './html.js';
 type AttachmentMetadata = { filename: string | null; mimeType: string; contentId: string | null; size: number };
 type Projection = { subject: string; from: string; text: string; html: string | null; attachments: AttachmentMetadata[] };
 type AttachmentContent = { filename: string | null; mimeType: string; content: Uint8Array };
+type AttachmentResult = AttachmentContent | { missing: true };
 let attachmentWorkerActive = false;
+
+export class MailAttachmentError extends Error {
+	constructor(public readonly code: 'NOT_FOUND' | 'BUSY') { super(`MAIL_ATTACHMENT_${code}`); }
+}
 
 /** A hard CPU/memory deadline, not Promise.race around CPU-bound MIME parsing. */
 async function runIsolated<T>(raw: Uint8Array, attachmentIndex?: number): Promise<T> {
@@ -25,7 +30,8 @@ async function runIsolated<T>(raw: Uint8Array, attachmentIndex?: number): Promis
 			if (mail.attachments.some(a => a.rfc822DepthExceeded)) throw new Error('DEPTH');
 			if (workerData.attachmentIndex !== undefined) {
 				const attachment = mail.attachments[workerData.attachmentIndex];
-				if (!attachment || !(attachment.content instanceof ArrayBuffer)) throw new Error('NOT_FOUND');
+				if (!attachment) { parentPort.postMessage({ missing: true }); return; }
+				if (!(attachment.content instanceof ArrayBuffer)) throw new Error('ATTACHMENT_ENCODING');
 				parentPort.postMessage({ filename: attachment.filename, mimeType: attachment.mimeType,
 					content: new Uint8Array(attachment.content) }, [attachment.content]);
 				return;
@@ -64,13 +70,14 @@ export async function parseMailIsolated(raw: Uint8Array): Promise<Record<string,
 	return result;
 }
 
-/** Call only after owner-scoped raw lookup. One attachment parser per API process, no unbounded waiter queue. */
-export async function readMailAttachmentIsolated(raw: Uint8Array, index: number): Promise<{ filename: string; mimeType: string; content: Uint8Array }> {
-	if (!Number.isInteger(index) || index < 0 || index >= MAIL_PARSE_LIMITS.maxPartCount) throw new Error('MAIL_ATTACHMENT_NOT_FOUND');
-	if (attachmentWorkerActive) throw new Error('MAIL_ATTACHMENT_BUSY');
+/** One attachment fetch/parse per API process. Supply an owner-scoped raw loader. */
+export async function readMailAttachmentIsolated(loadRaw: () => Promise<Uint8Array>, index: number): Promise<{ filename: string; mimeType: string; content: Uint8Array }> {
+	if (!Number.isInteger(index) || index < 0 || index >= MAIL_PARSE_LIMITS.maxPartCount) throw new MailAttachmentError('NOT_FOUND');
+	if (attachmentWorkerActive) throw new MailAttachmentError('BUSY');
 	attachmentWorkerActive = true;
 	try {
-		const attachment = await runIsolated<AttachmentContent>(raw, index);
+		const attachment = await runIsolated<AttachmentResult>(await loadRaw(), index);
+		if ('missing' in attachment) throw new MailAttachmentError('NOT_FOUND');
 		return { filename: safeMailAttachmentFilename(attachment.filename), mimeType: safeMimeType(attachment.mimeType), content: attachment.content };
 	} finally { attachmentWorkerActive = false; }
 }

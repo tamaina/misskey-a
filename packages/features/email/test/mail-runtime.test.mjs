@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createHash, createHmac } from 'node:crypto';
-import { createMailIngress, resolveUserMailConfig, parseMailIsolated, readMailAttachmentIsolated, mailDeliverySigningPayload, MailStore, MailStoreError } from '../../../backend/built/features/email/backend.js';
+import { createMailIngress, resolveUserMailConfig, parseMailIsolated, readMailAttachmentIsolated, mailDeliverySigningPayload, MailStore, MailStoreError, UserMailboxService } from '../../../backend/built/features/email/backend.js';
 
 const config = {
 	enabled: true, domain: 'mail.example.org', mxHost: 'mx.example.org', s3: { bucket: 'private-mail', region: 'eu-west-1' },
@@ -108,8 +108,10 @@ test('committed receipts are authenticated without new staging or current mailbo
 	assert.equal(stageCalls, 3);
 });
 
+const sampleAttachment = Buffer.from('From: a@example.org\r\nSubject: example\r\nMIME-Version: 1.0\r\nContent-Type: multipart/mixed; boundary=test\r\n\r\n--test\r\nContent-Type: text/html\r\n\r\n<b>Hello</b><script>alert(1)</script><img src="https://tracker.invalid/x">\r\n--test\r\nContent-Type: text/plain; name="../secret.txt"\r\nContent-Disposition: attachment; filename="../secret.txt"\r\nContent-ID: <safe@example.org>\r\n\r\nsecret\r\n--test--\r\n');
+
 test('isolated parse produces safe metadata-only display projection', async () => {
-	const raw = Buffer.from('From: a@example.org\r\nSubject: example\r\nMIME-Version: 1.0\r\nContent-Type: multipart/mixed; boundary=test\r\n\r\n--test\r\nContent-Type: text/html\r\n\r\n<b>Hello</b><script>alert(1)</script><img src="https://tracker.invalid/x">\r\n--test\r\nContent-Type: text/plain; name="../secret.txt"\r\nContent-Disposition: attachment; filename="../secret.txt"\r\nContent-ID: <safe@example.org>\r\n\r\nsecret\r\n--test--\r\n');
+	const raw = sampleAttachment;
 	const parsed = await parseMailIsolated(raw);
 	assert.equal(parsed.subject, 'example');
 	assert.doesNotMatch(parsed.html, /<script|<img|tracker.invalid/);
@@ -118,9 +120,45 @@ test('isolated parse produces safe metadata-only display projection', async () =
 	assert.equal(typeof parsed.attachments[0].size, 'number');
 	assert.equal('content' in parsed.attachments[0], false);
 	assert.equal(parsed.attachments[0].contentId, 'safe@example.org');
-	const attachment = await readMailAttachmentIsolated(raw, 0);
+	const loadRaw = async () => raw;
+	const attachment = await readMailAttachmentIsolated(loadRaw, 0);
 	assert.equal(attachment.filename, '.._secret.txt');
 	assert.equal(Buffer.from(attachment.content).toString().trim(), 'secret');
-	await assert.rejects(readMailAttachmentIsolated(raw, -1), /NOT_FOUND/);
-	await assert.rejects(readMailAttachmentIsolated(raw, 1), /MAIL_PARSE_FAILED/);
+	await assert.rejects(readMailAttachmentIsolated(loadRaw, -1), /NOT_FOUND/);
+	await assert.rejects(readMailAttachmentIsolated(loadRaw, 1), /NOT_FOUND/);
+});
+
+test('attachment read capacity is reserved before storage; busy, failed, and missing remain distinct', async () => {
+	const started = Promise.withResolvers();
+	const release = Promise.withResolvers();
+	let read = () => { started.resolve(); return release.promise; };
+	let reads = 0;
+	const store = { async readRaw(owner, id) { assert.deepEqual([owner, id], ['alice', 'fixture']); reads++; return read(); } };
+	const db = {
+		async query(sql, params) {
+			if (sql.includes('FROM "user"')) { assert.deepEqual(params, ['alice']); return [{ id: 'alice' }]; }
+			assert.match(sql, /FROM "mail_delivery"/);
+			assert.deepEqual(params, ['fixture', 'alice']);
+			return [{ id: 'fixture' }];
+		},
+	};
+	const service = new UserMailboxService({}, db, { settings: config, async getContext() { return { store }; } });
+	const first = service.attachment('alice', 'fixture', 0);
+	try {
+		await Promise.race([started.promise, first]);
+		read = async () => assert.fail('A second raw fetch must not start while the slot is held');
+		await assert.rejects(service.attachment('alice', 'fixture', 0), { code: 'RATE_LIMITED' });
+		assert.equal(reads, 1, 'the rejected request must not fetch raw storage');
+	} finally {
+		release.resolve(sampleAttachment);
+		assert.equal(Buffer.from((await first).data, 'base64').toString().trim(), 'secret');
+	}
+
+	read = async () => { throw new Error('temporary synthetic object storage failure'); };
+	await assert.rejects(service.attachment('alice', 'fixture', 0), { code: 'UNAVAILABLE' });
+	read = async () => { throw new MailStoreError('NOT_FOUND'); };
+	await assert.rejects(service.attachment('alice', 'fixture', 0), { code: 'NOT_FOUND' });
+	read = async () => sampleAttachment;
+	await assert.rejects(service.attachment('alice', 'fixture', 1), { code: 'NOT_FOUND' });
+	assert.equal((await service.attachment('alice', 'fixture', 0)).filename, '.._secret.txt');
 });
