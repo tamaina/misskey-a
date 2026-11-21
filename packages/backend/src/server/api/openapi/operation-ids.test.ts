@@ -125,6 +125,7 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 		['/fukushu/backup/inspect', 'post___fukushu___backup___inspect'],
 		['/fukushu/materials/create', 'post___fukushu___materials___create'],
 		['/fukushu/materials/show', 'post___fukushu___materials___show'],
+		['/fukushu/materials/anki-media', 'post___fukushu___materials___anki-media'],
 		['/fukushu/materials/list', 'post___fukushu___materials___list'],
 		['/fukushu/materials/import', 'post___fukushu___materials___import'],
 		['/fukushu/materials/update', 'post___fukushu___materials___update'],
@@ -140,7 +141,7 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 		['/fukushu/study/history', 'post___fukushu___study___history'],
 	]);
 	const addedFukushuIds = new Set(addedFukushuOperations.values());
-	expect(addedFukushuIds.size).toBe(29);
+	expect(addedFukushuIds.size).toBe(30);
 	for (const [path, operationId] of addedFukushuOperations) {
 		expect(spec.paths?.[path]?.post?.operationId).toBe(operationId);
 		expect(spec.paths?.[path]?.get).toBeUndefined();
