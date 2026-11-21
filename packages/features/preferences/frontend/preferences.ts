@@ -6,6 +6,7 @@
 import { TypedBroadcastChannel as BroadcastChannel } from '@features/runtime/frontend/utility/typed-broadcast-channel.js';
 import { createVisibilityAwareInterval } from '@features/ui/frontend/shared/interval.js';
 import type { StorageProvider } from '@features/preferences/frontend/state/manager.js';
+import { readDeviceAppearance } from '@features/preferences/frontend/state/device-appearance-backup.js';
 import { cloudBackup } from '@features/preferences/frontend/state/utility.js';
 import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
 import { isSameScope, PreferencesManager } from '@features/preferences/frontend/state/manager.js';
@@ -144,15 +145,28 @@ preferencesChannel.addEventListener('message', (ev) => {
 
 //#region 定期クラウドバックアップ
 let latestBackupAt = 0;
+let latestAppearanceBackup: string | undefined;
+let backupInFlight = false;
 
 // documentが非表示の間は実行されない (同期されていない古い値がバックアップされるのを防ぐ意味もある)
 createVisibilityAwareInterval(() => {
 	if ($i == null) return;
 	if (!store.s.enablePreferencesAutoCloudBackup) return;
-	if (prefer.profile.modifiedAt <= latestBackupAt) return;
+	if (backupInFlight) return;
+	const appearance = readDeviceAppearance(miLocalStorage);
+	const serializedAppearance = JSON.stringify(appearance);
+	const modifiedAt = prefer.profile.modifiedAt;
+	if (modifiedAt <= latestBackupAt && serializedAppearance === latestAppearanceBackup) return;
 
-	cloudBackup().then(() => {
-		latestBackupAt = Date.now();
+	backupInFlight = true;
+	cloudBackup(appearance).then(() => {
+		latestBackupAt = modifiedAt;
+		latestAppearanceBackup = serializedAppearance;
+	}).catch(error => {
+		// Leave the successful snapshot unchanged so the next interval can retry.
+		console.warn('Failed to back up preferences', error);
+	}).finally(() => {
+		backupInFlight = false;
 	});
 }, 1000 * 60 * 3);
 //#endregion
