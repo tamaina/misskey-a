@@ -3,22 +3,30 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { chatContract } from '../../../../contract/index.js';
-import { chatErrors } from '@features/chat/contract';
-import { legacyChatSchemas } from '@features/chat/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['chat'],
-	requireCredential: true,
-	kind: 'write:chat',
-	errors: chatErrors['chat/rooms/delete'],
-} as const;
+import { chatRoomsDeleteContract } from './delete.contract.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-export const paramDef = legacyChatSchemas['chat/rooms/delete'].input as Schema;
+import type { InferSchemaOutput } from '@orpc/contract';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { type ChatService } from '@features/chat/backend/services/ChatService.js';
+import { chatRoomsDeleteErrors } from './delete.contract.js';
+export interface ChatRoomsDeleteDependencies {
+	chatService: Pick<ChatService, 'checkChatAvailability' | 'findRoomById' | 'hasPermissionToDeleteRoom' | 'deleteRoom'>;
+}
+export function createChatRoomsDeleteProcedure(deps: ChatRoomsDeleteDependencies) {
+	async function execute(input: InferSchemaOutput<NonNullable<typeof chatRoomsDeleteContract['~orpc']['inputSchema']>>, actor: MiLocalUser): Promise<void> {
+		await deps.chatService.checkChatAvailability(actor.id, 'write');
+		const room = await deps.chatService.findRoomById(input.roomId);
+		if (room == null || !await deps.chatService.hasPermissionToDeleteRoom(actor.id, room)) {
+			throw apiError(chatRoomsDeleteErrors.noSuchRoom);
+		}
+		await deps.chatService.deleteRoom(room, actor);
+	}
 
-export const { feature, createEndpoint } = defineFeatureEndpoint('chatCommands', commands => createContractTransportEndpoint(meta, paramDef, chatContract['chat/rooms/delete'], async (params, user) => commands['chat/rooms/delete'](params, {
-	context: { actor: user },
-})));
+	return createApiProcedure<MiLocalUser>()(chatRoomsDeleteContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(({ input, context }) => execute(input, context.principal));
+}

@@ -3,9 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 import { test } from 'node:test';
+import { createProcedureClient } from '@orpc/server';
 import assert from 'node:assert/strict';
-import { createPing, legacyPingSchemas } from '../../../backend/built/features/instance/backend.js';
-import { instanceContract } from '../../../misskey-js/built/contracts/instance/contract/index.js';
+import * as v from 'valibot';
+import { createPingProcedure } from '../../../backend/built/features/instance/backend.js';
+import { instanceApiContract as instanceContract } from '../../../misskey-js/built/contracts/instance/backend/api.definition.js';
 
 test('implementation uses the contract and an injectable clock', async () => {
 	const ping = createPing(() => 123);
@@ -23,15 +25,17 @@ test('contract rejects non-object inputs', async () => {
 	}
 });
 
-test('contract rejects invalid handler output', async () => {
-	await assert.rejects(createPing(() => 'invalid')({}));
+test('native delivery skips output validation while the portable schema remains finite', async () => {
+	assert.deepEqual(await createPing(() => 'invalid')({}), { pong: 'invalid' });
+	assert.equal(v.safeParse(instanceContract.ping['~orpc'].outputSchema, { pong: 'invalid' }).success, false);
 });
 
-test('legacy schema is derived from the same input and output schemas', () => {
-	assert.equal(legacyPingSchemas.input.type, 'object');
-	assert.equal(legacyPingSchemas.output.type, 'object');
-	assert.equal(legacyPingSchemas.output.properties.pong.type, 'number');
-	assert.deepEqual(legacyPingSchemas.output.required, ['pong']);
+test('native contract exposes the same path and validates finite output', () => {
 	assert.equal(instanceContract.ping['~orpc'].route.method, 'POST');
 	assert.equal(instanceContract.ping['~orpc'].route.path, '/ping');
+	assert.equal(v.safeParse(instanceContract.ping['~orpc'].outputSchema, { pong: 1 }).success, true);
+	assert.equal(v.safeParse(instanceContract.ping['~orpc'].outputSchema, { pong: Infinity }).success, false);
+	assert.equal(v.safeParse(instanceContract.ping['~orpc'].outputSchema, { pong: 1, secret: true }).success, false);
 });
+
+function createPing(now = Date.now) { return createProcedureClient(createPingProcedure({ now }), { context: { credential: null, ip: '127.0.0.1', headers: {}, services: { authenticate: async () => [null, null], limitActor: () => null, rateLimitFactor: async () => 1, limit: async () => null } } }); }

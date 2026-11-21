@@ -1,322 +1,256 @@
----
-_lang_: "فارسی"
-headlineMisskey: "یک شبکه از طریق یادداشت ها متصل گردید."
-introMisskey: "خوش آمدید! Misskey یک سرویس میکروبلاگینگ متن باز و غیرمتمرکز می باشد.\nیک \"یادداشت\" درست کن و در مورد اتفاق هایی که داره می افته و یا به دیگران درمورد خودت بگو📡\nشما می توانید به سرعت با کمک قابلیت \"واکنش ها\" به یادداشت های دیگران واکنش نشون بدید👍\nیک دنیای جدید رو کاوش کنید🚀"
-poweredByMisskeyDescription: "{name} یکی از سرور های متن باز پلتفرم <b>Misskey</b> می باشد."
-monthAndDay: "{day}/{month}"
-search: "جستجو"
-reset: "بازنشانی"
-notifications: "اعلان ها"
-username: "نام کاربری"
-password: "گذرواژه"
-initialPasswordForSetup: "گذرواژه برای راه‌اندازی تنظیمات اولیه"
-initialPasswordIsIncorrect: "گذرواژه برای راه‌اندازی تنظیمات اولیه نادرست می باشد."
-initialPasswordForSetupDescription: "اگر خودتان Misskey را نصب کرده اید، لطفا از گذرواژه ای که در فایل تنظیمات وارد کرده اید استفاده کنید.\nاگه از سرویس میزبانی برای Misskey استفاده می کنید، لطفا از گذرواژه ای که توسط آنها ارائه شده استفاده کنید.\nاگر گذرواژه ای تنظیم نکردید، بخش را خالی بگذارید و ادامه دهید."
-forgotPassword: "گذرواژه ام را فراموش کردم"
-fetchingAsApObject: "در حال دریافت از فدیوِرس"
-ok: "باشه"
-gotIt: "متوجه شدم"
-cancel: "لغو"
-noThankYou: "الان نه"
-enterUsername: "نام کاربری خود را وارد کنید"
-renotedBy: "بازنشر شده توسط {user}"
-noNotes: "هیچ یادداشتی موجود نیست"
-noNotifications: "اعلانی موجود نیست"
-instance: "سرور"
-settings: "تنظیمات"
-notificationSettings: "تنظیمات اعلان"
-basicSettings: "تنظیمات اصلی"
-otherSettings: "تنظیمات بیشتر"
-openInWindow: "در پنجره باز کن"
-profile: "نمایه"
-timeline: "نوار زمانی"
-noAccountDescription: "این کاربر هنوز درون شرح حال خودش چیزی ننوشته."
-login: "ورود"
-loggingIn: "وارد شده"
-logout: "خروج"
-signup: "ثبت‌نام"
-uploading: "بارگذاری..."
-save: "ذخیره"
-users: "کاربران"
-addUser: "افزودن کاربر"
-favorite: "افزودن به برگزیده ها"
-favorites: "برگزیده ها"
-unfavorite: "حذف از برگزیده ها"
-favorited: "به برگزیده ها اضافه شد."
-alreadyFavorited: "قبلا به برگزیده ها اضافه شده."
-cantFavorite: "نمی توان به برگزیده ها اضافه کرد."
-pin: "سنجاق کردن"
-unpin: "حذف سنجاق"
-copyContent: "رونوشت از محتوا"
-copyLink: "رونوشت از پیوند"
-copyRemoteLink: "رونوشت از پیوند خارجی"
-copyLinkRenote: "رونوشت از پیوند بازنشر"
-delete: "حذف"
-deleteAndEdit: "حذف و ویرایش"
-deleteAndEditConfirm: "آیا می خواهید که این یادداشت را حذف و دوباره ویرایش کنید؟ در این صورت همچنین تمام واکنش ها، بازنشر ها و پاسخ ها به این یادداشت پاک خواهد شد."
-addToList: "افزودن به فهرست"
-addToAntenna: "افزودن به آنتن"
-sendMessage: "ارسال پیام"
-copyRSS: "رونوشت RSS"
-copyUsername: "رونوشت نام کاربری"
-copyUserId: "رونوشت شناسه کاربری"
-copyNoteId: "رونوشت شناسه یادداشت"
-copyFileId: "رونوشت شناسه پرونده"
-copyFolderId: "رونوشت شناسه پوشه"
-copyProfileUrl: "رونوشت ادرس نمایه"
-searchUser: "جستجوی کاربران"
-searchThisUsersNotes: "جستجو در یادداشت های این کاربر"
-reply: "پاسخ"
-loadMore: "بارگیری بیشتر"
-showMore: "نمایش بیشتر"
-showLess: "بستن"
-youGotNewFollower: "شما دنبال شده اید"
-receiveFollowRequest: "درخواست دنبال کردن دریافت شد"
-followRequestAccepted: "درخواست دنبال کردن قبول شد"
-mention: "اشاره"
-mentions: "اشاره کردن"
-directNotes: "یادداشت مستقیم"
-importAndExport: "واردسازی و خارج‌سازی"
-import: "واردسازی"
-export: "خارج‌سازی"
-files: "پرونده ها"
-download: "بارگیری"
-driveFileDeleteConfirm: "آیا مطمئن هستید که می خواهید \"{name}\" را حذف کنید؟ تمام یادداشت هایی که این فایل به آنها پیوست خورده اند نیز پاک خواهد شد."
-unfollowConfirm: "آیا می‌خواهید دیگر {name} را دنبال نکنید؟"
-cancelFollowRequestConfirm: "آیا می خواهید درخواست دنبال کردن از {name} را لغو کنید؟"
-rejectFollowRequestConfirm: "آیا می خواهید درخواست دنبال کردن از طرف {name} را رد کنید؟"
-exportRequested: "شما یک درخواست خارج‌سازی کرده اید. این ممکن است کمی طول بکشد. وقتی که به اتمام رسید در حافظه شما ذخیره خواهد شد."
-importRequested: "شما یک درخواست واردسازی داشتید. ممکن است زمان ببرد."
-lists: "فهرست ها"
-noLists: "فهرستی موجود نیست"
-note: "یادداشت"
-notes: "یادداشت ها"
-following: "دنبال می‌کنید"
-followers: "دنبال کنندگان"
-followsYou: "شما را دنبال می کند"
-createList: "ایجاد فهرست"
-manageLists: "مدیریت فهرست ها"
-error: "خطا"
-somethingHappened: "یک مشکلی پیش آمده"
-retry: "تلاش مجدد"
-pageLoadError: "در هنگام بارگیری صفحه یک مشکلی به وجود آمده"
-pageLoadErrorDescription: "این معمولا به خاطر مشکل در شبکه و یا حافظه پنهان اتفاق می افتد. سعی کنید حافظه کش(پنهان) را خالی کنید و یا مدتی صبر کنید و دوباره امتحان کنید."
-serverIsDead: "سرور پاسخگو نیست. لطفا مدتی صبر کنید و دوباره تلاش کنید."
-youShouldUpgradeClient: "برای دیدن این صفحه، لطفا صفحه را تازه‌کنید و از نسخه جدیدتر نرم‌افزار استفاده کنید."
-enterListName: "نامی برای فهرست وارد کنید"
-privacy: "حریم خصوصی"
-makeFollowManuallyApprove: "درخواست دنبال کردن فقط با تایید کاربر مجاز است"
-defaultNoteVisibility: "پیشفرض نمایش یادداشت"
-follow: "دنبال می‌کنید"
-followRequest: "درخواست های دنبال‌کردن"
-followRequests: "درخواست‌های دنبال‌کردن"
-unfollow: "لغو دنبال‌کردن"
-followRequestPending: "منتظر برای تایید درخواست دنبال‌کردن"
-enterEmoji: "یک شکلک وارد کنید"
-renote: "بازنشر"
-unrenote: "حذف بازنشر"
-renoted: "بازنشر شده."
-renotedToX: "به {name} بازنشر شده."
-cantRenote: "این پیام را نمی توان بازنشر کرد."
-cantReRenote: "نمی شود یک بازنشر شده را دوباره بازنشر کرد."
-quote: "نقل‌قول"
-inChannelRenote: "بازنشر فقط در کانال"
-inChannelQuote: "نقل‌قول فقط در کانال"
-renoteToChannel: "بازنشر در کانال"
-renoteToOtherChannel: "بازنشر در کانال‌های دیگر"
-pinnedNote: "یادداشت سنجاق شده"
-pinned: "سنجاق کردن"
-you: "شما"
-clickToShow: "کلیک به جهت نمایش"
-sensitive: "محتوای حساس"
-add: "اضافه"
-reaction: "واکنش‌ها"
-reactions: "واکنش‌ها"
-emojiPicker: "انتخابگر شکلک"
-pinnedEmojisForReactionSettingDescription: "شما می توانید شکلک ها را به گونه ای تنظیم کنید که به صورت سنجاق شده هنگام واکنش دادن به نمایش در بیایند."
-pinnedEmojisSettingDescription: "شما می توانید شکلک ها را به گونه ای تنظیم کنید که به صورت سنجاق شده هنگام واردکردن شکلک ها به نمایش در بیایند."
-emojiPickerDisplay: "نمایشگر انتخابگر شکلک ها"
-overwriteFromPinnedEmojisForReaction: "باطل کردن تنظیمات واکنش ها"
-overwriteFromPinnedEmojis: "باطل کردن تنظیمات عمومی (شکلک ها)"
-reactionSettingDescription2: "برای مرتب کردن بکشید، برای حذف کلیک کنید، برای اضافه کردن بروی \"+\" کلیک کنید."
-rememberNoteVisibility: "تنظیمات نمایش یادداشت‌ها را به خاطر بسپر"
-attachCancel: "حذف ضمیمه"
-deleteFile: "حذف پرونده‌"
-markAsSensitive: "علامت به عنوان حساس"
-unmarkAsSensitive: "برداشتن علامت حساس"
-enterFileName: "نام پرونده را وارد کن"
-mute: "سکوت"
-unmute: "لغو سکوت"
-renoteMute: "سکوت بازنشر"
-renoteUnmute: "لغو سکوت بازنشر"
-block: "مسدود کردن"
-unblock: "رفع مسدودیت"
-suspend: "انجماد"
-unsuspend: "ذوب شدن"
-blockConfirm: "آیا می خواهید این حساب مسدود شود؟"
-unblockConfirm: "آیا می خواهید مسدودیت این حساب رفع شود؟"
-suspendConfirm: "آیا می خواهید منجمد شود؟"
-unsuspendConfirm: "آیا می خواهید یخ زدایی شود؟"
-selectList: "انتخاب یک فهرست"
-editList: "ویرایش فهرست"
-selectChannel: "انتخاب یک کانال"
-selectAntenna: "انتخاب یک آنتن"
-editAntenna: "ویرایش آنتن"
-createAntenna: "ایجاد یک آنتن"
-selectWidget: "انتخاب یک ابزارک"
-editWidgets: "ویرایش یک ابزارک"
-editWidgetsExit: "پایان ویرایش"
-customEmojis: "شکلک سفارشی"
-emoji: "شکلک"
-emojis: "شکلک"
-emojiName: "اسم شکلک"
-emojiUrl: "پیوند شکلک"
-addEmoji: "افزودن شکلک"
-settingGuide: "تنظیمات پیشنهادی"
-cacheRemoteFiles: "کش کردن پرونده های خارجی"
-cacheRemoteFilesDescription: "در صورت فعال کردن این قابلیت پرونده های خارجی (در سرور های دیگر) در فضای ذخیره این سرور بارگیری می شود. این کار سرعت نمایش پرونده ها را افزایش می دهد، اما با این کار فضای داخلی سرور بیشتر اشغال می شود. مدت زمانی که هر کاربر می تواند از سرور خارجی کش کند، براساس محدودیت ظرفیت حافظه اعمال شده بر نقش اوست. اگر از این محدودیت فراتر رود پرونده های قدیمی حافظه پنهان (کش) حذف و تبدیل به لینک پیوند می شود. اگر این تنظیم غیرفعال باشد پرونده های خارجی از همان ابتدا به صورت لینک پیوند ذخیره می شود.\n"
-youCanCleanRemoteFilesCache: "شما می توانید حافظه پنهان (کش) را با کلیک بر دکمه 🗑️ در پایین صفحه مدیریت پرونده ها حذف کنید."
-cacheRemoteSensitiveFiles: "کش کردن پرونده های حساس سرور های خارجی"
-cacheRemoteSensitiveFilesDescription: "با غیر فعال کردن این قابلیت پرونده هایی که علامت حساس خورده اند در سرور های خارجی به جای اینکه در حافظه پنهان ذخیره شوند، مستقیما به ان پیوند داده می شوند."
-flagAsBot: "این اکانت را به عنوان ربات علامت گذاری کن"
-flagAsBotDescription: "این قابلیت را اگه این اکانت توسط یک ربات کنترل می شود فعال کنید. در صورت فعال شدن، این به عنوان یک پرچم برای برنامه نویس های دیگر عمل می کند تا جلوی تعامل های بی پایان با ربات های دیگر را بگیرد و همچنین سیستم داخلی Misskey با این اکانت به صورت ربات رفتار می‌کند."
-flagAsCat: "میووووووووووووووووو!!!!!!!!!"
-flagAsCatDescription: "میو میو میو؟؟"
-flagShowTimelineReplies: "نمایش پاسخ های یادداشت به صورت خط زمانی"
-flagShowTimelineRepliesDescription: "وقتی این قابلیت فعال شود، نه تنها یادداشت های کاربران بلکه پاسخ های کاربران به یادداشت ها را در خط زمانی به نمایش می گذارد."
-autoAcceptFollowed: "به صورت خودکار درخواست های دنبال کردن را از کاربرانی که دنبال می کنید را قبول کن"
-addAccount: "افزودن حساب کاربری"
-reloadAccountsList: "بارگذاری مجدد فهرست حساب ها"
-loginFailed: "مشکل در وارد شدن"
-showOnRemote: "دیدن از سرور‌خارجی"
-continueOnRemote: "ادامه در سرورخارجی"
-chooseServerOnMisskeyHub: "یک سرور را از Misskey Hub انتخاب کنید"
-specifyServerHost: "یک سرور را به طور مستقیم تعیین کنید"
-inputHostName: "دامنه را وارد کنید"
-general: "عمومی"
-wallpaper: "تصویر پس‌زمینه"
-setWallpaper: "تنظیم تصویر پس‌زمینه"
-removeWallpaper: "حذف تصویر پس‌زمینه"
-searchWith: "جستجو: {q}"
-youHaveNoLists: "شما فهرستی ندارید"
-followConfirm: "آیا می خواهید {name} را دنبال کنید؟"
-proxyAccount: "حساب نماینده (پروکسی)"
-host: "میزبان"
-selectSelf: "انتخاب خودت"
-selectUser: "انتخاب کاربر"
-recipient: "گیرنده"
-annotation: "حاشیه نویسی"
-federation: "شبکه‌اجتماعی‌غیرمتمرکز"
-instances: "سرور"
-registeredAt: "ثبت شده در"
-latestRequestReceivedAt: "آخرین درخواست دریافت شده"
-latestStatus: "جدیدترین وضعیت"
-storageUsage: "حافظه مصرفی"
-charts: "نمودارها"
-perHour: "هر ۱ ساعت"
-perDay: "هر ۱ روز"
-stopActivityDelivery: "جلوگیری از ارائه فعالیت ها"
-blockThisInstance: "این سرور را مسدود کن"
-silenceThisInstance: "این سرور را بی‌صدا کن"
-mediaSilenceThisInstance: "محتوای چندرسانه ای این سرور را بی‌صدا کن"
-operations: "عملیات ها"
-software: "نرم‌افزار"
-softwareName: "نام نرم‌افزار"
-version: "نگارش"
-metadata: "متادیتا"
-withNFiles: "{n} پرونده"
-monitor: "رصدگر"
-jobQueue: "صف‌کار"
-cpuAndMemory: "پردازنده و حافظه رم"
-network: "شبکه"
-disk: "حافظه ذخیره"
-instanceInfo: "اطلاعات سرور"
-statistics: "آمار"
-clearQueue: "پاکسازی صف"
-clearQueueConfirmTitle: "آیا می خواهید این صف را پاک کنید؟"
-clearQueueConfirmText: "هر یادداشت تحویل داده نشده در شبکه اجتماعی غیرمتمرکز منتشر نخواهد شد. معمولا این عملیات لازم نیست."
-clearCachedFiles: "پاک کردن حافظه پنهان"
-clearCachedFilesConfirm: "آیا می خواهید که تمام پرونده هایی که از سرور های در حافظه پنهان دریافت کردید حذف شود."
-blockedInstances: "سرور های مسدود شده"
-blockedInstancesDescription: "نام سرور هایی که می خواهید مسدود کنید را فهرست کنید و با کلید اینتر (هر سرور در اول خط جدید) از هم جدا کنید. سرور های فهرست شده دیگه قابلیت ارتباط گیری با این سرور را ندارند."
-silencedInstances: "سرور های بی‌صدا شده"
-silencedInstancesDescription: "نام سرور هایی که میخواهید بی‌صدا کنید را فهرست کنید و با کلید اینتر (هر سرور در اول خط جدید) از هم جدا کنید. تمام حساب ها از سرور های لیست شده \"بی‌صدا\" در نظر گرفته می شود و همه‌ی دنبال کردن ها به کاربر های این سرور به درخواست دنبال کردن تبدیل می‌شود. این قابلیت بر روی سرور های مسدود شده تاثیری نخواهد داشت."
-noCustomEmojis: "هیچ شکلکی نیست"
-remove: "حذف"
-pinnedNotes: "یادداشت سنجاق شده"
-userList: "فهرست ها"
-emojiStyle: "سبک شکلک"
-chooseEmoji: "انتخاب یک شکلک"
-smtpHost: "میزبان"
-smtpUser: "نام کاربری"
-smtpPass: "گذرواژه"
-theKeywordWhenSearchingForCustomEmoji: "این کلمه کلیدی است که هنگام جستجو در میان شکلک های سفارشی به کار گرفته می شود."
-clearCache: "پاک کردن حافظه پنهان"
-user: "کاربران"
-searchByGoogle: "جستجو"
-file: "پرونده ها"
-manageCustomEmojis: "مدیریت شکلک های سفارشی"
-rolesThatCanBeUsedThisEmojiAsReaction: "نقش هایی که اجازه دارند تا از این شکلک برای واکنش استفاده بکنند"
-rolesThatCanBeUsedThisEmojiAsReactionEmptyDescription: "اگر نقشی مشخص نشود، هر کسی اجازه استفاده از این شکلک به عنوان واکنش را دارا می باشند."
-rolesThatCanBeUsedThisEmojiAsReactionPublicRoleWarn: "این نقش ها باید عمومی باشند."
-replies: "پاسخ"
-renotes: "بازنشر"
-_role:
-  _options:
-    canManageCustomEmojis: "مدیریت شکلک های سفارشی"
-_email:
-  _follow:
-    title: "شما دنبال شده اید"
-_theme:
-  keys:
-    mention: "اشاره کردن"
-    renote: "بازنشر"
-_sfx:
-  note: "یادداشت ها"
-  notification: "اعلان ها"
-_2fa:
-  renewTOTPCancel: "الان نه"
-_widgets:
-  profile: "نمایه"
-  instanceInfo: "اطلاعات سرور"
-  notifications: "اعلان ها"
-  timeline: "نوار زمانی"
-  federation: "شبکه‌اجتماعی‌غیرمتمرکز"
-  jobQueue: "صف‌کار"
-  _userList:
-    chooseList: "انتخاب یک فهرست"
-_cw:
-  show: "بارگیری بیشتر"
-_visibility:
-  followers: "دنبال کنندگان"
-  specified: "یادداشت مستقیم"
-_profile:
-  username: "نام کاربری"
-_exportOrImport:
-  followingList: "دنبال می‌کنید"
-  muteList: "سکوت"
-  blockingList: "مسدود کردن"
-  userLists: "فهرست ها"
-_charts:
-  federation: "شبکه‌اجتماعی‌غیرمتمرکز"
+_lang_: 'فارسی'
+search: 'جستجو'
+ok: 'باشه'
+cancel: 'لغو'
+notificationSettings: 'تنظیمات اعلان'
+save: 'ذخیره'
+favorites: 'برگزیده ها'
+delete: 'حذف'
+lists: 'فهرست ها'
+notes: 'یادداشت ها'
+following: 'دنبال می‌کنید'
+somethingHappened: 'یک مشکلی پیش آمده'
+customEmojis: 'شکلک سفارشی'
 _notification:
-  youWereFollowed: "شما دنبال شده اید"
-  _types:
-    follow: "دنبال می‌کنید"
-    mention: "اشاره کردن"
-    renote: "بازنشر"
-    quote: "نقل‌قول"
-    reaction: "واکنش‌ها"
-    login: "ورود"
+  youWereFollowed: 'شما دنبال شده اید'
   _actions:
-    reply: "پاسخ"
-    renote: "بازنشر"
+    reply: 'پاسخ'
+    renote: 'بازنشر'
+  _types:
+    all: 'すべて'
+    note: 'ユーザーの新規投稿'
+    follow: 'دنبال می‌کنید'
+    mention: 'اشاره کردن'
+    reply: 'リプライ'
+    renote: 'بازنشر'
+    quote: 'نقل‌قول'
+    reaction: 'واکنش‌ها'
+    pollEnded: 'アンケートが終了'
+    scheduledNotePosted: '予約投稿が成功した'
+    scheduledNotePostFailed: '予約投稿が失敗した'
+    receiveFollowRequest: 'フォロー申請を受け取った'
+    followRequestAccepted: 'フォローが受理された'
+    roleAssigned: 'ロールが付与された'
+    chatRoomInvitationReceived: 'ダイレクトメッセージのグループへ招待された'
+    achievementEarned: '実績の獲得'
+    exportCompleted: 'エクスポートが完了した'
+    login: 'ورود'
+    createToken: 'アクセストークンの作成'
+    test: '通知のテスト'
+    app: '連携アプリからの通知'
+reset: 'بازنشانی'
+error: 'خطا'
+users: 'کاربران'
+permission: '権限'
+adminPermission: '管理者権限'
+enableAll: '全て有効にする'
+disableAll: '全て無効にする'
+generateAccessToken: 'アクセストークンの発行'
+enableAllAdmin: '管理者権限をすべて有効化'
+disableAllAdmin: '管理者権限をすべて無効化'
+add: '追加'
+remove: '削除'
+'yes': 'はい'
+'no': 'いいえ'
+gotIt: 'わかった'
+continue: '続ける'
+create: '作成'
+createNew: '新規作成'
+settings: '設定'
+share: '共有'
+more: 'もっと！'
+showMore: 'もっと見る'
+showLess: 'بستن'
+done: '完了'
+download: 'ダウンロード'
+update: '更新'
+retry: '再試行'
+goBack: '戻る'
+learnMore: '詳しく'
+info: '情報'
+filter: 'フィルタ'
+install: 'インストール'
+invite: '招待'
+rename: '名前を変更'
+copyUrl: 'URLをコピー'
+embed: '埋め込み'
+processing: '処理中'
+fromDrive: 'ドライブから'
+fromX: '{x}から'
+visibility: '公開範囲'
+public: 'パブリック'
+private: '非公開'
+sensitive: 'センシティブ'
+markAsSensitive: 'センシティブとして設定'
+unmarkAsSensitive: 'センシティブを解除する'
+deletedNote: '削除されたノート'
+poll: 'アンケート'
+drive: 'ドライブ'
+timeline: 'タイムライン'
+clip: 'クリップ'
+memo: 'メモ'
+overview: '概要'
+oneDay: '1日'
+oneHour: '1時間'
+oneMonth: '1ヶ月'
+oneWeek: '1週間'
+indefinitely: '無期限'
+period: '期限'
+createdAt: '作成日時'
+updatedAt: '更新日時'
+showRepliesToOthersInTimeline: 'TLに他の人への返信を含める'
+visibilityDisableFederation: '連合なし'
+removeAreYouSure: '「{x}」を削除しますか？'
+deleteAreYouSure: '「{x}」を削除しますか？'
+resetAreYouSure: 'リセットしますか？'
+driveFileDeleteConfirm: 'ファイル「{name}」を削除しますか？このファイルを使用した一部のコンテンツも削除されます。'
+follow: 'フォロー'
+followers: 'フォロワー'
+favorite: 'お気に入り'
+unfavorite: 'お気に入り解除'
+mute: 'ミュート'
+administrator: '管理者'
+moderator: 'モデレーター'
+announcements: 'お知らせ'
+channel: 'チャンネル'
+notifications: '通知'
+user: 'ユーザー'
+noteOf: '{user}のノート'
+userSaysSomething: '{name}が何かを言いました'
+charts: 'チャート'
+noName: '名前はありません'
+withNFiles: '{n}つのファイル'
+imageUrl: '画像URL'
+termsOfService: '利用規約'
+privacyPolicy: 'プライバシーポリシー'
+high: '高'
+medium: '中'
+low: '低'
+quote: '引用'
+localOnly: 'ローカルのみ'
+show: '表示'
+reply: '返信'
+renote: 'リノート'
+_timelines:
+  home: 'ホーム'
+  local: 'ローカル'
+  social: 'ソーシャル'
+  global: 'グローバル'
+_visibility:
+  public: 'パブリック'
+  publicDescription: '全てのユーザーに公開'
+  home: 'ホーム'
+  homeDescription: 'ホームタイムラインのみに公開'
+  followers: 'フォロワー'
+  followersDescription: '自分のフォロワーのみに公開'
+  specified: '指名'
+  specifiedDescription: '指定したユーザーのみに公開'
+  disableFederation: '連合なし'
+  disableFederationDescription: '他サーバーへの配信を行いません'
 _deck:
   _columns:
-    notifications: "اعلان ها"
-    tl: "نوار زمانی"
-    list: "فهرست ها"
-    mentions: "اشاره کردن"
-    direct: "یادداشت مستقیم"
-_moderationLogTypes:
-  suspend: "انجماد"
+    main: 'メイン'
+    widgets: 'ウィジェット'
+    notifications: '通知'
+    tl: 'タイムライン'
+    antenna: 'アンテナ'
+    list: 'リスト'
+    channel: 'チャンネル'
+    mentions: 'メンション'
+    direct: '指名'
+    roleTimeline: 'ロールタイムライン'
+    chat: 'ダイレクトメッセージ'
+    clip: 'クリップ'
+_permissions:
+  "access:mcp": 'MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）'
+  "read:account": 'アカウントの情報を見る'
+  "write:account": 'アカウントの情報を変更する'
+  "read:blocks": 'ブロックを見る'
+  "write:blocks": 'ブロックを操作する'
+  "read:drive": 'ドライブを見る'
+  "write:drive": 'ドライブを操作する'
+  "read:favorites": 'お気に入りを見る'
+  "write:favorites": 'お気に入りを操作する'
+  "read:following": 'フォローの情報を見る'
+  "write:following": 'フォロー・フォロー解除する'
+  "read:messaging": 'ダイレクトメッセージを見る'
+  "write:messaging": 'ダイレクトメッセージを操作する'
+  "read:mutes": 'ミュートを見る'
+  "write:mutes": 'ミュートを操作する'
+  "write:notes": 'ノートを作成・削除する'
+  "read:notifications": '通知を見る'
+  "write:notifications": '通知を操作する'
+  "read:reactions": 'リアクションを見る'
+  "write:reactions": 'リアクションを操作する'
+  "write:votes": '投票する'
+  "read:pages": 'ページを見る'
+  "write:pages": 'ページを操作する'
+  "read:page-likes": 'ページのいいねを見る'
+  "write:page-likes": 'ページのいいねを操作する'
+  "read:user-groups": 'ユーザーグループを見る'
+  "write:user-groups": 'ユーザーグループを操作する'
+  "read:channels": 'チャンネルを見る'
+  "write:channels": 'チャンネルを操作する'
+  "read:gallery": 'ギャラリーを見る'
+  "write:gallery": 'ギャラリーを操作する'
+  "read:gallery-likes": 'ギャラリーのいいねを見る'
+  "write:gallery-likes": 'ギャラリーのいいねを操作する'
+  "read:flash": 'Playを見る'
+  "write:flash": 'Playを操作する'
+  "read:flash-likes": 'Playのいいねを見る'
+  "write:flash-likes": 'Playのいいねを操作する'
+  "read:admin:abuse-user-reports": 'ユーザーからの通報を見る'
+  "write:admin:delete-account": 'ユーザーアカウントを削除する'
+  "write:admin:delete-all-files-of-a-user": 'ユーザーのすべてのファイルを削除する'
+  "read:admin:index-stats": 'データベースインデックスに関する情報を見る'
+  "read:admin:table-stats": 'データベーステーブルに関する情報を見る'
+  "read:admin:user-ips": 'ユーザーのIPアドレスを見る'
+  "read:admin:meta": 'インスタンスのメタデータを見る'
+  "write:admin:reset-password": 'ユーザーのパスワードをリセットする'
+  "write:admin:resolve-abuse-user-report": 'ユーザーからの通報を解決する'
+  "write:admin:send-email": 'メールを送る'
+  "read:admin:server-info": 'サーバーの情報を見る'
+  "read:admin:show-moderation-log": 'モデレーションログを見る'
+  "read:admin:show-user": 'ユーザーのプライベートな情報を見る'
+  "write:admin:suspend-user": 'ユーザーを凍結する'
+  "write:admin:unset-mfa": 'ユーザーの二要素認証を解除する'
+  "write:admin:unset-user-avatar": 'ユーザーのアバターを削除する'
+  "write:admin:unset-user-banner": 'ユーザーのバーナーを削除する'
+  "write:admin:unsuspend-user": 'ユーザーの凍結を解除する'
+  "write:admin:meta": 'インスタンスのメタデータを操作する'
+  "write:admin:user-note": 'モデレーションノートを操作する'
+  "write:admin:roles": 'ロールを操作する'
+  "read:admin:roles": 'ロールを見る'
+  "write:admin:relays": 'リレーを操作する'
+  "read:admin:relays": 'リレーを見る'
+  "write:admin:invite-codes": '招待コードを操作する'
+  "read:admin:invite-codes": '招待コードを見る'
+  "write:admin:announcements": 'お知らせを操作する'
+  "read:admin:announcements": 'お知らせを見る'
+  "write:admin:avatar-decorations": 'アバターデコレーションを操作する'
+  "read:admin:avatar-decorations": 'アバターデコレーションを見る'
+  "write:admin:federation": '連合に関する情報を操作する'
+  "write:admin:account": 'ユーザーアカウントを操作する'
+  "read:admin:account": 'ユーザーに関する情報を見る'
+  "write:admin:emoji": '絵文字を操作する'
+  "read:admin:emoji": '絵文字を見る'
+  "write:admin:queue": 'ジョブキューを操作する'
+  "read:admin:queue": 'ジョブキューに関する情報を見る'
+  "write:admin:promo": 'プロモーションノートを操作する'
+  "write:admin:drive": 'ユーザーのドライブを操作する'
+  "read:admin:drive": 'ユーザーのドライブの関する情報を見る'
+  "read:admin:stream": '管理者用のWebsocket APIを使う'
+  "write:admin:ad": '広告を操作する'
+  "read:admin:ad": '広告を見る'
+  "write:invite-codes": '招待コードを作成する'
+  "read:invite-codes": '招待コードを取得する'
+  "write:clip-favorite": 'クリップのいいねを操作する'
+  "read:clip-favorite": 'クリップのいいねを見る'
+  "read:federation": '連合に関する情報を取得する'
+  "write:report-abuse": '違反を報告する'
+  "write:chat": 'ダイレクトメッセージを操作する'
+  "read:chat": 'ダイレクトメッセージを閲覧する'
+_cw:
+  hide: '隠す'
+  show: 'もっと見る'
+hide: '隠す'

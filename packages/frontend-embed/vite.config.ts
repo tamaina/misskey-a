@@ -1,6 +1,7 @@
 import path from 'path';
 import { createRequire } from 'node:module';
 import pluginVue from '@vitejs/plugin-vue';
+import { pluginHostLocaleEntries } from '../frontend/lib/vite-plugin-host-locale-entries.js';
 import { pluginVvi } from '../frontend/lib/vite-plugin-vvi.js';
 import { pluginFeatureDependencies } from '../frontend/lib/vite-plugin-feature-dependencies.js';
 import { defineConfig, type UserConfig } from 'vite';
@@ -12,7 +13,6 @@ import meta from '../../package.json';
 import packageInfo from './package.json' with { type: 'json' };
 import embedSourcePaths from './lib/embed-source-paths.json' with { type: 'json' };
 import pluginJson5 from './lib/vite-plugin-json5.js';
-import { pluginRemoveUnrefI18n } from '../frontend-builder/rollup-plugin-remove-unref-i18n';
 import { Features } from 'lightningcss';
 
 const url = process.env.NODE_ENV === 'development' ? (loadYaml(await fsp.readFile('../../.config/default.yml', 'utf-8')) as any).url : null;
@@ -93,9 +93,9 @@ export function getConfig(): UserConfig {
 
 		plugins: [
 			pluginFeatureDependencies(__dirname, path.resolve(__dirname, '../features')),
+			pluginHostLocaleEntries({ embed: true }),
 			pluginVvi({ embed: true }),
 			pluginVue(),
-			pluginRemoveUnrefI18n(),
 			pluginJson5(),
 		],
 

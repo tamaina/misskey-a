@@ -15,7 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label><SearchLabel>{{ $locale.sfc.password }}</SearchLabel></template>
 
 				<SearchMarker>
-					<MkButton primary @click="change()">
+					<MkButton primary :disabled="changingPassword" @click="change()">
 						<SearchLabel>{{ $locale.sfc.changePassword }}</SearchLabel>
 					</MkButton>
 				</SearchMarker>
@@ -23,31 +23,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</SearchMarker>
 
 		<X2fa/>
-
 		<SearchMarker :keywords="['signin', 'login', 'history', 'log']">
-			<FormSection>
-				<template #label><SearchLabel>{{ $locale.sfc.signinHistory }}</SearchLabel></template>
-				<MkPagination :paginator="paginator" withControl :forceDisableInfiniteScroll="true">
-					<template #default="{items}">
-						<div>
-							<div v-for="item in items" :key="item.id" v-panel class="timnmucd">
-								<header>
-									<i v-if="item.success" class="ti ti-check icon succ"></i>
-									<i v-else class="ti ti-circle-x icon fail"></i>
-									<code class="ip _monospace">{{ item.ip }}</code>
-									<MkTime :time="item.createdAt" class="time"/>
-								</header>
-							</div>
-						</div>
-					</template>
-				</MkPagination>
-			</FormSection>
+			<MkBrowserSessions/>
 		</SearchMarker>
 
 		<SearchMarker :keywords="['regenerate', 'refresh', 'reset', 'token']">
 			<FormSection>
 				<FormSlot>
-					<MkButton danger @click="regenerateToken"><i class="ti ti-refresh"></i> <SearchLabel>{{ $locale.sfc.regenerateLoginToken }}</SearchLabel></MkButton>
+					<MkButton danger :disabled="changingPassword" @click="regenerateToken()"><i class="ti ti-refresh"></i> <SearchLabel>{{ $locale.sfc.regenerateLoginToken }}</SearchLabel></MkButton>
 					<template #caption>{{ $locale.sfc.regenerateLoginTokenDescription }}</template>
 				</FormSlot>
 			</FormSection>
@@ -57,63 +40,76 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, markRaw } from 'vue';
-import X2fa from '@features/auth/frontend/pages/settings/2fa.vue';
+import { computed, onActivated, onDeactivated, onUnmounted, ref, watch } from 'vue';
+import MkBrowserSessions from '@features/auth/frontend/components/MkBrowserSessions.vue';
+import X2fa from './2fa.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import FormSlot from '@features/ui/frontend/components/form/slot.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import * as os from '@features/ui/frontend/os.js';
-import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
-import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import { signout } from '@features/auth/frontend/signout.js';
+import { ownedConfirm, ownedInputText } from '@features/auth/frontend/utility/owned-dialog.js';
+import { ensureSudo } from '@features/auth/frontend/utility/ensure-sudo.js';
+import { ensureSignin } from '@features/auth/frontend/i.js';
+import { isSameLiveCredential } from '@features/auth/frontend/utility/live-account.js';
+import { cloudBackup } from '@features/preferences/frontend/state/utility.js';
+import { store } from '@features/preferences/frontend/store.js';
 
-const paginator = markRaw(new Paginator('i/signin-history', {
-	limit: 5,
-}));
+const ownerId = ensureSignin().id;
+const ownerToken = ensureSignin().token;
+const sameActor = () => isSameLiveCredential(ownerId, ownerToken, ensureSignin().id, ensureSignin().token);
+const changingPassword = ref(false);
+let disposed = false;
+let ceremonyGeneration = 0;
+let sudoAbort: AbortController | null = null;
+const invalidateCeremony = () => { disposed = true; ceremonyGeneration++; sudoAbort?.abort(); sudoAbort = null; };
+onDeactivated(invalidateCeremony);
+onUnmounted(invalidateCeremony);
+onActivated(() => { disposed = false; });
+watch(() => [ensureSignin().id, ensureSignin().token], () => { if (!sameActor()) invalidateCeremony(); }, { flush: 'sync' });
 
 async function change() {
-	const { canceled: canceled2, result: newPassword } = await os.inputText({
-		title: $locale.value.sfc.newPassword,
-		type: 'password',
-		autocomplete: 'new-password',
-	});
-	if (canceled2 || newPassword == null) return;
+	if (changingPassword.value || disposed) return;
+	changingPassword.value = true;
+	const generation = ++ceremonyGeneration;
+	sudoAbort = new AbortController();
+	try { await collectAndChangePassword(() => !disposed && generation === ceremonyGeneration && sameActor()); } finally { changingPassword.value = false; }
+}
 
-	const { canceled: canceled3, result: newPassword2 } = await os.inputText({
-		title: $locale.value.sfc.newPasswordRetype,
-		type: 'password',
-		autocomplete: 'new-password',
-	});
-	if (canceled3 || newPassword2 == null) return;
-
-	if (newPassword !== newPassword2) {
-		os.alert({
-			type: 'error',
-			text: $locale.value.sfc.retypedNotMatch,
-		});
-		return;
-	}
-
-	const auth = await os.authenticateDialog();
-	if (auth.canceled) return;
-
-	os.apiWithDialog('i/change-password', {
-		currentPassword: auth.result.password,
-		token: auth.result.token,
-		newPassword,
-	});
+async function collectAndChangePassword(isCurrent: () => boolean) {
+	const confirmation = await ownedConfirm({ type: 'question', title: $locale.value.sfc.changePassword, text: $locale.value.sfc.confirmPasswordChange }, sudoAbort?.signal);
+	if (!isCurrent() || confirmation.canceled) return;
+	if (!await ensureSudo(isCurrent, sudoAbort?.signal) || !isCurrent()) return;
+	const password = await ownedInputText({ title: $locale.value.sfc.newPassword, type: 'password', autocomplete: 'new-password', minLength: 1 }, sudoAbort?.signal);
+	if (!isCurrent() || password.canceled || !password.result) return;
+	const repeated = await ownedInputText({ title: $locale.value.sfc.newPasswordRetype, type: 'password', autocomplete: 'new-password', minLength: 1 }, sudoAbort?.signal);
+	if (!isCurrent() || repeated.canceled || !repeated.result) return;
+	if (password.result !== repeated.result) { await os.alert({ type: 'error', text: $locale.value.sfc.retypedNotMatch }); return; }
+	await os.apiWithDialog('i/security/password', { newPassword: password.result });
+	if (isCurrent()) await signout('credentials-changed');
 }
 
 async function regenerateToken() {
-	const auth = await os.authenticateDialog();
-	if (auth.canceled) return;
-
-	misskeyApi('i/regenerate-token', {
-		password: auth.result.password,
-		token: auth.result.token,
-	});
+	if (changingPassword.value || disposed) return;
+	changingPassword.value = true;
+	const generation = ++ceremonyGeneration;
+	sudoAbort = new AbortController();
+	const isCurrent = () => !disposed && generation === ceremonyGeneration && sameActor();
+	try {
+		const confirmation = await ownedConfirm({ type: 'warning', text: $locale.value.sfc.regenerateLoginTokenDescription }, sudoAbort?.signal);
+		if (!isCurrent() || confirmation.canceled) return;
+		if (!await ensureSudo(isCurrent, sudoAbort?.signal) || !isCurrent()) return;
+		if (store.s.enablePreferencesAutoCloudBackup) {
+			try { await cloudBackup(); } catch {
+				// A failed optional backup should not block credential renewal.
+			}
+			if (!isCurrent()) return;
+		}
+		await os.apiWithDialog('i/security/regenerate-token', {});
+		if (isCurrent()) await signout('credentials-changed');
+	} finally { changingPassword.value = false; }
 }
 
 const headerActions = computed(() => []);
@@ -126,65 +122,13 @@ definePage(() => ({
 }));
 </script>
 
-<style lang="scss" scoped>
-.timnmucd {
-	padding: 12px;
-
-	&:first-child {
-		border-top-left-radius: 6px;
-		border-top-right-radius: 6px;
-	}
-
-	&:last-child {
-		border-bottom-left-radius: 6px;
-		border-bottom-right-radius: 6px;
-	}
-
-	&:not(:last-child) {
-		border-bottom: solid 0.5px var(--MI_THEME-divider);
-	}
-
-	> header {
-		display: flex;
-		align-items: center;
-
-		> .icon {
-			width: 1em;
-			margin-right: 0.75em;
-
-			&.succ {
-				color: var(--MI_THEME-success);
-			}
-
-			&.fail {
-				color: var(--MI_THEME-error);
-			}
-		}
-
-		> .ip {
-			flex: 1;
-			min-width: 0;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			margin-right: 12px;
-		}
-
-		> .time {
-			margin-left: auto;
-			opacity: 0.7;
-		}
-	}
-}
-</style>
-
 <locale locale="ar-SA" lang="json">
 {
 	"newPassword": "كلمة المرور الجديدة",
 	"newPasswordRetype": "كرّر كلمة المرور الجديدة:",
 	"retypedNotMatch": "المدخلات لا تتطابق",
 	"security": "الأمان",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "يمكنك ضبط الإعدادات المتعلقة بأمان الحساب، مثل كلمة المرور وطرق تسجيل الدخول وتطبيقات المصادقة ومفاتيح المرور.",
 	"password": "الكلمة السرية",
 	"changePassword": "تغيير الكلمة السرية",
 	"signinHistory": "تاريخ تسجيل الدخول",
@@ -214,7 +158,7 @@ definePage(() => ({
 	"newPasswordRetype": "Nové heslo (znovu)",
 	"retypedNotMatch": "Zadané údaje se neshodují.",
 	"security": "Zabezpečení",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Zde můžete nastavit zabezpečení účtu, například heslo, způsoby přihlašování, ověřovací aplikace a přístupové klíče.",
 	"password": "Heslo",
 	"changePassword": "Změnit heslo",
 	"signinHistory": "Historie přihlášení",
@@ -226,15 +170,15 @@ definePage(() => ({
 <locale locale="da-DK" lang="json">
 {
 	"newPassword": "New password",
-	"newPasswordRetype": "Retype new password",
-	"retypedNotMatch": "The inputs do not match.",
+	"newPasswordRetype": "Indtast den nye adgangskode igen",
+	"retypedNotMatch": "De indtastede værdier stemmer ikke overens.",
 	"security": "Security",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Her kan du konfigurere indstillinger for kontosikkerhed, såsom adgangskode, loginmetoder, godkendelsesapps og adgangsnøgler.",
 	"password": "Password",
-	"changePassword": "Change password",
-	"signinHistory": "Login history",
-	"regenerateLoginToken": "Regenerate login token",
-	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
+	"changePassword": "Skift adgangskode",
+	"signinHistory": "Loginhistorik",
+	"regenerateLoginToken": "Generér et nyt login-token",
+	"regenerateLoginTokenDescription": "Genererer et nyt token, som bruges internt ved login. Dette er normalt ikke nødvendigt. Hvis tokenet genereres igen, bliver du logget ud på alle enheder."
 }
 </locale>
 
@@ -262,6 +206,8 @@ definePage(() => ({
 	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
 	"password": "Password",
 	"changePassword": "Change password",
+	"confirmPasswordChange": "Do you want to change your password?",
+	"passwordChangeRequiresSignin": "To change your password, please sign in again in the browser.",
 	"signinHistory": "Login history",
 	"regenerateLoginToken": "Regenerate login token",
 	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
@@ -289,7 +235,7 @@ definePage(() => ({
 	"newPasswordRetype": "Répéter le nouveau mot de passe",
 	"retypedNotMatch": "Les saisies ne correspondent pas.",
 	"security": "Sécurité",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Vous pouvez configurer les paramètres de sécurité du compte, comme le mot de passe, les méthodes de connexion, les applications d’authentification et les clés d’accès.",
 	"password": "Mot de passe",
 	"changePassword": "Modifier votre mot de passe",
 	"signinHistory": "Historique de connexion",
@@ -304,7 +250,7 @@ definePage(() => ({
 	"newPasswordRetype": "Ulangi kata sandi baru",
 	"retypedNotMatch": "Input tidak sama",
 	"security": "Keamanan",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Kamu dapat mengatur keamanan akun, seperti kata sandi, metode masuk, aplikasi autentikasi, dan kunci akses.",
 	"password": "Kata sandi",
 	"changePassword": "Ubah kata sandi",
 	"signinHistory": "Riwayat masuk",
@@ -337,7 +283,10 @@ definePage(() => ({
 	"securityBanner": "パスワード、ログイン方法、認証アプリ、パスキーなどアカウントのセキュリティに関する設定を行えます。",
 	"password": "パスワード",
 	"changePassword": "パスワードを変更",
-	"signinHistory": "ログイン履歴",
+	"confirmPasswordChange": "パスワードを変更しますか。",
+	"passwordChangeRequiresSignin": "パスワードを変更するには、ブラウザで再度ログインしてください。",
+	"signinHistory": "セッションに紐付いていない過去のログイン履歴",
+	"regenerateLoginTokenWithPasskey": "パスキーでログイントークンを再生成",
 	"regenerateLoginToken": "ログイントークンを再生成",
 	"regenerateLoginTokenDescription": "ログインに使用される内部トークンを再生成します。通常この操作を行う必要はありません。再生成すると、全てのデバイスでログアウトされます。"
 }
@@ -361,30 +310,30 @@ definePage(() => ({
 <locale locale="kab-KAB" lang="json">
 {
 	"newPassword": "New password",
-	"newPasswordRetype": "Retype new password",
-	"retypedNotMatch": "The inputs do not match.",
+	"newPasswordRetype": "Ales asekcem n wawal uffir amaynut",
+	"retypedNotMatch": "Isekcam ur mṣadan ara.",
 	"security": "Taɣellist",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Tzemreḍ ad tesbaduḍ iɣewwaren n tɣellist n umiḍan, am wawal uffir, tarrayin n unekcum, isnasen n usesteb akked tsura n unekcum.",
 	"password": "Awal uffir",
-	"changePassword": "Change password",
-	"signinHistory": "Login history",
-	"regenerateLoginToken": "Regenerate login token",
-	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
+	"changePassword": "Beddel awal uffir",
+	"signinHistory": "Amazray n unekcum",
+	"regenerateLoginToken": "Sirew tikelt-nniḍen ajuṭun n unekcum",
+	"regenerateLoginTokenDescription": "Yessiraw tikelt-nniḍen ajuṭun yettwasqedcen daxel deg unekcum. Tigawt-a ur tlaq ara s umata. Ma yella yettwasirew tikelt-nniḍen, ad teffɣeḍ seg meṛṛa ibenkan."
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
 	"newPassword": "New password",
-	"newPasswordRetype": "Retype new password",
-	"retypedNotMatch": "The inputs do not match.",
+	"newPasswordRetype": "ಹೊಸ ಗುಪ್ತಪದವನ್ನು ಮತ್ತೊಮ್ಮೆ ನಮೂದಿಸಿ",
+	"retypedNotMatch": "ನಮೂದಿಸಿದ ಮೌಲ್ಯಗಳು ಹೊಂದಿಕೆಯಾಗುತ್ತಿಲ್ಲ.",
 	"security": "Security",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "ಗುಪ್ತಪದ, ಪ್ರವೇಶ ವಿಧಾನಗಳು, ದೃಢೀಕರಣ ಅಪ್ಲಿಕೇಶನ್‌ಗಳು ಮತ್ತು ಪಾಸ್‌ಕೀಗಳಂತಹ ಖಾತೆಯ ಸುರಕ್ಷತೆಗೆ ಸಂಬಂಧಿಸಿದ ಸೆಟ್ಟಿಂಗ್‌ಗಳನ್ನು ಇಲ್ಲಿ ಹೊಂದಿಸಬಹುದು.",
 	"password": "ಗುಪ್ತಪದ",
-	"changePassword": "Change password",
-	"signinHistory": "Login history",
-	"regenerateLoginToken": "Regenerate login token",
-	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
+	"changePassword": "ಗುಪ್ತಪದ ಬದಲಾಯಿಸಿ",
+	"signinHistory": "ಪ್ರವೇಶದ ಇತಿಹಾಸ",
+	"regenerateLoginToken": "ಪ್ರವೇಶ ಟೋಕನ್ ಅನ್ನು ಮರುಸೃಷ್ಟಿಸಿ",
+	"regenerateLoginTokenDescription": "ಪ್ರವೇಶದ ವೇಳೆ ಆಂತರಿಕವಾಗಿ ಬಳಸುವ ಟೋಕನ್ ಅನ್ನು ಮರುಸೃಷ್ಟಿಸುತ್ತದೆ. ಸಾಮಾನ್ಯವಾಗಿ ಈ ಕ್ರಿಯೆ ಅಗತ್ಯವಿರುವುದಿಲ್ಲ. ಮರುಸೃಷ್ಟಿಸಿದರೆ, ಎಲ್ಲ ಸಾಧನಗಳಿಂದ ನಿರ್ಗಮಿಸಲಾಗುತ್ತದೆ."
 }
 </locale>
 
@@ -409,7 +358,7 @@ definePage(() => ({
 	"newPasswordRetype": "Nieuw wachtwoord (herhalen)",
 	"retypedNotMatch": "Invoer komt niet overeen",
 	"security": "Beveiliging",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Je kunt instellingen voor accountbeveiliging configureren, zoals je wachtwoord, aanmeldmethoden, authenticatie-apps en passkeys.",
 	"password": "Wachtwoord",
 	"changePassword": "Wachtwoord wijzigen",
 	"signinHistory": "Inloggeschiedenis",
@@ -424,12 +373,12 @@ definePage(() => ({
 	"newPasswordRetype": "Nytt passord (gjenta)",
 	"retypedNotMatch": "Inngangene stemmer ikke overens.",
 	"security": "Sikkerhet",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Du kan konfigurere innstillinger for kontosikkerhet, som passord, innloggingsmetoder, autentiseringsapper og tilgangsnøkler.",
 	"password": "Passord",
 	"changePassword": "Endre passord",
-	"signinHistory": "Login history",
-	"regenerateLoginToken": "Regenerate login token",
-	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
+	"signinHistory": "Innloggingshistorikk",
+	"regenerateLoginToken": "Generer innloggingstoken på nytt",
+	"regenerateLoginTokenDescription": "Genererer tokenet som brukes internt ved innlogging, på nytt. Dette er vanligvis ikke nødvendig. Hvis tokenet genereres på nytt, blir du logget ut på alle enheter."
 }
 </locale>
 
@@ -439,7 +388,7 @@ definePage(() => ({
 	"newPasswordRetype": "Powtórz nowe hasło",
 	"retypedNotMatch": "Wejście nie zgadza się.",
 	"security": "Bezpieczeństwo",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Możesz skonfigurować ustawienia zabezpieczeń konta, takie jak hasło, metody logowania, aplikacje uwierzytelniające i klucze dostępu.",
 	"password": "Hasło",
 	"changePassword": "Zmień hasło",
 	"signinHistory": "Historia logowania",
@@ -469,7 +418,7 @@ definePage(() => ({
 	"newPasswordRetype": "Новый пароль (ещё раз)",
 	"retypedNotMatch": "Не совпадают",
 	"security": "Безопасность",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Здесь можно настроить безопасность аккаунта: пароль, способы входа, приложения для аутентификации и ключи доступа.",
 	"password": "Пароль",
 	"changePassword": "Изменить пароль",
 	"signinHistory": "Журнал посещений",
@@ -484,7 +433,7 @@ definePage(() => ({
 	"newPasswordRetype": "Nové heslo (znovu)",
 	"retypedNotMatch": "Zadané vstupy nesúhlasia",
 	"security": "Zabezpečenie",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Tu môžete nastaviť zabezpečenie účtu, napríklad heslo, spôsoby prihlasovania, overovacie aplikácie a prístupové kľúče.",
 	"password": "Heslo",
 	"changePassword": "Zmeniť heslo",
 	"signinHistory": "História prihlásení",
@@ -526,15 +475,15 @@ definePage(() => ({
 <locale locale="ug-CN" lang="json">
 {
 	"newPassword": "New password",
-	"newPasswordRetype": "Retype new password",
-	"retypedNotMatch": "The inputs do not match.",
+	"newPasswordRetype": "يېڭى پارولنى قايتا كىرگۈزۈڭ",
+	"retypedNotMatch": "كىرگۈزگەن مەزمۇنلار ماس كەلمەيدۇ.",
 	"security": "Security",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "بۇ يەردە پارول، كىرىش ئۇسۇللىرى، دەلىللەش ئەپلىرى ۋە كىرىش ئاچقۇچلىرى قاتارلىق ھېسابات بىخەتەرلىكىگە مۇناسىۋەتلىك تەڭشەكلەرنى تەڭشىيەلەيسىز.",
 	"password": "Password",
-	"changePassword": "Change password",
-	"signinHistory": "Login history",
-	"regenerateLoginToken": "Regenerate login token",
-	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
+	"changePassword": "پارولنى ئۆزگەرتىش",
+	"signinHistory": "كىرىش تارىخى",
+	"regenerateLoginToken": "كىرىش توكىنىنى قايتا ھاسىل قىلىش",
+	"regenerateLoginTokenDescription": "كىرىش جەريانىدا ئىچكى قىسىمدا ئىشلىتىلىدىغان توكىننى قايتا ھاسىل قىلىدۇ. ئادەتتە بۇ مەشغۇلاتنىڭ ھاجىتى يوق. قايتا ھاسىل قىلىنسا، بارلىق ئۈسكۈنىلەردىن چىقىرىلىسىز."
 }
 </locale>
 
@@ -559,7 +508,7 @@ definePage(() => ({
 	"newPasswordRetype": "Nhập lại mật khẩu mới",
 	"retypedNotMatch": "Mật khẩu không trùng khớp.",
 	"security": "Bảo mật",
-	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
+	"securityBanner": "Bạn có thể cấu hình các thiết lập bảo mật tài khoản, như mật khẩu, phương thức đăng nhập, ứng dụng xác thực và khóa truy cập.",
 	"password": "Mật khẩu",
 	"changePassword": "Đổi mật khẩu",
 	"signinHistory": "Lịch sử đăng nhập",

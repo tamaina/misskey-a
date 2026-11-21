@@ -3,25 +3,28 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { channelContract, channelErrors } from '@features/channels/contract';
-import { legacyChannelSchemas } from '@features/channels/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['channels', 'mute'],
+import { channelsMuteDeleteContract, channelsMuteDeleteErrors } from './delete.contract.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-	requireCredential: true,
-	prohibitMoved: true,
-
-	kind: 'write:channels',
-
-	errors: channelErrors['channels/mute/delete'],
-} as const;
-
-export const paramDef = legacyChannelSchemas['channels/mute/delete'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('channelCommands', commands => createContractTransportEndpoint(meta, paramDef, channelContract['channels/mute/delete'], async (params, user) => commands['channels/mute/delete'](params, {
-	context: { actor: user },
-})));
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { ChannelsRepository } from '@features/persistence/backend/repositories/models.js';
+import { type ChannelMutingService } from '@features/channels/backend/services/ChannelMutingService.js';
+export interface ChannelsMuteDeleteDependencies {
+	channelsRepository: ChannelsRepository;
+	channelMutingService: ChannelMutingService;
+}
+export function createChannelsMuteDeleteProcedure<Actor extends MiLocalUser>(deps: ChannelsMuteDeleteDependencies) {
+	return createApiProcedure<Actor>()(channelsMuteDeleteContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const channel = await deps.channelsRepository.findOneBy({ id: input.channelId });
+			if (channel == null) throw apiError(channelsMuteDeleteErrors.noSuchChannel);
+			const isMuted = await deps.channelMutingService.isMuted({ requestUserId: actor.id, targetChannelId: channel.id });
+			if (!isMuted) throw apiError(channelsMuteDeleteErrors.notMuting);
+			await deps.channelMutingService.unmute({ requestUserId: actor.id, targetChannelId: channel.id });
+		});
+}

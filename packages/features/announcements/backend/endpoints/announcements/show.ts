@@ -3,46 +3,27 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedAnnouncementsShowDefinition, packedAnnouncementsShowInput, packedAnnouncementsShowOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
+import { toPackedAnnouncement } from '../../api.dto.js';
+
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { announcementsContract } from '../../api.definition.js';
+import type { AnnouncementsDependencies } from '../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { EntityNotFoundError } from 'typeorm';
-
-import { AnnouncementService } from '../../services/AnnouncementService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(packedAnnouncementsShowDefinition);
-
-export const meta = {
-	tags: ['meta'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-
-	errors: {
-		noSuchAnnouncement: {
-			message: 'No such announcement.',
-			code: 'NO_SUCH_ANNOUNCEMENT',
-			id: 'b57b5e1d-4f49-404a-9edb-46b00268f121',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAnnouncementsShowInput, typeof packedAnnouncementsShowOutput> {
-	constructor(
-		private announcementService: AnnouncementService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
+export interface AnnouncementShowDependencies<Actor extends ApiActor> {
+	announcementService: Pick<AnnouncementsDependencies<Actor>['announcementService'], 'getAnnouncement'>;
+}
+export function createAnnouncementShowProcedure<Actor extends ApiActor>(deps: AnnouncementShowDependencies<Actor>) {
+	return createApiProcedure<Actor>()(announcementsContract.show)
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
 			try {
-				return await this.announcementService.getAnnouncement(ps.announcementId, me);
-			} catch (err) {
-				if (err instanceof EntityNotFoundError) throw new ApiError(meta.errors.noSuchAnnouncement);
-				throw err;
+				return toPackedAnnouncement(await deps.announcementService.getAnnouncement(input.announcementId, actor));
+			} catch (error) {
+				if (error instanceof EntityNotFoundError) throw apiError({ code: 'NO_SUCH_ANNOUNCEMENT', message: 'No such announcement.', id: 'b57b5e1d-4f49-404a-9edb-46b00268f121' });
+				throw error;
 			}
 		});
-	}
 }

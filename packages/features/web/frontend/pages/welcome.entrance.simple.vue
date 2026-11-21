@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<MkFeaturedPhotos :class="$style.bg"/>
 	<div :class="$style.logoWrapper">
 		<div :class="$style.poweredBy">Powered by</div>
-		<img :src="misskeysvg" :class="$style.misskey"/>
+		<img :src="misskeysvg" :class="$style.misskey" :alt="productName"/>
 	</div>
 	<div :class="$style.contents">
 		<MkVisitorDashboard/>
@@ -19,6 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import MkFeaturedPhotos from '@features/drive/frontend/components/MkFeaturedPhotos.vue';
 import misskeysvg from '/client-assets/misskey.svg';
+import { productName } from '@features/boot/frontend/shared/config.js';
 import MkVisitorDashboard from '@features/statistics/frontend/components/MkVisitorDashboard.vue';
 import { instance as meta } from '@features/instance/frontend/instance.js';
 </script>
@@ -55,6 +56,7 @@ import { instance as meta } from '@features/instance/frontend/instance.js';
 }
 
 .misskey {
+	vertical-align: middle;
 	width: 120px;
 
 	@media (max-width: 450px) {
@@ -66,6 +68,6 @@ import { instance as meta } from '@features/instance/frontend/instance.js';
 	position: relative;
 	width: min(430px, calc(100% - 32px));
 	margin: auto;
-	padding: 100px 0 100px 0;
+	padding: 128px 0 100px 0;
 }
 </style>

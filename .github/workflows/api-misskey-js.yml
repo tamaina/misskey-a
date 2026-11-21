@@ -9,7 +9,7 @@ on:
       - .github/workflows/api-misskey-js.yml
   pull_request:
     branches-ignore:
-      - master
+      - main
     paths:
       - packages/misskey-js/**
       - packages/features/**

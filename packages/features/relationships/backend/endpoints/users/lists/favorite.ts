@@ -2,22 +2,21 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { listContract } from '../../../../contract/lists.js';
-import { listErrors } from '@features/relationships/contract';
-import { legacyListSchemas } from '@features/relationships/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
-
-export const meta = {
-	requireCredential: true,
-	kind: 'write:account',
-	errors: listErrors['users/lists/favorite'],
-} as const;
-
-export const paramDef = legacyListSchemas['users/lists/favorite'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('listCommands', commands => createContractTransportEndpoint(meta, paramDef, listContract['users/lists/favorite'], async (params, user) => commands['users/lists/favorite'](params, {
-	context: { actor: user },
-})));
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { relationshipsContract } from '../../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../../api.implementation.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { relationshipsErrors } from '../../relationships.errors.js';
+export function createUsersListsFavoriteProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'userListsRepository' | 'userListFavoritesRepository' | 'idService'>) {
+	return createApiProcedure<Actor>()(relationshipsContract["users/lists/favorite"]).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const errors = relationshipsErrors['users/lists/favorite'];
+			if (!await deps.userListsRepository.exists({ where: { id: input.listId, isPublic: true } })) throw apiError(errors.noSuchList);
+			if (await deps.userListFavoritesRepository.exists({ where: { userId: actor.id, userListId: input.listId } })) throw apiError(errors.alreadyFavorited);
+			await deps.userListFavoritesRepository.insert({ id: deps.idService.gen(), userId: actor.id, userListId: input.listId });
+		});
+}

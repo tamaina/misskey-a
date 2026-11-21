@@ -5,10 +5,11 @@
 
 import * as crypto from 'node:crypto';
 import { URL } from 'node:url';
-import { promisify } from 'node:util';
 import { Inject, Injectable } from '@nestjs/common';
 import * as htmlParser from 'node-html-parser';
-import { RsaKeyPair } from 'slacc';
+import type { CustomSigningKey } from '@misskey-dev/node-http-message-signatures';
+import { parseHttpSignatureImplementationLevel } from '../protocol/misc/http-signature-capabilities.js';
+import { signAsDraftToRequest } from '@misskey-dev/node-http-message-signatures';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
@@ -41,7 +42,7 @@ type PrivateKey = {
 };
 
 export class ApRequestCreator {
-	static async createSignedPost(args: { key: PrivateKey, url: string, body: string, digest?: string, additionalHeaders: Record<string, string> }): Promise<Signed> {
+	static async createSignedPost(args: { key: PrivateKey | CustomSigningKey, url: string, body: string, digest?: string, additionalHeaders: Record<string, string> }): Promise<Signed> {
 		const u = new URL(args.url);
 		const digestHeader = args.digest ?? this.createDigest(args.body);
 
@@ -70,7 +71,7 @@ export class ApRequestCreator {
 		return `SHA-256=${crypto.createHash('sha256').update(body).digest('base64')}`;
 	}
 
-	static async createSignedGet(args: { key: PrivateKey, url: string, additionalHeaders: Record<string, string> }): Promise<Signed> {
+	static async createSignedGet(args: { key: PrivateKey | CustomSigningKey, url: string, additionalHeaders: Record<string, string> }): Promise<Signed> {
 		const u = new URL(args.url);
 
 		const request: Request = {
@@ -93,42 +94,16 @@ export class ApRequestCreator {
 		};
 	}
 
-	static async #signToRequest(request: Request, key: PrivateKey, includeHeaders: string[]): Promise<Signed> {
-		const signingString = this.#genSigningString(request, includeHeaders);
-		const sign = promisify(RsaKeyPair.prototype.sign).bind(RsaKeyPair.fromPem(key.privateKeyPem));
-		const signature = (await sign(Buffer.from(signingString))).toString('base64');
-		const signatureHeader = `keyId="${key.keyId}",algorithm="rsa-sha256",headers="${includeHeaders.join(' ')}",signature="${signature}"`;
-
-		request.headers = this.#objectAssignWithLcKey(request.headers, {
-			Signature: signatureHeader,
-		});
+	static async #signToRequest(request: Request, key: PrivateKey | CustomSigningKey, includeHeaders: string[]): Promise<Signed> {
+		const result = await signAsDraftToRequest(request, key, includeHeaders);
+		request.headers = this.#lcObjectKey(request.headers);
 		// node-fetch will generate this for us. if we keep 'Host', it won't change with redirects!
 		delete request.headers['host'];
 
 		return {
 			request,
-			signingString,
-			signature,
-			signatureHeader,
+			...result,
 		};
-	}
-
-	static #genSigningString(request: Request, includeHeaders: string[]): string {
-		request.headers = this.#lcObjectKey(request.headers);
-
-		const results: string[] = [];
-
-		for (const key of includeHeaders.map(x => x.toLowerCase())) {
-			if (key === '(request-target)') {
-				const url = new URL(request.url);
-				const query = url.search || (url.href.split('#', 1)[0].endsWith('?') ? '?' : '');
-				results.push(`(request-target): ${request.method.toLowerCase()} ${url.pathname}${query}`);
-			} else {
-				results.push(`${key}: ${request.headers[key]}`);
-			}
-		}
-
-		return results.join('\n');
 	}
 
 	static #lcObjectKey(src: Record<string, string>): Record<string, string> {
@@ -160,16 +135,13 @@ export class ApRequestService {
 	}
 
 	@bindThis
-	public async signedPost(user: { id: MiUser['id'] }, url: string, object: unknown, digest?: string): Promise<void> {
+	public async signedPost(user: { id: MiUser['id'] }, url: string, object: unknown, digest?: string, options: { level?: unknown; forceMainKey?: boolean } = {}): Promise<void> {
 		const body = typeof object === 'string' ? object : JSON.stringify(object);
 
-		const keypair = await this.userKeypairService.getUserKeypair(user.id);
+		const key = await this.userKeypairService.getLocalUserPrivateKey(user.id, options.forceMainKey ? 'main' : parseHttpSignatureImplementationLevel(options.level));
 
 		const req = await ApRequestCreator.createSignedPost({
-			key: {
-				privateKeyPem: keypair.privateKey,
-				keyId: `${this.config.url}/users/${user.id}#main-key`,
-			},
+			key,
 			url,
 			body,
 			digest,
@@ -190,15 +162,12 @@ export class ApRequestService {
 	 * @param url URL to fetch
 	 */
 	@bindThis
-	public async signedGet(url: string, user: { id: MiUser['id'] }, allowSoftfail: FetchAllowSoftFailMask = FetchAllowSoftFailMask.Strict, followAlternate?: boolean): Promise<unknown> {
+	public async signedGet(url: string, user: { id: MiUser['id'] }, allowSoftfail: FetchAllowSoftFailMask = FetchAllowSoftFailMask.Strict, followAlternate?: boolean, level?: unknown): Promise<unknown> {
 		const _followAlternate = followAlternate ?? true;
-		const keypair = await this.userKeypairService.getUserKeypair(user.id);
+		const key = await this.userKeypairService.getLocalUserPrivateKey(user.id, parseHttpSignatureImplementationLevel(level));
 
 		const req = await ApRequestCreator.createSignedGet({
-			key: {
-				privateKeyPem: keypair.privateKey,
-				keyId: `${this.config.url}/users/${user.id}#main-key`,
-			},
+			key,
 			url,
 			additionalHeaders: {
 			},
@@ -228,7 +197,7 @@ export class ApRequestService {
 				if (alternate) {
 					const href = alternate.getAttribute('href');
 					if (href && this.utilityService.punyHost(url) === this.utilityService.punyHost(href)) {
-						return await this.signedGet(href, user, allowSoftfail, false);
+						return await this.signedGet(href, user, allowSoftfail, false, level);
 					}
 				}
 			} catch (_) {

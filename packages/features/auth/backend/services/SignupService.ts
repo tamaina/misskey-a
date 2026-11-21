@@ -4,6 +4,11 @@
  */
 
 import { generateKeyPair } from 'node:crypto';
+import { genEd25519KeyPair } from '@misskey-dev/node-http-message-signatures';
+import * as v from 'valibot';
+import type { PackedJsonValue } from '@features/users/backend/json-value.schema.js';
+import { localUsernameSchema, passwordSchema } from '@features/users/backend/user-validation.schema.js';
+
 import { Inject, Injectable } from '@nestjs/common';
 import bcrypt from 'bcryptjs';
 import { DataSource, IsNull } from 'typeorm';
@@ -38,7 +43,8 @@ export class SignupService {
 		@Inject(DI.usedUsernamesRepository)
 		private usedUsernamesRepository: UsedUsernamesRepository,
 
-		private utilityService: UtilityService,
+		@Inject(UtilityService)
+		private utilityService: Omit<UtilityService, 'toPunyNullable'> & { toPunyNullable(host: PackedJsonValue | undefined): string | null },
 		private userService: UserService,
 		private userEntityService: UserEntityService,
 		private idService: IdService,
@@ -50,19 +56,21 @@ export class SignupService {
 
 	@bindThis
 	public async signup(opts: {
-		username: MiUser['username'];
-		password?: string | null;
+		username: PackedJsonValue | undefined;
+		password?: PackedJsonValue;
 		passwordHash?: MiUserProfile['password'] | null;
-		host?: string | null;
+		host?: PackedJsonValue;
 		ignorePreservedUsernames?: boolean;
 	}) {
-		const { username, password, passwordHash, host } = opts;
+		const { password, passwordHash, host } = opts;
 		let hash = passwordHash;
 
 		// Validate username
-		if (!this.userEntityService.validateLocalUsername(username)) {
+		if (!this.userEntityService.validateLocalUsername(opts.username)) {
 			throw new Error('INVALID_USERNAME');
 		}
+
+		const username = v.parse(localUsernameSchema, opts.username);
 
 		if (password != null && passwordHash == null) {
 			// Validate password
@@ -72,7 +80,7 @@ export class SignupService {
 
 			// Generate hash of password
 			const salt = await bcrypt.genSalt(8);
-			hash = await bcrypt.hash(password, salt);
+			hash = await bcrypt.hash(v.parse(passwordSchema, password), salt);
 		}
 
 		// Generate secret
@@ -117,10 +125,21 @@ export class SignupService {
 				err ? rej(err) : res([publicKey, privateKey]),
 			));
 
+		const ed25519 = await genEd25519KeyPair();
+
 		let account!: MiUser;
 
 		// Start transaction
 		await this.db.transaction(async transactionalEntityManager => {
+			// ローカルユーザーのユーザー名は host が NULL のため、(usernameLower, host) の
+			// 複合ユニークインデックスでは重複を防げない（NULLは互いにdistinct扱い）。
+			// 同一ユーザー名の並行サインアップをトランザクション単位のadvisory lockで直列化し、
+			// チェック→挿入のTOCTOU競合を排除する。
+			await transactionalEntityManager.query(
+				'SELECT pg_advisory_xact_lock(hashtext($1))',
+				[`signup:username:${username.toLowerCase()}`],
+			);
+
 			const exist = await transactionalEntityManager.findOneBy(MiUser, {
 				usernameLower: username.toLowerCase(),
 				host: IsNull(),
@@ -139,6 +158,8 @@ export class SignupService {
 			await transactionalEntityManager.save(new MiUserKeypair({
 				publicKey: keyPair[0],
 				privateKey: keyPair[1],
+				ed25519PublicKey: ed25519.publicKey,
+				ed25519PrivateKey: ed25519.privateKey,
 				userId: account.id,
 			}));
 

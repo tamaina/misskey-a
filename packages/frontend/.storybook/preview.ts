@@ -3,15 +3,16 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { FORCE_RE_RENDER, FORCE_REMOUNT } from '@storybook/core-events';
-import { addons } from '@storybook/preview-api';
+import { FORCE_RE_RENDER, FORCE_REMOUNT } from 'storybook/internal/core-events';
+import { addons } from 'storybook/preview-api';
 import { type Preview, setup } from '@storybook/vue3';
 import { createInternationalization, setActiveInternationalization } from 'virtual:vite-vue-internationalization';
 import { startComponentLocales } from '@features/boot/frontend/index.js';
 import isChromatic from 'chromatic/isChromatic';
-import { initialize, mswLoader } from 'msw-storybook-addon';
+import { setupWorker } from 'msw/browser';
+import { mswLoader } from 'msw-storybook-addon/csf3';
 import { userDetailed } from './fakes.js';
-import { commonHandlers, onUnhandledRequest } from './mocks.js';
+import { commonHandlers, onUnhandledFrame } from './mocks.js';
 import themes from './themes.js';
 import '../src/style.scss';
 
@@ -58,21 +59,24 @@ function initLocalStorage() {
 	}));
 }
 
-initialize({
-	onUnhandledRequest,
-});
 initLocalStorage();
+// Registry consumers run while the runtime graph is imported, before story loaders.
+// Install the worker first so these requests cannot reach the Storybook server.
+const worker = setupWorker(...commonHandlers);
+await worker.start({ onUnhandledFrame });
 // Await locale activation before Storybook can finish evaluating this preview.
 // Story modules and initialization graphs can capture owner messages eagerly.
 const { lang } = await import('@features/boot/frontend/shared/config.js');
 const internationalization = await startComponentLocales(lang, createInternationalization, setActiveInternationalization);
-const [{ default: components }, { default: directives }, { default: widgets }, { themeManager }, { prefer }, os] = await Promise.all([
+// The OS entry owns popup imports that depend on preferences. Resolve it first
+// so concurrent entry traversal cannot observe `prefer` before initialization.
+const os = await import('../../features/ui/frontend/os.js');
+const [{ default: components }, { default: directives }, { default: widgets }, { themeManager }, { prefer }] = await Promise.all([
 	import('../../features/index/frontend/components.js'),
 	import('../../features/index/frontend/directives.js'),
 	import('../../features/index/frontend/widgets.js'),
 	import('../../features/preferences/frontend/theme.js'),
 	import('../../features/preferences/frontend/preferences.js'),
-	import('../../features/ui/frontend/os.js'),
 ]);
 setup((app) => {
 	moduleInitialized = true;
@@ -92,8 +96,20 @@ setup((app) => {
 });
 
 const preview = {
+	initialGlobals: { misskeyTheme: false },
+	globalTypes: {
+		misskeyTheme: {
+			description: 'Misskey theme',
+			toolbar: { icon: 'mirror', dynamicTitle: true, items: [{ value: '', title: '(clear)' }, ...Object.keys(themes)] },
+		},
+	},
 	decorators: [
 		(Story, context) => {
+			if (context.globals.misskeyTheme) {
+				window.document.documentElement.dataset.misskeyTheme = context.globals.misskeyTheme;
+			} else {
+				delete window.document.documentElement.dataset.misskeyTheme;
+			}
 			if (lastStory === context.id) {
 				lastStory = null;
 			} else {
@@ -138,7 +154,7 @@ const preview = {
 			};
 		},
 	],
-	loaders: [mswLoader],
+	loaders: [mswLoader(async () => worker)],
 	parameters: {
 		controls: {
 			exclude: /^__/,

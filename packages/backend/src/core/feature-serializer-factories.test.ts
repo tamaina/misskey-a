@@ -5,6 +5,7 @@
 
 import { describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
+import { IsNull, MoreThan, Or } from 'typeorm';
 import type { MiAbuseReportNotificationRecipient, MiAbuseUserReport, MiAntenna, MiApp, MiAuthSession, MiBlocking, MiChannel, MiChatMessage, MiDriveFile, MiDriveFolder, MiEmoji, MiFollowing, MiFollowRequest, MiHashtag, MiInstance, MiMeta, MiModerationLog, MiMuting, MiRegistrationTicket, MiRenoteMuting, MiReversiGame, MiRole, MiSignin, MiSystemWebhook, MiUser, MiUserList, MiUserListMembership } from '@features/persistence/backend/repositories/models.js';
 import { authServices } from '@features/auth/backend/services.js';
 import { channelServices } from '@features/channels/backend/services.js';
@@ -12,7 +13,7 @@ import { chatServices } from '@features/chat/backend/services.js';
 import { discoveryServices } from '@features/discovery/backend/services.js';
 import { driveServices } from '@features/drive/backend/services.js';
 import { emojiServices } from '@features/emojis/backend/services.js';
-import { gameServices } from '@features/games/backend/services.js';
+import { gameServices } from '@features/games/reversi/backend/services.js';
 import { instanceServices } from '@features/instance/backend/services.js';
 import { integrationServices } from '@features/integrations/backend/services.js';
 import { moderationServices } from '@features/moderation/backend/services.js';
@@ -20,7 +21,7 @@ import { relationshipServices } from '@features/relationships/backend/services.j
 import { roleServices } from '@features/roles/backend/services.js';
 import { timelineServices } from '@features/timelines/backend/services.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { SelectQueryBuilder } from 'typeorm';
 import type { Inputs } from '@features/index/backend/service-definitions.js';
 
@@ -35,19 +36,24 @@ const detailedUser = fixture<Packed<'UserDetailedNotMe'>>({ id: 'user' });
 
 describe('annotation-free feature serializers', () => {
 	test('auth sessions reuse their composed app serializer and preserve secret visibility', async () => {
-		const deps = mockDeep<Inputs<typeof authServices>>();
-		const app = fixture<MiApp>({ id: 'app', secret: 'secret', permission: [] });
-		deps.appsRepository.findOneByOrFail.mockResolvedValue(app);
-		deps.accessTokensRepository.countBy.mockResolvedValue(1);
-		const services = authServices.create(deps);
-		const packApp = vi.spyOn(services.AppEntityService, 'pack');
-		const pack = services.AuthSessionEntityService.pack;
-		const packed = await pack(fixture<MiAuthSession>({ id: 'session', appId: 'app', token: 'token' }), viewer);
-		expect(packApp).toHaveBeenCalledWith('app', viewer);
-		expect(packed.app).toMatchObject({ id: 'app', isAuthorized: true });
-		expect(packed.app).not.toHaveProperty('secret');
-		expect(await services.AppEntityService.pack(app, null, { includeSecret: true })).toHaveProperty('secret', 'secret');
-		expect(deps.accessTokensRepository.countBy).toHaveBeenCalledWith({ appId: 'app', userId: 'viewer' });
+		vi.useFakeTimers({ now: date });
+		try {
+			const deps = mockDeep<Inputs<typeof authServices>>();
+			const app = fixture<MiApp>({ id: 'app', secret: 'secret', permission: [] });
+			deps.appsRepository.findOneByOrFail.mockResolvedValue(app);
+			deps.accessTokensRepository.countBy.mockResolvedValue(1);
+			const services = authServices.create(deps);
+			const packApp = vi.spyOn(services.AppEntityService, 'pack');
+			const pack = services.AuthSessionEntityService.pack;
+			const packed = await pack(fixture<MiAuthSession>({ id: 'session', appId: 'app', token: 'token' }), viewer);
+			expect(packApp).toHaveBeenCalledWith('app', viewer);
+			expect(packed.app).toMatchObject({ id: 'app', isAuthorized: true });
+			expect(packed.app).not.toHaveProperty('secret');
+			expect(await services.AppEntityService.pack(app, null, { includeSecret: true })).toHaveProperty('secret', 'secret');
+			expect(deps.accessTokensRepository.countBy).toHaveBeenCalledWith({ appId: 'app', userId: 'viewer', expiresAt: Or(IsNull(), MoreThan(date)) });
+		} finally {
+			vi.useRealTimers();
+		}
 	});
 
 	test('invite codes keep dates and batch user hints without repacking', async () => {
@@ -65,7 +71,7 @@ describe('annotation-free feature serializers', () => {
 		const deps = mockDeep<Inputs<typeof authServices>>();
 		deps.idService.parse.mockReturnValue({ date });
 		const pack = authServices.create(deps).SigninEntityService.pack;
-		expect(await pack(fixture<MiSignin>({ id: 'signin', ip: '127.0.0.1', headers: { accept: 'application/json' }, success: false }))).toEqual({ id: 'signin', createdAt: date.toISOString(), ip: '127.0.0.1', headers: { accept: 'application/json' }, success: false });
+		expect(await pack(fixture<MiSignin>({ id: 'signin', ip: '127.0.0.1', headers: { accept: 'application/json' }, success: false }))).toEqual({ id: 'signin', createdAt: date.toISOString(), ip: '127.0.0.1', headers: { accept: 'application/json' }, success: false, browserSessionId: null, browserSession: null });
 	});
 
 	test('channels preserve viewer hints, banner URLs, and pinned-note order', async () => {

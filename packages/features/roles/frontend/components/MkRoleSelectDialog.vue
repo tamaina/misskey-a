@@ -18,7 +18,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MkLoading v-if="fetching"/>
 		<div v-else class="_gaps" :class="$style.root">
 			<div :class="$style.header">
-				<MkButton rounded @click="addRole"><i class="ti ti-plus"></i> {{ $locale.sfc.add }}</MkButton>
+				<MkButton rounded @click="addRole"><i class="ti ti-plus"></i> {{ globalLocale.env.add }}</MkButton>
 			</div>
 
 			<div v-if="selectedRoles.length > 0" class="_gaps" :class="$style.roleItemArea">
@@ -34,8 +34,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkInfo v-if="infoMessage">{{ infoMessage }}</MkInfo>
 
 			<div :class="$style.buttons">
-				<MkButton primary @click="onOkClicked">{{ $locale.sfc.ok }}</MkButton>
-				<MkButton @click="onCancelClicked">{{ $locale.sfc.cancel }}</MkButton>
+				<MkButton primary @click="onOkClicked">{{ globalLocale.env.ok }}</MkButton>
+				<MkButton @click="onCancelClicked">{{ globalLocale.env.cancel }}</MkButton>
 			</div>
 		</div>
 	</div>
@@ -43,6 +43,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref, toRefs, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -52,6 +53,9 @@ import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import * as os from '@features/ui/frontend/os.js';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkLoading from '@features/ui/frontend/components/global/MkLoading.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const emit = defineEmits<{
 	(ev: 'done', value: Misskey.entities.Role[]): void;
@@ -197,252 +201,168 @@ fetchRoles();
 
 <locale locale="ar-SA" lang="json">
 {
-  "add": "إضافة",
-  "notSelected": "Not selected",
-  "ok": " حسناً",
-  "cancel": " إلغاء"
+  "notSelected": "Not selected"
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
-  "add": "Afegir",
-  "notSelected": "No seleccionat",
-  "ok": "OK",
-  "cancel": "Cancel·lar"
+  "notSelected": "No seleccionat"
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
-  "add": "Přidat",
-  "notSelected": "Not selected",
-  "ok": "Potvrdit",
-  "cancel": "Zrušit"
+  "notSelected": "Not selected"
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
-  "add": "Add",
-  "notSelected": "Not selected",
-  "ok": "OK",
-  "cancel": "Cancel"
+  "notSelected": "Not selected"
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
-  "add": "Hinzufügen",
-  "notSelected": "Nicht ausgewählt",
-  "ok": "OK",
-  "cancel": "Abbrechen"
+  "notSelected": "Nicht ausgewählt"
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
-  "add": "Add",
-  "notSelected": "Not selected",
-  "ok": "OK",
-  "cancel": "Cancel"
+  "notSelected": "Not selected"
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
-  "add": "Agregar",
-  "notSelected": "No seleccionado",
-  "ok": "OK",
-  "cancel": "Cancelar"
+  "notSelected": "No seleccionado"
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
-  "add": "Ajouter",
-  "notSelected": "Not selected",
-  "ok": "OK",
-  "cancel": "Annuler"
+  "notSelected": "Not selected"
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
-  "add": "Tambahkan",
-  "notSelected": "Not selected",
-  "ok": "Oke",
-  "cancel": "Batalkan"
+  "notSelected": "Not selected"
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
-  "add": "Aggiungi",
-  "notSelected": "Niente selezioato",
-  "ok": "OK",
-  "cancel": "Annulla"
+  "notSelected": "Niente selezioato"
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
-  "add": "追加",
-  "notSelected": "選択されていません",
-  "ok": "OK",
-  "cancel": "キャンセル"
+  "notSelected": "選択されていません"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
-  "add": "増やす",
-  "notSelected": "選択されとらんで",
-  "ok": "ええで",
-  "cancel": "やめる"
+  "notSelected": "選択されとらんで"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
-  "add": "Add",
-  "notSelected": "Not selected",
-  "ok": "IH",
-  "cancel": "Cancel"
+  "notSelected": "Not selected"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
-  "add": "Add",
-  "notSelected": "Not selected",
-  "ok": "ಸರಿ",
-  "cancel": "ರದ್ದು"
+  "notSelected": "Not selected"
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
-  "add": "추가",
-  "notSelected": "선택하지 않았습니다.",
-  "ok": "확인",
-  "cancel": "취소"
+  "notSelected": "선택하지 않았습니다."
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
-  "add": "Toevoegen",
-  "notSelected": "Not selected",
-  "ok": "Ok",
-  "cancel": "Annuleren"
+  "notSelected": "Not selected"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
-  "add": "Legg til",
-  "notSelected": "Not selected",
-  "ok": "OK",
-  "cancel": "Avbryt"
+  "notSelected": "Not selected"
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
-  "add": "Dodaj",
-  "notSelected": "Not selected",
-  "ok": "OK",
-  "cancel": "Anuluj"
+  "notSelected": "Not selected"
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
-  "add": "Adicionar",
-  "notSelected": "Não selecionado",
-  "ok": "OK",
-  "cancel": "Cancelar"
+  "notSelected": "Não selecionado"
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
-  "add": "Добавить",
-  "notSelected": "Not selected",
-  "ok": "Подтвердить",
-  "cancel": "Отмена"
+  "notSelected": "Not selected"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
-  "add": "Pridať",
-  "notSelected": "Not selected",
-  "ok": "OK",
-  "cancel": "Zrušiť"
+  "notSelected": "Not selected"
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
-  "add": "เพิ่ม",
-  "notSelected": "ยังไม่มีการเลือก",
-  "ok": "ตกลง",
-  "cancel": "ยกเลิก"
+  "notSelected": "ยังไม่มีการเลือก"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
-  "add": "Ekle",
-  "notSelected": "Seçilmedi",
-  "ok": "Tamam",
-  "cancel": "Vazgeç"
+  "notSelected": "Seçilmedi"
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
-  "add": "Add",
-  "notSelected": "Not selected",
-  "ok": "ماقۇل",
-  "cancel": "Cancel"
+  "notSelected": "Not selected"
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
-  "add": "Додати",
-  "notSelected": "Not selected",
-  "ok": "OK",
-  "cancel": "Скасувати"
+  "notSelected": "Not selected"
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
-  "add": "Thêm",
-  "notSelected": "Not selected",
-  "ok": "Đồng ý",
-  "cancel": "Hủy"
+  "notSelected": "Not selected"
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
-  "add": "添加",
-  "notSelected": "未选中",
-  "ok": "OK",
-  "cancel": "取消"
+  "notSelected": "未选中"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
-  "add": "新增",
-  "notSelected": "未選擇",
-  "ok": "OK",
-  "cancel": "取消"
+  "notSelected": "未選擇"
 }
 </locale>

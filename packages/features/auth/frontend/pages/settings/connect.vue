@@ -15,7 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label><i class="ti ti-api"></i> <SearchLabel>{{ $locale.sfc.api }}</SearchLabel></template>
 
 				<div class="_gaps_m">
-					<MkButton primary @click="generateToken">{{ $locale.sfc.generateAccessToken }}</MkButton>
+					<MkButton primary :disabled="credentialBusy" @click="generateToken">{{ globalLocale.env.generateAccessToken }}</MkButton>
 					<FormLink to="/settings/apps">{{ $locale.sfc.manageAccessTokens }}</FormLink>
 					<FormLink to="/api-console" :behavior="isDesktop ? 'window' : null">API console</FormLink>
 				</div>
@@ -61,6 +61,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref, defineAsyncComponent, markRaw } from 'vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
@@ -69,9 +70,15 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import MkDialog from '@features/ui/frontend/components/MkDialog.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import { ensureSudo } from '../../utility/ensure-sudo.js';
+import { useCredentialOperation } from '../../utility/use-credential-operation.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const isDesktop = ref(window.innerWidth >= 1100);
 
@@ -80,23 +87,28 @@ const paginator = markRaw(new Paginator('i/webhooks/list', {
 	noPaging: true,
 }));
 
-async function generateToken() {
-	const { dispose } = await os.popupAsyncWithDialog(import('@features/auth/frontend/components/MkTokenGenerateWindow.vue').then(x => x.default), {}, {
-		done: async result => {
-			const { name, permissions } = result;
-			const { token } = await misskeyApi('miauth/gen-token', {
-				session: null,
-				name: name,
-				permission: permissions,
-			});
+const { run: runCredential, busy: credentialBusy } = useCredentialOperation();
 
-			os.alert({
-				type: 'success',
-				title: $locale.value.sfc.accessToken,
-				text: token,
-			});
-		},
-		closed: () => dispose(),
+async function generateToken() {
+	await runCredential(async (current, signal) => {
+		let dispose: (() => void) | undefined; let onAbort: () => void = () => {};
+		type Selection = { name: string | null; permissions: string[]; expiresAt?: string };
+		const result = await new Promise<Selection | undefined>((resolve, reject) => {
+			onAbort = () => { dispose?.(); resolve(undefined); }; signal.addEventListener('abort', onAbort, { once: true });
+			void os.popupAsyncWithDialog(import('@features/auth/frontend/components/MkTokenGenerateWindow.vue').then(x => x.default), {}, {
+				done: selection => resolve(selection), closed: () => { dispose?.(); resolve(undefined); },
+			}).then(popup => { dispose = popup.dispose; if (!current()) onAbort(); }).catch(reject);
+		}).finally(() => { signal.removeEventListener('abort', onAbort); dispose?.(); });
+		if (!result || !current() || !await ensureSudo(current, signal) || !current()) return;
+		let issued: { token: string };
+		try { issued = await misskeyApi('miauth/gen-token', { session: null, name: result.name, permission: result.permissions, ...(result.expiresAt ? { expiresAt: result.expiresAt } : {}) }); } catch { if (current()) await os.alert({ type: 'error', text: $locale.value.sfc.issuanceFailed }); return; }
+		const { token } = issued;
+		if (!current()) return;
+		await new Promise<void>(resolve => {
+			const dialog = os.popup(MkDialog, { type: 'success', title: $locale.value.sfc.accessToken, text: token }, { done: () => { dialog.dispose(); resolve(); }, closed: () => { dialog.dispose(); resolve(); } });
+			const close = () => { dialog.dispose(); resolve(); }; signal.addEventListener('abort', close, { once: true });
+			if (!current()) close();
+		});
 	});
 }
 
@@ -116,7 +128,6 @@ definePage(() => ({
 	"serviceConnection": "Service integration",
 	"serviceConnectionBanner": "Manage and configure access tokens and Webhooks to integrate with external apps or services.",
 	"api": "API",
-	"generateAccessToken": "ولّد رمز الوصول",
 	"manageAccessTokens": "إدارة رموز الوصول",
 	"webhook": "Webhook",
 	"createWebhook": "Create Webhook",
@@ -130,7 +141,6 @@ definePage(() => ({
 	"serviceConnection": "Relació entre serveis",
 	"serviceConnectionBanner": "Pots configurar i gestionar tokens d'accés i webhooks per integrar serveis i aplicacions externes.",
 	"api": "API",
-	"generateAccessToken": "Genera codi d'accés",
 	"manageAccessTokens": "Administrar claus de seguretat d'accés ",
 	"webhook": "Webhook",
 	"createWebhook": "Crear un Webhook",
@@ -144,7 +154,6 @@ definePage(() => ({
 	"serviceConnection": "Service integration",
 	"serviceConnectionBanner": "Manage and configure access tokens and Webhooks to integrate with external apps or services.",
 	"api": "API",
-	"generateAccessToken": "Vygenerovat přístupový token",
 	"manageAccessTokens": "Spravovat přístupové tokeny",
 	"webhook": "Webhook",
 	"createWebhook": "Vytvořit Webhook",
@@ -158,7 +167,6 @@ definePage(() => ({
 	"serviceConnection": "Service integration",
 	"serviceConnectionBanner": "Manage and configure access tokens and Webhooks to integrate with external apps or services.",
 	"api": "API",
-	"generateAccessToken": "Generate access token",
 	"manageAccessTokens": "Manage access tokens",
 	"webhook": "Webhook",
 	"createWebhook": "Create Webhook",
@@ -172,7 +180,6 @@ definePage(() => ({
 	"serviceConnection": "Integrierte Dienste",
 	"serviceConnectionBanner": "Du kannst Zugriffstoken und Webhooks für die Integration mit externen Anwendungen und Diensten verwalten und konfigurieren.",
 	"api": "API",
-	"generateAccessToken": "Zugriffstoken generieren",
 	"manageAccessTokens": "Zugriffstokens verwalten",
 	"webhook": "Webhook",
 	"createWebhook": "Webhook erstellen",
@@ -186,7 +193,6 @@ definePage(() => ({
 	"serviceConnection": "Service integration",
 	"serviceConnectionBanner": "Manage and configure access tokens and Webhooks to integrate with external apps or services.",
 	"api": "API",
-	"generateAccessToken": "Generate access token",
 	"manageAccessTokens": "Manage access tokens",
 	"webhook": "Webhook",
 	"createWebhook": "Create Webhook",
@@ -200,7 +206,6 @@ definePage(() => ({
 	"serviceConnection": "Integraciones",
 	"serviceConnectionBanner": "Gestione y configure tokens de acceso y Webhooks para integrarse con aplicaciones o servicios externos.",
 	"api": "API",
-	"generateAccessToken": "Generar token de acceso",
 	"manageAccessTokens": "Administrar tokens de acceso",
 	"webhook": "Webhook",
 	"createWebhook": "Crear Webhook",
@@ -214,7 +219,6 @@ definePage(() => ({
 	"serviceConnection": "Service integration",
 	"serviceConnectionBanner": "Manage and configure access tokens and Webhooks to integrate with external apps or services.",
 	"api": "API",
-	"generateAccessToken": "Générer un jeton d'accès",
 	"manageAccessTokens": "Gérer les jetons d'accès",
 	"webhook": "Webhook",
 	"createWebhook": "Create Webhook",
@@ -228,7 +232,6 @@ definePage(() => ({
 	"serviceConnection": "Service integration",
 	"serviceConnectionBanner": "Manage and configure access tokens and Webhooks to integrate with external apps or services.",
 	"api": "API",
-	"generateAccessToken": "Buat token akses",
 	"manageAccessTokens": "Kelola token akses",
 	"webhook": "Webhook",
 	"createWebhook": "Buat Webhook",
@@ -242,7 +245,6 @@ definePage(() => ({
 	"serviceConnection": "Integrazione servizi",
 	"serviceConnectionBanner": "Puoi gestire i codici di accesso e i Webhook per collegare App o servizi esterni.",
 	"api": "API",
-	"generateAccessToken": "Genera token di accesso",
 	"manageAccessTokens": "Gestisci token di accesso",
 	"webhook": "Webhook",
 	"createWebhook": "Creazione Webhook",
@@ -256,11 +258,12 @@ definePage(() => ({
 	"serviceConnection": "サービス連携",
 	"serviceConnectionBanner": "外部のアプリ・サービスと連携するためのアクセストークンやWebhookの管理と設定が行えます。",
 	"api": "API",
-	"generateAccessToken": "アクセストークンの発行",
 	"manageAccessTokens": "アクセストークンの管理",
 	"webhook": "Webhook",
 	"createWebhook": "Webhookを作成",
-	"manage": "管理"
+	"manage": "管理",
+	"individualCredentialRequired": "トークンを発行するには通常のログインで個別セッションを作成し、発行時に再認証してください。",
+	"issuanceFailed": "発行できませんでした。現在のアカウント・再認証・有効期限を確認してやり直してください。"
 }
 </locale>
 
@@ -270,7 +273,6 @@ definePage(() => ({
 	"serviceConnection": "サービス連携",
 	"serviceConnectionBanner": "外部のアプリ・サービスと連携するのに使うとるアクセストークンとかWebhookの管理と設定ができるで。",
 	"api": "API",
-	"generateAccessToken": "アクセストークンの発行",
 	"manageAccessTokens": "アクセストークンの管理",
 	"webhook": "Webhook",
 	"createWebhook": "Webhookをつくる",
@@ -284,7 +286,6 @@ definePage(() => ({
 	"serviceConnection": "Service integration",
 	"serviceConnectionBanner": "Manage and configure access tokens and Webhooks to integrate with external apps or services.",
 	"api": "API",
-	"generateAccessToken": "Generate access token",
 	"manageAccessTokens": "Manage access tokens",
 	"webhook": "Webhook",
 	"createWebhook": "Create Webhook",
@@ -298,7 +299,6 @@ definePage(() => ({
 	"serviceConnection": "Service integration",
 	"serviceConnectionBanner": "Manage and configure access tokens and Webhooks to integrate with external apps or services.",
 	"api": "API",
-	"generateAccessToken": "Generate access token",
 	"manageAccessTokens": "Manage access tokens",
 	"webhook": "Webhook",
 	"createWebhook": "Create Webhook",
@@ -312,7 +312,6 @@ definePage(() => ({
 	"serviceConnection": "서비스 연동",
 	"serviceConnectionBanner": "외부 앱, 서비스와 연결하기 위한 액세스 토큰과 웹 훅 관리 설정을 합니다.",
 	"api": "API",
-	"generateAccessToken": "액세스 토큰 생성",
 	"manageAccessTokens": "액세스 토큰 관리",
 	"webhook": "Webhook",
 	"createWebhook": "Webhook 생성",
@@ -326,7 +325,6 @@ definePage(() => ({
 	"serviceConnection": "Service integration",
 	"serviceConnectionBanner": "Manage and configure access tokens and Webhooks to integrate with external apps or services.",
 	"api": "API",
-	"generateAccessToken": "Toegangstoken genereren",
 	"manageAccessTokens": "Toegangstokens beheren",
 	"webhook": "Webhook",
 	"createWebhook": "Create Webhook",
@@ -340,7 +338,6 @@ definePage(() => ({
 	"serviceConnection": "Service integration",
 	"serviceConnectionBanner": "Manage and configure access tokens and Webhooks to integrate with external apps or services.",
 	"api": "API",
-	"generateAccessToken": "Generate access token",
 	"manageAccessTokens": "Manage access tokens",
 	"webhook": "Webhook",
 	"createWebhook": "Create Webhook",
@@ -354,7 +351,6 @@ definePage(() => ({
 	"serviceConnection": "Service integration",
 	"serviceConnectionBanner": "Manage and configure access tokens and Webhooks to integrate with external apps or services.",
 	"api": "API",
-	"generateAccessToken": "Generuj token dostępu",
 	"manageAccessTokens": "Zarządzaj tokenami dostępu",
 	"webhook": "Webhook",
 	"createWebhook": "Stwórz Webhook",
@@ -368,7 +364,6 @@ definePage(() => ({
 	"serviceConnection": "Integração de serviço",
 	"serviceConnectionBanner": "Administre e configure tokens de acesso e webhooks para interagir com aplicações e serviços externos.",
 	"api": "API",
-	"generateAccessToken": "Gerar token de acesso",
 	"manageAccessTokens": "Gerenciar tokens de acesso",
 	"webhook": "Webhook",
 	"createWebhook": "Criar Webhook",
@@ -382,7 +377,6 @@ definePage(() => ({
 	"serviceConnection": "Интеграция сервисов",
 	"serviceConnectionBanner": "Настраивайте и управляйте токенами и вебхуками для интеграции с внешними приложениями или сервисами.",
 	"api": "API",
-	"generateAccessToken": "Создать токен доступа",
 	"manageAccessTokens": "Управление токенами доступа",
 	"webhook": "Вебхук",
 	"createWebhook": "Создать вебхук",
@@ -396,7 +390,6 @@ definePage(() => ({
 	"serviceConnection": "Service integration",
 	"serviceConnectionBanner": "Manage and configure access tokens and Webhooks to integrate with external apps or services.",
 	"api": "API",
-	"generateAccessToken": "Vygenerovať prístupový token",
 	"manageAccessTokens": "Spravovať prístupové tokeny",
 	"webhook": "Webhook",
 	"createWebhook": "Create Webhook",
@@ -410,7 +403,6 @@ definePage(() => ({
 	"serviceConnection": "การเชื่อมต่อกับบริการ",
 	"serviceConnectionBanner": "สามารถจัดการและตั้งค่าโทเค็นการเข้าถึงและ Webhook เพื่อเชื่อมต่อกับแอปหรือบริการภายนอกได้",
 	"api": "API",
-	"generateAccessToken": "สร้างโทเค็นการเข้าถึง",
 	"manageAccessTokens": "การจัดการโทเค็นการเข้าถึง",
 	"webhook": "Webhook",
 	"createWebhook": "สร้าง Webhook",
@@ -424,7 +416,6 @@ definePage(() => ({
 	"serviceConnection": "Hizmet entegrasyonu",
 	"serviceConnectionBanner": "Dış uygulamalar veya hizmetlerle entegrasyon sağlamak için erişim belirteçlerini ve Webhook'ları yönetin ve yapılandırın.",
 	"api": "API",
-	"generateAccessToken": "Erişim jetonu oluştur",
 	"manageAccessTokens": "Acces Tokens yönet",
 	"webhook": "Webhook",
 	"createWebhook": "Webhook oluştur",
@@ -438,7 +429,6 @@ definePage(() => ({
 	"serviceConnection": "Service integration",
 	"serviceConnectionBanner": "Manage and configure access tokens and Webhooks to integrate with external apps or services.",
 	"api": "API",
-	"generateAccessToken": "Generate access token",
 	"manageAccessTokens": "Manage access tokens",
 	"webhook": "Webhook",
 	"createWebhook": "Create Webhook",
@@ -452,7 +442,6 @@ definePage(() => ({
 	"serviceConnection": "Інтеграції",
 	"serviceConnectionBanner": "Керуйте та налаштовуйте токени доступу та веб хуки задля інтегрування сторонніх додатків або сервісів.",
 	"api": "API",
-	"generateAccessToken": "Згенерувати токен доступу",
 	"manageAccessTokens": "Керування токенами доступу",
 	"webhook": "Веб хук",
 	"createWebhook": "Create Webhook",
@@ -466,7 +455,6 @@ definePage(() => ({
 	"serviceConnection": "Service integration",
 	"serviceConnectionBanner": "Manage and configure access tokens and Webhooks to integrate with external apps or services.",
 	"api": "API",
-	"generateAccessToken": "Tạo mã truy cập",
 	"manageAccessTokens": "Tạo mã truy cập",
 	"webhook": "Webhook",
 	"createWebhook": "Tạo Webhook",
@@ -480,7 +468,6 @@ definePage(() => ({
 	"serviceConnection": "连接服务",
 	"serviceConnectionBanner": "可在此管理用于连接外部应用或服务的访问令牌及 Webhook。",
 	"api": "API",
-	"generateAccessToken": "生成访问令牌",
 	"manageAccessTokens": "管理访问令牌",
 	"webhook": "Webhook",
 	"createWebhook": "创建 Webhook",
@@ -494,7 +481,6 @@ definePage(() => ({
 	"serviceConnection": "服務整合",
 	"serviceConnectionBanner": "您可以管理和設定存取權杖與 Webhooks，以便與外部應用程式和服務整合。",
 	"api": "API",
-	"generateAccessToken": "發行存取權杖",
 	"manageAccessTokens": "管理存取權杖",
 	"webhook": "Webhook",
 	"createWebhook": "建立 Webhook",

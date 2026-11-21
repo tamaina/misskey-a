@@ -18,14 +18,16 @@ async function main() {
 		throw new Error('`built` directory does not exist.');
 	}
 
+	await import('reflect-metadata');
+
 	/** @type {import('../src/config.js')} */
 	const { loadConfig } = await import('../built/config.js');
 
 	/** @type {import('@features/api/backend/transport/openapi/gen-spec.js')} */
-	const { genOpenapiSpec } = await import('../built/gen-spec.js');
+	const { genCompatibleOpenapiSpec } = await import('../built/gen-spec.js');
 
 	const config = loadConfig();
-	const spec = genOpenapiSpec(config, true);
+	const spec = await genCompatibleOpenapiSpec(config, true);
 
 	writeFileSync('./built/api.json', JSON.stringify(spec), 'utf-8');
 }

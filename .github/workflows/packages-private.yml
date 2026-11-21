@@ -3,7 +3,7 @@ name: Lint and test packages-private
 on:
   push:
     branches:
-      - master
+      - main
       - develop
     paths:
       - packages-private/**
@@ -14,7 +14,7 @@ on:
       - .github/workflows/packages-private.yml
   pull_request:
     branches-ignore:
-      - master
+      - main
     paths:
       - packages-private/**
       - packages/shared/eslint.config.js

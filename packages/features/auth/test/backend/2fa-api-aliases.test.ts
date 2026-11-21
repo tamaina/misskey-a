@@ -1,0 +1,537 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
+import { createHash } from 'node:crypto';
+import { writeFileSync } from 'node:fs';
+import { call, implement } from '@orpc/server';
+import { oc } from '@orpc/contract';
+import { OpenAPIHandler } from '@orpc/openapi/fastify';
+import Fastify from 'fastify';
+import bcrypt from 'bcryptjs';
+import { expect, test, vi } from 'vitest';
+import { mockDeep } from 'vitest-mock-extended';
+import * as v from 'valibot';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { commonErrors } from '@features/api/backend/transport/errors.schema.js';
+import { genPilotOpenapiSpec } from '@features/api/backend/transport/openapi/pilot-spec.js';
+import { registerPilotHttp } from '@features/api/backend/transport/pilot-http.js';
+import { misskeyErrorBody } from '@features/api/backend/transport/orpc-error.js';
+import { requestRoutes } from '@features/api/shared/api-routing.js';
+import { webhookEventTypes } from '@features/integrations/backend/webhook-events.schema.js';
+import { clientContract } from '@features/index/backend/client.contract.js';
+import type { InferContractRouterInputs } from '@orpc/contract';
+import { aliasTwoFactorContract } from '../../backend/2fa-api-aliases.contract.js';
+import { aliasTwoFactorProcedure, createAuthRouter } from '../../backend/api.implementation.js';
+import { authContract } from '../../backend/api.definition.js';
+import baseline from './fixtures/2fa-api-alias-baseline.json';
+import expiryRebases from './fixtures/credential-expiry-operation-rebase.json';
+import { restoreAnnouncementOperationBaseline } from '../../../announcements/test/backend/operation-rebase.js';
+import { testContext } from './native-context.js';
+import type { AuthRouterDependencies } from '../../backend/api.implementation.js';
+import type { ApiServices } from '@features/api/backend/transport/context.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+const pairs = [
+	['i/2fa/done', 'i/2fa/totp/done'],
+	['i/2fa/register', 'i/2fa/totp/register'],
+	['i/2fa/unregister', 'i/2fa/totp/remove'],
+	['i/2fa/key-done', 'i/2fa/passkey/done'],
+	['i/2fa/register-key', 'i/2fa/passkey/register'],
+	['i/2fa/remove-key', 'i/2fa/passkey/remove'],
+	['i/2fa/update-key', 'i/2fa/passkey/update'],
+	['i/2fa/password-less', 'i/2fa/passkey/password-less'],
+] as const;
+const actor = mockDeep<MiLocalUser>({ id: 'synthetic-user', isSuspended: false, movedToUri: null });
+
+function harness() {
+	const deps = mockDeep<AuthRouterDependencies>();
+	const services = mockDeep<ApiServices<MiLocalUser>>();
+	services.authenticate.mockResolvedValue([actor, null]);
+	services.limitActor.mockReturnValue(actor.id);
+	services.rateLimitFactor.mockResolvedValue(1);
+	services.limit.mockResolvedValue(null);
+	return { deps, services, router: createAuthRouter(deps), context: { services, credential: 'synthetic', ip: '127.0.0.1', headers: {} } };
+}
+
+test.each(pairs)('%s and %s share schemas, handler and middleware without mutating legacy routing', (legacy, canonical) => {
+	const h = harness();
+	const oldContract = authContract[legacy]['~orpc'];
+	const newContract = authContract[canonical]['~orpc'];
+	const oldProcedure = h.router[legacy]['~orpc'];
+	const newProcedure = h.router[canonical]['~orpc'];
+	expect(oldContract.meta.requestName).toBe(legacy);
+	expect(oldContract.route.path).toBe(`/${legacy}`);
+	expect(newContract.meta).toEqual({ ...oldContract.meta, requestName: canonical, compatibilityAliasOf: legacy });
+	expect(newContract.route).toEqual({ ...oldContract.route, path: `/${canonical}` });
+	for (const field of ['inputSchema', 'outputSchema', 'errorMap'] as const) expect(newContract[field]).toBe(oldContract[field]);
+	for (const field of ['inputSchema', 'outputSchema', 'middlewares', 'handler'] as const) expect(newProcedure[field]).toBe(oldProcedure[field]);
+	// The native router normalizes each error map while preserving its contents.
+	expect(newProcedure.errorMap).toEqual(oldProcedure.errorMap);
+	expect(oldProcedure.meta.requestName).toBe(legacy);
+	expect(oldProcedure.route.path).toBe(`/${legacy}`);
+	expect(newProcedure.meta).toEqual(newContract.meta);
+	expect(newProcedure.route).toEqual(newContract.route);
+});
+
+function stableJson(value: unknown): string {
+	if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`;
+	if (value !== null && typeof value === 'object') return `{${Object.entries(value).sort(([a], [b]) => a < b ? -1 : a > b ? 1 : 0).map(([key, child]) => `${JSON.stringify(key)}:${stableJson(child)}`).join(',')}}`;
+	return JSON.stringify(value);
+}
+
+function schemaHash(value: unknown): string {
+	return createHash('sha256').update(stableJson(JSON.parse(JSON.stringify(value)))).digest('hex');
+}
+
+// Intentional availability change from PR #124, captured by its actual CI API
+// generator. The frozen alias baseline stays unchanged; no other delta is allowed.
+const availableSigninOperationHash = '964c00bbfe0d53b9f634afffb50031961f7a60ff47c8630a27bc08e206453c89';
+const availableFactorsShape = { type: 'array', items: { enum: ['totp', 'passkey'], type: 'string' }, minItems: 1, maxItems: 2 };
+
+function object(value: unknown): Record<string, unknown> {
+	if (value === null || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid availability inverse boundary');
+	return value as Record<string, unknown>;
+}
+
+function signinOutput(operation: unknown): Record<string, unknown> {
+	const responses = object(object(object(operation).post).responses);
+	const content = object(object(responses['200']).content);
+	return object(object(content['application/json']).schema);
+}
+
+// PR #188 adds linked sessions and three session filters to signin history. Pin
+// the complete new boundaries, then reverse only those fields for the old oracle.
+function restoreSigninSessionFields(schema: Record<string, unknown>) {
+	const properties = object(schema.properties);
+	expect(schema.required).toEqual(['id', 'createdAt', 'ip', 'headers', 'success', 'browserSessionId', 'browserSession']);
+	delete properties.browserSessionId;
+	delete properties.browserSession;
+	schema.required = ['id', 'createdAt', 'ip', 'headers', 'success'];
+}
+
+function restoreSigninHistoryOperation(path: string, operation: unknown): unknown {
+	if (path !== '/i/signin-history') return operation;
+	expect(schemaHash(operation)).toBe('2e96a091dfc7c0ed55cb1720e8c9d846139f299d7881dbe54d75d8e798f218be');
+	const restored: unknown = structuredClone(operation);
+	restoreSigninSessionFields(object(signinOutput(restored).items));
+	const request = object(object(object(object(object(restored).post).requestBody).content)['application/json']);
+	const input = object(request.schema);
+	if (!Array.isArray(input.allOf)) throw new Error('Invalid signin history input');
+	for (const shape of [input, object(input.allOf[0])]) {
+		const properties = object(shape.properties);
+		for (const key of ['browserSessionId', 'unlinkedOnly', 'latestPerSession']) delete properties[key];
+	}
+	return restored;
+}
+
+function restoreSigninSchema(name: string, schema: unknown): unknown {
+	if (name !== 'Signin') return schema;
+	expect(schemaHash(schema)).toBe('b112a6ba856a034d3ff7fdab46d43d27de3c752adb46ec2107702df5282b475d');
+	const restored = object(structuredClone(schema));
+	restoreSigninSessionFields(restored);
+	return restored;
+}
+
+function restoreSessionIpOperation(path: string, operation: unknown): unknown {
+	if (path !== '/admin/get-user-ips') return operation;
+	expect(schemaHash(operation)).toBe('bb7fa220fb565f28d5bcb8c87a2fe35150e328c7e1bec61b01c81f52c2b9af4d');
+	const restored: unknown = structuredClone(operation);
+	const item = object(signinOutput(restored).items);
+	expect(item.required).toEqual(['id', 'lastSeenAt', 'ip', 'createdAt']);
+	const properties = object(item.properties);
+	delete properties.id;
+	delete properties.lastSeenAt;
+	item.required = ['ip', 'createdAt'];
+	return restored;
+}
+
+function signinBranches(operation: unknown): unknown[] {
+	const output = signinOutput(operation);
+	expect(Object.keys(output).sort()).toEqual(['$schema', 'anyOf']);
+	expect(output.$schema).toBe('https://json-schema.org/draft/2020-12/schema');
+	if (!Array.isArray(output.anyOf)) throw new Error('Invalid availability outer union');
+	expect(output.anyOf).toHaveLength(3);
+	const success = object(output.anyOf[0]);
+	expect(Object.keys(success)).toEqual(['anyOf']);
+	if (!Array.isArray(success.anyOf)) throw new Error('Invalid availability success union');
+	expect(success.anyOf).toHaveLength(4);
+	return success.anyOf;
+}
+
+const progressOpaqueShape = { type: 'string', pattern: '^[A-Za-z0-9_-]{43}$' };
+const progressShape = { type: 'object', properties: {
+	ticket: progressOpaqueShape, browserSecret: progressOpaqueShape, nonce: progressOpaqueShape,
+	version: { type: 'integer', minimum: 0, maximum: Number.MAX_SAFE_INTEGER },
+}, required: ['ticket', 'browserSecret', 'nonce', 'version'], additionalProperties: false };
+
+function restorePreProgressSigninOperation(operation: unknown): unknown {
+	const restored: unknown = structuredClone(operation);
+	const branches = signinBranches(restored);
+	for (const index of [2, 3]) {
+		const branch = object(branches[index]);
+		const properties = object(branch.properties);
+		expect(properties.authenticationProgress).toEqual(progressShape);
+		expect(branch.required).toEqual(index === 2 ? ['finished', 'next'] : ['finished', 'next', 'authRequest']);
+		delete properties.authenticationProgress;
+	}
+	expect(schemaHash(restored)).toBe(signinPolicyOperationHashes['/signin-flow']);
+	return restored;
+}
+
+// Issue #180 changes only these two response boundaries. Restore them before
+// applying the unchanged availability and historical alias oracles.
+const signinPolicyOperationHashes = {
+	'/signin-flow': '1cfb7d68266d3cc3a3be88acb287eac09d5a3a1a3febc3c6ee50313c764da040',
+	'/signin-with-passkey': '57ce9cdbbf224ee25817ea295d31b185d24fe58f92a0a75de021aa5aaff2127e',
+};
+const recoveryFactorsShape = { type: 'array', items: { enum: ['totp', 'passkey', 'recovery'], type: 'string' }, minItems: 1, maxItems: 3 };
+
+/** Accept only the pinned optional expiry additions, then apply the frozen legacy oracle. */
+function restorePreExpiryOperation(path: string, operation: unknown): unknown {
+	const rebase = expiryRebases.find(entry => entry.path === path);
+	if (!rebase) return operation;
+	expect(schemaHash(operation), path).toBe(rebase.currentSha256);
+	const restored: unknown = structuredClone(operation);
+	for (const removal of rebase.removals) {
+		let parent: unknown = restored;
+		for (const part of removal.parent) {
+			if (parent === null || typeof parent !== 'object' || !(part in parent)) throw new Error('Expiry inverse parent differs');
+			parent = Reflect.get(parent, part);
+		}
+		if (typeof removal.key === 'number') {
+			if (!Array.isArray(parent)) throw new Error('Expiry inverse array differs');
+			expect(parent[removal.key]).toEqual(removal.current);
+			parent.splice(removal.key, 1);
+		} else {
+			expect(object(parent)[removal.key]).toEqual(removal.current);
+			delete object(parent)[removal.key];
+		}
+	}
+	expect(schemaHash(restored), path).toBe(rebase.baselineSha256);
+	return restored;
+}
+
+function restorePreSigninPolicyOperation(path: string, operation: unknown): unknown {
+	if (path !== '/signin-flow' && path !== '/signin-with-passkey') return operation;
+	if (path === '/signin-flow') operation = restorePreProgressSigninOperation(operation);
+	expect(schemaHash(operation)).toBe(signinPolicyOperationHashes[path]);
+	const restored: unknown = structuredClone(operation);
+	if (path === '/signin-flow') {
+		const branches = signinBranches(restored);
+		for (const index of [2, 3]) {
+			const properties = object(object(branches[index]).properties);
+			expect(properties.availableFactors).toEqual(recoveryFactorsShape);
+			properties.availableFactors = structuredClone(availableFactorsShape);
+		}
+		expect(schemaHash(restored)).toBe(availableSigninOperationHash);
+	} else {
+		const output = signinOutput(restored);
+		expect(Object.keys(output).sort()).toEqual(['$schema', 'anyOf']);
+		expect(output.$schema).toBe('https://json-schema.org/draft/2020-12/schema');
+		if (!Array.isArray(output.anyOf)) throw new Error('Invalid login policy union');
+		expect(output.anyOf).toHaveLength(4);
+		expect(output.anyOf[3]).toEqual({ type: 'object', properties: { passwordFlowRequired: { const: true } }, required: ['passwordFlowRequired'], additionalProperties: false });
+		output.anyOf.pop();
+		expect(schemaHash(restored)).toBe(baseline.operationHashes[path]);
+	}
+	return restored;
+}
+
+function restorePreAvailabilitySigninOperation(operation: unknown): unknown {
+	// This full new-operation hash also guards request/error/security metadata,
+	// WebAuthn constraints, and all fields outside the narrowly reversed response.
+	expect(schemaHash(operation)).toBe(availableSigninOperationHash);
+	const restored: unknown = structuredClone(operation);
+	const branches = signinBranches(restored);
+	expect(branches[0]).toEqual({ type: 'object', properties: { finished: { const: true }, id: { type: 'string' }, i: { type: 'string' } }, required: ['finished', 'id', 'i'], additionalProperties: false });
+	expect(branches[1]).toEqual({ type: 'object', properties: { finished: { const: false }, next: { enum: ['captcha', 'password'], type: 'string' } }, required: ['finished', 'next'], additionalProperties: false });
+	expect(branches[2]).toEqual({ type: 'object', properties: { finished: { const: false }, next: { const: 'totp' }, availableFactors: availableFactorsShape }, required: ['finished', 'next'], additionalProperties: false });
+	const passkey = object(branches[3]);
+	expect(Object.keys(passkey).sort()).toEqual(['additionalProperties', 'properties', 'required', 'type']);
+	expect(passkey.type).toBe('object');
+	expect(passkey.additionalProperties).toBe(false);
+	expect(passkey.required).toEqual(['finished', 'next', 'authRequest']);
+	const properties = object(passkey.properties);
+	expect(Object.keys(properties).sort()).toEqual(['authRequest', 'availableFactors', 'finished', 'next']);
+	expect(properties.finished).toEqual({ const: false });
+	expect(properties.next).toEqual({ const: 'passkey' });
+	expect(properties.availableFactors).toEqual(availableFactorsShape);
+	delete properties.availableFactors;
+	const passwordProperties = object(object(branches[1]).properties);
+	passwordProperties.next = { enum: ['captcha', 'password', 'totp'], type: 'string' };
+	branches.splice(2, 1);
+	expect(schemaHash(restored)).toBe(baseline.operationHashes['/signin-flow']);
+	return restored;
+}
+
+// PR #222 intentionally expands only webhook event enums. As with availability
+// and announcements, pin the new generator hashes and reverse that exact delta
+// before replaying the frozen alias baseline. To refresh, export with
+// MISSKEY_TEST_EXPORT_2FA_API_JSON, inspect all five operations and UserWebhook,
+// and verify that restoring the old enum reproduces every frozen hash.
+const notificationWebhookOperationHashes: Record<string, string> = {
+	'/i/webhooks/create': 'a7d4d71fd7494331711527240905b9e7858e5353c6ed7f099addb245d815a32f',
+	'/i/webhooks/test': 'befe1dcbdc3ecf179acc43bc8e270365cd188ec1bef4931cd703fb326cfc7c24',
+	'/i/webhooks/update': 'f237e79bfd4fda636a8fa2d55bf0ac3e9459f36089ec1f58218543860259609e',
+	'/i/webhooks/show': '6d46fa2b3f86bc5af2b3b5a5be5f8cd10f04e2002b2c4ce3e4287fe1d34932ad',
+	'/i/webhooks/list': '9ad0ccee8bfe277447ec538451989fe6931c9cade38a48579dfd3acbaf83d8a3',
+};
+const legacyWebhookEvents = ['mention', 'unfollow', 'follow', 'followed', 'note', 'reply', 'renote', 'reaction'];
+
+function restoreWebhookEventEnum(schema: unknown, field: 'on' | 'type' = 'on'): void {
+	const property = object(object(schema).properties)[field];
+	const items = field === 'on' ? object(property).items : property;
+	expect(items).toEqual({ enum: [...webhookEventTypes], type: 'string' });
+	object(items).enum = legacyWebhookEvents;
+}
+
+function restoreWebhookOperationBaseline(path: string, operation: unknown): unknown {
+	const hash = notificationWebhookOperationHashes[path];
+	if (!hash) return operation;
+	expect(schemaHash(operation), path).toBe(hash);
+	const restored: unknown = structuredClone(operation);
+	if (path === '/i/webhooks/create' || path === '/i/webhooks/update' || path === '/i/webhooks/test') {
+		const post = object(object(restored).post);
+		const schema = object(object(object(object(post.requestBody).content)['application/json']).schema);
+		const field = path === '/i/webhooks/test' ? 'type' : 'on';
+		restoreWebhookEventEnum(schema, field);
+		if (!Array.isArray(schema.allOf)) throw new Error('Invalid webhook input intersection');
+		expect(schema.allOf).toHaveLength(2);
+		restoreWebhookEventEnum(schema.allOf[0], field);
+	}
+	if (path !== '/i/webhooks/update' && path !== '/i/webhooks/test') {
+		const output = signinOutput(restored);
+		restoreWebhookEventEnum(path === '/i/webhooks/list' ? output.items : output);
+	}
+	return restored;
+}
+
+function restoreWebhookSchemaBaseline(name: string, schema: unknown): unknown {
+	if (name !== 'UserWebhook') return schema;
+	expect(schemaHash(schema)).toBe('342c842e548f7dfb9dcbc8024a8ab9d2540f84d3dae5a7fcdd436f3245ea490e');
+	const restored: unknown = structuredClone(schema);
+	restoreWebhookEventEnum(restored);
+	return restored;
+}
+
+// Upstream #18100 moves QR rendering to the client. Pin the complete new
+// operation before restoring exactly the removed field for the frozen oracle.
+function restoreClientQrOperationBaseline(path: string, operation: unknown): unknown {
+	if (path !== '/i/2fa/register') return operation;
+	expect(schemaHash(operation)).toBe('a91d8c3ff490798e767bcead320574f7e1d5652e1b90d45898b179ebd2497eaf');
+	const restored: unknown = structuredClone(operation);
+	const output = signinOutput(restored);
+	output.properties = { qr: { type: 'string' }, ...object(output.properties) };
+	if (!Array.isArray(output.required)) throw new Error('Invalid TOTP output');
+	output.required = ['qr', ...output.required];
+	return restored;
+}
+
+test('actual portable generator preserves every legacy operation and public schema, with eight unique canonical IDs', async () => {
+	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
+	// Export before assertions so an intentional contract delta can be inspected.
+	if (process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON) writeFileSync(process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON, JSON.stringify(spec));
+	const routes = requestRoutes(clientContract);
+	for (const [path, hash] of Object.entries(baseline.operationHashes)) {
+		const operation = restoreSessionIpOperation(path, restoreSigninHistoryOperation(path, restorePreSigninPolicyOperation(path, restorePreExpiryOperation(path, spec.paths?.[path]))));
+		expect(schemaHash(path === '/signin-flow' ? restorePreAvailabilitySigninOperation(operation) : restoreClientQrOperationBaseline(path, restoreWebhookOperationBaseline(path, restoreAnnouncementOperationBaseline(path, operation)))), path).toBe(hash);
+	}
+	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(restoreSigninSchema(name, restoreWebhookSchemaBaseline(name, spec.components?.schemas?.[name]))), name).toBe(hash);
+	expect(Object.keys(baseline.schemaHashes)).toHaveLength(1107);
+	expect(Object.keys(spec.components?.schemas ?? {}).filter(name => !(name in baseline.schemaHashes))).toEqual(['OrpcDefinition1038']);
+	expect(Object.keys(baseline.paths)).toHaveLength(443);
+	for (const [path, operationId] of Object.entries(baseline.paths)) expect(spec.paths?.[path]?.post?.operationId).toBe(operationId);
+	const generatedIds = Object.values(spec.paths ?? {}).map(path => path?.post?.operationId);
+	expect(new Set(generatedIds).size).toBe(generatedIds.length);
+	expect(Object.keys(spec.paths ?? {})).toHaveLength(routes.length);
+	for (const [legacy, canonical] of pairs) {
+		expect(routes.filter(route => route.name === legacy)).toHaveLength(1);
+		expect(routes.filter(route => route.name === canonical)).toHaveLength(1);
+		expect(spec.paths?.[`/${canonical}`]?.post?.operationId).toBe(`post___${canonical.replaceAll('/', '___')}`);
+	}
+});
+
+test('signin history inverse rejects unrelated changes and changed session fields', async () => {
+	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
+	const path = '/i/signin-history';
+	const original = spec.paths?.[path];
+	expect(schemaHash(restoreSigninHistoryOperation(path, original))).toBe(baseline.operationHashes[path]);
+	for (const field of ['browserSessionId', 'browserSession', 'headers']) {
+		const changed: unknown = structuredClone(original);
+		object(object(signinOutput(changed).items).properties)[field] = { type: 'string' };
+		expect(() => restoreSigninHistoryOperation(path, changed)).toThrow();
+	}
+	const changed: unknown = structuredClone(original);
+	object(object(changed).post).operationId = 'unexpected';
+	expect(() => restoreSigninHistoryOperation(path, changed)).toThrow();
+	const schema = object(structuredClone(spec.components?.schemas?.Signin));
+	object(schema.properties).browserSession = { type: 'null' };
+	expect(() => restoreSigninSchema('Signin', schema)).toThrow();
+});
+
+test('session IP inverse rejects changed audit fields and unrelated metadata', async () => {
+	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
+	const path = '/admin/get-user-ips';
+	const original = spec.paths?.[path];
+	expect(schemaHash(restoreSessionIpOperation(path, original))).toBe(baseline.operationHashes[path]);
+	for (const field of ['id', 'lastSeenAt', 'ip']) {
+		const changed: unknown = structuredClone(original);
+		object(object(signinOutput(changed).items).properties)[field] = { type: 'number' };
+		expect(() => restoreSessionIpOperation(path, changed)).toThrow();
+	}
+	const changed: unknown = structuredClone(original);
+	object(object(changed).post).operationId = 'unexpected';
+	expect(() => restoreSessionIpOperation(path, changed)).toThrow();
+});
+
+test('expiry inverse rejects changed constraints and unrelated operation metadata', async () => {
+	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
+	for (const rebase of expiryRebases) {
+		const original = spec.paths?.[rebase.path];
+		expect(schemaHash(restorePreExpiryOperation(rebase.path, original))).toBe(baseline.operationHashes[rebase.path as keyof typeof baseline.operationHashes]);
+		for (const removal of rebase.removals) {
+			const changed: unknown = structuredClone(original);
+			let parent: unknown = changed;
+			for (const part of removal.parent) parent = Reflect.get(parent as object, part);
+			Reflect.set(parent as object, removal.key, null);
+			expect(() => restorePreExpiryOperation(rebase.path, changed)).toThrow();
+		}
+		const changed: unknown = structuredClone(original);
+		object(object(changed).post).operationId = 'unexpected';
+		expect(() => restorePreExpiryOperation(rebase.path, changed)).toThrow();
+	}
+});
+
+test('availability inverse rejects tampering at every allowed boundary and outside the response', async () => {
+	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
+	const original = restorePreSigninPolicyOperation('/signin-flow', spec.paths?.['/signin-flow']);
+	const originalHash = schemaHash(original);
+	expect(schemaHash(restorePreAvailabilitySigninOperation(original))).toBe(baseline.operationHashes['/signin-flow']);
+	expect(schemaHash(original)).toBe(originalHash);
+	const tamper: Array<(operation: unknown) => void> = [
+		operation => { object(object(operation).post).operationId = 'wrong'; },
+		operation => { object(object(operation).post).security = []; },
+		operation => { object(object(operation).post).requestBody = {}; },
+		operation => { object(object(object(operation).post).responses)['403'] = {}; },
+		operation => { object(signinBranches(operation)[0]).additionalProperties = true; },
+		operation => { object(object(signinBranches(operation)[1]).properties).availableFactors = availableFactorsShape; },
+		operation => { object(object(signinBranches(operation)[2]).properties).next = { const: 'password' }; },
+		operation => { object(signinBranches(operation)[2]).required = ['finished', 'next', 'availableFactors']; },
+		operation => { object(object(object(signinBranches(operation)[2]).properties).availableFactors).maxItems = 3; },
+		operation => { object(object(object(signinBranches(operation)[3]).properties).availableFactors).items = { type: 'string' }; },
+		operation => { object(object(object(signinBranches(operation)[3]).properties).authRequest).required = []; },
+		operation => { object(signinBranches(operation)[3]).required = ['finished', 'next', 'authRequest', 'availableFactors']; },
+		operation => { signinBranches(operation).splice(2, 1); },
+		operation => { const outer = signinOutput(operation).anyOf; if (!Array.isArray(outer)) throw new Error('Invalid union'); outer[2] = { type: 'string' }; },
+	];
+	for (const change of tamper) {
+		const changed: unknown = structuredClone(original);
+		change(changed);
+		expect(() => restorePreAvailabilitySigninOperation(changed)).toThrow();
+	}
+});
+
+test('login policy inverse is exact, immutable and rejects added outcomes or changed factor boundaries', async () => {
+	const spec = await genPilotOpenapiSpec({ version: 'test', apiUrl: '/api' });
+	for (const path of ['/signin-flow', '/signin-with-passkey'] as const) {
+		const original = spec.paths?.[path]; const originalHash = schemaHash(original);
+		const restored = restorePreSigninPolicyOperation(path, original);
+		expect(schemaHash(original)).toBe(originalHash);
+		expect(schemaHash(restored)).toBe(path === '/signin-flow' ? availableSigninOperationHash : baseline.operationHashes[path]);
+		const changes: Array<(operation: unknown) => void> = [
+			operation => { object(object(operation).post).operationId = 'wrong'; },
+			operation => { object(object(operation).post).security = []; },
+			operation => { object(object(operation).post).requestBody = {}; },
+			operation => { object(object(object(operation).post).responses)['403'] = {}; },
+		];
+		if (path === '/signin-flow') {
+			for (const index of [2, 3]) {
+				changes.push(operation => { object(object(object(signinBranches(operation)[index]).properties).availableFactors).maxItems = 4; });
+				changes.push(operation => { object(object(object(signinBranches(operation)[index]).properties).availableFactors).minItems = 0; });
+				changes.push(operation => { object(object(object(signinBranches(operation)[index]).properties).availableFactors).items = { type: 'string', enum: ['totp', 'passkey'] }; });
+				changes.push(operation => { object(signinBranches(operation)[index]).required = ['finished', 'next', 'availableFactors']; });
+			}
+		} else {
+			const fallback = (operation: unknown) => { const branches = signinOutput(operation).anyOf; if (!Array.isArray(branches)) throw new Error('Invalid union'); return object(branches[3]); };
+			changes.push(operation => { fallback(operation).additionalProperties = true; });
+			changes.push(operation => { fallback(operation).required = []; });
+			changes.push(operation => { object(fallback(operation).properties).passwordFlowRequired = { type: 'boolean' }; });
+			changes.push(operation => { object(fallback(operation).properties).signinResponse = { type: 'string' }; });
+			changes.push(operation => { const branches = signinOutput(operation).anyOf; if (!Array.isArray(branches)) throw new Error('Invalid union'); branches.push({}); });
+		}
+		for (const change of changes) {
+			const changed: unknown = structuredClone(original); change(changed);
+			expect(() => restorePreSigninPolicyOperation(path, changed)).toThrow();
+		}
+	}
+});
+
+test('both HTTP namespaces reject anonymous and scoped tokens before malformed input validation', async () => {
+	const h = harness();
+	const app = Fastify();
+	const handler = new OpenAPIHandler(h.router, { customErrorResponseBodyEncoder: misskeyErrorBody });
+	await app.register(async api => registerPilotHttp(api, handler, {
+		maxFileSize: 1024, context: () => h.context, runSpan: (_name, run) => run(),
+	}), { prefix: '/api' });
+	try {
+		for (const [principal, token] of [[null, null], [actor, { permission: ['write:account'] }]] as const) {
+			h.services.authenticate.mockResolvedValue([principal, token]);
+			for (const paths of pairs) for (const path of paths) {
+				const response = await app.inject({ method: 'POST', url: `/api/${path}`, payload: { password: 7, token: [], name: false } });
+				expect(response.statusCode).toBe(400);
+				expect(response.json()).toMatchObject({ error: { code: 'ACCESS_DENIED' } });
+			}
+		}
+		expect(h.deps['i/2fa/register-key'].userProfilesRepository.findOne).not.toHaveBeenCalled();
+	} finally { await app.close(); }
+});
+
+test('native passkey registration aliases preserve password/MFA validation and producer arguments', async () => {
+	const h = harness();
+	const deps = h.deps['i/2fa/register-key'];
+	const profile = mockDeep<NonNullable<Awaited<ReturnType<typeof deps.userProfilesRepository.findOne>>>>({ userId: actor.id, user: null, twoFactorEnabled: true, password: bcrypt.hashSync('synthetic-password', 4) });
+	deps.userProfilesRepository.findOne.mockResolvedValue(profile);
+	deps.webAuthnService.initiateRegistration.mockResolvedValue({ challenge: 'synthetic', rp: { id: 'synthetic.example', name: 'Synthetic' }, user: { id: 'AQID', name: 'synthetic', displayName: 'Synthetic' }, pubKeyCredParams: [{ type: 'public-key', alg: -7 }] });
+	type RegistrationInput = InferContractRouterInputs<typeof authContract>['i/2fa/register-key'];
+	const register = [
+		(input: RegistrationInput) => call(h.router['i/2fa/register-key'], input, { context: testContext(actor) }),
+		(input: RegistrationInput) => call(h.router['i/2fa/passkey/register'], input, { context: testContext(actor) }),
+	];
+	for (const run of register) {
+		await expect(run({ password: 'synthetic-password' })).rejects.toThrow('authentication failed');
+		await expect(run({ password: 'wrong', token: '111111' })).rejects.toMatchObject({ code: 'INCORRECT_PASSWORD' });
+		await expect(run({ password: 'synthetic-password', token: '222222' })).resolves.toMatchObject({ challenge: 'synthetic' });
+	}
+	expect(deps.userAuthService.twoFactorAuthenticate).toHaveBeenCalledTimes(4);
+	expect(deps.webAuthnService.initiateRegistration).toHaveBeenCalledTimes(2);
+	expect(deps.webAuthnService.initiateRegistration).toHaveBeenCalledWith(actor.id, actor.id, undefined);
+});
+
+test('cloning accepts the actual ImplementedProcedure factory result and retains its handler', async () => {
+	const contract = oc.$meta({ requestName: 'synthetic-legacy' as const }).input(v.string()).output(v.string());
+	const legacy = implement(contract).$context<{ suffix: string }>().handler(({ input, context }) => input + context.suffix);
+	const canonical = aliasTwoFactorProcedure(legacy, 'synthetic-canonical');
+	expect(canonical['~orpc'].handler).toBe(legacy['~orpc'].handler);
+	expect(legacy['~orpc'].meta.requestName).toBe('synthetic-legacy');
+	expect(canonical['~orpc'].meta.requestName).toBe('synthetic-canonical');
+	await expect(call(canonical, 'synthetic-input', { context: { suffix: '-result' } })).resolves.toBe('synthetic-input-result');
+});
+
+test('cloning retains the captured legacy rate bucket and its error despite canonical routing metadata', async () => {
+	const contract = oc.$meta({ requestName: 'i/2fa/synthetic-legacy', requireCredential: true, secure: true, limit: { duration: 1000, max: 1 } })
+		.route({ method: 'POST', path: '/i/2fa/synthetic-legacy' }).errors(commonErrors).input(v.void()).output(v.void());
+	const run = vi.fn();
+	const legacy = createApiProcedure<MiLocalUser>()(contract).handler(() => { run(); });
+	const canonicalContract = aliasTwoFactorContract(contract, 'i/2fa/totp/synthetic');
+	const canonical = aliasTwoFactorProcedure(legacy, canonicalContract['~orpc'].meta.requestName);
+	for (const field of ['inputSchema', 'outputSchema', 'errorMap', 'middlewares', 'handler'] as const) expect(canonical['~orpc'][field]).toBe(legacy['~orpc'][field]);
+	const h = harness();
+	await call(legacy, undefined, { context: h.context });
+	h.services.limit.mockResolvedValue({ info: { synthetic: true } });
+	await expect(call(canonical, undefined, { context: h.context })).rejects.toMatchObject({ code: 'RATE_LIMIT_EXCEEDED' });
+	expect(h.services.limit).toHaveBeenNthCalledWith(1, { duration: 1000, max: 1, key: 'i/2fa/synthetic-legacy' }, actor.id, 1);
+	expect(h.services.limit).toHaveBeenNthCalledWith(2, { duration: 1000, max: 1, key: 'i/2fa/synthetic-legacy' }, actor.id, 1);
+	expect(run).toHaveBeenCalledOnce();
+});

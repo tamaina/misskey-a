@@ -3,64 +3,38 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidResetDbDefinition, voidResetDbInput, voidResetDbOutput } from '../../contract/void-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import { DataSource } from 'typeorm';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { resetDbContract } from './reset-db.contract.js';
+import type { DataSource } from 'typeorm';
 import * as Redis from 'ioredis';
-import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
-
-import { DI } from '@/di-symbols.js';
+import type { LoggerService } from '../../../runtime/backend/services/LoggerService.js';
 import { resetDb } from '../utility/reset-db.js';
-import { MetaService } from '@features/instance/backend/services/MetaService.js';
-import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-
-const contractProjection = projectEndpointContract(voidResetDbDefinition);
-
-export const meta = {
-	tags: ['non-productive'],
-
-	requireCredential: false,
-
-	description: 'Only available when running with <code>NODE_ENV=testing</code>. Reset the database and flush Redis.',
-
-	errors: {
-
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidResetDbInput, typeof voidResetDbOutput> {
-	constructor(
-		@Inject(DI.db)
-		private db: DataSource,
-
-		@Inject(DI.redis)
-		private redisClient: Redis.Redis,
-
-		private loggerService: LoggerService,
-		private metaService: MetaService,
-		private globalEventService: GlobalEventService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			if (process.env.NODE_ENV !== 'test') throw new Error('NODE_ENV is not a test');
-
-			const logger = this.loggerService.getLogger('reset-db');
-			logger.info('---- Resetting database...');
-
-			await this.redisClient.flushdb();
-			await resetDb(this.db);
-
-			// DIコンテナで管理しているmetaのインスタンスには上記のリセット処理が届かないため、
-			// 初期値を流して明示的にリフレッシュする
-			const meta = await this.metaService.fetch(true);
-			this.globalEventService.publishInternalEvent('metaUpdated', { after: meta });
-
-			logger.info('---- Database reset complete.');
-
-			await new Promise(resolve => setTimeout(resolve, 1000));
+import type { MetaService } from '../../../instance/backend/services/MetaService.js';
+import type { GlobalEventService } from '../../../runtime/backend/services/GlobalEventService.js';
+export interface ResetDbDependencies {
+	db: DataSource;
+	redisClient: Pick<Redis.Redis, 'flushdb'>;
+	loggerService: Pick<LoggerService, 'getLogger'>;
+	metaService: Pick<MetaService, 'fetch'>;
+	globalEventService: Pick<GlobalEventService, 'publishInternalEvent'>;
+}
+export function createResetDbProcedure<Actor extends ApiActor>(deps: ResetDbDependencies) {
+	return createApiProcedure<Actor>()(resetDbContract)
+		.handler(async () => {
+			const result = await (async () => {
+				if (process.env.NODE_ENV !== 'test') throw new Error('NODE_ENV is not a test');
+				const logger = deps.loggerService.getLogger('reset-db');
+				logger.info('---- Resetting database...');
+				await deps.redisClient.flushdb();
+				await resetDb(deps.db);
+				// DIコンテナで管理しているmetaのインスタンスには上記のリセット処理が届かないため、
+				// 初期値を流して明示的にリフレッシュする
+				const meta = await deps.metaService.fetch(true);
+				deps.globalEventService.publishInternalEvent('metaUpdated', { after: meta });
+				logger.info('---- Database reset complete.');
+				await new Promise(resolve => setTimeout(resolve, 1000));
+			})();
+			return result;
 		});
-	}
 }

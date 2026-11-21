@@ -18,9 +18,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 			><code :class="$style.codeBlockFallbackCode">Loading...</code></pre>
 		</template>
 		<XCode
-			v-if="show && lang"
+			v-if="show && (lang || diffBase != null)"
 			class="_selectable"
 			:code="code"
+			:diffBase="diffBase"
+			:maxHeight="maxHeight"
 			:lang="lang"
 			:withOuterStyle="withOuterStyle"
 		/>
@@ -48,6 +50,8 @@ import { prefer } from '@features/preferences/frontend/preferences.js';
 
 const props = withDefaults(defineProps<{
 	code: string;
+	diffBase?: string;
+	maxHeight?: number | null;
 	forceShow?: boolean;
 	copyButton?: boolean;
 	withOuterStyle?: boolean;

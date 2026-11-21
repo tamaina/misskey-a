@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<MkButton v-if="$i && ($i.isModerator || $i.policies.canManageCustomEmojis)" primary type="routerLink" to="/custom-emojis-manager">{{ $locale.sfc.manageCustomEmojis }}</MkButton>
 
 	<div class="query">
-		<MkInput v-model="q" class="" :placeholder="$locale.sfc.search" autocapitalize="off">
+		<MkInput v-model="q" class="" :placeholder="globalLocale.env.search" autocapitalize="off">
 			<template #prefix><i class="ti ti-search"></i></template>
 		</MkInput>
 	</div>
@@ -30,15 +30,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { watch, ref } from 'vue';
-import type { EmojiSimple } from '../contract/index.js';
-import EmojiCatalogItem from './EmojiCatalogItem.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
 import { customEmojis, customEmojiCategories } from '@features/emojis/frontend/custom-emojis.js';
 import { $i } from '@features/auth/frontend/i.js';
+import EmojiCatalogItem from './EmojiCatalogItem.vue';
 import { searchEmojiCatalog } from './search.js';
+import type { EmojiSimple } from '../backend/api.definition.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const q = ref('');
 const searchEmojis = ref<EmojiSimple[] | null>(null);
@@ -63,7 +67,6 @@ watch(q, () => {
 <locale locale="ar-SA" lang="json">
 {
   "manageCustomEmojis": "إدارة الإيموجي المخصصة",
-  "search": "البحث",
   "searchResult": "نتائج البحث",
   "other": "منوعات"
 }
@@ -72,7 +75,6 @@ watch(q, () => {
 <locale locale="ca-ES" lang="json">
 {
   "manageCustomEmojis": "Gestiona els emojis personalitzats",
-  "search": "Cercar",
   "searchResult": "Resultats de la cerca",
   "other": "Altres"
 }
@@ -81,7 +83,6 @@ watch(q, () => {
 <locale locale="cs-CZ" lang="json">
 {
   "manageCustomEmojis": "Spravovat vlastní emoji",
-  "search": "Vyhledávání",
   "searchResult": "Výsledky hledání",
   "other": "Ostatní"
 }
@@ -90,7 +91,6 @@ watch(q, () => {
 <locale locale="da-DK" lang="json">
 {
   "manageCustomEmojis": "Manage Custom Emojis",
-  "search": "Search",
   "searchResult": "Search results",
   "other": "Other"
 }
@@ -99,7 +99,6 @@ watch(q, () => {
 <locale locale="de-DE" lang="json">
 {
   "manageCustomEmojis": "Kann benutzerdefinierte Emojis verwalten",
-  "search": "Suchen",
   "searchResult": "Suchergebnisse",
   "other": "Anderes"
 }
@@ -108,7 +107,6 @@ watch(q, () => {
 <locale locale="en-US" lang="json">
 {
   "manageCustomEmojis": "Manage Custom Emojis",
-  "search": "Search",
   "searchResult": "Search results",
   "other": "Other"
 }
@@ -117,7 +115,6 @@ watch(q, () => {
 <locale locale="es-ES" lang="json">
 {
   "manageCustomEmojis": "Administrar emojis personalizados",
-  "search": "Buscar",
   "searchResult": "Resultados de búsqueda",
   "other": "Otro"
 }
@@ -126,7 +123,6 @@ watch(q, () => {
 <locale locale="fr-FR" lang="json">
 {
   "manageCustomEmojis": "Gestion des émojis personnalisés",
-  "search": "Rechercher",
   "searchResult": "Résultats de la recherche",
   "other": "Autre"
 }
@@ -135,7 +131,6 @@ watch(q, () => {
 <locale locale="id-ID" lang="json">
 {
   "manageCustomEmojis": "Kelola Emoji Kustom",
-  "search": "Cari",
   "searchResult": "Hasil Penelusuran",
   "other": "Lainnya"
 }
@@ -144,7 +139,6 @@ watch(q, () => {
 <locale locale="it-IT" lang="json">
 {
   "manageCustomEmojis": "Gestisci le emoji personalizzate",
-  "search": "Cerca",
   "searchResult": "Risultati della Ricerca",
   "other": "Eccetera"
 }
@@ -153,7 +147,6 @@ watch(q, () => {
 <locale locale="ja-JP" lang="json">
 {
   "manageCustomEmojis": "カスタム絵文字の管理",
-  "search": "検索",
   "searchResult": "検索結果",
   "other": "その他"
 }
@@ -162,7 +155,6 @@ watch(q, () => {
 <locale locale="ja-KS" lang="json">
 {
   "manageCustomEmojis": "カスタム絵文字の管理",
-  "search": "探す",
   "searchResult": "検索結果やで",
   "other": "その他"
 }
@@ -171,7 +163,6 @@ watch(q, () => {
 <locale locale="kab-KAB" lang="json">
 {
   "manageCustomEmojis": "Manage Custom Emojis",
-  "search": "Nadi",
   "searchResult": "Search results",
   "other": "Wiyyaḍ"
 }
@@ -180,7 +171,6 @@ watch(q, () => {
 <locale locale="kn-IN" lang="json">
 {
   "manageCustomEmojis": "Manage Custom Emojis",
-  "search": "ಹುಡುಕು",
   "searchResult": "Search results",
   "other": "Other"
 }
@@ -189,7 +179,6 @@ watch(q, () => {
 <locale locale="ko-KR" lang="json">
 {
   "manageCustomEmojis": "커스텀 이모지 관리",
-  "search": "검색",
   "searchResult": "검색 결과",
   "other": "기타"
 }
@@ -198,7 +187,6 @@ watch(q, () => {
 <locale locale="nl-NL" lang="json">
 {
   "manageCustomEmojis": "Manage Custom Emojis",
-  "search": "Zoeken",
   "searchResult": "Zoekresultaten",
   "other": "Ander"
 }
@@ -207,7 +195,6 @@ watch(q, () => {
 <locale locale="no-NO" lang="json">
 {
   "manageCustomEmojis": "Manage Custom Emojis",
-  "search": "Søk",
   "searchResult": "Search results",
   "other": "Andre"
 }
@@ -216,7 +203,6 @@ watch(q, () => {
 <locale locale="pl-PL" lang="json">
 {
   "manageCustomEmojis": "Zarządzaj niestandardowymi Emoji",
-  "search": "Szukaj",
   "searchResult": "Wyniki wyszukiwania",
   "other": "Inne"
 }
@@ -225,7 +211,6 @@ watch(q, () => {
 <locale locale="pt-PT" lang="json">
 {
   "manageCustomEmojis": "Gerenciar Emojis customizados",
-  "search": "Pesquisar",
   "searchResult": "Pesquisar",
   "other": "Outros"
 }
@@ -234,7 +219,6 @@ watch(q, () => {
 <locale locale="ru-RU" lang="json">
 {
   "manageCustomEmojis": "Управлять пользовательскими эмодзи",
-  "search": "Поиск",
   "searchResult": "Результаты поиска",
   "other": "Другие"
 }
@@ -243,7 +227,6 @@ watch(q, () => {
 <locale locale="sk-SK" lang="json">
 {
   "manageCustomEmojis": "Manage Custom Emojis",
-  "search": "Hľadať",
   "searchResult": "Výsledky hľadania",
   "other": "Ostatní"
 }
@@ -252,7 +235,6 @@ watch(q, () => {
 <locale locale="th-TH" lang="json">
 {
   "manageCustomEmojis": "จัดการเอโมจิที่กำหนดเอง",
-  "search": "ค้นหา",
   "searchResult": "ผลการค้นหา",
   "other": "อื่น ๆ"
 }
@@ -261,7 +243,6 @@ watch(q, () => {
 <locale locale="tr-TR" lang="json">
 {
   "manageCustomEmojis": "Özel Emojileri Yönet",
-  "search": "Ara",
   "searchResult": "Arama sonuçları",
   "other": "Diğer"
 }
@@ -270,7 +251,6 @@ watch(q, () => {
 <locale locale="ug-CN" lang="json">
 {
   "manageCustomEmojis": "Manage Custom Emojis",
-  "search": "ئىزدەش",
   "searchResult": "Search results",
   "other": "Other"
 }
@@ -279,7 +259,6 @@ watch(q, () => {
 <locale locale="uk-UA" lang="json">
 {
   "manageCustomEmojis": "Керування користувацькими емодзі",
-  "search": "Пошук",
   "searchResult": "Результати пошуку",
   "other": "Інше"
 }
@@ -288,7 +267,6 @@ watch(q, () => {
 <locale locale="vi-VN" lang="json">
 {
   "manageCustomEmojis": "Quản lý CustomEmoji",
-  "search": "Tìm kiếm",
   "searchResult": "Kết quả tìm kiếm",
   "other": "Khác"
 }
@@ -297,7 +275,6 @@ watch(q, () => {
 <locale locale="zh-CN" lang="json">
 {
   "manageCustomEmojis": "管理自定义表情符号",
-  "search": "搜索",
   "searchResult": "搜索结果",
   "other": "其他"
 }
@@ -306,7 +283,6 @@ watch(q, () => {
 <locale locale="zh-TW" lang="json">
 {
   "manageCustomEmojis": "管理自訂表情符號",
-  "search": "搜尋",
   "searchResult": "搜尋結果",
   "other": "其他"
 }

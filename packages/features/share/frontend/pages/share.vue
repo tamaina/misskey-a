@@ -13,6 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			:initialText="initialText"
 			:initialVisibility="visibility"
 			:initialFiles="files"
+			:initialLocalFiles="tempFiles"
 			:initialLocalOnly="localOnly"
 			:reply="reply"
 			:renote="renote"
@@ -21,7 +22,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			@posted="onPosted"
 		/>
 		<div v-else-if="state === 'posted'" class="_buttonsCenter">
-			<MkButton primary @click="close">{{ $locale.sfc.close }}</MkButton>
+			<MkButton primary @click="close">{{ globalLocale.env.close }}</MkButton>
 			<MkButton @click="goToMisskey">{{ $locale.sfc.goToMisskey }}</MkButton>
 		</div>
 	</div>
@@ -29,18 +30,36 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 // SPECIFICATION: https://misskey-hub.net/docs/for-users/features/share-form/
 
-import { ref, computed } from 'vue';
+import { ref, computed, onBeforeUnmount, onDeactivated } from 'vue';
 import * as Misskey from 'misskey-js';
+import { readSharedFiles, discardSharedFiles } from '@@/js/shared-files.js';
+import { $i } from '@features/auth/frontend/i.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkPostForm from '@features/notes/frontend/components/MkPostForm.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { postMessageToParentWindow } from '@features/web/frontend/utility/post-message.js';
+import type { Locale } from 'i18n';
 
+const globalLocale = useLocale<Locale>(import.meta.url);
+
+//#region parameters
 const urlParams = new URLSearchParams(window.location.search);
+// merge hash parameters
+try {
+	const hashParams = new URLSearchParams(window.location.hash.slice(1));
+	for (const [key, value] of hashParams.entries()) {
+		urlParams.set(key, value);
+	}
+} catch (e) {
+	console.error('Failed to parse hash parameters:', e);
+}
+//#endregion
+
 const localOnlyQuery = urlParams.get('localOnly');
 const visibilityQuery = urlParams.get('visibility') as typeof Misskey.noteVisibilities[number];
 
@@ -55,6 +74,25 @@ const visibility = ref(Misskey.noteVisibilities.includes(visibilityQuery) ? visi
 const localOnly = ref(localOnlyQuery === '0' ? false : localOnlyQuery === '1' ? true : undefined);
 const files = ref([] as Misskey.entities.DriveFile[]);
 const visibleUsers = ref([] as Misskey.entities.UserDetailed[]);
+const tempFiles = ref([] as File[]);
+const shareId = urlParams.get('shareId');
+const shareAccountId = $i?.id ?? null;
+
+function discardShare() {
+	return discardSharedFiles(shareId, shareAccountId).catch(err => console.error('Failed to clear shared files:', err));
+}
+
+let disposed = false;
+
+function isCurrentShare() {
+	return !disposed && ($i?.id ?? null) === shareAccountId;
+}
+
+onBeforeUnmount(() => {
+	disposed = true;
+	tempFiles.value = [];
+	void discardShare();
+});
 
 async function init() {
 	let noteText = '';
@@ -180,12 +218,55 @@ async function init() {
 		});
 	}
 
+	//#region Local files
+	// If the browser supports IndexedDB, try to get the temporary files from temp.
+	if (shareId && window.indexedDB) {
+		try {
+			const filesFromIdb = await readSharedFiles(shareId, shareAccountId);
+			if (isCurrentShare() && Array.isArray(filesFromIdb) && filesFromIdb.length > 0 && filesFromIdb.every(file => file instanceof Blob)) {
+				tempFiles.value = filesFromIdb;
+			}
+		} catch (err) {
+			console.error('Failed to read shared files:', err);
+			if (isCurrentShare()) os.alert({ type: 'error', title: $locale.value.sfc.error, text: err instanceof Error ? err.message : String(err) });
+		}
+	}
+
+	const fileData = urlParams.get('file');
+	if (fileData && fileData.startsWith('data:')) {
+		try {
+			const file = await window.fetch(fileData).then(res => res.blob());
+			if (isCurrentShare() && file instanceof Blob) {
+				tempFiles.value.push(new File([file], 'shared-file', { type: file.type }));
+			} else {
+				console.error('Fetched file is not a Blob:', file);
+			}
+		} catch (e) {
+			console.error('Failed to fetch file:', e);
+		}
+	}
+	//#endregion
+
+	if (!isCurrentShare()) return;
 	state.value = 'writing';
 }
 
 init();
 
-function close(): void {
+onDeactivated(() => {
+	cancelShare();
+	void discardShare();
+});
+
+function cancelShare() {
+	disposed = true;
+	tempFiles.value = [];
+	state.value = 'fetching';
+}
+
+async function close(): Promise<void> {
+	cancelShare();
+	await discardShare();
 	window.close();
 
 	// 閉じなければ100ms後タイムラインに
@@ -194,245 +275,214 @@ function close(): void {
 	}, 100);
 }
 
-function goToMisskey(): void {
+async function goToMisskey(): Promise<void> {
+	cancelShare();
+	await discardShare();
 	window.location.href = '/';
 }
 
 function onPosted(): void {
 	state.value = 'posted';
+	// SWが保存したファイルは投稿が完了するまでIndexedDBに保持
+	void discardShare();
 	postMessageToParentWindow('misskey:shareForm:shareCompleted');
 }
 
-const headerActions = computed(() => []);
+const headerActions = computed(() => [
+	{
+		icon: 'ti ti-dots',
+		text: $locale.value.sfc.menu,
+		handler: (ev: MouseEvent) => {
+			os.popupMenu([
+				{
+					icon: 'ti ti-home',
+					text: $locale.value.sfc.goToMisskey,
+					action: () => goToMisskey(),
+				},
+				{
+					icon: 'ti ti-x',
+					text: globalLocale.value.env.close,
+					action: () => close(),
+				},
+			], ev.currentTarget ?? ev.target);
+		},
+	},
+]);
 
 const headerTabs = computed(() => []);
 
 definePage(() => ({
-	title: $locale.value.sfc.share,
+	title: globalLocale.value.env.share,
 	icon: 'ti ti-share',
 }));
 </script>
 
 <locale locale="ar-SA" lang="json">
 {
-	"close": "اغلق",
-	"goToMisskey": "لميسكي",
-	"share": "شارِك"
+	"goToMisskey": "لميسكي"
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
-	"close": "Tanca",
-	"goToMisskey": "Ves a Misskey",
-	"share": "Comparteix"
+	"goToMisskey": "Ves a Misskey"
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
-	"close": "Zavřít",
-	"goToMisskey": "Jít na Misskey",
-	"share": "Sdílet"
+	"goToMisskey": "Jít na Misskey"
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
-	"close": "Close",
-	"goToMisskey": "To Misskey",
-	"share": "Share"
+	"goToMisskey": "To Misskey"
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
-	"close": "Schließen",
-	"goToMisskey": "Zu Misskey",
-	"share": "Teilen"
+	"goToMisskey": "Zu Misskey"
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
-	"close": "Close",
-	"goToMisskey": "To Misskey",
-	"share": "Share"
+	"goToMisskey": "To Misskey"
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
-	"close": "Cerrar",
-	"goToMisskey": "ir a Misskey",
-	"share": "Compartir"
+	"goToMisskey": "ir a Misskey"
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
-	"close": "Fermer",
-	"goToMisskey": "Retour vers Misskey",
-	"share": "Partager"
+	"goToMisskey": "Retour vers Misskey"
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
-	"close": "Tutup",
-	"goToMisskey": "Ke Misskey",
-	"share": "Bagikan"
+	"goToMisskey": "Ke Misskey"
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
-	"close": "Chiudi",
-	"goToMisskey": "Vai a Misskey",
-	"share": "Condividi"
+	"goToMisskey": "Vai a Misskey"
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
-	"close": "閉じる",
-	"goToMisskey": "Misskeyへ",
-	"share": "共有"
+	"menu": "メニュー",
+	"error": "エラー",
+	"goToMisskey": "Misskeyへ"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
-	"close": "さいなら",
-	"goToMisskey": "Misskeyへ",
-	"share": "わけわけ"
+	"goToMisskey": "Misskeyへ"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
-	"close": "Close",
-	"goToMisskey": "To Misskey",
-	"share": "Share"
+	"goToMisskey": "To Misskey"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
-	"close": "Close",
-	"goToMisskey": "To Misskey",
-	"share": "Share"
+	"goToMisskey": "To Misskey"
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
-	"close": "닫기",
-	"goToMisskey": "Misskey로",
-	"share": "공유"
+	"goToMisskey": "Misskey로"
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
-	"close": "Sluiten",
-	"goToMisskey": "To Misskey",
-	"share": "Delen"
+	"goToMisskey": "To Misskey"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
-	"close": "Lukk",
-	"goToMisskey": "To Misskey",
-	"share": "Del"
+	"goToMisskey": "To Misskey"
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
-	"close": "Zamknij",
-	"goToMisskey": "To Misskey",
-	"share": "Udostępnij"
+	"goToMisskey": "To Misskey"
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
-	"close": "Fechar",
-	"goToMisskey": "Ao Misskey",
-	"share": "Compartilhar"
+	"goToMisskey": "Ao Misskey"
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
-	"close": "Закрыть",
-	"goToMisskey": "К Misskey",
-	"share": "Поделиться"
+	"goToMisskey": "К Misskey"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
-	"close": "Zavrieť",
-	"goToMisskey": "To Misskey",
-	"share": "Zdieľať"
+	"goToMisskey": "To Misskey"
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
-	"close": "ปิด",
-	"goToMisskey": "ถึง Misskey",
-	"share": "แบ่งปัน"
+	"goToMisskey": "ถึง Misskey"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
-	"close": "Kapat",
-	"goToMisskey": "Misskey'e",
-	"share": "Paylaş"
+	"goToMisskey": "Misskey'e"
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
-	"close": "Close",
-	"goToMisskey": "To Misskey",
-	"share": "Share"
+	"goToMisskey": "To Misskey"
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
-	"close": "Закрити",
-	"goToMisskey": "До Misskey",
-	"share": "Поділитись"
+	"goToMisskey": "До Misskey"
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
-	"close": "Đóng",
-	"goToMisskey": "Tới Misskey",
-	"share": "Chia sẻ"
+	"goToMisskey": "Tới Misskey"
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
-	"close": "关闭",
-	"goToMisskey": "去往 Misskey",
-	"share": "分享"
+	"goToMisskey": "去往 Misskey"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
-	"close": "關閉",
-	"goToMisskey": "往 Misskey",
-	"share": "分享"
+	"goToMisskey": "往 Misskey"
 }
 </locale>

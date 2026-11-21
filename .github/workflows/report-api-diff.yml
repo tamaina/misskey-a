@@ -40,35 +40,56 @@ jobs:
       - name: Get full diff
         run: diff --label=base --label=head --new-line-format='+%L' --old-line-format='-%L' --unchanged-line-format=' %L' ./api-base.json ./api-head.json | cat > api-full.json.diff
       - name: Upload full diff to Artifact
+        id: full-diff
         uses: actions/upload-artifact@v7
         with:
           name: api-artifact
           path: |
             api-full.json.diff
+            api.json.diff
             api-base.json
             api-head.json
       - id: out-diff
         name: Build diff Comment
+        env:
+          DIFF_ARTIFACT_URL: ${{ steps.full-diff.outputs.artifact-url }}
         run: |
-          HEADER="このPRによるapi.jsonの差分"
-          FOOTER="[Get diff files from Workflow Page](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})"
-          DIFF_BYTES="$(stat ./api.json.diff -c '%s' | tr -d '\n')"
+          node --input-type=module <<'NODE'
+          import { readFileSync, writeFileSync } from 'node:fs';
 
-          echo "$HEADER" > ./output.md
-
-          if (( "$DIFF_BYTES" <= 1 )); then
-            echo '差分はありません。' >> ./output.md
-          else
-            echo '<details>' >> ./output.md
-            echo '<summary>差分はこちら</summary>' >> ./output.md
-            echo >> ./output.md
-            echo '```diff' >> ./output.md
-            cat ./api.json.diff >> ./output.md
-            echo '```' >> ./output.md
-            echo '</details>' >> .output.md
-          fi
-
-          echo "$FOOTER" >> ./output.md
+          const diff = readFileSync('api.json.diff', 'utf8');
+          const artifactUrl = process.env.DIFF_ARTIFACT_URL;
+          if (!artifactUrl) throw new Error('Full API diff artifact URL is missing');
+          const runUrl = `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`;
+          const lines = diff.split('\n');
+          const added = lines.filter(line => line.startsWith('+') && !line.startsWith('+++')).length;
+          const removed = lines.filter(line => line.startsWith('-') && !line.startsWith('---')).length;
+          const diffBytes = Buffer.byteLength(diff);
+          const previewLimit = 8 * 1024;
+          const bodyLimit = 60 * 1024; // Strict UTF-8 byte bound, below GitHub's character limit.
+          let body = `このPRによるapi.jsonの差分\n\n${added} 追加行 / ${removed} 削除行 (${diffBytes} bytes)\n\n`;
+          if (diff.trim().length === 0) {
+            body += '差分はありません。\n\n';
+          } else {
+            let preview = '';
+            let previewBytes = 0;
+            for (const character of diff) {
+              const bytes = Buffer.byteLength(character);
+              if (previewBytes + bytes > previewLimit) break;
+              preview += character;
+              previewBytes += bytes;
+            }
+            // Keep untrusted diff text inside its fence, including embedded backtick runs.
+            const longestFence = Math.max(2, ...[...preview.matchAll(/`+/g)].map(match => match[0].length));
+            const fence = '`'.repeat(longestFence + 1);
+            const truncated = preview.length < diff.length;
+            if (truncated) body += '大きい差分のため、先頭8 KiBのみ表示します。全文とbase/head JSONはartifactに保存しています。\n\n';
+            body += `<details>\n<summary>${truncated ? '差分の先頭（省略あり）' : '差分はこちら'}</summary>\n\n${fence}diff\n${preview}\n${fence}\n</details>\n\n`;
+          }
+          body += `[Full diff and API JSON artifact](${artifactUrl})\n\n[Workflow Page](${runUrl})\n`;
+          if (Buffer.byteLength(body) > bodyLimit) throw new Error('API diff comment exceeded its bound');
+          writeFileSync('output.md', body);
+          NODE
       - uses: thollander/actions-comment-pull-request@v3
         with:
           pr-number: ${{ steps.load-pr-num.outputs.pr-number }}

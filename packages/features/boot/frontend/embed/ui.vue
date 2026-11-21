@@ -33,6 +33,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { safeURIDecode } from '@features/web/frontend/shared/url.js';
 import { ref, shallowRef, onMounted, onUnmounted, inject } from 'vue';
 import { postMessageToParentWindow } from '@features/web/frontend/embed/post-message.js';
 import { DI } from '@features/boot/frontend/embed/di.js';
@@ -43,14 +44,6 @@ import EmClipPage from '@features/collections/frontend/embed/pages/clip.vue';
 import EmTagPage from '@features/discovery/frontend/embed/pages/tag.vue';
 import XNotFound from '@features/web/frontend/embed/pages/not-found.vue';
 import EmLoading from '@features/ui/frontend/embed/components/EmLoading.vue';
-
-function safeURIDecode(str: string): string {
-	try {
-		return decodeURIComponent(str);
-	} catch {
-		return str;
-	}
-}
 
 const page = window.location.pathname.split('/')[2];
 const contentId = safeURIDecode(window.location.pathname.split('/')[3]);

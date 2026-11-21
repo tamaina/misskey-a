@@ -2,29 +2,17 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { portabilityImportContract } from '../../../contract/imports.js';
-import ms from 'ms';
-import { portabilityImportErrors } from '@features/portability/contract';
-import { legacyPortabilityImportSchemas } from '@features/portability/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
-
-const featureMeta = {
-	secure: true,
-	requireCredential: true,
-	requiredRolePolicy: 'canImportFollowing',
-	prohibitMoved: true,
-	limit: { duration: ms('1hour'), max: 1 },
-	errors: portabilityImportErrors['i/import-following'],
-} as const;
-
-const featureParamDef = legacyPortabilityImportSchemas['i/import-following'].input;
-
-export const meta = featureMeta;
-export const paramDef = featureParamDef as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('portabilityImportCommands', commands => createContractTransportEndpoint(meta, paramDef, portabilityImportContract['i/import-following'], async (params, user) => commands['i/import-following'](params, {
-	context: { actor: user },
-})));
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { importFile } from '../../import-file.js';
+import { iImportFollowingErrors } from './import-following.contract.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { iImportFollowingContract } from './import-following.contract.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import type { PortabilityDependencies } from '../../api.implementation.js';
+export function createIImportFollowingProcedure<Actor extends ApiActor, File extends { id: string; size: number; url: string }>(deps: Pick<PortabilityDependencies<Actor, File>, 'createImportFollowingJob' | 'findOwnedFile' | 'isMovingDuringGracePeriod'>) {
+	return createApiProcedure<Actor>()(iImportFollowingContract).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const file = await importFile(deps, actor, input.fileId, iImportFollowingErrors); deps.createImportFollowingJob(actor, file.id, input.withReplies);
+		});
+}

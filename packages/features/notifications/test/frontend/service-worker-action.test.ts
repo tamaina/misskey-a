@@ -34,6 +34,7 @@ test.each([
 		'@/scripts/create-notification.js': {},
 		'@/scripts/lang.js': {},
 		'@/scripts/operations.js': { api, sendMarkAllAsRead: markRead },
+		'@/scripts/share.js': {},
 	};
 	const compiled = ts.transpileModule(workerSource, {
 		compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },

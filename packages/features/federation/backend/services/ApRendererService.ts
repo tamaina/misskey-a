@@ -10,6 +10,7 @@ import * as mfm from 'mfm-js';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
 import type { MiPartialLocalUser, MiLocalUser, MiPartialRemoteUser, MiRemoteUser, MiUser } from '@features/users/backend/models/User.js';
+import type { MiFollowRequest } from '@features/relationships/backend/models/FollowRequest.js';
 import type { IMentionedRemoteUsers, MiNote } from '@features/notes/backend/models/Note.js';
 import type { MiBlocking } from '@features/relationships/backend/models/Blocking.js';
 import type { MiRelay } from '../models/Relay.js';
@@ -32,6 +33,8 @@ import { escapeHtml } from '@features/markup/backend/utility/escape-html.js';
 import { JsonLdService } from './JsonLdService.js';
 import { ApMfmService } from './ApMfmService.js';
 import { CONTEXT } from '../protocol/misc/contexts.js';
+import { encodeActorPublicMultikey } from '@features/federation/backend/protocol/misc/actor-public-keys.js';
+import type { IMultikey } from '../protocol/type.js';
 import type { IAccept, IActivity, IAdd, IAnnounce, IApDocument, IApEmoji, IApHashtag, IApImage, IApMention, IBlock, ICreate, IDelete, IFlag, IFollow, IKey, ILike, IMove, IObject, IPost, IQuestion, IReject, IRemove, ITombstone, IUndo, IUpdate } from '../protocol/type.js';
 
 @Injectable()
@@ -243,6 +246,11 @@ export class ApRendererService {
 	}
 
 	@bindThis
+	public getLocalFollowRequestActivityId(request: Pick<MiFollowRequest, 'id' | 'requestId'>): string {
+		return request.requestId ?? `${this.config.url}/follows/${request.id}`;
+	}
+
+	@bindThis
 	public renderHashtag(tag: string): IApHashtag {
 		return {
 			type: 'Hashtag',
@@ -304,6 +312,12 @@ export class ApRendererService {
 				format: 'pem',
 			}),
 		};
+	}
+
+	@bindThis
+	public renderMultikey(user: MiLocalUser, publicKey: string, postfix: string): IMultikey {
+		const controller = this.userEntityService.genLocalUserUri(user.id);
+		return { id: controller + postfix, type: 'Multikey', controller, publicKeyMultibase: encodeActorPublicMultikey(publicKey) };
 	}
 
 	@bindThis
@@ -567,8 +581,13 @@ export class ApRendererService {
 			manuallyApprovesFollowers: user.isLocked,
 			discoverable: user.isExplorable,
 			publicKey: this.renderKey(user, keypair, '#main-key'),
+			assertionMethod: [
+				this.renderMultikey(user, keypair.publicKey, '#main-key'),
+				...(keypair.ed25519PublicKey ? [this.renderMultikey(user, keypair.ed25519PublicKey, '#ed25519-key')] : []),
+			],
 			isCat: user.isCat,
 			attachment: attachment.length ? attachment : undefined,
+			suspended: user.isSuspended,
 		};
 
 		if (user.movedToUri) {

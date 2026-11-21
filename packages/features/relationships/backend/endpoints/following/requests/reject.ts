@@ -2,26 +2,19 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { relationshipContract } from '../../../../contract/commands.js';
-import { relationshipErrors } from '@features/relationships/contract';
-import { legacyRelationshipSchemas } from '@features/relationships/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
-
-const featureMeta = {
-	tags: ['following', 'account'],
-	requireCredential: true,
-	kind: 'write:following',
-	errors: relationshipErrors['following/requests/reject'],
-} as const;
-
-const featureParamDef = legacyRelationshipSchemas['following/requests/reject'].input;
-
-export const meta = featureMeta;
-export const paramDef = featureParamDef as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('relationshipCommands', commands => createContractTransportEndpoint(meta, paramDef, relationshipContract['following/requests/reject'], async (params, user) => commands['following/requests/reject'](params, {
-	context: { actor: user },
-})));
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { relationshipsContract } from '../../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../../api.implementation.js';
+import { relationshipsErrors } from '../../relationships.errors.js';
+import { getRelationshipUser } from '../../relationship-errors.js';
+export function createFollowingRequestsRejectProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'getterService' | 'userFollowingService'>) {
+	return createApiProcedure<Actor>()(relationshipsContract["following/requests/reject"]).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const follower = await getRelationshipUser(deps.getterService, input.userId, relationshipsErrors['following/requests/reject'].noSuchUser);
+			await deps.userFollowingService.rejectFollowRequest(actor, follower);
+		});
+}

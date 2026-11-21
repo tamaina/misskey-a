@@ -3,18 +3,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { statisticsContract } from '../../contract/index.js';
-import { legacyStatsSchemas } from '@features/statistics/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	requireCredential: false,
-	tags: ['meta'],
-	res: legacyStatsSchemas.output as Schema,
-} as const;
-
-export const paramDef = legacyStatsSchemas.input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('statistics', statistics => createContractTransportEndpoint(meta, paramDef, statisticsContract['stats'], async params => statistics.stats(params)));
+import { statsContract } from './stats.contract.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import type { StatisticsDependencies } from '../api.implementation.js';
+export function createStatsProcedure<Actor extends ApiActor>(deps: Pick<StatisticsDependencies, 'readNotes' | 'readUsers' | 'countReactions' | 'countInstances'>) {
+	return createApiProcedure<Actor>()(statsContract)
+		.handler(async () => {
+			const notes = await deps.readNotes();
+			const users = await deps.readUsers();
+			const [reactionsCount, instances] = await Promise.all([deps.countReactions(), deps.countInstances()]);
+			return {
+				notesCount: notes.local + notes.remote, originalNotesCount: notes.local,
+				usersCount: users.local + users.remote, originalUsersCount: users.local,
+				reactionsCount, instances, driveUsageLocal: 0, driveUsageRemote: 0
+			};
+		});
+}

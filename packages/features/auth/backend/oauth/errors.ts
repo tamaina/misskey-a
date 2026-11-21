@@ -57,4 +57,3 @@ export class UnsupportedResponseTypeError extends OAuthProviderError {
 		super('unsupported_response_type', description);
 	}
 }
-

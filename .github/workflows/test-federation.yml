@@ -3,17 +3,19 @@ name: Test (federation)
 on:
   push:
     branches:
-      - master
+      - main
       - develop
     paths:
       - packages/backend/**
+      - packages/features/federation/**
       - packages/misskey-js/**
       - .github/workflows/test-federation.yml
   pull_request:
     branches-ignore:
-      - master
+      - main
     paths:
       - packages/backend/**
+      - packages/features/federation/**
       - packages/misskey-js/**
       - .github/workflows/test-federation.yml
   workflow_dispatch:

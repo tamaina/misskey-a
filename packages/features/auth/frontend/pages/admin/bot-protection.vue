@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template v-else-if="botProtectionForm.savedState.provider === 'recaptcha'" #suffix>reCAPTCHA</template>
 		<template v-else-if="botProtectionForm.savedState.provider === 'turnstile'" #suffix>Turnstile</template>
 		<template v-else-if="botProtectionForm.savedState.provider === 'testcaptcha'" #suffix>testCaptcha</template>
-		<template v-else #suffix>{{ $locale.sfc.none }} ({{ $locale.sfc.notRecommended }})</template>
+		<template v-else #suffix>{{ globalLocale.env.none }} ({{ $locale.sfc.notRecommended }})</template>
 		<template v-if="botProtectionForm.modified.value" #footer>
 			<MkFormFooter :canSaving="canSaving" :form="botProtectionForm"/>
 		</template>
@@ -22,7 +22,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<MkRadios
 				v-model="botProtectionForm.state.provider"
 				:options="[
-					{ value: 'none', label: `${$locale.sfc.none} (${$locale.sfc.notRecommended})` },
+					{ value: 'none', label: `${globalLocale.env.none} (${$locale.sfc.notRecommended})` },
 					{ value: 'hcaptcha', label: 'hCaptcha' },
 					{ value: 'mcaptcha', label: 'mCaptcha' },
 					{ value: 'recaptcha', label: 'reCAPTCHA' },
@@ -160,9 +160,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
-import type { ApiWithDialogCustomErrors } from '@features/ui/frontend/os.js';
 import MkRadios from '@features/ui/frontend/components/MkRadios.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import FormSlot from '@features/ui/frontend/components/form/slot.vue';
@@ -173,6 +173,10 @@ import { useForm } from '@features/ui/frontend/composables/use-form.js';
 import MkFormFooter from '@features/ui/frontend/components/MkFormFooter.vue';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import type { ApiWithDialogCustomErrors } from '@features/ui/frontend/os.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const MkCaptcha = defineAsyncComponent(() => import('@features/auth/frontend/components/MkCaptcha.vue'));
 
@@ -280,7 +284,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="ar-SA">
 {
 	"botProtection": "الحماية من الحسابات الآلية",
-	"none": "لا شيء",
 	"notRecommended": "غير مستحسن",
 	"hcaptchaSiteKey": "مفتاح الموقع",
 	"hcaptchaSecretKey": "المفتاح السري",
@@ -306,7 +309,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="ca-ES">
 {
 	"botProtection": "Protecció contra bots",
-	"none": "Res",
 	"notRecommended": "No recomanat",
 	"hcaptchaSiteKey": "Clau del lloc",
 	"hcaptchaSecretKey": "Clau secreta",
@@ -332,7 +334,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="cs-CZ">
 {
 	"botProtection": "Bot ochrana",
-	"none": "Žádný",
 	"notRecommended": "Nedoporučuje se",
 	"hcaptchaSiteKey": "Klíč stránky",
 	"hcaptchaSecretKey": "Tajný Klíč (Secret Key)",
@@ -358,7 +359,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="da-DK">
 {
 	"botProtection": "Bot Protection",
-	"none": "None",
 	"notRecommended": "Not recommended",
 	"hcaptchaSiteKey": "Site key",
 	"hcaptchaSecretKey": "Secret key",
@@ -384,7 +384,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="de-DE">
 {
 	"botProtection": "Schutz vor Bots",
-	"none": "Nichts",
 	"notRecommended": "Nicht empfohlen",
 	"hcaptchaSiteKey": "Site key",
 	"hcaptchaSecretKey": "Secret key",
@@ -410,7 +409,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="en-US">
 {
 	"botProtection": "Bot Protection",
-	"none": "None",
 	"notRecommended": "Not recommended",
 	"hcaptchaSiteKey": "Site key",
 	"hcaptchaSecretKey": "Secret key",
@@ -436,7 +434,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="es-ES">
 {
 	"botProtection": "Protección contra bots",
-	"none": "Ninguna",
 	"notRecommended": "obsoleto",
 	"hcaptchaSiteKey": "Clave del sitio",
 	"hcaptchaSecretKey": "Clave secreta",
@@ -462,7 +459,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="fr-FR">
 {
 	"botProtection": "Protection contre les bots",
-	"none": "Rien",
 	"notRecommended": "Déconseillé",
 	"hcaptchaSiteKey": "Clé du site",
 	"hcaptchaSecretKey": "Clé secrète",
@@ -488,7 +484,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="id-ID">
 {
 	"botProtection": "Perlindungan Bot",
-	"none": "Tidak ada",
 	"notRecommended": "Tidak disarankan",
 	"hcaptchaSiteKey": "Site Key",
 	"hcaptchaSecretKey": "Secret Key",
@@ -514,7 +509,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="it-IT">
 {
 	"botProtection": "Protezione contro i bot",
-	"none": "Nessuna",
 	"notRecommended": "Sconsigliato",
 	"hcaptchaSiteKey": "Chiave del sito",
 	"hcaptchaSecretKey": "Chiave segreta",
@@ -540,7 +534,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="ja-JP">
 {
 	"botProtection": "Botプロテクション",
-	"none": "なし",
 	"notRecommended": "非推奨",
 	"hcaptchaSiteKey": "サイトキー",
 	"hcaptchaSecretKey": "シークレットキー",
@@ -566,7 +559,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="ja-KS">
 {
 	"botProtection": "Botプロテクション",
-	"none": "なし",
 	"notRecommended": "あんま推奨しやんで",
 	"hcaptchaSiteKey": "サイトキー",
 	"hcaptchaSecretKey": "シークレットキー",
@@ -592,7 +584,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="kab-KAB">
 {
 	"botProtection": "Bot Protection",
-	"none": "None",
 	"notRecommended": "Not recommended",
 	"hcaptchaSiteKey": "Site key",
 	"hcaptchaSecretKey": "Secret key",
@@ -618,7 +609,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="kn-IN">
 {
 	"botProtection": "Bot Protection",
-	"none": "None",
 	"notRecommended": "Not recommended",
 	"hcaptchaSiteKey": "Site key",
 	"hcaptchaSecretKey": "Secret key",
@@ -644,7 +634,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="ko-KR">
 {
 	"botProtection": "Bot 방어",
-	"none": "없음",
 	"notRecommended": "추천하지 않음",
 	"hcaptchaSiteKey": "사이트 키",
 	"hcaptchaSecretKey": "시크릿 키",
@@ -670,7 +659,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="nl-NL">
 {
 	"botProtection": "Beveiliging tegen bots",
-	"none": "Niets",
 	"notRecommended": "Niet aanbevolen",
 	"hcaptchaSiteKey": "Site sleutel",
 	"hcaptchaSecretKey": "Geheime sleutel",
@@ -696,7 +684,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="no-NO">
 {
 	"botProtection": "Bot Protection",
-	"none": "Ingen",
 	"notRecommended": "Not recommended",
 	"hcaptchaSiteKey": "Site key",
 	"hcaptchaSecretKey": "Secret key",
@@ -722,7 +709,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="pl-PL">
 {
 	"botProtection": "Zabezpieczenie przed botami",
-	"none": "Brak",
 	"notRecommended": "Nie zalecane",
 	"hcaptchaSiteKey": "Klucz strony",
 	"hcaptchaSecretKey": "Tajny klucz",
@@ -748,7 +734,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="pt-PT">
 {
 	"botProtection": "Proteção contra Bot",
-	"none": "Nenhum",
 	"notRecommended": "Não recomendado",
 	"hcaptchaSiteKey": "Chave do sítio ‘web’",
 	"hcaptchaSecretKey": "Chave secreta",
@@ -774,7 +759,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="ru-RU">
 {
 	"botProtection": "Ботозащита",
-	"none": "Ничего",
 	"notRecommended": "Не рекомендуется",
 	"hcaptchaSiteKey": "Ключ сайта",
 	"hcaptchaSecretKey": "Секретный ключ",
@@ -800,7 +784,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="sk-SK">
 {
 	"botProtection": "Bot ochrana",
-	"none": "Žiadne",
 	"notRecommended": "Neodporúčané",
 	"hcaptchaSiteKey": "Site key",
 	"hcaptchaSecretKey": "Secret key",
@@ -826,7 +809,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="th-TH">
 {
 	"botProtection": "การป้องกัน Bot",
-	"none": "ไม่มี",
 	"notRecommended": "ไม่แนะนำ",
 	"hcaptchaSiteKey": "คีย์ไซต์",
 	"hcaptchaSecretKey": "คีย์ลับ",
@@ -852,7 +834,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="tr-TR">
 {
 	"botProtection": "Bot Koruması",
-	"none": "Hiçbiri",
 	"notRecommended": "Tavsiye edilmez",
 	"hcaptchaSiteKey": "Site anahtar",
 	"hcaptchaSecretKey": "Gizli anahtar",
@@ -878,7 +859,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="ug-CN">
 {
 	"botProtection": "Bot Protection",
-	"none": "None",
 	"notRecommended": "Not recommended",
 	"hcaptchaSiteKey": "Site key",
 	"hcaptchaSecretKey": "Secret key",
@@ -904,7 +884,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="uk-UA">
 {
 	"botProtection": "Захист від ботів",
-	"none": "Відсутній",
 	"notRecommended": "Не рекомендовано",
 	"hcaptchaSiteKey": "Ключ сайту",
 	"hcaptchaSecretKey": "Секретний ключ",
@@ -930,7 +909,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="vi-VN">
 {
 	"botProtection": "Bảo vệ Bot",
-	"none": "Không",
 	"notRecommended": "Không đề xuất",
 	"hcaptchaSiteKey": "Khóa của trang",
 	"hcaptchaSecretKey": "Khóa bí mật",
@@ -956,7 +934,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="zh-CN">
 {
 	"botProtection": "Bot防御",
-	"none": "无",
 	"notRecommended": "不推荐",
 	"hcaptchaSiteKey": "网站密钥",
 	"hcaptchaSecretKey": "hCaptcha 密钥(SecretKey)",
@@ -982,7 +959,6 @@ const canSaving = computed((): boolean => {
 <locale lang="json" locale="zh-TW">
 {
 	"botProtection": "Bot 防護",
-	"none": "無",
 	"notRecommended": "不推薦",
 	"hcaptchaSiteKey": "hcaptchaSiteKey",
 	"hcaptchaSecretKey": "hcaptchaSecretKey",

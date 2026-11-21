@@ -1,498 +1,269 @@
----
-_lang_: "ພາສາລາວ"
-headlineMisskey: "ເຊື່ອມຕໍ່ເຄືອຂ່າຍໂດຍ note"
-introMisskey: "ຍິນດີຕ້ອນຮັບ! Misskey ເປັນຊອຟແວopensource, ສຳລັບບໍລິການ microblogging ແບບ decentralized\nສ້າງ “note” ເພື່ອແບ່ງປັນຄວາມຄິດຂອງທ່ານກັບທຸກໆ ຄົນທີ່ຢູ່ອ້ອມຮອບທ່ານ 📡\nຢ່າລືມ “reaction” ໂນຕຂອງລາວເພື່ອສະແດງຄວາມຮູ້ສຶກ 👍\nມາສຳຫຼວດໂລກໃໝ່ແນ! 🚀"
-poweredByMisskeyDescription: "{name} ແມ່ນສ່ວນໜຶ່ງຂອງການບໍລິການທີ່ຂັບເຄື່ອນໂດຍແພລດຟອມ open source. <b>Misskey</b> (ເອີ້ນວ່າ \"Misskey instance\")"
-monthAndDay: "ເດືອນ{month} / ວັນ{day}"
-search: "ຄົ້ນຫາ"
-reset: "ຣີເຊັດ"
-notifications: "ການແຈ້ງເຕືອນ"
-username: "ຊື່ຜູ້ໃຊ້"
-password: "ລະຫັດຜ່ານ"
-forgotPassword: "ລືມລະຫັດຜ່ານ"
-fetchingAsApObject: "ກຳລັງດຶງຂໍ້ມູນຈາກ fediverse..."
-ok: "ຕົກ​ລົງ"
-gotIt: "ເຂົ້າໃຈແລ້ວ!"
-cancel: "ຍົກເລີກ"
-noThankYou: "ບໍ່​ແມ່ນ​ຕອນ​ນີ້"
-enterUsername: "ປ້ອນຊື່ຜູ້ໃຊ້"
-renotedBy: "Renoted ໂດຍ {user}"
-noNotes: "ບໍ່ມີ note"
-noNotifications: "ບໍ່ມີການແຈ້ງເຕືອນ"
-instance: "ເຊີຟເວີຣ໌"
-settings: "ຕັ້ງຄ່າ"
-notificationSettings: "ຕັ້ງຄ່າການແຈ້ງເຕືອນ"
-basicSettings: "ການຕັ້ງຄ່າພື້ນຖານ"
-otherSettings: "ການຕັ້ງຄ່າອື່ນໆ"
-openInWindow: "ເປີດໃນ window"
-profile: "ໂປຣໄຟລ໌"
-timeline: "ໄທມ໌ໄລນ໌"
-noAccountDescription: "ຜູ້ໃຊ້ຄົນນີ້ຍັງບໍ່ໄດ້ຂຽນຄຳແນະນຳໂຕ"
-login: "ເຂົ້າ​ສູ່​ລະ​ບົບ"
-loggingIn: "ກຳລັງເຂົ້າສູ່ລະບົບ..."
-logout: "ອອກ​ຈາກ​ລະ​ບົບ"
-signup: "ລົງ​ທະ​ບຽນ"
-uploading: "ກຳລັງອັບໂຫຼດ..."
-save: "ບັນທຶກ"
-users: "ຜູ້ໃຊ້"
-addUser: "ເພີ່ມຜູ້ໃຊ້"
-favorite: "ເພີ່ມໃສ່ລາຍການທີ່ມັກ"
-favorites: "ລາຍການທີ່ມັກ"
-unfavorite: "ເອົາອອກຈາກລາຍການທີ່ມັກ"
-favorited: "ເພີ່ມໃສ່ລາຍການທີ່ມັກແລ້ວ"
-alreadyFavorited: "ເພີ່ມເຂົ້າໃນລາຍການທີ່ມັກແລ້ວ."
-cantFavorite: "ບໍ່ສາມາດເພີ່ມໃສ່ລາຍການທີ່ມັກໄດ້."
-pin: "ປັກໝຸດ"
-unpin: "ຖອດປັກໝຸດອອກ"
-copyContent: "ຄັດລອກເນື້ອຫາ"
-copyLink: "ຄັດລອກລິ້ງ"
-copyLinkRenote: "ຄັດລອກລິ້ງຂອງ renote"
-delete: "ລຶບ"
-deleteAndEdit: "ລຶບ​ແລະ​ແກ້​ໄຂ​"
-deleteAndEditConfirm: "ຕ້ອງການລຶບ note ນີ້ແລະແກ້ໄຂໃໝ່ແມ່ນບໍ່? reaction, renote ແລະການຕອບກັບຕໍ່ note ນີ້ ທັງເບິດຈະຖືກລຶບອອກ"
-addToList: "ເພີ່ມໃສ່ລາຍຊື່"
-addToAntenna: "ເພີ່ມໃສ່ເສົາອາກາດ"
-sendMessage: "ສົ່ງຂໍ້ຄວາມ"
-copyRSS: "ຄັດລອກ RSS"
-copyUsername: "ຄັດລອກຊື່ຜູ້ໃຊ້"
-copyUserId: "ຄັດລອກ ID ຜູ້ໃຊ້"
-copyNoteId: "ຄັດລອກ ID ຂອງ note"
-copyFileId: "ຄັດລອກ ID ໄຟລ໌"
-copyFolderId: "ຄັດລອກ ID ໂຟລ໌ເດີຣ໌"
-copyProfileUrl: "ຄັດລອກ URL ໂປຣໄຟລ໌"
-searchUser: "ຄົ້ນຫາຜູ້ໃຊ້"
-reply: "ຕອບ​ກັບ"
-loadMore: "ໂຫຼດເພີ່ມເຕີມ"
-showMore: "ໂຫຼດເພີ່ມເຕີມ"
-showLess: "ປິດ"
-youGotNewFollower: "ໄດ້ຕິດຕາມເຈົ້າ"
-receiveFollowRequest: "ມີຄຳຂໍຕິດຕາມສົ່ງມາ"
-followRequestAccepted: "ການຕິດຕາມໄດ້ຮັບອນຸຍາດແລ້ວ"
-mention: "ເວົ້າເຖີງ"
-mentions: "ເວົ້າເຖີງເຈົ້າ"
-directNotes: "ໂພສ Direct note"
-importAndExport: "ນໍາເຂົ້າ / ສົ່ງອອກ"
-import: "ນຳເຂົ້າ"
-export: "ສົ່ງອອກ"
-files: "ໄຟລ໌"
-download: "ດາວໂຫລດ"
-driveFileDeleteConfirm: "ຕ້ອງການລຶບໄຟລ໌ “{name}” ແມ່ນບໍ່? Note ທີ່ແນບມາກັບໄຟລ໌ນີ້ຈະຖືກລຶບອອກ"
-unfollowConfirm: "ຕ້ອງການເລີກຕິດຕາມ {name} ແມ່ນບໍ່?"
-exportRequested: "ເຈົ້າໄດ້ຮ້ອງຂໍການສົ່ງອອກ ອາດໃຊ້ເວລາຈັກໜ່ອຍ ເມື່ອແລ້ວຈະຖືກເພີ່ມໃສ່ drive"
-importRequested: "ເຈົ້າໄດ້ຮ້ອງຂໍການນຳເຂົ້າ ການດຳເນິນການນີ້ອາດໃຊ້ເວລາຈັກໜ່ອຍ"
-lists: "ລາຍການ"
-noLists: "ບໍ່​ມີ​ລາຍ​ການ​ໃດໆ​"
-note: "Note"
-notes: "Note"
-following: "ກຳລັງຕິດຕາມ"
-followers: "ຜູ້ຕິດຕາມ"
-followsYou: "ຕິດ​ຕາມ​ເຈົ້າ"
-createList: "ສ້າງລາຍຊື່"
-manageLists: "ຈັດການລາຍຊື່"
-error: "ຂໍ້ຜິດພາດ"
-somethingHappened: "​ອຸຍ, ມີ​ບາງ​ຢ່າງ​ຜິ​ດ​ພາດ"
-retry: "ລອງໃຫມ່"
-pageLoadError: "ເກີດຄວາມຜິດພາດໃນການໂຫລດໜ້ານີ້"
-pageLoadErrorDescription: "ປົກກະຕິແລ້ວມັນເກີດຈາກຄວາມຜິດພາດເຄືອຂ່າຍ ຫຼື cache ຂອງຕົວທ່ອງເວັບ ລອງລຶບລ້າງແຄດແລ້ວລອງໃໝ່ພາຍຫຼັງສອງສາມນາທີ"
-serverIsDead: "ເຊີບເວີນີ້ບໍ່ຕອບສະໜອງ ກະລຸນາລໍຖ້າຈັກໜ່ອຍແລ້ວລອງໃໝ່ອີກຄັ້ງ"
-youShouldUpgradeClient: "ເພື່ອເບິ່ງໜ້ານີ້, ກະລຸນາໂຫຼດຂໍ້ມູນຄືນໃໝ່ເພື່ອອັບເດດລູກຄ້າຂອງທ່ານ"
-enterListName: "ໃສ່ຊື່ສຳລັບລາຍຊື່"
-privacy: "ຄວາມເປັນສ່ວນຕົວ"
-makeFollowManuallyApprove: "ຕິດຕາມຄຳຂໍທີ່ຕ້ອງໄດ້ຮັບການອະນຸມັດ"
-defaultNoteVisibility: "ການເບິ່ງເຫັນທີ່ເປັນຄ່າເລີ່ມຕົ້ນ"
-follow: "ກຳລັງຕິດຕາມ"
-followRequest: "ສົ່ງ​ຄຳຂໍ​ຕິ​ດ​ຕາມ​"
-followRequests: "ສົ່ງ​ຄຳຂໍ​ຕິ​ດ​ຕາມ​"
-unfollow: "ເຊົາຕິດຕາມ"
-followRequestPending: "ລໍຖ້າການອະນຸມັດໃຫ້ຕິດຕາມ"
-enterEmoji: "ປ້ອນເອໂມຈິ"
-renote: "Renote"
-unrenote: "ເລີກ Renote"
-renoted: "renote ແລ້ວ"
-cantRenote: "ໂພສນີ້ບໍ່ສາມາດ renote ໃໝ່ໄດ້"
-cantReRenote: "ບໍ່ສາມາດບັນທຶກຄືນໃໝ່ໄດ້"
-quote: "ອ້າງອີງ"
-inChannelRenote: "Renote ໃນ channel ເທົ່ານັ້ນ"
-inChannelQuote: "ອ້າງອິງໃນ channel ເທົ່ານັ້ນ"
-pinnedNote: "note ທີ່ປັກໝຸດໄວ້"
-pinned: "ປັກໝຸດ"
-you: "ເຈົ້າ"
-clickToShow: "ກົດເພື່ອສະແດງໃຫ້ເຫັນ"
-sensitive: "NSFW"
-add: "ເພີ່ມ"
-reaction: "reaction"
-reactions: "reaction"
-attachCancel: "ເອົາໄຟລ໌ແນບ"
-mute: "ປີດສຽງ"
-unmute: "ເປີດສຽງ"
-block: "ບລັອກ"
-unblock: "ເລີກບລັອກ"
-suspend: "ລະງັບ"
-unsuspend: "ເຊົາ​ລະ​ງັບ"
-selectList: "ເລືອກລາຍຊື່"
-editList: "ແກ້ໄຂລາຍຊື່"
-selectChannel: "ເລືອກຊ່ອງ"
-selectAntenna: "ເລືອກເສົາອາກາດ"
-editAntenna: "ແກ້ໄຂເສົາອາກາດ"
-selectWidget: "ເລືອກວິກເຈັດ"
-editWidgets: "ແກ້ໄຂ Widget"
-editWidgetsExit: "ສຳເລັດແລ້ວ"
-customEmojis: "ອີໂມຈິແບບກຳນົດເອງ"
-emoji: "ອີໂມຈິ"
-emojis: "ອີໂມຈິ"
-emojiName: "ຊື່ Emoji"
-emojiUrl: "URL ອີໂມຈິ"
-addEmoji: "ຕື່ມອີໂມຈິ"
-settingGuide: "ການຕັ້ງຄ່າທີ່ແນະນໍາ"
-flagAsBot: "ໝາຍບັນຊີນີ້ເປັນບັອດ"
-flagAsCat: "ໝາຍບັນຊີນີ້ເປັນແມວ"
-flagAsCatDescription: "ເປີດໃຊ້ຕົວເລືອກນີ້ເພື່ອໝາຍບັນຊີນີ້ເປັນແມວ"
-flagShowTimelineReplies: "ສະແດງການຕອບກັບໃນທາມລາຍ"
-flagShowTimelineRepliesDescription: "ສະແດງການຕອບກັບຂອງຜູ້ໃຊ້ຕໍ່ກັບບັນທຶກຂອງຜູ້ໃຊ້ອື່ນໃນທາມລາຍຖ້າເປີດໃຊ້ງານ"
-autoAcceptFollowed: "ອະນຸມັດອັດຕະໂນມັດຕາມຄຳຮ້ອງຂໍຈາກຜູ້ໃຊ້ທີ່ທ່ານກຳລັງຕິດຕາມຢູ່"
-addAccount: "ເພີ່ມບັນຊີ"
-loginFailed: "ການເຂົ້າສູ່ລະບົບບໍ່ສຳເລັດ"
-showOnRemote: "ເບິ່ງໃນເຊີຟເວີຣ໌ໄລຍະໄກ"
-general: "ທົ່ວໄປ"
-wallpaper: "ພາບພື້ນຫລັງ"
-setWallpaper: "ຕັ້ງເປັນພາບພື້ນຫຼັງ"
-removeWallpaper: "ລຶບຮູບວໍເປເປີອອກ"
-searchWith: "ຊອກຫາ: {q}"
-youHaveNoLists: "ເຈົ້າບໍ່ມີລາຍຊື່ໃດໆ"
-proxyAccount: "ບັນຊີພຣັອກຊີ"
-host: "ໂຮສຕ໌"
-selectUser: "ເລືອກຜູ້ໃຊ້"
-recipient: "ເຖິງ"
-annotation: "ຄຳເຫັນ"
-federation: "ສະຫະພັນ"
-instances: "ເຊີຟເວີຣ໌"
-registeredAt: "ລົງທະບຽນຢູ່"
-storageUsage: "ບ່ອນ​ຈັດ​ເກັບ​ຂໍ້​ມູນທີ່ໃຊ້"
-charts: "ແຜນພູມ"
-perHour: "ຕໍ່ຊົ່ວໂມງ"
-perDay: "ຕໍ່​ມື້"
-stopActivityDelivery: "ຢຸດເຊົາການສົ່ງກິດຈະກໍາ"
-blockThisInstance: "ຂັດຂວາງຕົວຢ່າງນີ້"
-operations: "ການດຳເນີນງານ"
-software: "ຊອບແວ"
-version: "ເວີຣ໌ຊັນ"
-metadata: "Metadata"
-withNFiles: "{n} ໄຟລ໌(s)"
-monitor: "ຈໍພາບ"
-jobQueue: "ຄິວວຽກ"
-cpuAndMemory: "CPU ແລະ ຫນ່ວຍຄວາມຈໍາ"
-network: "ເຄືອຂ່າຍ"
-disk: "ດິສກ໌"
-instanceInfo: "ອີນສະແຕນ"
-statistics: "ສະຖິຕິ"
-clearQueue: "ລ້າງຄິວ"
-clearCachedFiles: "ລຶບລ້າງແຄສ"
-noUsers: "ບໍ່ພົບຜູ້ໃຊ້"
-editProfile: "ແກ້ໄຂໂປຣໄຟລ໌"
-done: "ສຳເລັດ"
-processing: "ກຳລັງປະມວນຜົນ"
-preview: "ສະແດງເປັນຕົວຢ່າງ"
-default: "ຄ່າເລີ່ມຕົ້ນ"
-defaultValueIs: "ຄ່າເລີ່ມຕົ້ນ: {value}"
-noCustomEmojis: "ບໍ່ມີອີໂມຈິ"
-noJobs: "ບໍ່ມີຊິ້ນວຽກ"
-federating: "ສະຫະພັນ"
-blocked: "ບລັອກແລ້ວ "
-suspended: "ໂຈະ"
-all: "ທັງໝົດ"
-subscribing: "ກຳລັງສະມັກສະມາຊິກ"
-publishing: "ກຳລັງ​ເຜີຍ​ແພ່"
-notResponding: "ບໍ່ຕອບສະໜອງ"
-instanceFollowing: "ກຳລັງຕິດຕາມບົນເຊີຟເວີຣ໌"
-instanceFollowers: "ຜູ້ຕິດຕາມຂອງເຊີຟເວີຣ໌"
-instanceUsers: "ຜູ້​ໃຊ້​ຂອງ​ເຊີຟເວີຣ໌ນີ້"
-changePassword: "ປ່ຽນ​ລະ​ຫັດ​ຜ່ານ"
-security: "ຄວາມປອດໄພ"
-retypedNotMatch: "ປ້ອນຂໍ້ມູນບໍ່ກົງກັນ"
-currentPassword: "ລະຫັດຜ່ານປະຈຸບັນ"
-newPassword: "ລະຫັດຜ່ານໃໝ່"
-newPasswordRetype: "ໃສ່ລະຫັດຜ່ານໃໝ່ອີກເທື່ອໜຶ່ງ"
-attachFile: "ແນບໄຟລ໌"
-more: "ເພີ່ມເຕີມ!"
-featured: "ໄຮໄລທ໌"
-usernameOrUserId: "ຊື່ຜູ້ໃຊ້ ຫຼື id ຜູ້ໃຊ້"
-noSuchUser: "ບໍ່ພົບຜູ້ໃຊ້"
-lookup: "ຄົ້ນ​ຫາ"
-announcements: "ປະກາດ"
-imageUrl: "URL ຮູບພາບ"
-remove: "ລຶບ"
-removed: "ລຶບແລ້ວ"
-resetAreYouSure: "ຣີ​ເຊັດບໍ?"
-saved: "ບັນທຶກແລ້ວ"
-upload: "ອັບໂຫຼດ"
-keepOriginalUploading: "ຮັກສາຮູບພາບຕົ້ນສະບັບ"
-fromDrive: "ຈາກ Drive"
-fromUrl: "ຈາກ URL"
-uploadFromUrl: "ອັບໂຫຼດຈາກ URL"
-uploadFromUrlDescription: "URL ຂອງໄຟລ໌ທີ່ທ່ານຕ້ອງການອັບໂຫລດ"
-uploadFromUrlRequested: "ຮ້ອງຂໍການອັບໂຫລດແລ້ວ"
-explore: "ສຳຫຼວດ"
-messageRead: "ອ່ານແລ້ວ"
-nUsersRead: "ອ່ານໂດຍ {n}"
-agree: "ຍອມຮັບ"
-termsOfService: "ເງື່ອນໄຂການບໍລິການ"
-start: "ເລີ່ມຕົ້ນນຳໃຊ້ເລີຍ"
-home: "ໜ້າຫຼັກ"
-activity: "ກິດຈະກຳ"
-images: "ຮູບພາບ"
-image: "ຮູບພາບ"
-birthday: "ວັນເກີດ"
-yearsOld: "{age} ປີ"
-registeredDate: "ວັນທີ່ລົງທະບຽນ"
-location: "ທີ່ຕັ້ງ"
-theme: "Theme"
-themeForLightMode: "Theme ໃຊ້ໃນໂໝດສະຫວ່າງ"
-themeForDarkMode: "Theme ໃຊ້ໃນໂໝດມືດ"
-light: "ສະຫວ່າງ"
-dark: "ມືດ"
-lightThemes: "ຊຸດຮູບແບບສະຫວ່າງ"
-darkThemes: "ຮູບແບບສີສັນມືດ"
-syncDeviceDarkMode: "ຊິງຄ໌ໂໝດມືດກັບການຕັ້ງຄ່າທົ່ວອຸປະກອນ"
-drive: "Drive"
-fileName: "ຊື່ໄຟລ໌"
-selectFile: "ເລືອກໄຟລ໌"
-selectFiles: "ເລືອກໄຟລ໌"
-selectFolder: "ເລືອກໂຟລເດີ"
-selectFolders: "ເລືອກໂຟລເດີ"
-renameFile: "ປ່ຽນຊື່ໄຟລ໌"
-folderName: "ຊື່ໂຟລເດີຣ໌"
-createFolder: "​ສ້າງ​ໂຟ​ລ​ເດີ"
-renameFolder: "ປ່ຽນຊື່ໂຟນເດີນີ້"
-deleteFolder: "ລົບໂຟ​ລ​ເດີ​"
-addFile: "ເພີ່ມໄຟລ໌"
-emptyDrive: "Drive ຂອງທ່ານຫວ່າງເປົ່າ"
-emptyFolder: "ໂຟລເດີຣ໌ນີ້ວ່າງເປົ່າ"
-unableToDelete: "ບໍ່​ສາ​ມາດລົບໄດ້"
-inputNewFileName: "ໃສ່ຊື່ໄຟລ໌ໃໝ່"
-inputNewDescription: "ໃສ່ຄຳບັນຍາຍໃໝ່"
-inputNewFolderName: "ໃສ່ຊື່ໂຟນເດີໃໝ່"
-circularReferenceFolder: "ໂຟນເດີປາຍທາງແມ່ນໂຟນເດີຍ່ອຍຂອງໂຟນເດີທີ່ທ່ານຕ້ອງການຍ້າຍ"
-rename: "ປ່ຽນຊື່"
-doNothing: "ຢ່າມັນ"
-watch: "ເພັ່ງເລັງ"
-unwatch: "ຢຸດເພັ່ງເລັງ"
-accept: "ອະນຸຍາດ"
-reject: "ປະຕິເສດ"
-normal: "ປົກກະຕິ"
-instanceName: "ຊື່ເຊີເວີ້"
-instanceDescription: "ຄຳອະທິບາຍແນະນຳເຊີຟເວີຣ໌"
-maintainerName: "ຜູ້ດູແລ"
-maintainerEmail: "ອີເມລຜູ້ດູແລ"
-tosUrl: " URL ເງື່ອນໄຂການໃຫ້ບໍລິການ"
-thisYear: "ປີນີ້"
-thisMonth: "ເດືອນນີ້"
-today: "ມື້ນີ້"
-dayX: "ວັນ {day}"
-monthX: "ເດືອນ {month}"
-yearX: "ປີ {year}"
-pages: "ໜ້າ"
-integration: "ເຊື່ອມໂຍງ"
-connectService: "ເຊື່ອມຕໍ່"
-disconnectService: "ຕັດການເຊື່ອມຕໍ່"
-enableLocalTimeline: "ເປີດໃຊ້ທາມລາຍທ້ອງຖິ່ນ"
-enableGlobalTimeline: "ເປີດໃຊ້ທາມລາຍທົ່ວໂລກ"
-disablingTimelinesInfo: "ຜູ້ດູແລລະບບແລະຜູ້ຄວບຄຸມຈະສາມາດເຂົ້າເຖີງໄທມ໌ໄລນ໌ທັ້ງເບີດ ເຖີງວ່າຈະບໍ່ໄດ້ເປີດໃຊ້ງານກໍ່ຕາມ"
-registration: "ລົງທະບຽນ"
-invite: "ເຊີນ"
-driveCapacityPerLocalAccount: "ຄວາມຈຸຂອງ drive ຕໍ່ຜູ້ໃຊ້ທ້ອງຖິ່ນ"
-driveCapacityPerRemoteAccount: "ຄວາມຈຸຂອງ drive ຕໍ່ຜູ້ໃຊ້ໄລຍະໄກ"
-basicInfo: "ຂໍ້ມຸນເບື້ອງຕົ້ນ"
-pinnedNotes: "Note ທີ່ປັກໝຸດໄວ້"
-hcaptchaSiteKey: "Site key"
-hcaptchaSecretKey: "Secret key"
-mcaptchaSiteKey: "Site key"
-mcaptchaSecretKey: "Secret Key"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "ເປີດໃຊ້ງານ reCAPTCHA"
-recaptchaSiteKey: "Site key"
-recaptchaSecretKey: "Secret key"
-turnstileSiteKey: "Site key"
-turnstileSecretKey: "Secret key"
-name: "ຊື່"
-userList: "ລາຍການ"
-about: "ກ່ຽວກັບ"
-aboutMisskey: "ກ່ຽວກັບ Misskey"
-administrator: "ຜູ້ດູແລ"
-token: "ໂທເຄັນ"
-share: "ແບ່ງປັນ"
-notFound: "ບໍ່ພົບ"
-help: "ຊ່ວຍເຫຼືອ"
-close: "ປິດ"
-invites: "ເຊີນ"
-members: "ສະມາຊິກ"
-transfer: "ໂອນຍ້າຍ"
-title: "ຫົວຂໍ້"
-text: "ຂໍ້ຄວາມ"
-enable: "ເປີດໃຊ້"
-next: "ຕໍ່ໄປ"
-retype: "ລອງພິມລະຫັດອີກເທື່ອໜຶ່ງ"
-quoteAttached: "ອ້າງອິງ"
-invitations: "ເຊີນ"
-unavailable: "ບໍ່​ສາ​ມາດ​ໃຊ້​ໄດ້"
-language: "ພາສາ"
-aboutX: "ກ່ຽວກັບ {x}"
-emojiStyle: "ຮູບແບບອີໂມຈິ"
-native: "ພາ​ສາ​ແມ່"
-noHistory: "​ບໍ່​ມີປະຫວັດ"
-doing: "ກຳລັງປະມວນຜົນ..."
-category: "ຫມວດຫມູ່"
-tags: "Aliases"
-createAccount: "ສ້າງບັນຊີ"
-existingAccount: "ບັນຊີທີ່ມີຢູ່ແລ້ວ"
-dashboard: "Dashboard"
-local: "ທ້ອງຖິ່ນ"
-numberOfDays: "ຈຳນວນມື້"
-objectStorageBucket: "Bucket"
-objectStoragePrefix: "Prefix"
-objectStorageEndpoint: "Endpoint"
-objectStorageRegion: "ພູມິພາກ"
-deleteAll: "ລຶບທັງໝົດ"
-sounds: "ສຽງ"
-sound: "ສຽງ"
-none: "ບໍ່ມີ"
-volume: "ລະດັບສຽງ"
-details: "ລາຍລະອຽດ"
-install: "ຕິດຕັ້ງ"
-uninstall: "ຖອນການຕິດຕັ້ງ"
-state: "ສະຖານະ"
-sort: "ຈັດຮຽງໂດຍ"
-ascendingOrder: "ນ້ອຍໄປຫາໃຫຍ່"
-descendingOrder: "ໃຫຍ່ຫານ້ອຍ"
-output: "Output"
-script: "Script"
-menu: "ເມນູ"
-rearrange: "ຈັດລຽງໃໝ່"
-poll: "Poll"
-description: "ລາຍລະອຽດ"
-author: "ຜູ້ຂຽນ"
-manage: "ການຈັດການ"
-plugins: "ປລັ໋ກອີນ"
-width: "ກວ້າງ"
-height: "ຄວາມສູງ"
-large: "ໃຫຍ່."
-medium: "ປານກາງ"
-small: "ເລັກ"
-permission: "ການອະນຸຍາດ"
-notificationType: "​ປະເພດການ​ແຈ້ງ​ເຕືອນ"
-edit: "ແກ້ໄຂ"
-email: "ອີເມວ"
-smtpHost: "ໂຮສຕ໌"
-smtpUser: "ຊື່ຜູ້ໃຊ້"
-smtpPass: "ລະຫັດຜ່ານ"
-clearCache: "ລຶບລ້າງແຄສ"
-info: "ກ່ຽວກັບ"
-user: "ຜູ້ໃຊ້ຕ່າງໆ"
-administration: "ການຈັດການ"
-middle: "ປານກາງ"
-searchByGoogle: "ຄົ້ນຫາ"
-file: "ໄຟລ໌"
-replies: "ຕອບ​ກັບ"
-renotes: "Renote"
-information: "ກ່ຽວກັບ"
-_imageEditing:
-  _vars:
-    filename: "ຊື່ໄຟລ໌"
-_chat:
-  invitations: "ເຊີນ"
-  noHistory: "​ບໍ່​ມີປະຫວັດ"
-  members: "ສະມາຊິກ"
-  home: "ໜ້າຫຼັກ"
-_delivery:
-  stop: "ໂຈະ"
-  _type:
-    none: "ກຳລັງ​ເຜີຍ​ແພ່"
-_role:
-  _priority:
-    middle: "ປານກາງ"
-_email:
-  _follow:
-    title: "ໄດ້ຕິດຕາມທ່ານ"
-_theme:
-  description: "ລາຍລະອຽດ"
-  keys:
-    mention: "ໄດ້ກ່າວມາ"
-    renote: "Renote"
-_sfx:
-  note: "ບັນທຶກ"
-  notification: "ການແຈ້ງເຕືອນ"
-_2fa:
-  renewTOTPCancel: "ບໍ່​ແມ່ນ​ຕອນ​ນີ້"
-_widgets:
-  profile: "ໂປຣໄຟລ໌"
-  instanceInfo: "ຂໍ້ມູລເຊີຟເວີຣ໌"
-  notifications: "ການແຈ້ງເຕືອນ"
-  timeline: "​ເສັ້ນກຳ​ນົດ​ເວ​ລາ​"
-  activity: "ກິດຈະກຳ"
-  federation: "ສະຫະພັນ"
-  jobQueue: "ຄິວວຽກ"
-  _userList:
-    chooseList: "ເລືອກບັນຊີລາຍການ"
-_widgetOptions:
-  height: "ຄວາມສູງ"
-_cw:
-  show: "ໂຫຼດເພີ່ມເຕີມ"
-_visibility:
-  home: "ໜ້າຫຼັກ"
-  followers: "ຜູ້ຕິດຕາມ"
-  specified: "ໂພສ Direct note"
-_postForm:
-  _howToUse:
-    menu_title: "ເມນູ"
-_profile:
-  name: "ຊື່"
-  username: "ຊື່ຜູ້ໃຊ້"
-_exportOrImport:
-  followingList: "ກຳລັງຕິດຕາມ"
-  muteList: "ປີດສຽງ"
-  blockingList: "ບລັອກ"
-  userLists: "ລາຍການ"
-_charts:
-  federation: "ສະຫະພັນ"
-_timelines:
-  home: "ໜ້າຫຼັກ"
-_play:
-  script: "Script"
-  summary: "ລາຍລະອຽດ"
-_pages:
-  blocks:
-    image: "ຮູບພາບ"
+_lang_: 'ພາສາລາວ'
+search: 'ຄົ້ນຫາ'
+ok: 'ຕົກ​ລົງ'
+cancel: 'ຍົກເລີກ'
+notificationSettings: 'ຕັ້ງຄ່າການແຈ້ງເຕືອນ'
+save: 'ບັນທຶກ'
+favorites: 'ລາຍການທີ່ມັກ'
+delete: 'ລຶບ'
+lists: 'ລາຍການ'
+notes: 'Note'
+following: 'ກຳລັງຕິດຕາມ'
+somethingHappened: '​ອຸຍ, ມີ​ບາງ​ຢ່າງ​ຜິ​ດ​ພາດ'
+customEmojis: 'ອີໂມຈິແບບກຳນົດເອງ'
+accept: 'ອະນຸຍາດ'
+reject: 'ປະຕິເສດ'
+close: 'ປິດ'
+edit: 'ແກ້ໄຂ'
 _notification:
-  youWereFollowed: "ໄດ້ຕິດຕາມເຈົ້າ"
-  _types:
-    follow: "ກຳລັງຕິດຕາມ"
-    mention: "ໄດ້ກ່າວເຖິງ"
-    renote: "Renote"
-    quote: "ອ້າງອີງ"
-    reaction: "Reaction"
-    login: "ເຂົ້າ​ສູ່​ລະ​ບົບ"
+  youWereFollowed: 'ໄດ້ຕິດຕາມເຈົ້າ'
   _actions:
-    reply: "ຕອບ​ກັບ"
-    renote: "Renote"
+    reply: 'ຕອບ​ກັບ'
+    renote: 'Renote'
+  _types:
+    all: 'すべて'
+    note: 'ユーザーの新規投稿'
+    follow: 'ກຳລັງຕິດຕາມ'
+    mention: 'ໄດ້ກ່າວເຖິງ'
+    reply: 'リプライ'
+    renote: 'Renote'
+    quote: 'ອ້າງອີງ'
+    reaction: 'Reaction'
+    pollEnded: 'アンケートが終了'
+    scheduledNotePosted: '予約投稿が成功した'
+    scheduledNotePostFailed: '予約投稿が失敗した'
+    receiveFollowRequest: 'フォロー申請を受け取った'
+    followRequestAccepted: 'フォローが受理された'
+    roleAssigned: 'ロールが付与された'
+    chatRoomInvitationReceived: 'ダイレクトメッセージのグループへ招待された'
+    achievementEarned: '実績の獲得'
+    exportCompleted: 'エクスポートが完了した'
+    login: 'ເຂົ້າ​ສູ່​ລະ​ບົບ'
+    createToken: 'アクセストークンの作成'
+    test: '通知のテスト'
+    app: '連携アプリからの通知'
+next: 'ຕໍ່ໄປ'
+upload: 'ອັບໂຫຼດ'
+preview: 'ສະແດງເປັນຕົວຢ່າງ'
+reset: 'ຣີເຊັດ'
+name: 'ຊື່'
+title: 'ຫົວຂໍ້'
+description: 'ລາຍລະອຽດ'
+none: 'ບໍ່ມີ'
+all: 'ທັງໝົດ'
+default: 'ຄ່າເລີ່ມຕົ້ນ'
+error: 'ຂໍ້ຜິດພາດ'
+users: 'ຜູ້ໃຊ້'
+permission: '権限'
+adminPermission: '管理者権限'
+enableAll: '全て有効にする'
+disableAll: '全て無効にする'
+generateAccessToken: 'アクセストークンの発行'
+enableAllAdmin: '管理者権限をすべて有効化'
+disableAllAdmin: '管理者権限をすべて無効化'
+add: '追加'
+remove: '削除'
+'yes': 'はい'
+'no': 'いいえ'
+gotIt: 'わかった'
+continue: '続ける'
+create: '作成'
+createNew: '新規作成'
+settings: '設定'
+share: '共有'
+more: 'もっと！'
+showMore: 'もっと見る'
+showLess: 'ປິດ'
+done: '完了'
+download: 'ダウンロード'
+update: '更新'
+retry: '再試行'
+goBack: '戻る'
+learnMore: '詳しく'
+info: '情報'
+filter: 'フィルタ'
+install: 'インストール'
+invite: '招待'
+rename: '名前を変更'
+copyUrl: 'URLをコピー'
+embed: '埋め込み'
+processing: '処理中'
+fromDrive: 'ドライブから'
+fromX: '{x}から'
+visibility: '公開範囲'
+public: 'パブリック'
+private: '非公開'
+sensitive: 'センシティブ'
+markAsSensitive: 'センシティブとして設定'
+unmarkAsSensitive: 'センシティブを解除する'
+deletedNote: '削除されたノート'
+poll: 'アンケート'
+drive: 'ドライブ'
+timeline: 'タイムライン'
+clip: 'クリップ'
+memo: 'メモ'
+overview: '概要'
+oneDay: '1日'
+oneHour: '1時間'
+oneMonth: '1ヶ月'
+oneWeek: '1週間'
+indefinitely: '無期限'
+period: '期限'
+createdAt: '作成日時'
+updatedAt: '更新日時'
+showRepliesToOthersInTimeline: 'TLに他の人への返信を含める'
+visibilityDisableFederation: '連合なし'
+removeAreYouSure: '「{x}」を削除しますか？'
+deleteAreYouSure: '「{x}」を削除しますか？'
+resetAreYouSure: 'リセットしますか？'
+driveFileDeleteConfirm: 'ファイル「{name}」を削除しますか？このファイルを使用した一部のコンテンツも削除されます。'
+follow: 'フォロー'
+followers: 'フォロワー'
+favorite: 'お気に入り'
+unfavorite: 'お気に入り解除'
+mute: 'ミュート'
+administrator: '管理者'
+moderator: 'モデレーター'
+announcements: 'お知らせ'
+channel: 'チャンネル'
+notifications: '通知'
+user: 'ユーザー'
+noteOf: '{user}のノート'
+userSaysSomething: '{name}が何かを言いました'
+charts: 'チャート'
+noName: '名前はありません'
+withNFiles: '{n}つのファイル'
+imageUrl: '画像URL'
+termsOfService: '利用規約'
+privacyPolicy: 'プライバシーポリシー'
+high: '高'
+medium: '中'
+low: '低'
+quote: '引用'
+localOnly: 'ローカルのみ'
+show: '表示'
+reply: '返信'
+renote: 'リノート'
+_timelines:
+  home: 'ホーム'
+  local: 'ローカル'
+  social: 'ソーシャル'
+  global: 'グローバル'
+_visibility:
+  public: 'パブリック'
+  publicDescription: '全てのユーザーに公開'
+  home: 'ホーム'
+  homeDescription: 'ホームタイムラインのみに公開'
+  followers: 'フォロワー'
+  followersDescription: '自分のフォロワーのみに公開'
+  specified: '指名'
+  specifiedDescription: '指定したユーザーのみに公開'
+  disableFederation: '連合なし'
+  disableFederationDescription: '他サーバーへの配信を行いません'
 _deck:
   _columns:
-    notifications: "ການແຈ້ງເຕືອນ"
-    tl: "​ເສັ້ນກຳ​ນົດ​ເວ​ລາ​"
-    list: "ລາຍການ"
-    channel: "ຊ່ອງ"
-    mentions: "ກ່າວເຖິງເຈົ້າ"
-    direct: "ໂພສ Direct note"
-_webhookSettings:
-  name: "ຊື່"
-_abuseReport:
-  _notificationRecipient:
-    _recipientType:
-      mail: "ອີເມວ"
-_moderationLogTypes:
-  suspend: "ລະງັບ"
-_remoteLookupErrors:
-  _noSuchObject:
-    title: "ບໍ່ພົບ"
-_search:
-  searchScopeAll: "ທັງໝົດ"
-_watermarkEditor:
-  image: "ຮູບພາບ"
+    main: 'メイン'
+    widgets: 'ウィジェット'
+    notifications: '通知'
+    tl: 'タイムライン'
+    antenna: 'アンテナ'
+    list: 'リスト'
+    channel: 'チャンネル'
+    mentions: 'メンション'
+    direct: '指名'
+    roleTimeline: 'ロールタイムライン'
+    chat: 'ダイレクトメッセージ'
+    clip: 'クリップ'
+_permissions:
+  "access:mcp": 'MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）'
+  "read:account": 'アカウントの情報を見る'
+  "write:account": 'アカウントの情報を変更する'
+  "read:blocks": 'ブロックを見る'
+  "write:blocks": 'ブロックを操作する'
+  "read:drive": 'ドライブを見る'
+  "write:drive": 'ドライブを操作する'
+  "read:favorites": 'お気に入りを見る'
+  "write:favorites": 'お気に入りを操作する'
+  "read:following": 'フォローの情報を見る'
+  "write:following": 'フォロー・フォロー解除する'
+  "read:messaging": 'ダイレクトメッセージを見る'
+  "write:messaging": 'ダイレクトメッセージを操作する'
+  "read:mutes": 'ミュートを見る'
+  "write:mutes": 'ミュートを操作する'
+  "write:notes": 'ノートを作成・削除する'
+  "read:notifications": '通知を見る'
+  "write:notifications": '通知を操作する'
+  "read:reactions": 'リアクションを見る'
+  "write:reactions": 'リアクションを操作する'
+  "write:votes": '投票する'
+  "read:pages": 'ページを見る'
+  "write:pages": 'ページを操作する'
+  "read:page-likes": 'ページのいいねを見る'
+  "write:page-likes": 'ページのいいねを操作する'
+  "read:user-groups": 'ユーザーグループを見る'
+  "write:user-groups": 'ユーザーグループを操作する'
+  "read:channels": 'チャンネルを見る'
+  "write:channels": 'チャンネルを操作する'
+  "read:gallery": 'ギャラリーを見る'
+  "write:gallery": 'ギャラリーを操作する'
+  "read:gallery-likes": 'ギャラリーのいいねを見る'
+  "write:gallery-likes": 'ギャラリーのいいねを操作する'
+  "read:flash": 'Playを見る'
+  "write:flash": 'Playを操作する'
+  "read:flash-likes": 'Playのいいねを見る'
+  "write:flash-likes": 'Playのいいねを操作する'
+  "read:admin:abuse-user-reports": 'ユーザーからの通報を見る'
+  "write:admin:delete-account": 'ユーザーアカウントを削除する'
+  "write:admin:delete-all-files-of-a-user": 'ユーザーのすべてのファイルを削除する'
+  "read:admin:index-stats": 'データベースインデックスに関する情報を見る'
+  "read:admin:table-stats": 'データベーステーブルに関する情報を見る'
+  "read:admin:user-ips": 'ユーザーのIPアドレスを見る'
+  "read:admin:meta": 'インスタンスのメタデータを見る'
+  "write:admin:reset-password": 'ユーザーのパスワードをリセットする'
+  "write:admin:resolve-abuse-user-report": 'ユーザーからの通報を解決する'
+  "write:admin:send-email": 'メールを送る'
+  "read:admin:server-info": 'サーバーの情報を見る'
+  "read:admin:show-moderation-log": 'モデレーションログを見る'
+  "read:admin:show-user": 'ユーザーのプライベートな情報を見る'
+  "write:admin:suspend-user": 'ユーザーを凍結する'
+  "write:admin:unset-mfa": 'ユーザーの二要素認証を解除する'
+  "write:admin:unset-user-avatar": 'ユーザーのアバターを削除する'
+  "write:admin:unset-user-banner": 'ユーザーのバーナーを削除する'
+  "write:admin:unsuspend-user": 'ユーザーの凍結を解除する'
+  "write:admin:meta": 'インスタンスのメタデータを操作する'
+  "write:admin:user-note": 'モデレーションノートを操作する'
+  "write:admin:roles": 'ロールを操作する'
+  "read:admin:roles": 'ロールを見る'
+  "write:admin:relays": 'リレーを操作する'
+  "read:admin:relays": 'リレーを見る'
+  "write:admin:invite-codes": '招待コードを操作する'
+  "read:admin:invite-codes": '招待コードを見る'
+  "write:admin:announcements": 'お知らせを操作する'
+  "read:admin:announcements": 'お知らせを見る'
+  "write:admin:avatar-decorations": 'アバターデコレーションを操作する'
+  "read:admin:avatar-decorations": 'アバターデコレーションを見る'
+  "write:admin:federation": '連合に関する情報を操作する'
+  "write:admin:account": 'ユーザーアカウントを操作する'
+  "read:admin:account": 'ユーザーに関する情報を見る'
+  "write:admin:emoji": '絵文字を操作する'
+  "read:admin:emoji": '絵文字を見る'
+  "write:admin:queue": 'ジョブキューを操作する'
+  "read:admin:queue": 'ジョブキューに関する情報を見る'
+  "write:admin:promo": 'プロモーションノートを操作する'
+  "write:admin:drive": 'ユーザーのドライブを操作する'
+  "read:admin:drive": 'ユーザーのドライブの関する情報を見る'
+  "read:admin:stream": '管理者用のWebsocket APIを使う'
+  "write:admin:ad": '広告を操作する'
+  "read:admin:ad": '広告を見る'
+  "write:invite-codes": '招待コードを作成する'
+  "read:invite-codes": '招待コードを取得する'
+  "write:clip-favorite": 'クリップのいいねを操作する'
+  "read:clip-favorite": 'クリップのいいねを見る'
+  "read:federation": '連合に関する情報を取得する'
+  "write:report-abuse": '違反を報告する'
+  "write:chat": 'ダイレクトメッセージを操作する'
+  "read:chat": 'ダイレクトメッセージを閲覧する'
+_cw:
+  hide: '隠す'
+  show: 'もっと見る'
+hide: '隠す'

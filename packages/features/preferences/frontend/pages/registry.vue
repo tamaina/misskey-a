@@ -24,6 +24,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import JSON5 from 'json5';
+import * as v from 'valibot';
+import { packedJsonValueSchema } from '../../../users/backend/json-value.schema.js';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
@@ -61,7 +63,7 @@ async function createKey() {
 	os.apiWithDialog('i/registry/set', {
 		scope: result.scope.split('/'),
 		key: result.key,
-		value: JSON5.parse(result.value),
+		value: v.parse(packedJsonValueSchema, JSON5.parse(result.value)),
 	}).then(() => {
 		fetchScopes();
 	});

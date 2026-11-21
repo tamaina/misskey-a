@@ -3,10 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { readonly, ref } from 'vue';
 import * as os from '@features/ui/frontend/os.js';
 import { store } from '@features/preferences/frontend/store.js';
-import FeatureLocaleMessages from '@features/runtime/frontend/ts-messages.vue';
+import type { Locale } from 'i18n';
+
+function getGlobalLocale() {
+	return useLocale<Locale>(import.meta.url).value.env;
+}
 
 export const storagePersistenceSupported = window.isSecureContext && 'storage' in navigator;
 const storagePersisted = ref(false);
@@ -28,13 +33,13 @@ export async function enableStoragePersistence() {
 		} else {
 			os.alert({
 				type: 'error',
-				text: FeatureLocaleMessages.$locale.somethingHappened,
+				text: getGlobalLocale().somethingHappened,
 			});
 		}
 	}	catch (err) {
 		os.alert({
 			type: 'error',
-			text: FeatureLocaleMessages.$locale.somethingHappened,
+			text: getGlobalLocale().somethingHappened,
 		});
 	}
 }

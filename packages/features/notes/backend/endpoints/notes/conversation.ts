@@ -2,84 +2,64 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedNotesConversationDefinition, packedNotesConversationInput, packedNotesConversationOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import type { MiNote } from '../../models/Note.js';
-import type { MiMeta, NotesRepository } from '@features/persistence/backend/repositories/models.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPackedNote } from '@features/notes/backend/note.schema.js';
+import { GetterService } from '@features/api/backend/transport/GetterService.js';
 
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { GetterService } from '@features/api/backend/transport/GetterService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from "@features/api/backend/transport/orpc-error.js";
+import { readErrorId } from '../../request.schema.js';
+import { notesConversationContract, notesConversationErrors } from './conversation.contract.js';
+import type { MiNote } from '../../models/Note.js';
+import type { MiMeta, NotesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from "@features/users/backend/models/User.js";
 
-const contractProjection = projectEndpointContract(packedNotesConversationDefinition);
+export interface NotesConversationDependencies {
+	notesRepository: NotesRepository;
+	serverSettings: MiMeta;
+	noteEntityService: Pick<NoteEntityService, 'packMany'>;
+	getterService: Pick<GetterService, 'getNote'>;
+}
+export function createNotesConversationProcedure(deps: NotesConversationDependencies) {
+	return createApiProcedure<MiLocalUser>()(notesConversationContract).handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
 
-export const meta = {
-	tags: ['notes'],
+					if (me == null && deps.serverSettings.ugcVisibilityForVisitor === 'none') return [];
 
-	requireCredential: false,
+					const note = await deps.getterService.getNote(ps.noteId).catch((err: unknown) => {
+						if (readErrorId(err) === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw apiError(notesConversationErrors.noSuchNote);
+						throw err;
+					});
 
-	res: contractProjection.response,
+					const conversation: MiNote[] = [];
+					let i = 0;
 
-	errors: {
-		noSuchNote: {
-			message: 'No such note.',
-			code: 'NO_SUCH_NOTE',
-			id: 'e1035875-9551-45ec-afa8-1ded1fcb53c8',
-		},
-	},
-} as const;
+					const get = async (id: string): Promise<void> => {
+						i++;
+						const p = await deps.notesRepository.findOneBy({ id });
+						if (p == null) return;
 
-export const paramDef = contractProjection.input;
+						if (i > ps.offset) {
+							conversation.push(p);
+						}
 
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedNotesConversationInput, typeof packedNotesConversationOutput> {
-	constructor(
-		@Inject(DI.notesRepository)
-		private notesRepository: NotesRepository,
+						if (conversation.length === ps.limit) {
+							return;
+						}
 
-		@Inject(DI.meta)
-		private serverSettings: MiMeta,
+						if (p.replyId) {
+							await get(p.replyId);
+						}
+					};
 
-		private noteEntityService: NoteEntityService,
-		private getterService: GetterService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			if (me == null && this.serverSettings.ugcVisibilityForVisitor === 'none') return [];
+					if (note.replyId) {
+						await get(note.replyId);
+					}
 
-			const note = await this.getterService.getNote(ps.noteId).catch(err => {
-				if (err.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw new ApiError(meta.errors.noSuchNote);
-				throw err;
-			});
-
-			const conversation: MiNote[] = [];
-			let i = 0;
-
-			const get = async (id: any) => {
-				i++;
-				const p = await this.notesRepository.findOneBy({ id });
-				if (p == null) return;
-
-				if (i > ps.offset!) {
-					conversation.push(p);
-				}
-
-				if (conversation.length === ps.limit) {
-					return;
-				}
-
-				if (p.replyId) {
-					await get(p.replyId);
-				}
-			};
-
-			if (note.replyId) {
-				await get(note.replyId);
-			}
-
-			return await this.noteEntityService.packMany(conversation, me);
+					return await deps.noteEntityService.packMany(conversation, me);
+			})();
+			return result.map(toPackedNote);
 		});
-	}
 }

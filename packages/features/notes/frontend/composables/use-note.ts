@@ -34,7 +34,7 @@ import { globalEvents, useGlobalEvent } from '@features/runtime/frontend/events.
 import MkUsersTooltip from '@features/users/frontend/components/MkUsersTooltip.vue';
 import MkReactionsViewerDetails from '@features/notes/frontend/components/MkReactionsViewer.details.vue';
 import MkRippleEffect from '@features/ui/frontend/components/MkRippleEffect.vue';
-import { notePage } from '@features/notes/frontend/filters/note.js';
+import { notePage } from '@features/notes/frontend/shared/note.js';
 import type { DI as DIType } from '@features/ui/frontend/di.js';
 import type { ExtractInjectedType } from '@features/ui/frontend/types/misc.js';
 import type { MenuItem } from '@features/navigation/frontend/types/menu.js';

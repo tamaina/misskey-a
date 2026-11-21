@@ -5,7 +5,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <div v-if="note == null" :class="$style.deleted">
-	{{ $locale.sfc.deletedNote }}
+	{{ globalLocale.env.deletedNote }}
 </div>
 <div v-else-if="!muted" :class="[$style.root, { [$style.children]: depth > 1 }]">
 	<div :class="$style.main">
@@ -32,7 +32,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 </div>
 <div v-else :class="$style.muted" @click="muted = false">
-	<I18n :src="$locale.sfc.userSaysSomething" tag="small">
+	<I18n :src="globalLocale.env.userSaysSomething" tag="small">
 		<template #name>
 			<MkA v-user-preview="note.userId" :to="userPage(note.user)">
 				<MkUserName :user="note.user"/>
@@ -43,16 +43,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkNoteHeader from '@features/notes/frontend/components/MkNoteHeader.vue';
 import MkSubNoteContent from '@features/notes/frontend/components/MkSubNoteContent.vue';
 import MkCwButton from '@features/notes/frontend/components/MkCwButton.vue';
-import { notePage } from '@features/notes/frontend/filters/note.js';
+import { notePage } from '@features/notes/frontend/shared/note.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { $i } from '@features/auth/frontend/i.js';
-import { userPage } from '@features/users/frontend/filters/user.js';
+import { userPage } from '@features/users/frontend/shared/user.js';
 import { checkWordMute } from '@features/relationships/frontend/utility/check-word-mute.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	note: Misskey.entities.Note | null;
@@ -176,224 +180,168 @@ if (props.detail && props.note) {
 
 <locale lang="json" locale="ar-SA">
 {
-	"deletedNote": "ملاحظة محذوفة",
-	"continueThread": "اعرض بقية النقاش",
-	"userSaysSomething": "كتب {name} شيءً"
+	"continueThread": "اعرض بقية النقاش"
 }
 </locale>
 
 <locale lang="json" locale="ca-ES">
 {
-	"deletedNote": "Publicacions eliminades",
-	"continueThread": "Veure la continuació del fil",
-	"userSaysSomething": "{name} n'ha dit alguna cosa"
+	"continueThread": "Veure la continuació del fil"
 }
 </locale>
 
 <locale lang="json" locale="cs-CZ">
 {
-	"deletedNote": "Odstraněné příspěvky",
-	"continueThread": "Zobrazit pokračování vlákna",
-	"userSaysSomething": "{name} řekl/a něco"
+	"continueThread": "Zobrazit pokračování vlákna"
 }
 </locale>
 
 <locale lang="json" locale="da-DK">
 {
-	"deletedNote": "Deleted note",
-	"continueThread": "View thread continuation",
-	"userSaysSomething": "{name} said something"
+	"continueThread": "View thread continuation"
 }
 </locale>
 
 <locale lang="json" locale="de-DE">
 {
-	"deletedNote": "Gelöschte Notiz",
-	"continueThread": "Weiteren Threadverlauf anzeigen",
-	"userSaysSomething": "{name} hat etwas gesagt"
+	"continueThread": "Weiteren Threadverlauf anzeigen"
 }
 </locale>
 
 <locale lang="json" locale="en-US">
 {
-	"deletedNote": "Deleted note",
-	"continueThread": "View thread continuation",
-	"userSaysSomething": "{name} said something"
+	"continueThread": "View thread continuation"
 }
 </locale>
 
 <locale lang="json" locale="es-ES">
 {
-	"deletedNote": "Nota eliminada",
-	"continueThread": "Ver la continuación del hilo",
-	"userSaysSomething": "{name} dijo algo"
+	"continueThread": "Ver la continuación del hilo"
 }
 </locale>
 
 <locale lang="json" locale="fr-FR">
 {
-	"deletedNote": "Note supprimée",
-	"continueThread": "Afficher la suite du fil",
-	"userSaysSomething": "{name} a dit quelque chose"
+	"continueThread": "Afficher la suite du fil"
 }
 </locale>
 
 <locale lang="json" locale="id-ID">
 {
-	"deletedNote": "Catatan yang dihapus",
-	"continueThread": "Lihat lanjutan thread",
-	"userSaysSomething": "{name} mengatakan sesuatu"
+	"continueThread": "Lihat lanjutan thread"
 }
 </locale>
 
 <locale lang="json" locale="it-IT">
 {
-	"deletedNote": "Nota eliminata",
-	"continueThread": "Altre conversazioni",
-	"userSaysSomething": "{name} ha scritto qualcosa"
+	"continueThread": "Altre conversazioni"
 }
 </locale>
 
 <locale lang="json" locale="ja-JP">
 {
-	"deletedNote": "削除されたノート",
-	"continueThread": "さらにスレッドを見る",
-	"userSaysSomething": "{name}が何かを言いました"
+	"continueThread": "さらにスレッドを見る"
 }
 </locale>
 
 <locale lang="json" locale="ja-KS">
 {
-	"deletedNote": "消された投稿",
-	"continueThread": "さらにスレッドを見るで",
-	"userSaysSomething": "{name}が何か言うとるわ"
+	"continueThread": "さらにスレッドを見るで"
 }
 </locale>
 
 <locale lang="json" locale="kab-KAB">
 {
-	"deletedNote": "Deleted note",
-	"continueThread": "View thread continuation",
-	"userSaysSomething": "{name} said something"
+	"continueThread": "View thread continuation"
 }
 </locale>
 
 <locale lang="json" locale="kn-IN">
 {
-	"deletedNote": "Deleted note",
-	"continueThread": "View thread continuation",
-	"userSaysSomething": "{name} said something"
+	"continueThread": "View thread continuation"
 }
 </locale>
 
 <locale lang="json" locale="ko-KR">
 {
-	"deletedNote": "삭제된 노트",
-	"continueThread": "글타래 더 보기",
-	"userSaysSomething": "{name}님이 무언가를 말했습니다"
+	"continueThread": "글타래 더 보기"
 }
 </locale>
 
 <locale lang="json" locale="nl-NL">
 {
-	"deletedNote": "Verwijderde notitie",
-	"continueThread": "Bekijk draad voortzetting",
-	"userSaysSomething": "{name} zei iets"
+	"continueThread": "Bekijk draad voortzetting"
 }
 </locale>
 
 <locale lang="json" locale="no-NO">
 {
-	"deletedNote": "Deleted note",
-	"continueThread": "Vis fortsettelse av tråden",
-	"userSaysSomething": "{name} sa noe"
+	"continueThread": "Vis fortsettelse av tråden"
 }
 </locale>
 
 <locale lang="json" locale="pl-PL">
 {
-	"deletedNote": "Usunięty wpis",
-	"continueThread": "Pokaż kontynuację wątku",
-	"userSaysSomething": "{name} powiedział(-a) coś"
+	"continueThread": "Pokaż kontynuację wątku"
 }
 </locale>
 
 <locale lang="json" locale="pt-PT">
 {
-	"deletedNote": "Postagem excluída",
-	"continueThread": "Ver mais desta conversa",
-	"userSaysSomething": "{name} disse algo"
+	"continueThread": "Ver mais desta conversa"
 }
 </locale>
 
 <locale lang="json" locale="ru-RU">
 {
-	"deletedNote": "Удалённая заметка",
-	"continueThread": "Показать следующие ответы",
-	"userSaysSomething": "{name} что-то сообщает"
+	"continueThread": "Показать следующие ответы"
 }
 </locale>
 
 <locale lang="json" locale="sk-SK">
 {
-	"deletedNote": "Odstránené príspevky",
-	"continueThread": "Zobraziť pokračovanie vlákna",
-	"userSaysSomething": "{name} niečo povedal/a"
+	"continueThread": "Zobraziť pokračovanie vlákna"
 }
 </locale>
 
 <locale lang="json" locale="th-TH">
 {
-	"deletedNote": "โน้ตที่ถูกลบ",
-	"continueThread": "ดูความต่อเนื่องเธรด",
-	"userSaysSomething": "{name} พูดอะไรบางอย่าง"
+	"continueThread": "ดูความต่อเนื่องเธรด"
 }
 </locale>
 
 <locale lang="json" locale="tr-TR">
 {
-	"deletedNote": "Silinen not",
-	"continueThread": "Konunun devamını görüntüle",
-	"userSaysSomething": "{name} bir şey söyledi."
+	"continueThread": "Konunun devamını görüntüle"
 }
 </locale>
 
 <locale lang="json" locale="ug-CN">
 {
-	"deletedNote": "Deleted note",
-	"continueThread": "View thread continuation",
-	"userSaysSomething": "{name} said something"
+	"continueThread": "View thread continuation"
 }
 </locale>
 
 <locale lang="json" locale="uk-UA">
 {
-	"deletedNote": "Видалена нотатка",
-	"continueThread": "Показати продовження треду",
-	"userSaysSomething": "{name} щось сказав(ла)"
+	"continueThread": "Показати продовження треду"
 }
 </locale>
 
 <locale lang="json" locale="vi-VN">
 {
-	"deletedNote": "Tút đã bị xóa",
-	"continueThread": "Tiếp tục xem chuỗi tút",
-	"userSaysSomething": "{name} nói gì đó"
+	"continueThread": "Tiếp tục xem chuỗi tút"
 }
 </locale>
 
 <locale lang="json" locale="zh-CN">
 {
-	"deletedNote": "已删除的帖子",
-	"continueThread": "查看更多帖子",
-	"userSaysSomething": "{name} 说了些什么，但被屏蔽词过滤了"
+	"continueThread": "查看更多帖子"
 }
 </locale>
 
 <locale lang="json" locale="zh-TW">
 {
-	"deletedNote": "已刪除的貼文",
-	"continueThread": "查看更多貼文",
-	"userSaysSomething": "{name}說了什麼"
+	"continueThread": "查看更多貼文"
 }
 </locale>

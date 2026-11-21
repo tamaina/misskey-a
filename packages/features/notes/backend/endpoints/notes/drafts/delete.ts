@@ -3,21 +3,23 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { legacyNotesCommandSchemas } from '../../../commands.js';
-import { notesCommandErrors, notesCommandsContract } from '../../../../contract/index.js';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { notesDraftsDeleteContract, notesDraftsDeleteErrors } from './delete.contract.js';
 
-export const meta = {
-	tags: ['notes', 'drafts'],
-	requireCredential: true,
-	prohibitMoved: true,
-	kind: 'write:account',
-	errors: notesCommandErrors['notes/drafts/delete'],
-} as const;
-
-export const paramDef = legacyNotesCommandSchemas['notes/drafts/delete'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('notesCommands', commands =>
-	createContractTransportEndpoint(meta, paramDef, notesCommandsContract['notes/drafts/delete'], async (params, user) => commands['notes/drafts/delete'](params, { context: { actor: user } })));
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { NotesCommandDependencies } from '../../../command.dependencies.js';
+import { getCommandNote } from '../../../get-command-note.js';
+import { readErrorId } from '../../../request.schema.js';
+export function createNotesDraftsDeleteProcedure(deps: NotesCommandDependencies) {
+	return createApiProcedure<MiLocalUser>()(notesDraftsDeleteContract).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const draft = await deps.getDraft(actor, input.draftId);
+			if (draft == null) throw deps.createError(notesDraftsDeleteErrors.noSuchNoteDraft);
+			if (draft.userId !== actor.id) {
+				throw deps.createError(notesDraftsDeleteErrors.accessDenied);
+			}
+			await deps.deleteDraft(actor, draft.id);
+		});
+}

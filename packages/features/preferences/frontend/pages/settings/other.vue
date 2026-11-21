@@ -77,7 +77,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<div class="_gaps_m">
 						<FormInfo warn>{{ $locale.sfc.mayTakeTime }}</FormInfo>
 						<FormInfo>{{ $locale.sfc.sendEmail }}</FormInfo>
-						<MkButton v-if="!$i.isDeleted" danger @click="deleteAccount"><SearchText>{{ $locale.sfc.requestAccountDelete }}</SearchText></MkButton>
+						<MkButton v-if="!$i.isDeleted" danger :disabled="deletingAccount" @click="deleteAccount"><SearchText>{{ $locale.sfc.requestAccountDelete }}</SearchText></MkButton>
 						<MkButton v-else disabled>{{ $locale.sfc.inProgress }}</MkButton>
 					</div>
 				</MkFolder>
@@ -105,6 +105,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<template #label>Enable in-browser translator API</template>
 						</MkSwitch>
 					</div>
+				</MkFolder>
+			</SearchMarker>
+
+			<SearchMarker :keywords="['client', 'error', 'log']">
+				<MkFolder>
+					<template #icon><SearchIcon><i class="ti ti-bug"></i></SearchIcon></template>
+					<template #label><SearchLabel>{{ $locale.sfc.clientErrorLogTitle }}</SearchLabel></template>
+					<MkClientErrorLog/>
 				</MkFolder>
 			</SearchMarker>
 
@@ -147,7 +155,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, watch } from 'vue';
+import { ensureSudo } from '@features/auth/frontend/utility/ensure-sudo.js';
+import MkClientErrorLog from './error-log.vue';
+import { computed, watch, ref, onActivated, onDeactivated, onUnmounted } from 'vue';
 import XMigration from '@features/users/frontend/pages/settings/migration.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import FormLink from '@features/ui/frontend/components/form/link.vue';
@@ -158,6 +168,7 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import FormSlot from '@features/ui/frontend/components/form/slot.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { enableStoragePersistence, getStoragePersistenceStatusRef, storagePersistenceSupported } from '@features/runtime/frontend/utility/storage.js';
+import { isSameLiveCredential } from '@features/auth/frontend/utility/live-account.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
@@ -184,28 +195,30 @@ watch(skipNoteRender, () => {
 	suggestReload();
 });
 
+const deletingAccount = ref(false);
+let deletionActive = true;
+let deletionGeneration = 0;
+let deletionAbort: AbortController | null = null;
+const leaveDeletion = () => { deletionActive = false; deletionGeneration++; deletionAbort?.abort(); };
+onDeactivated(leaveDeletion); onUnmounted(leaveDeletion);
+onActivated(() => { deletionActive = true; });
+
 async function deleteAccount() {
-	{
-		const { canceled } = await os.confirm({
-			type: 'warning',
-			text: $locale.value.sfc.deleteAccountConfirm,
-		});
-		if (canceled) return;
-	}
-
-	const auth = await os.authenticateDialog();
-	if (auth.canceled) return;
-
-	await os.apiWithDialog('i/delete-account', {
-		password: auth.result.password,
-		token: auth.result.token,
-	});
-
-	await os.alert({
-		title: $locale.value.sfc.started,
-	});
-
-	await signout();
+	if (deletingAccount.value || !deletionActive) return;
+	deletingAccount.value = true;
+	const ownerId = $i.id; const ownerToken = $i.token;
+	const generation = ++deletionGeneration;
+	const controller = new AbortController(); deletionAbort = controller;
+	const isCurrent = () => deletionActive && generation === deletionGeneration && isSameLiveCredential(ownerId, ownerToken, $i.id, $i.token);
+	try {
+		const confirmation = await os.confirm({ type: 'warning', text: $locale.value.sfc.deleteAccountConfirm });
+		if (!isCurrent() || confirmation.canceled) return;
+		if (!await ensureSudo(isCurrent, controller.signal) || !isCurrent()) return;
+		await os.apiWithDialog('i/security/account/delete', { acknowledged: true });
+		if (!isCurrent()) return;
+		await os.alert({ title: $locale.value.sfc.started });
+		if (isCurrent()) await signout('account-deletion-accepted');
+	} finally { controller.abort(); deletingAccount.value = false; if (deletionAbort === controller) deletionAbort = null; }
 }
 
 function resetAllTips() {
@@ -260,7 +273,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -287,7 +301,8 @@ definePage(() => ({
 	"hideAllTips": "Amagar tots els trucs i consells",
 	"readAllChatMessages": "Marcar tots els missatges com a llegits",
 	"settingsPersistence_title": "Persistència de la configuració ",
-	"forceBackup": "Còpia de seguretat forçada de la configuració "
+	"forceBackup": "Còpia de seguretat forçada de la configuració ",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -314,7 +329,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Označit všechny zprávy za přečtené",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -341,7 +357,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -368,7 +385,8 @@ definePage(() => ({
 	"hideAllTips": "Alle „Tipps und Tricks“ ausblenden",
 	"readAllChatMessages": "Alle Nachrichten als gelesen markieren",
 	"settingsPersistence_title": "Persistenz der Einstellungen",
-	"forceBackup": "Erzwungenes Backup der Einstellungen"
+	"forceBackup": "Erzwungenes Backup der Einstellungen",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -395,7 +413,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -422,7 +441,8 @@ definePage(() => ({
 	"hideAllTips": "Ocultar todos los \"Trucos y consejos\"",
 	"readAllChatMessages": "Marcar todos los mensajes como leídos",
 	"settingsPersistence_title": "Persistencia de la configuración",
-	"forceBackup": "Forzar una copia de seguridad de la configuración"
+	"forceBackup": "Forzar una copia de seguridad de la configuración",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -449,7 +469,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -476,7 +497,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Tandai semua pesan menjadi terbaca",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -503,7 +525,8 @@ definePage(() => ({
 	"hideAllTips": "Nascondi tutti i suggerimenti",
 	"readAllChatMessages": "Segna tutti i messaggi come già letti",
 	"settingsPersistence_title": "Configurazione persistente",
-	"forceBackup": "Backup forzato delle impostazioni"
+	"forceBackup": "Backup forzato delle impostazioni",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -530,7 +553,8 @@ definePage(() => ({
 	"hideAllTips": "全ての「ヒントとコツ」を非表示",
 	"readAllChatMessages": "すべてのメッセージを既読にする",
 	"settingsPersistence_title": "設定の永続化",
-	"forceBackup": "設定の強制バックアップ"
+	"forceBackup": "設定の強制バックアップ",
+	"clientErrorLogTitle": "クライアントエラーログ"
 }
 </locale>
 
@@ -557,7 +581,8 @@ definePage(() => ({
 	"hideAllTips": "「ヒントとコツ」は全部表示せんでええ",
 	"readAllChatMessages": "メッセージを全部読んだことにしとく",
 	"settingsPersistence_title": "設定の永続化",
-	"forceBackup": "設定の強制バックアップ"
+	"forceBackup": "設定の強制バックアップ",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -584,7 +609,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -611,7 +637,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -638,7 +665,8 @@ definePage(() => ({
 	"hideAllTips": "모든 '팁과 유용한 정보'를 비표시",
 	"readAllChatMessages": "모든 메시지를 읽은 상태로 표시",
 	"settingsPersistence_title": "설정 영구화",
-	"forceBackup": "설정 강제 백업"
+	"forceBackup": "설정 강제 백업",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -665,7 +693,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -692,7 +721,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -719,7 +749,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -746,7 +777,8 @@ definePage(() => ({
 	"hideAllTips": "Ocultas todas as \"Dicas e Truques\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -773,7 +805,8 @@ definePage(() => ({
 	"hideAllTips": "Скрыть все \"Советы и рекомендации\"",
 	"readAllChatMessages": "Отметить прочитанным",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -800,7 +833,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -827,7 +861,8 @@ definePage(() => ({
 	"hideAllTips": "ซ่อนคำแนะนำและเคล็ดลับทั้งหมด",
 	"readAllChatMessages": "ทำเครื่องหมายใส่ข้อความทั้งหมดว่าอ่านแล้ว",
 	"settingsPersistence_title": "คงสภาพการตั้งค่า",
-	"forceBackup": "บังคับสำรองการตั้งค่า"
+	"forceBackup": "บังคับสำรองการตั้งค่า",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -854,7 +889,8 @@ definePage(() => ({
 	"hideAllTips": "Tüm “İpucu & Püf Nokta” gizle",
 	"readAllChatMessages": "Tüm mesajları okundu olarak işaretle",
 	"settingsPersistence_title": "Ayarların kalıcılığı",
-	"forceBackup": "Ayarların zorunlu yedeklenmesi"
+	"forceBackup": "Ayarların zorunlu yedeklenmesi",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -881,7 +917,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -908,7 +945,8 @@ definePage(() => ({
 	"hideAllTips": "Приховати всі «Поради й підказки»",
 	"readAllChatMessages": "Позначити всі повідомлення як прочитані",
 	"settingsPersistence_title": "Збереження налаштувань",
-	"forceBackup": "Примусово створити резервну копію налаштувань"
+	"forceBackup": "Примусово створити резервну копію налаштувань",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -935,7 +973,8 @@ definePage(() => ({
 	"hideAllTips": "Hide all \"Tips & Tricks\"",
 	"readAllChatMessages": "Mark all messages as read",
 	"settingsPersistence_title": "Persistence of Settings",
-	"forceBackup": "Force a backup of settings"
+	"forceBackup": "Force a backup of settings",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -962,7 +1001,8 @@ definePage(() => ({
 	"hideAllTips": "隐藏所有的 “提示与技巧”",
 	"readAllChatMessages": "将所有消息标记为已读",
 	"settingsPersistence_title": "设置持久化",
-	"forceBackup": "强制备份设置"
+	"forceBackup": "强制备份设置",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>
 
@@ -989,6 +1029,7 @@ definePage(() => ({
 	"hideAllTips": "隱藏所有「提示與技巧」",
 	"readAllChatMessages": "將所有訊息標記為已讀",
 	"settingsPersistence_title": "設定的持久化",
-	"forceBackup": "強制備份設定"
+	"forceBackup": "強制備份設定",
+	"clientErrorLogTitle": "Client error logs"
 }
 </locale>

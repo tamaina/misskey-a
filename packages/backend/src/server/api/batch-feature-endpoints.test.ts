@@ -3,59 +3,75 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { describe, expect, test, vi } from 'vitest';
-import { createOperations } from '@features/operations/backend';
-import { createPortability } from '@features/portability/backend';
+import { expect, test } from 'vitest';
+import { mockDeep } from 'vitest-mock-extended';
+import { call } from '@orpc/server';
+import { OpenAPIHandler } from '@orpc/openapi/fetch';
+import type { ApiServices, ApiContext } from '@features/api/backend/transport/context.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
-import * as pause from '@features/operations/backend/endpoints/admin/queue/pause.js';
-import * as clear from '@features/operations/backend/endpoints/admin/queue/clear.js';
-import * as following from '@features/portability/backend/endpoints/i/export-following.js';
-import * as notes from '@features/portability/backend/endpoints/i/export-notes.js';
+import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { ModerationLogService } from '@features/moderation/backend/services/ModerationLogService.js';
+import { createAdminQueuePauseProcedure } from '@features/operations/backend/endpoints/admin/queue/pause.js';
+import { createAdminQueueClearProcedure } from '@features/operations/backend/endpoints/admin/queue/clear.js';
+import { createIExportFollowingProcedure } from '@features/portability/backend/endpoints/i/export-following.js';
+import { createIExportNotesProcedure } from '@features/portability/backend/endpoints/i/export-notes.js';
+import type { PortabilityDependencies } from '@features/portability/backend/api.implementation.js';
+const actor = mockDeep<MiLocalUser>({ id: 'trusted-user', isSuspended: false, movedToUri: null });
 
-const actor = { id: 'trusted-user' } as MiLocalUser;
+function services(principal: MiLocalUser | null = actor) {
+	const result = mockDeep<ApiServices<MiLocalUser>>();
+	result.authenticate.mockResolvedValue([principal, null]);
+	result.limitActor.mockReturnValue('trusted-user');
+	result.rateLimitFactor.mockResolvedValue(1);
+	result.limit.mockResolvedValue(null);
+	return result;
+}
 
-describe('batch feature endpoint adapters', () => {
-	test('queue command transport preserves validation, policy and trusted actor', async () => {
-		const queuePause = vi.fn(async () => {});
-		const queueClear = vi.fn(async () => {});
-		const log = vi.fn();
-		const feature = createOperations({
-			queuePause, queueClear, log,
-			queueResume: async () => {}, queuePromoteJobs: async () => {},
-			queueRetryJob: async () => {}, queueRemoveJob: async () => {},
-		});
-		const endpoint = pause.createEndpoint(feature);
-		await endpoint.exec({ queue: 'db', actor: { id: 'forged' } }, actor, null);
-		expect(queuePause).toHaveBeenCalledWith('db');
-		expect(log).toHaveBeenCalledWith({ id: actor.id }, 'pauseQueue');
-		await expect(endpoint.exec({ queue: 'unknown' }, actor, null)).rejects.toMatchObject({ code: 'INVALID_PARAM' });
-		await expect(clear.createEndpoint(feature).exec({ queue: 'db', state: 'unknown' }, actor, null)).rejects.toMatchObject({ code: 'INVALID_PARAM' });
-		await expect(endpoint.exec({ queue: 'db', actor: { id: 'forged' } }, null as unknown as MiLocalUser, null)).rejects.toThrow();
-		expect(queuePause).toHaveBeenCalledTimes(1);
-		expect(queueClear).not.toHaveBeenCalled();
-		expect(pause.meta).toEqual({ tags: ['admin'], requireCredential: true, requireModerator: true, kind: 'write:admin:queue' });
-	});
+test('native queue transport validates, checks moderator/token policy and retains trusted actor', async () => {
+	const queue = mockDeep<QueueService>();
+	const log = mockDeep<ModerationLogService>();
+	const context: ApiContext<MiLocalUser> = { services: services(), authorization: { rootUserId: () => actor.id, roles: async () => [], policyAllowed: async () => false }, credential: null, ip: '127.0.0.1', headers: {} };
+	const procedure = createAdminQueuePauseProcedure<MiLocalUser>({ queueService: queue, moderationLogService: log });
+	const forged = { queue: 'db' as const, actor: { id: 'forged' } };
+	await call(procedure, forged, { context });
+	expect(queue.queuePause).toHaveBeenCalledWith('db');
+	expect(log.log).toHaveBeenCalledWith(actor, 'pauseQueue');
+	const handler = new OpenAPIHandler({ pause: procedure, clear: createAdminQueueClearProcedure<MiLocalUser>({ queueService: queue, moderationLogService: log }) });
+	for (const [path, input] of [['pause', { queue: 'unknown' }], ['clear', { queue: 'db', state: 'unknown' }]] as const) {
+		const result = await handler.handle(new Request(`https://local.test/admin/queue/${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(input) }), { context });
+		expect(result.response?.status).toBe(400);
+	}
+	context.services.authenticate = async () => [null, null];
+	await expect(call(procedure, { queue: 'db' }, { context })).rejects.toMatchObject({ code: 'CREDENTIAL_REQUIRED' });
+	context.services.authenticate = async () => [actor, { permission: ['read:admin:queue'] }];
+	await expect(call(procedure, { queue: 'db' }, { context })).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
+	context.services.authenticate = async () => [actor, null];
+	context.authorization = { rootUserId: () => null, roles: async () => [], policyAllowed: async () => false };
+	await expect(call(procedure, { queue: 'db' }, { context })).rejects.toMatchObject({ code: 'ROLE_PERMISSION_DENIED' });
+	expect(queue.queuePause).toHaveBeenCalledTimes(1);
+	expect(queue.queueClear).not.toHaveBeenCalled();
+});
 
-	test('export transport applies old defaults and retains credential/rate policy', async () => {
-		const createExportFollowingJob = vi.fn();
-		const createExportNotesJob = vi.fn();
-		const feature = createPortability({
-			createExportFollowingJob, createExportNotesJob,
-			createExportAntennasJob: () => {}, createExportBlockingJob: () => {},
-			createExportClipsJob: () => {}, createExportFavoritesJob: () => {},
-			createExportMuteJob: () => {}, createExportUserListsJob: () => {},
-		});
-		const endpoint = following.createEndpoint(feature);
-		await expect(endpoint.exec({ actor: { id: 'forged' } }, actor, null)).resolves.toBeUndefined();
-		expect(createExportFollowingJob).toHaveBeenCalledWith({ id: actor.id }, false, false);
-		await endpoint.exec({ excludeMuting: true, excludeInactive: true }, actor, null);
-		expect(createExportFollowingJob).toHaveBeenLastCalledWith({ id: actor.id }, true, true);
-		await expect(endpoint.exec({ excludeMuting: 'yes' }, actor, null)).rejects.toMatchObject({ code: 'INVALID_PARAM' });
-		await expect(endpoint.exec({ actor: { id: 'forged' } }, null as unknown as MiLocalUser, null)).rejects.toThrow();
-		expect(createExportFollowingJob).toHaveBeenCalledTimes(2);
-		await expect(notes.createEndpoint(feature).exec({}, actor, null)).resolves.toBeUndefined();
-		expect(createExportNotesJob).toHaveBeenCalledWith({ id: actor.id });
-		expect(following.meta).toEqual({ secure: true, requireCredential: true, limit: { duration: 3600000, max: 1 } });
-		expect(notes.meta).toEqual({ secure: true, requireCredential: true, limit: { duration: 86400000, max: 1 } });
-	});
+test('native export transport preserves defaults, secure token rejection and rate windows', async () => {
+	const deps = mockDeep<PortabilityDependencies<MiLocalUser, { id: string; size: number; url: string }>>();
+	const context: ApiContext<MiLocalUser> = { services: services(), credential: null, ip: '127.0.0.1', headers: {} };
+	const following = createIExportFollowingProcedure<MiLocalUser, { id: string; size: number; url: string }>(deps);
+	const notes = createIExportNotesProcedure<MiLocalUser, { id: string; size: number; url: string }>(deps);
+	const handler = new OpenAPIHandler({ following });
+	const forged = await handler.handle(new Request('https://local.test/i/export-following', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ actor: { id: 'forged' } }) }), { context });
+	expect(forged.response?.status).toBeLessThan(300);
+	expect(deps.createExportFollowingJob).toHaveBeenCalledWith({ id: actor.id }, false, false);
+	await call(following, { excludeMuting: true, excludeInactive: true }, { context });
+	expect(deps.createExportFollowingJob).toHaveBeenLastCalledWith({ id: actor.id }, true, true);
+	const invalid = await handler.handle(new Request('https://local.test/i/export-following', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ excludeMuting: 'yes' }) }), { context });
+	expect(invalid.response?.status).toBe(400);
+	expect(await call(notes, {}, { context })).toBeUndefined();
+	expect(deps.createExportNotesJob).toHaveBeenCalledWith({ id: actor.id });
+	expect(context.services.limit).toHaveBeenCalledWith({ key: 'i/export-following', duration: 3600000, max: 1 }, actor.id, 1);
+	expect(context.services.limit).toHaveBeenCalledWith({ key: 'i/export-notes', duration: 86400000, max: 1 }, actor.id, 1);
+	context.services.authenticate = async () => [null, null];
+	await expect(call(following, {}, { context })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
+	context.services.authenticate = async () => [actor, { permission: [] }];
+	await expect(call(following, {}, { context })).rejects.toMatchObject({ code: 'ACCESS_DENIED' });
+	expect(deps.createExportFollowingJob).toHaveBeenCalledTimes(2);
 });

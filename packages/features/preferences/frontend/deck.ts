@@ -47,6 +47,7 @@ export const columnTypes = [
 	'direct',
 	'roleTimeline',
 	'chat',
+	'clip',
 ] as const;
 
 export type ColumnType = typeof columnTypes[number];
@@ -62,6 +63,7 @@ export type Column = {
 	antennaId?: string;
 	listId?: string;
 	channelId?: string;
+	clipId?: string;
 	roleId?: string;
 	excludeTypes?: typeof notificationTypes[number][];
 	tl?: BasicTimelineType;
@@ -70,7 +72,7 @@ export type Column = {
 	withSensitive?: boolean;
 	onlyFiles?: boolean;
 	soundSetting?: SoundStore;
-	// The cache for the name of the antenna, channel, list, or role
+	// The cache for the name of the antenna, channel, list, role, or clip
 	timelineNameCache?: string;
 };
 

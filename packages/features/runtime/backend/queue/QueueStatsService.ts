@@ -5,6 +5,7 @@
 
 import { Inject, Injectable } from '@nestjs/common';
 import Xev from 'xev';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import * as Bull from 'bullmq';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { bindThis } from '../decorators.js';
@@ -30,6 +31,7 @@ export class QueueStatsService implements OnApplicationShutdown {
 		private config: Config,
 
 		private queueService: QueueService,
+		private globalEventService: GlobalEventService,
 	) {
 	}
 
@@ -83,6 +85,7 @@ export class QueueStatsService implements OnApplicationShutdown {
 
 			if (this.disposing) return;
 			ev.emit('queueStats', stats);
+			this.globalEventService.publishStatisticsStream('queueStats', stats);
 
 			log.unshift(stats);
 			if (log.length > 200) log.pop();

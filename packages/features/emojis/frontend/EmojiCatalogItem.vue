@@ -14,13 +14,17 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import type { EmojiSimple } from '../contract/index.js';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApiGet } from '@features/api/frontend/utility/misskey-api.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import MkCustomEmojiDetailedDialog from '@features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue';
 import { $i } from '@features/auth/frontend/i.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { EmojiSimple } from '../backend/api.definition.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	emoji: EmojiSimple;
@@ -32,13 +36,13 @@ function menu(ev: PointerEvent) {
 		type: 'label',
 		text: ':' + props.emoji.name + ':',
 	}, {
-		text: $locale.value.sfc.copy,
+		text: globalLocale.value.env.copy,
 		icon: 'ti ti-copy',
 		action: () => {
 			copyToClipboard(`:${props.emoji.name}:`);
 		},
 	}, {
-		text: $locale.value.sfc.info,
+		text: globalLocale.value.env.info,
 		icon: 'ti ti-info-circle',
 		action: async () => {
 			const { dispose } = os.popup(MkCustomEmojiDetailedDialog, {
@@ -53,7 +57,7 @@ function menu(ev: PointerEvent) {
 
 	if ($i?.isModerator ?? $i?.isAdmin) {
 		menuItems.push({
-			text: $locale.value.sfc.edit,
+			text: globalLocale.value.env.edit,
 			icon: 'ti ti-pencil',
 			action: async () => {
 				const detailedEmoji = await misskeyApiGet('emoji', {
@@ -114,225 +118,113 @@ function menu(ev: PointerEvent) {
 </style>
 
 <locale locale="ar-SA" lang="json">
-{
-  "copy": "نسخ",
-  "info": "عن",
-  "edit": "التعديل"
-}
+{}
 </locale>
 
 <locale locale="ca-ES" lang="json">
-{
-  "copy": "Copiar",
-  "info": "Informació",
-  "edit": "Editar"
-}
+{}
 </locale>
 
 <locale locale="cs-CZ" lang="json">
-{
-  "copy": "Kopírovat",
-  "info": "Informace",
-  "edit": "Upravit"
-}
+{}
 </locale>
 
 <locale locale="da-DK" lang="json">
-{
-  "copy": "Copy",
-  "info": "About",
-  "edit": "Edit"
-}
+{}
 </locale>
 
 <locale locale="de-DE" lang="json">
-{
-  "copy": "Kopieren",
-  "info": "Über",
-  "edit": "Bearbeiten"
-}
+{}
 </locale>
 
 <locale locale="en-US" lang="json">
-{
-  "copy": "Copy",
-  "info": "About",
-  "edit": "Edit"
-}
+{}
 </locale>
 
 <locale locale="es-ES" lang="json">
-{
-  "copy": "Copiar",
-  "info": "Información",
-  "edit": "Editar"
-}
+{}
 </locale>
 
 <locale locale="fr-FR" lang="json">
-{
-  "copy": "Copier",
-  "info": "Informations",
-  "edit": "Editer"
-}
+{}
 </locale>
 
 <locale locale="id-ID" lang="json">
-{
-  "copy": "Salin",
-  "info": "Informasi",
-  "edit": "Sunting"
-}
+{}
 </locale>
 
 <locale locale="it-IT" lang="json">
-{
-  "copy": "Copia",
-  "info": "Informazioni",
-  "edit": "Modifica"
-}
+{}
 </locale>
 
 <locale locale="ja-JP" lang="json">
-{
-  "copy": "コピー",
-  "info": "情報",
-  "edit": "編集"
-}
+{}
 </locale>
 
 <locale locale="ja-KS" lang="json">
-{
-  "copy": "コピー",
-  "info": "情報",
-  "edit": "編集"
-}
+{}
 </locale>
 
 <locale locale="kab-KAB" lang="json">
-{
-  "copy": "Copy",
-  "info": "About",
-  "edit": "Edit"
-}
+{}
 </locale>
 
 <locale locale="kn-IN" lang="json">
-{
-  "copy": "Copy",
-  "info": "About",
-  "edit": "Edit"
-}
+{}
 </locale>
 
 <locale locale="ko-KR" lang="json">
-{
-  "copy": "복사",
-  "info": "정보",
-  "edit": "편집"
-}
+{}
 </locale>
 
 <locale locale="nl-NL" lang="json">
-{
-  "copy": "Kopiëren",
-  "info": "Over",
-  "edit": "Bewerken"
-}
+{}
 </locale>
 
 <locale locale="no-NO" lang="json">
-{
-  "copy": "Kopier",
-  "info": "Infomasjon",
-  "edit": "Rediger"
-}
+{}
 </locale>
 
 <locale locale="pl-PL" lang="json">
-{
-  "copy": "Kopiuj",
-  "info": "Informacje",
-  "edit": "Edytuj"
-}
+{}
 </locale>
 
 <locale locale="pt-PT" lang="json">
-{
-  "copy": "Copiar",
-  "info": "Informações",
-  "edit": "Editar"
-}
+{}
 </locale>
 
 <locale locale="ru-RU" lang="json">
-{
-  "copy": "Копировать",
-  "info": "Описание",
-  "edit": "Изменить"
-}
+{}
 </locale>
 
 <locale locale="sk-SK" lang="json">
-{
-  "copy": "Kopírovať",
-  "info": "Informácie",
-  "edit": "Upraviť"
-}
+{}
 </locale>
 
 <locale locale="th-TH" lang="json">
-{
-  "copy": "คัดลอก",
-  "info": "เกี่ยวกับ",
-  "edit": "แก้ไข"
-}
+{}
 </locale>
 
 <locale locale="tr-TR" lang="json">
-{
-  "copy": "Kopyala",
-  "info": "Hakkında",
-  "edit": "Düzenle"
-}
+{}
 </locale>
 
 <locale locale="ug-CN" lang="json">
-{
-  "copy": "Copy",
-  "info": "About",
-  "edit": "Edit"
-}
+{}
 </locale>
 
 <locale locale="uk-UA" lang="json">
-{
-  "copy": "Скопіювати",
-  "info": "Інформація",
-  "edit": "Редагувати"
-}
+{}
 </locale>
 
 <locale locale="vi-VN" lang="json">
-{
-  "copy": "Sao chép",
-  "info": "Giới thiệu",
-  "edit": "Sửa"
-}
+{}
 </locale>
 
 <locale locale="zh-CN" lang="json">
-{
-  "copy": "复制",
-  "info": "关于",
-  "edit": "编辑"
-}
+{}
 </locale>
 
 <locale locale="zh-TW" lang="json">
-{
-  "copy": "複製",
-  "info": "資訊",
-  "edit": "編輯"
-}
+{}
 </locale>

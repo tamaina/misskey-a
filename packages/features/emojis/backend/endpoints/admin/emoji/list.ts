@@ -3,69 +3,30 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedAdminEmojiListDefinition, packedAdminEmojiListInput, packedAdminEmojiListOutput } from '../../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
-import type { EmojisRepository } from '@features/persistence/backend/repositories/models.js';
+import { toEmojiDetailed } from '../../../emoji-output.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { emojisContract } from '../../../api.definition.js';
+import type { EmojisDependencies } from '../../../api.implementation.js';
 import type { MiEmoji } from '../../../models/Emoji.js';
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { DI } from '@/di-symbols.js';
-import { EmojiEntityService } from '../../../serializers/EmojiEntityService.js';
-//import { sqlLikeEscape } from '@features/persistence/backend/utility/sql-like-escape.js';
-
-const contractProjection = projectEndpointContract(packedAdminEmojiListDefinition);
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requiredRolePolicy: 'canManageCustomEmojis',
-	kind: 'read:admin:emoji',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAdminEmojiListInput, typeof packedAdminEmojiListOutput> {
-	constructor(
-		@Inject(DI.emojisRepository)
-		private emojisRepository: EmojisRepository,
-
-		private emojiEntityService: EmojiEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const q = this.queryService.makePaginationQuery(this.emojisRepository.createQueryBuilder('emoji'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+export function createListProcedure<Actor extends ApiActor>(deps: Pick<EmojisDependencies<Actor>, 'queryService' | 'emojisRepository' | 'emojiEntityService'>) {
+	return createApiProcedure<Actor>()(emojisContract.list).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const query = deps.queryService.makePaginationQuery(deps.emojisRepository.createQueryBuilder('emoji'), input.sinceId, input.untilId, input.sinceDate, input.untilDate)
 				.andWhere('emoji.host IS NULL');
-
-			let emojis: MiEmoji[];
-
-			if (ps.query) {
-				//q.andWhere('emoji.name ILIKE :q', { q: `%${ sqlLikeEscape(ps.query) }%` });
-				//const emojis = await q.limit(ps.limit).getMany();
-
-				emojis = await q.getMany();
-				const queryarry = ps.query.match(/\:([a-z0-9_]*)\:/g);
-
-				if (queryarry) {
-					emojis = emojis.filter(emoji =>
-						queryarry.includes(`:${emoji.name}:`),
-					);
-				} else {
-					emojis = emojis.filter(emoji =>
-						emoji.name.includes(ps.query!) ||
-						emoji.aliases.some(a => a.includes(ps.query!)) ||
-						emoji.category?.includes(ps.query!));
-				}
-				emojis.splice(ps.limit + 1);
+			let rows: MiEmoji[];
+			const search = input.query;
+			if (search) {
+				rows = await query.getMany();
+				const names = search.match(/\:([a-z0-9_]*)\:/g);
+				rows = names ? rows.filter(row => names.includes(`:${row.name}:`))
+					: rows.filter(row => row.name.includes(search) || row.aliases.some(alias => alias.includes(search)) || row.category?.includes(search));
+				// The legacy search path deliberately returns limit + 1 rows.
+				rows.splice(input.limit + 1);
 			} else {
-				emojis = await q.limit(ps.limit).getMany();
+				rows = await query.limit(input.limit).getMany();
 			}
-
-			return this.emojiEntityService.packDetailedMany(emojis);
+			return (await deps.emojiEntityService.packDetailedMany(rows)).map(toEmojiDetailed);
 		});
-	}
 }

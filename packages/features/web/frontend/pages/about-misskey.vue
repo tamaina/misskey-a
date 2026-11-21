@@ -11,7 +11,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<div v-panel class="about">
 					<div ref="containerEl" class="container" :class="{ playing: easterEggEngine != null }">
 						<img src="/client-assets/about-icon.png" alt="" class="icon" draggable="false" @load="iconLoaded" @click="gravity"/>
-						<div class="misskey">Misskey</div>
+						<div class="misskey">{{ productName }}</div>
 						<div class="version">v{{ version }}</div>
 						<span v-for="emoji in easterEggEmojis" :key="emoji.id" class="emoji" :data-physics-x="emoji.left" :data-physics-y="emoji.top" :class="{ _physics_circle_: !emoji.emoji.startsWith(':') }">
 							<MkCustomEmoji v-if="emoji.emoji[0] === ':'" class="emoji" :name="emoji.emoji" :normal="true" :noStyle="true" :fallbackToImage="true"/>
@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<button v-if="thereIsTreasure" class="_button treasure" @click="getTreasure"><img src="/fluent-emoji/1f3c6.png" class="treasureImg"></button>
 				</div>
 				<div style="text-align: center;">
-					{{ $locale.sfc.aboutMisskeyAbout }}<br><a href="https://misskey-hub.net/docs/about-misskey/" target="_blank" class="_link">{{ $locale.sfc.learnMore }}</a>
+					{{ $locale.sfc.aboutMisskeyAbout }}<br><a href="https://misskey-hub.net/docs/about-misskey/" target="_blank" class="_link">{{ globalLocale.env.learnMore }}</a>
 				</div>
 				<div v-if="$i != null" style="text-align: center;">
 					<MkButton primary rounded inline @click="iLoveMisskey">I <Mfm text="$[jelly ❤]"/> #Misskey</MkButton>
@@ -136,8 +136,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { nextTick, onBeforeUnmount, ref, useTemplateRef, computed } from 'vue';
-import { host, version } from '@features/boot/frontend/shared/config.js';
+import { host, version, productName } from '@features/boot/frontend/shared/config.js';
 import { DEFAULT_EMOJIS } from '@features/emojis/frontend/shared/default-emojis.js';
 import FormLink from '@features/ui/frontend/components/form/link.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
@@ -151,6 +152,9 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import { claimAchievement, claimedAchievements } from '@features/users/frontend/utility/achievements.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const patronsWithIcon = [{
 	name: 'カイヤン',
@@ -485,7 +489,7 @@ const headerActions = computed(() => []);
 const headerTabs = computed(() => []);
 
 definePage(() => ({
-	title: $locale.value.sfc.aboutMisskey,
+	title: interpolateLocaleParameters($locale.value.sfc.aboutMisskey, { productName }),
 	icon: null,
 }));
 </script>
@@ -636,7 +640,6 @@ definePage(() => ({
 <locale lang="json" locale="ar-SA">
 {
 	"aboutMisskeyAbout": "ميسكي هو برمجية مفتوحة المصدر يطورها syuilo منذ 2014.",
-	"learnMore": "راجع المزيد",
 	"aboutMisskeySource": "الشفرة المصدرية",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "ترجم ميسكي",
@@ -646,14 +649,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "الداعمون",
 	"aboutMisskeyMorePatrons": "نحن نقدر الدعم الذي قدمه العديد من الأشخاص الذين لم نذكرهم. شكرًا لكم 🥰",
-	"aboutMisskey": "عن Misskey"
+	"aboutMisskey": "عن {productName}"
 }
 </locale>
 
 <locale lang="json" locale="ca-ES">
 {
 	"aboutMisskeyAbout": "Misskey és un programa de codi obert desenvolupat des del 2014 per syuilo",
-	"learnMore": "Saber-ne més ",
 	"aboutMisskeySource": "Codi font",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Tradueix Misskey",
@@ -663,14 +665,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Membres del projecte",
 	"aboutMisskeyPatrons": "Patrocinadors",
 	"aboutMisskeyMorePatrons": "També agraïm el suport d'altres col·laboradors que no surten en aquesta llista. Gràcies! 🥰",
-	"aboutMisskey": "Quant a Misskey"
+	"aboutMisskey": "Quant a {productName}"
 }
 </locale>
 
 <locale lang="json" locale="cs-CZ">
 {
 	"aboutMisskeyAbout": "Misskey je open-source software vyvíjený syuilo od roku 2014.",
-	"learnMore": "Zjistit více",
 	"aboutMisskeySource": "Zdrojový kód",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Přeložit Misskey",
@@ -680,14 +681,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Patroni",
 	"aboutMisskeyMorePatrons": "Vážíme si také podpory mnoha dalších pomocníků, kteří zde nejsou uvedeni. Děkujeme! 🥰",
-	"aboutMisskey": "O Misskey"
+	"aboutMisskey": "O {productName}"
 }
 </locale>
 
 <locale lang="json" locale="da-DK">
 {
 	"aboutMisskeyAbout": "Misskey is open-source software being developed by syuilo since 2014.",
-	"learnMore": "Learn more",
 	"aboutMisskeySource": "Source code",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Translate Misskey",
@@ -697,14 +697,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Patrons",
 	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
-	"aboutMisskey": "About Misskey"
+	"aboutMisskey": "About {productName}"
 }
 </locale>
 
 <locale lang="json" locale="de-DE">
 {
 	"aboutMisskeyAbout": "Misskey ist Open-Source-Software, welche von syuilo seit 2014 entwickelt wird.",
-	"learnMore": "Mehr erfahren",
 	"aboutMisskeySource": "Quellcode",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Misskey übersetzen",
@@ -714,14 +713,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Projektmitglieder",
 	"aboutMisskeyPatrons": "UnterstützerInnen",
 	"aboutMisskeyMorePatrons": "Wir schätzen ebenso die Unterstützung vieler anderer hier nicht gelisteter Personen sehr. Danke! 🥰",
-	"aboutMisskey": "Über Misskey"
+	"aboutMisskey": "Über {productName}"
 }
 </locale>
 
 <locale lang="json" locale="en-US">
 {
 	"aboutMisskeyAbout": "Misskey is open-source software being developed by syuilo since 2014.",
-	"learnMore": "Learn more",
 	"aboutMisskeySource": "Source code",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Translate Misskey",
@@ -731,14 +729,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Patrons",
 	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
-	"aboutMisskey": "About Misskey"
+	"aboutMisskey": "About {productName}"
 }
 </locale>
 
 <locale lang="json" locale="es-ES">
 {
 	"aboutMisskeyAbout": "Misskey es un software de código abierto, desarrollado por syuilo desde 2014",
-	"learnMore": "Ver más",
 	"aboutMisskeySource": "Código fuente",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Traducir Misskey",
@@ -748,14 +745,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Miembros del proyecto",
 	"aboutMisskeyPatrons": "Patrocinadores",
 	"aboutMisskeyMorePatrons": "Muchas más personas nos apoyan. Muchas gracias🥰",
-	"aboutMisskey": "Sobre Misskey"
+	"aboutMisskey": "Sobre {productName}"
 }
 </locale>
 
 <locale lang="json" locale="fr-FR">
 {
 	"aboutMisskeyAbout": "Misskey est un logiciel libre et ouvert, développé par syuilo depuis 2014.",
-	"learnMore": "Plus d'informations",
 	"aboutMisskeySource": "Code source",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Traduire Misskey",
@@ -765,14 +761,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Membres du projet",
 	"aboutMisskeyPatrons": "Contributeurs",
 	"aboutMisskeyMorePatrons": "Nous apprécions vraiment le soutien de nombreuses autres personnes non mentionnées ici. Merci à toutes et à tous ! 🥰",
-	"aboutMisskey": "À propos de Misskey"
+	"aboutMisskey": "À propos de {productName}"
 }
 </locale>
 
 <locale lang="json" locale="id-ID">
 {
 	"aboutMisskeyAbout": "Misskey adalah perangkat lunak sumber terbuka yang sedang dikembangkan oleh syuilo sejak 2014.",
-	"learnMore": "Pelajari lebih lanjut",
 	"aboutMisskeySource": "Sumber kode",
 	"aboutMisskeyOriginal": "Asli",
 	"aboutMisskeyTranslation": "Terjemahkan Misskey",
@@ -782,14 +777,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Anggota proyek",
 	"aboutMisskeyPatrons": "Pendukung",
 	"aboutMisskeyMorePatrons": "Kami sangat mengapresiasi dukungan dari banyak penolong lain yang tidak tercantum disini. Terima kasih! 🥰",
-	"aboutMisskey": "Tentang Misskey"
+	"aboutMisskey": "Tentang {productName}"
 }
 </locale>
 
 <locale lang="json" locale="it-IT">
 {
 	"aboutMisskeyAbout": "Misskey è software libero, open source, sviluppato da Syuilo fin dal lontano 2014.",
-	"learnMore": "Per saperne di più",
 	"aboutMisskeySource": "Codice sorgente",
 	"aboutMisskeyOriginal": "Originale",
 	"aboutMisskeyTranslation": "Tradurre Misskey",
@@ -799,14 +793,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Partecipanti al progetto",
 	"aboutMisskeyPatrons": "Sostenitori",
 	"aboutMisskeyMorePatrons": "Apprezziamo sinceramente il supporto di tante altre persone. Grazie mille! 🥰",
-	"aboutMisskey": "A proposito di Misskey"
+	"aboutMisskey": "A proposito di {productName}"
 }
 </locale>
 
 <locale lang="json" locale="ja-JP">
 {
 	"aboutMisskeyAbout": "Misskeyはsyuiloによって2014年から開発されている、オープンソースのソフトウェアです。",
-	"learnMore": "詳しく",
 	"aboutMisskeySource": "ソースコード",
 	"aboutMisskeyOriginal": "オリジナル",
 	"aboutMisskeyTranslation": "Misskeyを翻訳",
@@ -816,14 +809,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "プロジェクトメンバー",
 	"aboutMisskeyPatrons": "支援者",
 	"aboutMisskeyMorePatrons": "他にも多くの方が支援してくれています。ありがとうございます🥰",
-	"aboutMisskey": "Misskeyについて"
+	"aboutMisskey": "{productName}について"
 }
 </locale>
 
 <locale lang="json" locale="ja-KS">
 {
 	"aboutMisskeyAbout": "Misskeyはsyuiloが2014年からずっと作ってはる、オープンソースなソフトウェアや。",
-	"learnMore": "詳しく",
 	"aboutMisskeySource": "ソースコード",
 	"aboutMisskeyOriginal": "オリジナル",
 	"aboutMisskeyTranslation": "Misskeyを翻訳",
@@ -833,14 +825,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "プロジェクトメンバー",
 	"aboutMisskeyPatrons": "支援者",
 	"aboutMisskeyMorePatrons": "他にもぎょうさんの人からサポートしてもろてんねん。ほんまおおきに🥰",
-	"aboutMisskey": "Misskeyってなんや？"
+	"aboutMisskey": "{productName}ってなんや？"
 }
 </locale>
 
 <locale lang="json" locale="kab-KAB">
 {
 	"aboutMisskeyAbout": "Misskey is open-source software being developed by syuilo since 2014.",
-	"learnMore": "Learn more",
 	"aboutMisskeySource": "Source code",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Translate Misskey",
@@ -850,14 +841,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Patrons",
 	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
-	"aboutMisskey": "About Misskey"
+	"aboutMisskey": "About {productName}"
 }
 </locale>
 
 <locale lang="json" locale="kn-IN">
 {
 	"aboutMisskeyAbout": "Misskey is open-source software being developed by syuilo since 2014.",
-	"learnMore": "Learn more",
 	"aboutMisskeySource": "Source code",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Translate Misskey",
@@ -867,14 +857,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Patrons",
 	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
-	"aboutMisskey": "About Misskey"
+	"aboutMisskey": "About {productName}"
 }
 </locale>
 
 <locale lang="json" locale="ko-KR">
 {
 	"aboutMisskeyAbout": "Misskey는 syuilo가 2014년부터 개발한 오픈소스 소프트웨어입니다.",
-	"learnMore": "자세히",
 	"aboutMisskeySource": "소스 코드",
 	"aboutMisskeyOriginal": "원본",
 	"aboutMisskeyTranslation": "Misskey를 번역하기",
@@ -884,14 +873,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "프로젝트 구성원",
 	"aboutMisskeyPatrons": "후원자",
 	"aboutMisskeyMorePatrons": "이 외에도 다른 많은 분들이 도움을 주시고 계십니다. 감사합니다🥰",
-	"aboutMisskey": "Misskey에 대하여"
+	"aboutMisskey": "{productName}에 대하여"
 }
 </locale>
 
 <locale lang="json" locale="nl-NL">
 {
 	"aboutMisskeyAbout": "Misskey is open-source software being developed by syuilo since 2014.",
-	"learnMore": "Meer leren",
 	"aboutMisskeySource": "Source code",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Translate Misskey",
@@ -901,14 +889,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Patrons",
 	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
-	"aboutMisskey": "Over Misskey"
+	"aboutMisskey": "Over {productName}"
 }
 </locale>
 
 <locale lang="json" locale="no-NO">
 {
 	"aboutMisskeyAbout": "Misskey er programvare med åpen kildekode som har blitt utviklet av syuilo siden 2014.",
-	"learnMore": "Les mer",
 	"aboutMisskeySource": "Source code",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Oversett Misskey",
@@ -918,14 +905,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Patrons",
 	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
-	"aboutMisskey": "Om Misskey"
+	"aboutMisskey": "Om {productName}"
 }
 </locale>
 
 <locale lang="json" locale="pl-PL">
 {
 	"aboutMisskeyAbout": "Misskey jest oprogramowanie open source rozwijanym przez syuilo od 2014.",
-	"learnMore": "Dowiedz się więcej",
 	"aboutMisskeySource": "Kod źródłowy",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Tłumacz Misskey",
@@ -935,14 +921,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Wspierający",
 	"aboutMisskeyMorePatrons": "Naprawdę doceniam wsparcie ze strony wielu niewymienionych tu osób. Dziękuję! 🥰",
-	"aboutMisskey": "O Misskey"
+	"aboutMisskey": "O {productName}"
 }
 </locale>
 
 <locale lang="json" locale="pt-PT">
 {
 	"aboutMisskeyAbout": "Misskey é um software de código aberto desenvolvido por syulio desde 2014.",
-	"learnMore": "Saiba mais",
 	"aboutMisskeySource": "Código-fonte",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Traduza o Misskey",
@@ -952,14 +937,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Membros do projeto",
 	"aboutMisskeyPatrons": "Apoiadores",
 	"aboutMisskeyMorePatrons": "Nós apreciamos o apoio de vários outros apoiadores não listados aqui. Obrigado! 🥰",
-	"aboutMisskey": "Sobre Misskey"
+	"aboutMisskey": "Sobre {productName}"
 }
 </locale>
 
 <locale lang="json" locale="ru-RU">
 {
 	"aboutMisskeyAbout": "Misskey — программа с открытым исходным кодом, которую разрабатывает syuilo с 2014 года.",
-	"learnMore": "Подробнее",
 	"aboutMisskeySource": "Исходный код",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Перевод Misskey",
@@ -969,14 +953,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Участники проекта",
 	"aboutMisskeyPatrons": "Материальная поддержка",
 	"aboutMisskeyMorePatrons": "Большое спасибо и многим другим, кто принял участие в этом проекте! 🥰",
-	"aboutMisskey": "О Misskey"
+	"aboutMisskey": "О {productName}"
 }
 </locale>
 
 <locale lang="json" locale="sk-SK">
 {
 	"aboutMisskeyAbout": "Misskey je open-source softvér, ktorý vyvíja syuilo od 2014.",
-	"learnMore": "Zistiť viac",
 	"aboutMisskeySource": "Zdrojový kód",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Preložiť Misskey",
@@ -986,14 +969,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Prispievatelia",
 	"aboutMisskeyMorePatrons": "Takisto oceňujeme podporu mnoých ďalších, ktorí tu nie sú uvedení. Ďakujeme! 🥰",
-	"aboutMisskey": "O Misskey"
+	"aboutMisskey": "O {productName}"
 }
 </locale>
 
 <locale lang="json" locale="th-TH">
 {
 	"aboutMisskeyAbout": "Misskey เป็นซอฟต์แวร์โอเพ่นซอร์สที่ถูกพัฒนาโดย Syuilo ตั้งแต่ปี 2014",
-	"learnMore": "แสดงให้ดูหน่อย",
 	"aboutMisskeySource": "ซอร์สโค้ด",
 	"aboutMisskeyOriginal": "ต้นฉบับ",
 	"aboutMisskeyTranslation": "แปลภาษา Misskey",
@@ -1003,14 +985,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "สมาชิกในโครงการ",
 	"aboutMisskeyPatrons": "ผู้อุปถัมภ์",
 	"aboutMisskeyMorePatrons": "และอีกหลายท่านที่ไม่ได้เอ่ยนาม ขอบคุณที่ร่วมช่วยเหลือตลอดมานะคะ 🥰",
-	"aboutMisskey": "เกี่ยวกับ Misskey"
+	"aboutMisskey": "เกี่ยวกับ {productName}"
 }
 </locale>
 
 <locale lang="json" locale="tr-TR">
 {
 	"aboutMisskeyAbout": "Misskey, 2014 yılından beri syuilo tarafından geliştirilen açık kaynaklı bir yazılımdır.",
-	"learnMore": "Daha fazla bilgi edinin",
 	"aboutMisskeySource": "Kaynak kodu",
 	"aboutMisskeyOriginal": "Orijinal",
 	"aboutMisskeyTranslation": "Misskey'i çevir",
@@ -1020,14 +1001,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Proje üyeleri",
 	"aboutMisskeyPatrons": "Müşteriler",
 	"aboutMisskeyMorePatrons": "Burada adı geçmeyen diğer birçok yardımseverin desteğine de teşekkür ederiz. Teşekkürler! 🥰",
-	"aboutMisskey": "Misskey Hakkında"
+	"aboutMisskey": "{productName} Hakkında"
 }
 </locale>
 
 <locale lang="json" locale="ug-CN">
 {
 	"aboutMisskeyAbout": "Misskey is open-source software being developed by syuilo since 2014.",
-	"learnMore": "Learn more",
 	"aboutMisskeySource": "Source code",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Translate Misskey",
@@ -1037,14 +1017,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Patrons",
 	"aboutMisskeyMorePatrons": "We also appreciate the support of many other helpers not listed here. Thank you! 🥰",
-	"aboutMisskey": "About Misskey"
+	"aboutMisskey": "About {productName}"
 }
 </locale>
 
 <locale lang="json" locale="uk-UA">
 {
 	"aboutMisskeyAbout": "Misskey - це програмне забезпечення з відкритим кодом, яке розробляє syuilo з 2014 року.",
-	"learnMore": "Докладніше",
 	"aboutMisskeySource": "Вихідний код",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Перекладати Misskey",
@@ -1054,14 +1033,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Підтримали",
 	"aboutMisskeyMorePatrons": "Ми дуже цінуємо підтримку багатьох інших помічників, не перелічених тут. Дякуємо! 🥰",
-	"aboutMisskey": "Про Misskey"
+	"aboutMisskey": "Про {productName}"
 }
 </locale>
 
 <locale lang="json" locale="vi-VN">
 {
 	"aboutMisskeyAbout": "Misskey là phần mềm mã nguồn mở được phát triển bởi syuilo từ năm 2014.",
-	"learnMore": "Tìm hiểu thêm",
 	"aboutMisskeySource": "Mã nguồn",
 	"aboutMisskeyOriginal": "Original",
 	"aboutMisskeyTranslation": "Dịch Misskey",
@@ -1071,14 +1049,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "Project members",
 	"aboutMisskeyPatrons": "Người ủng hộ",
 	"aboutMisskeyMorePatrons": "Chúng tôi cũng trân trọng sự hỗ trợ của nhiều người đóng góp khác không được liệt kê ở đây. Cảm ơn! 🥰",
-	"aboutMisskey": "Về Misskey"
+	"aboutMisskey": "Về {productName}"
 }
 </locale>
 
 <locale lang="json" locale="zh-CN">
 {
 	"aboutMisskeyAbout": "Misskey 是由 syuilo 于 2014 年开发的开源软件。",
-	"learnMore": "更多信息",
 	"aboutMisskeySource": "源代码",
 	"aboutMisskeyOriginal": "原版",
 	"aboutMisskeyTranslation": "翻译 Misskey",
@@ -1088,14 +1065,13 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "项目成员",
 	"aboutMisskeyPatrons": "支持者",
 	"aboutMisskeyMorePatrons": "还有很多其它的人也在支持我们，非常感谢🥰",
-	"aboutMisskey": "关于 Misskey"
+	"aboutMisskey": "关于 {productName}"
 }
 </locale>
 
 <locale lang="json" locale="zh-TW">
 {
 	"aboutMisskeyAbout": "Misskey 是由 syuilo 自 2014 年起開發的開放原始碼軟體。",
-	"learnMore": "更多資訊",
 	"aboutMisskeySource": "原始碼",
 	"aboutMisskeyOriginal": "原始",
 	"aboutMisskeyTranslation": "翻譯 Misskey",
@@ -1105,6 +1081,6 @@ definePage(() => ({
 	"aboutMisskeyProjectMembers": "專案成員",
 	"aboutMisskeyPatrons": "贊助者",
 	"aboutMisskeyMorePatrons": "還有許許多多幫助我們的其他人，非常感謝你們。 🥰",
-	"aboutMisskey": "關於 Misskey"
+	"aboutMisskey": "關於 {productName}"
 }
 </locale>

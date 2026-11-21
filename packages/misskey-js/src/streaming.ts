@@ -38,6 +38,7 @@ export interface IStream extends EventEmitter<StreamEvents> {
 	ping(): void;
 	heartbeat(): void;
 	close(): void;
+	reconnect(user: { token: string; } | null): void;
 }
 
 /**
@@ -51,6 +52,11 @@ export default class Stream extends EventEmitter<StreamEvents> implements IStrea
 	private sharedConnections: SharedConnection[] = [];
 	private nonSharedConnections: NonSharedConnection[] = [];
 	private idCounter = 0;
+	private wsOrigin: string;
+	private wsOptions: {
+		WebSocket?: Options['WebSocket'];
+		binaryType?: ReconnectingWebSocket['binaryType'];
+	};
 
 	constructor(origin: string, user: { token: string; } | null, options?: {
 		WebSocket?: Options['WebSocket'];
@@ -74,25 +80,39 @@ export default class Stream extends EventEmitter<StreamEvents> implements IStrea
 		// eslint-disable-next-line no-param-reassign
 		options = options ?? { };
 
+		this.wsOrigin = origin.replace('http://', 'ws://').replace('https://', 'wss://');
+		this.wsOptions = options;
+		this.stream = this.openSocket(user);
+	}
+
+	private openSocket(user: { token: string; } | null): ReconnectingWebSocket {
 		const query = urlQuery({
 			i: user?.token,
 
 			// To prevent cache of an HTML such as error screen
 			_t: Date.now(),
 		});
-
-		const wsOrigin = origin.replace('http://', 'ws://').replace('https://', 'wss://');
-
-		this.stream = new ReconnectingWebSocketConstructor(`${wsOrigin}/streaming?${query}`, '', {
+		const socket = new ReconnectingWebSocketConstructor(`${this.wsOrigin}/streaming?${query}`, '', {
 			minReconnectionDelay: 1, // https://github.com/pladaria/reconnecting-websocket/issues/91
-			WebSocket: options.WebSocket,
+			WebSocket: this.wsOptions.WebSocket,
 		});
-		if (options.binaryType) {
-			this.stream.binaryType = options.binaryType;
+		if (this.wsOptions.binaryType) {
+			socket.binaryType = this.wsOptions.binaryType;
 		}
-		this.stream.addEventListener('open', this.onOpen);
-		this.stream.addEventListener('close', this.onClose);
-		this.stream.addEventListener('message', this.onMessage);
+		socket.addEventListener('open', this.onOpen);
+		socket.addEventListener('close', this.onClose);
+		socket.addEventListener('message', this.onMessage);
+		return socket;
+	}
+
+	/** Replace the credential on the same Stream so existing channel holders stay valid. */
+	public reconnect(user: { token: string; } | null): void {
+		this.stream.removeEventListener('open', this.onOpen);
+		this.stream.removeEventListener('close', this.onClose);
+		this.stream.removeEventListener('message', this.onMessage);
+		this.stream.close();
+		this.state = 'reconnecting';
+		this.stream = this.openSocket(user);
 	}
 
 	private genId(): string {

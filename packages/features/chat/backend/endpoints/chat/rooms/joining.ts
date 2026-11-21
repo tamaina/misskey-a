@@ -3,52 +3,44 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedChatRoomsJoiningDefinition, packedChatRoomsJoiningInput, packedChatRoomsJoiningOutput } from '../../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { toPackedChatRoomMembership } from '../../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { DI } from '@/di-symbols.js';
-import { ChatService } from '../../../services/ChatService.js';
-import { ChatEntityService } from '../../../serializers/ChatEntityService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-import { IdService } from '@features/runtime/backend/services/IdService.js';
+import type { InferSchemaOutput } from '@orpc/contract';
 
-const contractProjection = projectEndpointContract(packedChatRoomsJoiningDefinition);
+import { type IdService } from '@features/runtime/backend/services/IdService.js';
 
-export const meta = {
-	tags: ['chat'],
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { type ChatService } from '../../../services/ChatService.js';
+import { type ChatEntityService } from '../../../serializers/ChatEntityService.js';
+import { chatRoomsJoiningContract } from './joining.contract.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-	requireCredential: true,
+export interface ChatRoomsJoiningDependencies {
+	chatService: ChatService;
+	chatEntityService: ChatEntityService;
+	idService: IdService;
+}
+export function createChatRoomsJoiningProcedure(deps: ChatRoomsJoiningDependencies) {
+	async function execute(ps: InferSchemaOutput<NonNullable<typeof chatRoomsJoiningContract['~orpc']['inputSchema']>>, me: MiLocalUser): Promise<InferSchemaOutput<NonNullable<typeof chatRoomsJoiningContract['~orpc']['outputSchema']>>> {
+		return (await run(ps, me)).map(toPackedChatRoomMembership);
+	}
 
-	kind: 'read:chat',
+	async function run(ps: InferSchemaOutput<NonNullable<typeof chatRoomsJoiningContract['~orpc']['inputSchema']>>, me: MiLocalUser) {
+		const untilId = ps.untilId ?? (ps.untilDate ? deps.idService.gen(ps.untilDate!) : null);
+		const sinceId = ps.sinceId ?? (ps.sinceDate ? deps.idService.gen(ps.sinceDate!) : null);
 
-	res: contractProjection.response,
+		await deps.chatService.checkChatAvailability(me.id, 'read');
 
-	errors: {
-	},
-} as const;
+		const memberships = await deps.chatService.getMyMemberships(me.id, ps.limit, sinceId, untilId);
 
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChatRoomsJoiningInput, typeof packedChatRoomsJoiningOutput> {
-	constructor(
-		private chatService: ChatService,
-		private chatEntityService: ChatEntityService,
-		private idService: IdService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
-			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
-
-			await this.chatService.checkChatAvailability(me.id, 'read');
-
-			const memberships = await this.chatService.getMyMemberships(me.id, ps.limit, sinceId, untilId);
-
-			return this.chatEntityService.packRoomMemberships(memberships, me, {
-				populateUser: false,
-				populateRoom: true,
-			});
+		return deps.chatEntityService.packRoomMemberships(memberships, me, {
+			populateUser: false,
+			populateRoom: true,
 		});
 	}
+
+	return createApiProcedure<MiLocalUser>()(chatRoomsJoiningContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(({ input, context }) => execute(input, context.principal));
 }

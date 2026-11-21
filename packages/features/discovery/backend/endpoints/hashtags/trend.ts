@@ -2,47 +2,33 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineHashtagsTrendDefinition, inlineHashtagsTrendInput, inlineHashtagsTrendOutput } from '../../../contract/endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
-import { DI } from '@/di-symbols.js';
 import { FeaturedService } from '../../services/FeaturedService.js';
 import { HashtagService } from '../../services/HashtagService.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-const contractProjection = projectEndpointContract(inlineHashtagsTrendDefinition);
+import type { ApiContext } from '@features/api/backend/transport/context.js';
+import { discoveryContract, type DiscoveryInputs } from '../discovery.contract.js';
+export interface HashtagsTrendDependencies {
+	featuredService: FeaturedService;
+	hashtagService: HashtagService;
+}
+export function createHashtagsTrendProcedure<Actor extends MiLocalUser>(deps: HashtagsTrendDependencies) {
+	const handler = async (_request: { input: DiscoveryInputs['hashtags/trend']; context: ApiContext<Actor> & { principal: Actor | null } }) => {
+		const ranking = await deps.featuredService.getHashtagsRanking(10);
 
-export const meta = {
-	tags: ['hashtags'],
+		const charts = ranking.length === 0 ? {} : await deps.hashtagService.getCharts(ranking, 20);
 
-	requireCredential: false,
-	allowGet: true,
-	cacheSec: 60 * 1,
+		const stats = ranking.map(tag => ({
+			tag,
+			chart: charts[tag],
+			usersCount: Math.max(...charts[tag]),
+		}));
 
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineHashtagsTrendInput, typeof inlineHashtagsTrendOutput> {
-	constructor(
-		private featuredService: FeaturedService,
-		private hashtagService: HashtagService,
-	) {
-		super(meta, contractProjection, async () => {
-			const ranking = await this.featuredService.getHashtagsRanking(10);
-
-			const charts = ranking.length === 0 ? {} : await this.hashtagService.getCharts(ranking, 20);
-
-			const stats = ranking.map((tag, i) => ({
-				tag,
-				chart: charts[tag],
-				usersCount: Math.max(...charts[tag]),
-			}));
-
-			return stats;
-		});
-	}
+		return stats;
+	};
+	return {
+		canonical: createApiProcedure<Actor>()(discoveryContract['hashtags/trend']).handler(handler),
+		get: createApiProcedure<Actor>()(discoveryContract['hashtags/trend:get']).handler(handler),
+	};
 }

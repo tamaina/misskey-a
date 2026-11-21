@@ -7,7 +7,7 @@ import { QueueStatsService } from '@features/runtime/backend/queue/QueueStatsSer
 import { ServerStatsService } from '@features/statistics/backend/daemons/ServerStatsService.js';
 import { ChartManagementService } from '@features/statistics/backend/services/ChartManagementService.js';
 const state = vi.hoisted(() => ({ events: [] as { close: ReturnType<typeof vi.fn> }[], emitters: [] as any[], cpu: [] as ((value: number) => void)[] }));
-vi.mock('bullmq', () => ({ QueueEvents: class {
+vi.mock('bullmq', async () => ({ ...await vi.importActual<typeof import('bullmq')>('bullmq'), QueueEvents: class {
 	close = vi.fn(async () => {});
 	constructor() { state.events.push(this); }
 	on() {}
@@ -24,7 +24,7 @@ test('queue statistics waits for pending reads and closes event clients once', a
 	vi.useFakeTimers(); let release!: (value: { active: number; waiting: number; delayed: number }) => void;
 	const counts = new Promise<{ active: number; waiting: number; delayed: number }>(resolve => { release = resolve; });
 	const queue = { getJobCounts: () => counts };
-	const service = new QueueStatsService({} as never, { deliverQueue: queue, inboxQueue: queue } as never);
+	const service = new QueueStatsService({} as never, { deliverQueue: queue, inboxQueue: queue } as never, { publishStatisticsStream: vi.fn() } as never);
 	service.start(); service.start(); expect(state.events).toHaveLength(2);
 	let done = false; const stopping = service.dispose().then(() => { done = true; });
 	await Promise.resolve(); expect(done).toBe(false);
@@ -34,10 +34,53 @@ test('queue statistics waits for pending reads and closes event clients once', a
 	expect(vi.getTimerCount()).toBe(0);
 });
 test('server statistics removes its listener and waits for the active sample', async () => {
-	vi.useFakeTimers(); const service = new ServerStatsService({ enableServerMachineStats: true } as never);
+	vi.useFakeTimers(); const service = new ServerStatsService({ enableServerMachineStats: true } as never, { publishStatisticsStream: vi.fn() } as never);
 	service.start(); expect(state.cpu).toHaveLength(1);
 	let done = false; const stopping = service.dispose().then(() => { done = true; });
 	await Promise.resolve(); expect(done).toBe(false); state.cpu[0](0.25); await stopping;
+	for (const emitter of state.emitters) expect(emitter.listenerCount('requestServerStatsLog')).toBe(0);
+	expect(vi.getTimerCount()).toBe(0);
+});
+test('queue statistics publishes the same live snapshot once alongside Xev', async () => {
+	vi.useFakeTimers();
+	const publishStatisticsStream = vi.fn();
+	const queue = { getJobCounts: async () => ({ active: 1, waiting: 2, delayed: 3 }) };
+	const service = new QueueStatsService({} as never, { deliverQueue: queue, inboxQueue: queue } as never, { publishStatisticsStream } as never);
+	const output = vi.fn();
+	for (const emitter of state.emitters) emitter.on('queueStats', output);
+	try {
+		service.start(); await vi.advanceTimersByTimeAsync(0);
+		expect(publishStatisticsStream).toHaveBeenCalledOnce();
+		expect(output).toHaveBeenCalledOnce();
+		expect(publishStatisticsStream.mock.calls[0]).toEqual(['queueStats', output.mock.calls[0][0]]);
+	} finally {
+		await service.dispose();
+		for (const emitter of state.emitters) emitter.off('queueStats', output);
+	}
+});
+test('server statistics publishes the same live snapshot once alongside Xev', async () => {
+	vi.useFakeTimers();
+	const publishStatisticsStream = vi.fn();
+	const service = new ServerStatsService({ enableServerMachineStats: true } as never, { publishStatisticsStream } as never);
+	const output = vi.fn();
+	for (const emitter of state.emitters) emitter.on('serverStats', output);
+	try {
+		await service.start(); state.cpu[0](0.25); await vi.advanceTimersByTimeAsync(0);
+		expect(publishStatisticsStream).toHaveBeenCalledOnce();
+		expect(output).toHaveBeenCalledOnce();
+		expect(publishStatisticsStream.mock.calls[0]).toEqual(['serverStats', output.mock.calls[0][0]]);
+	} finally {
+		await service.dispose();
+		for (const emitter of state.emitters) emitter.off('serverStats', output);
+	}
+});
+test('disabled server statistics creates no sample, listener, timer or Redis publication', async () => {
+	vi.useFakeTimers();
+	const publishStatisticsStream = vi.fn();
+	const service = new ServerStatsService({ enableServerMachineStats: false } as never, { publishStatisticsStream } as never);
+	await service.start(); await service.dispose();
+	expect(publishStatisticsStream).not.toHaveBeenCalled();
+	expect(state.cpu).toHaveLength(0);
 	for (const emitter of state.emitters) expect(emitter.listenerCount('requestServerStatsLog')).toBe(0);
 	expect(vi.getTimerCount()).toBe(0);
 });

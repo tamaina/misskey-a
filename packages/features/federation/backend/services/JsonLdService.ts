@@ -6,7 +6,8 @@
 import * as crypto from 'node:crypto';
 import { promisify } from 'node:util';
 import { Injectable } from '@nestjs/common';
-import { RsaKeyPair } from 'slacc';
+import { Signer } from 'slacc';
+import type { SignatureAlgorithmIdentifier } from 'slacc';
 import { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
@@ -82,7 +83,8 @@ export class JsonLd {
 
 		const toBeSigned = await this.createVerifyData(data, options);
 
-		const sign = promisify(RsaKeyPair.prototype.sign).bind(RsaKeyPair.fromPem(privateKey));
+		const signer = Signer.fromPkcs8Pem('Rsa2048_8192' as SignatureAlgorithmIdentifier.Rsa2048_8192, privateKey);
+		const sign = promisify(Signer.prototype.signRaw).bind(signer);
 
 		const signature = await sign(Buffer.from(toBeSigned));
 

@@ -34,7 +34,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<svg viewBox="0 0 16 16" version="1.1" :class="$style.grabber">
 			<path fill="currentColor" d="M10 13a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm0-4a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm-4 4a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm5-9a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM7 8a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM6 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path>
 		</svg>
-		<button v-tooltip="$locale.sfc.settings" :class="$style.menu" class="_button" @click.stop="showSettingsMenu"><i class="ti ti-dots"></i></button>
+		<button v-tooltip="globalLocale.env.settings" :class="$style.menu" class="_button" @click.stop="showSettingsMenu"><i class="ti ti-dots"></i></button>
 	</header>
 	<div v-if="active" ref="body" :class="$style.body">
 		<slot></slot>
@@ -43,14 +43,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { onBeforeUnmount, onMounted, provide, watch, useTemplateRef, ref, computed } from 'vue';
-import type { Column } from '@features/preferences/frontend/deck.js';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { deckGlobalEvents, updateColumn, swapLeftColumn, swapRightColumn, swapUpColumn, swapDownColumn, stackLeftColumn, popRightColumn, removeColumn, swapColumn } from '@features/preferences/frontend/deck.js';
 import * as os from '@features/ui/frontend/os.js';
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { checkDragDataType, getDragData, setDragData } from '@features/ui/frontend/drag-and-drop.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Column } from '@features/preferences/frontend/deck.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 provide('shouldHeaderThin', true);
 provide('shouldOmitHeaderTitle', true);
@@ -121,7 +125,7 @@ function getMenu() {
 	if (props.refresher) {
 		menuItems.push({
 			icon: 'ti ti-refresh',
-			text: $locale.value.sfc.reload,
+			text: globalLocale.value.env.reload,
 			action: () => {
 				if (props.refresher) {
 					props.refresher();
@@ -140,11 +144,11 @@ function getMenu() {
 		icon: 'ti ti-settings',
 		text: $locale.value.sfc.deckConfigureColumn,
 		action: async () => {
-			const name = props.column.name ?? copyLocaleDictionary($locale.value.sfc.deckColumnsLabels)[props.column.type];
+			const name = props.column.name ?? copyLocaleDictionary(globalLocale.value.env._deck._columns)[props.column.type];
 			const { canceled, result } = await os.form(name, {
 				name: {
 					type: 'string',
-					label: $locale.value.sfc.name,
+					label: globalLocale.value.env.name,
 					default: props.column.name,
 				},
 				width: {
@@ -236,7 +240,7 @@ function getMenu() {
 
 	menuItems.push({ type: 'divider' }, {
 		icon: 'ti ti-trash',
-		text: $locale.value.sfc.remove,
+		text: globalLocale.value.env.remove,
 		danger: true,
 		action: () => {
 			removeColumn(props.column.id);
@@ -321,7 +325,13 @@ function onDrop(ev: DragEvent) {
 
 	height: 100%;
 	overflow: clip;
-	contain: strict;
+	/**
+	 * FIXME: Safari 26 で contain: layout を(含む)指定するとバグる
+	 * https://github.com/misskey-dev/misskey/issues/16204#issuecomment-3265404776
+	 * https://bugs.webkit.org/show_bug.cgi?id=297186
+	 */
+	// contain: strict;
+	contain: size style paint;
 	border-radius: 10px;
 
 	&.draghover {
@@ -493,23 +503,7 @@ function onDrop(ev: DragEvent) {
 
 <locale lang="json" locale="ar-SA">
 {
-	"settings": "الاعدادات",
-	"reload": "انعش",
 	"deckConfigureColumn": "Column settings",
-	"deckColumnsLabels": {
-		"main": "الرئيسية",
-		"widgets": "التطبيقات المُصغّرة",
-		"notifications": "الإشعارات",
-		"tl": "الخط الزمني",
-		"antenna": "الهوائيات",
-		"list": "القوائم",
-		"channel": "القنوات",
-		"mentions": "الإشارات",
-		"direct": "مباشرة",
-		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
-	},
-	"name": "الإسم",
 	"width": "العرض",
 	"deckUsedAsMinWidthWhenFlexible": "Minimum width will be used for this when the \"Auto-adjust width\" option is enabled",
 	"deckFlexible": "Auto-adjust width",
@@ -519,30 +513,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "التحريك إلى الأسفل",
 	"move": "أنقل",
 	"deckStackLeft": "Stack on left column",
-	"deckPopRight": "Pop column to the right",
-	"remove": "حذف"
+	"deckPopRight": "Pop column to the right"
 }
 </locale>
 
 <locale lang="json" locale="ca-ES">
 {
-	"settings": "Preferències",
-	"reload": "Actualitzar",
 	"deckConfigureColumn": "Configuració de columnes",
-	"deckColumnsLabels": {
-		"main": "Principal",
-		"widgets": "Ginys",
-		"notifications": "Notificacions",
-		"tl": "Línia de temps",
-		"antenna": "Antena",
-		"list": "Llistes",
-		"channel": "Canals",
-		"mentions": "Mencions",
-		"direct": "Publicacions directes",
-		"roleTimeline": "Línia de temps dels rols",
-		"chat": "Xateja amb aquest usuari"
-	},
-	"name": "Nom",
 	"width": "Amplada",
 	"deckUsedAsMinWidthWhenFlexible": "L'amplada mínima es farà servir quan \"Ajust automàtic de l'amplada\" estigui activat",
 	"deckFlexible": "Ajust automàtic de l'amplada",
@@ -552,30 +529,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Mou cap avall",
 	"move": "Mou",
 	"deckStackLeft": "Pila a la columna esquerra",
-	"deckPopRight": "Col·loca a la dreta",
-	"remove": "Eliminar"
+	"deckPopRight": "Col·loca a la dreta"
 }
 </locale>
 
 <locale lang="json" locale="cs-CZ">
 {
-	"settings": "Nastavení",
-	"reload": "Aktualizovat",
 	"deckConfigureColumn": "Nastavení sloupců",
-	"deckColumnsLabels": {
-		"main": "Hlavní",
-		"widgets": "Widgety",
-		"notifications": "Oznámení",
-		"tl": "Časová osa",
-		"antenna": "Antény",
-		"list": "Seznamy",
-		"channel": "Kanály",
-		"mentions": "Zmínění",
-		"direct": "Přímé poznámky",
-		"roleTimeline": "Časová osa role",
-		"chat": "Chat with user"
-	},
-	"name": "Jméno",
 	"width": "Šířka",
 	"deckUsedAsMinWidthWhenFlexible": "Minimum width will be used for this when the \"Auto-adjust width\" option is enabled",
 	"deckFlexible": "Auto-adjust width",
@@ -585,30 +545,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Prohodit s níže uvedeným sloupcem",
 	"move": "Přesunout",
 	"deckStackLeft": "Nahromadit v levém sloupci",
-	"deckPopRight": "Popnout sloupec na pravou stranu",
-	"remove": "Smazat"
+	"deckPopRight": "Popnout sloupec na pravou stranu"
 }
 </locale>
 
 <locale lang="json" locale="da-DK">
 {
-	"settings": "Settings",
-	"reload": "Refresh",
 	"deckConfigureColumn": "Column settings",
-	"deckColumnsLabels": {
-		"main": "Main",
-		"widgets": "Widgets",
-		"notifications": "Notifications",
-		"tl": "Timeline",
-		"antenna": "Antennas",
-		"list": "List",
-		"channel": "Channel",
-		"mentions": "Mentions",
-		"direct": "Direct notes",
-		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
-	},
-	"name": "Name",
 	"width": "Width",
 	"deckUsedAsMinWidthWhenFlexible": "Minimum width will be used for this when the \"Auto-adjust width\" option is enabled",
 	"deckFlexible": "Auto-adjust width",
@@ -618,30 +561,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Swap with the below column",
 	"move": "Move",
 	"deckStackLeft": "Stack on left column",
-	"deckPopRight": "Pop column to the right",
-	"remove": "Delete"
+	"deckPopRight": "Pop column to the right"
 }
 </locale>
 
 <locale lang="json" locale="de-DE">
 {
-	"settings": "Einstellungen",
-	"reload": "Aktualisieren",
 	"deckConfigureColumn": "Spalteneinstellungen",
-	"deckColumnsLabels": {
-		"main": "Hauptspalte",
-		"widgets": "Widgets",
-		"notifications": "Benachrichtigungen",
-		"tl": "Chronik",
-		"antenna": "Antennen",
-		"list": "Listen",
-		"channel": "Kanal",
-		"mentions": "Erwähnungen",
-		"direct": "Direktnachrichten",
-		"roleTimeline": "Rollenchronik",
-		"chat": "Mit dem Benutzer chatten"
-	},
-	"name": "Name",
 	"width": "Breite",
 	"deckUsedAsMinWidthWhenFlexible": "Ist \"Automatische Breitenanpassung\" aktiviert, wird hierfür die minimale Breite verwendet",
 	"deckFlexible": "Automatische Breitenanpassung",
@@ -651,30 +577,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Mit unterer Spalte tauschen",
 	"move": "Verschieben",
 	"deckStackLeft": "Auf linke Spalte stapeln",
-	"deckPopRight": "Nach rechts vom Stapel nehmen",
-	"remove": "Löschen"
+	"deckPopRight": "Nach rechts vom Stapel nehmen"
 }
 </locale>
 
 <locale lang="json" locale="en-US">
 {
-	"settings": "Settings",
-	"reload": "Refresh",
 	"deckConfigureColumn": "Column settings",
-	"deckColumnsLabels": {
-		"main": "Main",
-		"widgets": "Widgets",
-		"notifications": "Notifications",
-		"tl": "Timeline",
-		"antenna": "Antennas",
-		"list": "List",
-		"channel": "Channel",
-		"mentions": "Mentions",
-		"direct": "Direct notes",
-		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
-	},
-	"name": "Name",
 	"width": "Width",
 	"deckUsedAsMinWidthWhenFlexible": "Minimum width will be used for this when the \"Auto-adjust width\" option is enabled",
 	"deckFlexible": "Auto-adjust width",
@@ -684,30 +593,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Swap with the below column",
 	"move": "Move",
 	"deckStackLeft": "Stack on left column",
-	"deckPopRight": "Pop column to the right",
-	"remove": "Delete"
+	"deckPopRight": "Pop column to the right"
 }
 </locale>
 
 <locale lang="json" locale="es-ES">
 {
-	"settings": "Configuración",
-	"reload": "Recargar",
 	"deckConfigureColumn": "Ajustes de columna",
-	"deckColumnsLabels": {
-		"main": "Principal",
-		"widgets": "Widgets",
-		"notifications": "Notificaciones",
-		"tl": "Linea de tiempo",
-		"antenna": "Antenas",
-		"list": "Listas",
-		"channel": "Canal",
-		"mentions": "Menciones",
-		"direct": "Notas directas",
-		"roleTimeline": "Linea de tiempo del rol",
-		"chat": "Chatear"
-	},
-	"name": "Nombre",
 	"width": "Ancho",
 	"deckUsedAsMinWidthWhenFlexible": "Se usará el ancho mínimo cuando la opción \"Autoajustar ancho\" esté habilitada",
 	"deckFlexible": "Autoajustar ancho",
@@ -717,30 +609,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Mover abajo",
 	"move": "Mover",
 	"deckStackLeft": "Apilar a la izquierda",
-	"deckPopRight": "Sacar a la derecha",
-	"remove": "Borrar"
+	"deckPopRight": "Sacar a la derecha"
 }
 </locale>
 
 <locale lang="json" locale="fr-FR">
 {
-	"settings": "Paramètres",
-	"reload": "Rafraîchir",
 	"deckConfigureColumn": "Configuration de la colonne",
-	"deckColumnsLabels": {
-		"main": "Principale",
-		"widgets": "Widgets",
-		"notifications": "Notifications",
-		"tl": "Fil",
-		"antenna": "Antennes",
-		"list": "Listes",
-		"channel": "Canal",
-		"mentions": "Mentions",
-		"direct": "Direct",
-		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
-	},
-	"name": "Nom",
 	"width": "Largeur",
 	"deckUsedAsMinWidthWhenFlexible": "Minimum width will be used for this when the \"Auto-adjust width\" option is enabled",
 	"deckFlexible": "Ajuster automatiquement la largeur",
@@ -750,30 +625,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Déplacer vers le bas",
 	"move": "Déplacer",
 	"deckStackLeft": "Empiler à gauche",
-	"deckPopRight": "Extraire à droite",
-	"remove": "Supprimer"
+	"deckPopRight": "Extraire à droite"
 }
 </locale>
 
 <locale lang="json" locale="id-ID">
 {
-	"settings": "Pengaturan",
-	"reload": "Muat ulang",
 	"deckConfigureColumn": "Atur kolom",
-	"deckColumnsLabels": {
-		"main": "Utama",
-		"widgets": "Widget",
-		"notifications": "Notifikasi",
-		"tl": "Beranda",
-		"antenna": "Antena",
-		"list": "Daftar",
-		"channel": "Kanal",
-		"mentions": "Sebutan",
-		"direct": "Langsung",
-		"roleTimeline": "Lini masa peran",
-		"chat": "Obrolan pengguna"
-	},
-	"name": "Nama",
 	"width": "Lebar",
 	"deckUsedAsMinWidthWhenFlexible": "Lebar minimum akan digunakan untuk ini ketika opsi \"Atur-otomatis lebar\" dinyalakan",
 	"deckFlexible": "Atur-otomatis lebar",
@@ -783,30 +641,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Pindah ke bawah",
 	"move": "Pindah",
 	"deckStackLeft": "Tumpukkan di kolom kiri",
-	"deckPopRight": "Keluarkan di kanan",
-	"remove": "Hapus"
+	"deckPopRight": "Keluarkan di kanan"
 }
 </locale>
 
 <locale lang="json" locale="it-IT">
 {
-	"settings": "Impostazioni",
-	"reload": "Ricarica",
 	"deckConfigureColumn": "Impostazioni colonna",
-	"deckColumnsLabels": {
-		"main": "Principale",
-		"widgets": "Riquadri",
-		"notifications": "Notifiche",
-		"tl": "Timeline",
-		"antenna": "Antenne",
-		"list": "Liste",
-		"channel": "Canali",
-		"mentions": "Menzioni",
-		"direct": "Note Dirette",
-		"roleTimeline": "Timeline Ruolo",
-		"chat": "Chatta con questa persona"
-	},
-	"name": "Nome",
 	"width": "Larghezza",
 	"deckUsedAsMinWidthWhenFlexible": "Se \"larghezza flessibile\" è abilitato, questa diventa la larghezza minima",
 	"deckFlexible": "Larghezza flessibile",
@@ -816,30 +657,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Sposta in basso",
 	"move": "Sposta",
 	"deckStackLeft": "Impila a sinistra",
-	"deckPopRight": "Estrai a destra",
-	"remove": "Elimina"
+	"deckPopRight": "Estrai a destra"
 }
 </locale>
 
 <locale lang="json" locale="ja-JP">
 {
-	"settings": "設定",
-	"reload": "リロード",
 	"deckConfigureColumn": "カラムの設定",
-	"deckColumnsLabels": {
-		"main": "メイン",
-		"widgets": "ウィジェット",
-		"notifications": "通知",
-		"tl": "タイムライン",
-		"antenna": "アンテナ",
-		"list": "リスト",
-		"channel": "チャンネル",
-		"mentions": "メンション",
-		"direct": "指名",
-		"roleTimeline": "ロールタイムライン",
-		"chat": "ダイレクトメッセージ"
-	},
-	"name": "名前",
 	"width": "幅",
 	"deckUsedAsMinWidthWhenFlexible": "「幅を自動調整」が有効の場合、これが幅の最小値となります",
 	"deckFlexible": "幅を自動調整",
@@ -849,30 +673,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "下に移動",
 	"move": "移動",
 	"deckStackLeft": "左にスタック",
-	"deckPopRight": "右に出す",
-	"remove": "削除"
+	"deckPopRight": "右に出す"
 }
 </locale>
 
 <locale lang="json" locale="ja-KS">
 {
-	"settings": "設定",
-	"reload": "リロード",
 	"deckConfigureColumn": "カラムの設定",
-	"deckColumnsLabels": {
-		"main": "メイン",
-		"widgets": "ウィジェット",
-		"notifications": "通知",
-		"tl": "タイムライン",
-		"antenna": "アンテナ",
-		"list": "リスト",
-		"channel": "チャンネル",
-		"mentions": "あんた宛て",
-		"direct": "ダイレクト",
-		"roleTimeline": "ロールタイムライン",
-		"chat": "チャットしよか"
-	},
-	"name": "名前",
 	"width": "幅",
 	"deckUsedAsMinWidthWhenFlexible": "「幅を自動調整」が有効の場合、これが幅の最小値となるで",
 	"deckFlexible": "幅を自動調整",
@@ -882,30 +689,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "下に移動",
 	"move": "移すで",
 	"deckStackLeft": "左に重ねる",
-	"deckPopRight": "右に出す",
-	"remove": "ほかす"
+	"deckPopRight": "右に出す"
 }
 </locale>
 
 <locale lang="json" locale="kab-KAB">
 {
-	"settings": "Iɣewwaṛen",
-	"reload": "Refresh",
 	"deckConfigureColumn": "Column settings",
-	"deckColumnsLabels": {
-		"main": "Main",
-		"widgets": "Widgets",
-		"notifications": "Ilɣuyen",
-		"tl": "Timeline",
-		"antenna": "Antennas",
-		"list": "Tibdarin",
-		"channel": "Channel",
-		"mentions": "Mentions",
-		"direct": "Direct notes",
-		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
-	},
-	"name": "Name",
 	"width": "Width",
 	"deckUsedAsMinWidthWhenFlexible": "Minimum width will be used for this when the \"Auto-adjust width\" option is enabled",
 	"deckFlexible": "Auto-adjust width",
@@ -915,30 +705,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Swap with the below column",
 	"move": "Move",
 	"deckStackLeft": "Stack on left column",
-	"deckPopRight": "Pop column to the right",
-	"remove": "Kkes"
+	"deckPopRight": "Pop column to the right"
 }
 </locale>
 
 <locale lang="json" locale="kn-IN">
 {
-	"settings": "ಸಿದ್ಧತೆಗಳು",
-	"reload": "Refresh",
 	"deckConfigureColumn": "Column settings",
-	"deckColumnsLabels": {
-		"main": "Main",
-		"widgets": "Widgets",
-		"notifications": "ಅಧಿಸೂಚನೆಗಳು",
-		"tl": "ಸಮಯಸಾಲು",
-		"antenna": "Antennas",
-		"list": "List",
-		"channel": "Channel",
-		"mentions": "ಹೆಸರಿಸಿದ",
-		"direct": "ನೇರ ಟಿಪ್ಪಣಿಗಳು",
-		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
-	},
-	"name": "Name",
 	"width": "Width",
 	"deckUsedAsMinWidthWhenFlexible": "Minimum width will be used for this when the \"Auto-adjust width\" option is enabled",
 	"deckFlexible": "Auto-adjust width",
@@ -948,30 +721,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Swap with the below column",
 	"move": "Move",
 	"deckStackLeft": "Stack on left column",
-	"deckPopRight": "Pop column to the right",
-	"remove": "ಅಳಿಸು"
+	"deckPopRight": "Pop column to the right"
 }
 </locale>
 
 <locale lang="json" locale="ko-KR">
 {
-	"settings": "설정",
-	"reload": "새로고침",
 	"deckConfigureColumn": "칼럼 설정",
-	"deckColumnsLabels": {
-		"main": "메인",
-		"widgets": "위젯",
-		"notifications": "알림",
-		"tl": "타임라인",
-		"antenna": "안테나",
-		"list": "리스트",
-		"channel": "채널",
-		"mentions": "받은 멘션",
-		"direct": "다이렉트",
-		"roleTimeline": "역할 타임라인",
-		"chat": "채팅하기"
-	},
-	"name": "이름",
 	"width": "폭",
 	"deckUsedAsMinWidthWhenFlexible": "'폭 자동 조정'이 활성화된 경우 최소 폭으로 사용됩니다",
 	"deckFlexible": "폭 자동 조정",
@@ -981,30 +737,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "아래로 이동",
 	"move": "이동",
 	"deckStackLeft": "왼쪽에 쌓기",
-	"deckPopRight": "오른쪽으로 빼기",
-	"remove": "삭제"
+	"deckPopRight": "오른쪽으로 빼기"
 }
 </locale>
 
 <locale lang="json" locale="nl-NL">
 {
-	"settings": "Instellingen",
-	"reload": "Verversen",
 	"deckConfigureColumn": "Column settings",
-	"deckColumnsLabels": {
-		"main": "Main",
-		"widgets": "Widgets",
-		"notifications": "Meldingen",
-		"tl": "Tijdlijn",
-		"antenna": "Antennes",
-		"list": "Lijsten",
-		"channel": "Kanalen",
-		"mentions": "Vermeldingen",
-		"direct": "Directe notities",
-		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
-	},
-	"name": "Naam",
 	"width": "Breedte",
 	"deckUsedAsMinWidthWhenFlexible": "Minimum width will be used for this when the \"Auto-adjust width\" option is enabled",
 	"deckFlexible": "Auto-adjust width",
@@ -1014,30 +753,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Swap with the below column",
 	"move": "Move",
 	"deckStackLeft": "Stack on left column",
-	"deckPopRight": "Pop column to the right",
-	"remove": "Verwijderen"
+	"deckPopRight": "Pop column to the right"
 }
 </locale>
 
 <locale lang="json" locale="no-NO">
 {
-	"settings": "Innstillinger",
-	"reload": "Refresh",
 	"deckConfigureColumn": "Column settings",
-	"deckColumnsLabels": {
-		"main": "Main",
-		"widgets": "Widgets",
-		"notifications": "Varsler",
-		"tl": "Tidslinje",
-		"antenna": "Antenner",
-		"list": "Lister",
-		"channel": "Kanaler",
-		"mentions": "Mentions",
-		"direct": "Direkte",
-		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
-	},
-	"name": "Navn",
 	"width": "Width",
 	"deckUsedAsMinWidthWhenFlexible": "Minimum width will be used for this when the \"Auto-adjust width\" option is enabled",
 	"deckFlexible": "Auto-adjust width",
@@ -1047,30 +769,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Flytt ned",
 	"move": "Flytt",
 	"deckStackLeft": "Stack on left column",
-	"deckPopRight": "Pop column to the right",
-	"remove": "Slett"
+	"deckPopRight": "Pop column to the right"
 }
 </locale>
 
 <locale lang="json" locale="pl-PL">
 {
-	"settings": "Ustawienia",
-	"reload": "Odśwież",
 	"deckConfigureColumn": "Ustawienia kolumny",
-	"deckColumnsLabels": {
-		"main": "Główna",
-		"widgets": "Widżety",
-		"notifications": "Powiadomienia",
-		"tl": "Oś czasu",
-		"antenna": "Anteny",
-		"list": "Listy",
-		"channel": "Kanały",
-		"mentions": "Wspomnienia",
-		"direct": "Bezpośredni",
-		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
-	},
-	"name": "Nazwa",
 	"width": "Szerokość",
 	"deckUsedAsMinWidthWhenFlexible": "Minimum width will be used for this when the \"Auto-adjust width\" option is enabled",
 	"deckFlexible": "Auto-adjust width",
@@ -1080,30 +785,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Zamień z poniższym",
 	"move": "Przenieś",
 	"deckStackLeft": "Przypnij do lewej",
-	"deckPopRight": "Odepnij w prawo",
-	"remove": "Usuń"
+	"deckPopRight": "Odepnij w prawo"
 }
 </locale>
 
 <locale lang="json" locale="pt-PT">
 {
-	"settings": "Configurações",
-	"reload": "Recarregar",
 	"deckConfigureColumn": "Configurar coluna",
-	"deckColumnsLabels": {
-		"main": "Principal",
-		"widgets": "Widgets",
-		"notifications": "Notificações",
-		"tl": "Timeline",
-		"antenna": "Antenas",
-		"list": "Listas",
-		"channel": "Canais",
-		"mentions": "Menções",
-		"direct": "Notas diretas",
-		"roleTimeline": "Linha do tempo do cargo",
-		"chat": "Conversar com usuário"
-	},
-	"name": "Nome",
 	"width": "Largura",
 	"deckUsedAsMinWidthWhenFlexible": "A largura mínima será usada para isso quando o \"Ajuste automático da largura\" estiver ativado",
 	"deckFlexible": "Ajuste automático da largura",
@@ -1113,30 +801,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Trocar de posição com a coluna abaixo",
 	"move": "Mover",
 	"deckStackLeft": "Empilhar na coluna à esquerda",
-	"deckPopRight": "Acoplar coluna à direita",
-	"remove": "Remover"
+	"deckPopRight": "Acoplar coluna à direita"
 }
 </locale>
 
 <locale lang="json" locale="ru-RU">
 {
-	"settings": "Настройки",
-	"reload": "Перезагрузить",
 	"deckConfigureColumn": "Настройки колонок",
-	"deckColumnsLabels": {
-		"main": "Основная",
-		"widgets": "Виджеты",
-		"notifications": "Уведомления",
-		"tl": "Лента",
-		"antenna": "Антенны",
-		"list": "Списки",
-		"channel": "Каналы",
-		"mentions": "Упоминания",
-		"direct": "Личное",
-		"roleTimeline": "История Ролей",
-		"chat": "Открыть личные сообщения"
-	},
-	"name": "Название",
 	"width": "Ширина",
 	"deckUsedAsMinWidthWhenFlexible": "Minimum width will be used for this when the \"Auto-adjust width\" option is enabled",
 	"deckFlexible": "Auto-adjust width",
@@ -1146,30 +817,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Переставить ниже",
 	"move": "Переместить",
 	"deckStackLeft": "В столбик влево",
-	"deckPopRight": "Из столбика вправо",
-	"remove": "Удалить"
+	"deckPopRight": "Из столбика вправо"
 }
 </locale>
 
 <locale lang="json" locale="sk-SK">
 {
-	"settings": "Nastavenia",
-	"reload": "Obnoviť",
 	"deckConfigureColumn": "Nastavenie stĺpcov",
-	"deckColumnsLabels": {
-		"main": "Hlavný",
-		"widgets": "Widgety",
-		"notifications": "Oznámenia",
-		"tl": "Časová os",
-		"antenna": "Antény",
-		"list": "Zoznam",
-		"channel": "Kanály",
-		"mentions": "Zmienky",
-		"direct": "Priame poznámky",
-		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
-	},
-	"name": "Názov",
 	"width": "Šírka",
 	"deckUsedAsMinWidthWhenFlexible": "Minimum width will be used for this when the \"Auto-adjust width\" option is enabled",
 	"deckFlexible": "Auto-adjust width",
@@ -1179,30 +833,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Vymeniť s nasledujúcim",
 	"move": "Pohyb",
 	"deckStackLeft": "Priložiť do ľavého stĺpca",
-	"deckPopRight": "Vybrať napravo",
-	"remove": "Odstrániť"
+	"deckPopRight": "Vybrať napravo"
 }
 </locale>
 
 <locale lang="json" locale="th-TH">
 {
-	"settings": "การตั้งค่า",
-	"reload": "รีโหลด",
 	"deckConfigureColumn": "ตั้งค่าคอลัมน์",
-	"deckColumnsLabels": {
-		"main": "หลัก",
-		"widgets": "วิดเจ็ต",
-		"notifications": "การเเจ้งเตือน",
-		"tl": "ไทม์ไลน์",
-		"antenna": "เสาอากาศ",
-		"list": "รายการ",
-		"channel": "ช่อง",
-		"mentions": "กล่าวถึงคุณ",
-		"direct": "ไดเร็กต์",
-		"roleTimeline": "บทบาทไทม์ไลน์",
-		"chat": "แชตเลย"
-	},
-	"name": "ชื่อ",
 	"width": "ความกว้าง",
 	"deckUsedAsMinWidthWhenFlexible": "ความกว้างขั้นต่ำนั้นจะถูกใช้งานสำหรับสิ่งนี้เมื่อเปิดใช้งานตัวเลือก \"ปรับความกว้างอัตโนมัติ\" หากเลือกเปิดใช้งานแล้ว",
 	"deckFlexible": "ปรับความกว้างอัตโนมัติ",
@@ -1212,30 +849,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "เลื่อนลง",
 	"move": "ย้าย",
 	"deckStackLeft": "กองกับคอลัมน์ด้านซ้าย",
-	"deckPopRight": "ป๊อปคอลัมน์ไปทางขวา",
-	"remove": "ลบ"
+	"deckPopRight": "ป๊อปคอลัมน์ไปทางขวา"
 }
 </locale>
 
 <locale lang="json" locale="tr-TR">
 {
-	"settings": "Ayarlar",
-	"reload": "Yenile",
 	"deckConfigureColumn": "Sütun ayarları",
-	"deckColumnsLabels": {
-		"main": "Ana",
-		"widgets": "Widget'lar",
-		"notifications": "Bildirimler",
-		"tl": "Pano",
-		"antenna": "Antenler",
-		"list": "Liste",
-		"channel": "Kanal",
-		"mentions": "Bahsetmeler",
-		"direct": "Doğrudan notlar",
-		"roleTimeline": "Rol Pano",
-		"chat": "Sohbet"
-	},
-	"name": "İsim",
 	"width": "Genişlik",
 	"deckUsedAsMinWidthWhenFlexible": "“Otomatik genişlik ayarı” seçeneği etkinleştirildiğinde, bunun için minimum genişlik kullanılacak.",
 	"deckFlexible": "Otomatik genişlik ayarı",
@@ -1245,30 +865,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Aşağıdaki sütunla değiştir",
 	"move": "Taşı",
 	"deckStackLeft": "Sol sütunda yığın",
-	"deckPopRight": "Sağdaki pop sütunu",
-	"remove": "Sil"
+	"deckPopRight": "Sağdaki pop sütunu"
 }
 </locale>
 
 <locale lang="json" locale="ug-CN">
 {
-	"settings": "Settings",
-	"reload": "Refresh",
 	"deckConfigureColumn": "Column settings",
-	"deckColumnsLabels": {
-		"main": "Main",
-		"widgets": "Widgets",
-		"notifications": "Notifications",
-		"tl": "Timeline",
-		"antenna": "Antennas",
-		"list": "List",
-		"channel": "Channel",
-		"mentions": "Mentions",
-		"direct": "Direct notes",
-		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
-	},
-	"name": "Name",
 	"width": "Width",
 	"deckUsedAsMinWidthWhenFlexible": "Minimum width will be used for this when the \"Auto-adjust width\" option is enabled",
 	"deckFlexible": "Auto-adjust width",
@@ -1278,30 +881,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Swap with the below column",
 	"move": "Move",
 	"deckStackLeft": "Stack on left column",
-	"deckPopRight": "Pop column to the right",
-	"remove": "ئۆچۈرۈش"
+	"deckPopRight": "Pop column to the right"
 }
 </locale>
 
 <locale lang="json" locale="uk-UA">
 {
-	"settings": "Налаштування",
-	"reload": "Оновити",
 	"deckConfigureColumn": "Column settings",
-	"deckColumnsLabels": {
-		"main": "Головна",
-		"widgets": "Віджети",
-		"notifications": "Сповіщення",
-		"tl": "Стрічка",
-		"antenna": "Антени",
-		"list": "Списки",
-		"channel": "Канали",
-		"mentions": "Згадки",
-		"direct": "Особисте",
-		"roleTimeline": "Role Timeline",
-		"chat": "Написати цьому користувачу"
-	},
-	"name": "Ім'я",
 	"width": "Ширина",
 	"deckUsedAsMinWidthWhenFlexible": "Minimum width will be used for this when the \"Auto-adjust width\" option is enabled",
 	"deckFlexible": "Auto-adjust width",
@@ -1311,30 +897,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Пересунути вниз",
 	"move": "Пересунути",
 	"deckStackLeft": "У стовпчик вліво",
-	"deckPopRight": "Витягнути вправо",
-	"remove": "Видалити"
+	"deckPopRight": "Витягнути вправо"
 }
 </locale>
 
 <locale lang="json" locale="vi-VN">
 {
-	"settings": "Cài đặt",
-	"reload": "Tải lại",
 	"deckConfigureColumn": "Cài đặt cột",
-	"deckColumnsLabels": {
-		"main": "Chính",
-		"widgets": "Tiện ích",
-		"notifications": "Thông báo",
-		"tl": "Bảng tin",
-		"antenna": "Trạm phát sóng",
-		"list": "Danh sách",
-		"channel": "Kênh",
-		"mentions": "Lượt nhắc",
-		"direct": "Nhắn riêng",
-		"roleTimeline": "Role Timeline",
-		"chat": "Chat with user"
-	},
-	"name": "Tên",
 	"width": "Chiều rộng",
 	"deckUsedAsMinWidthWhenFlexible": "Minimum width will be used for this when the \"Auto-adjust width\" option is enabled",
 	"deckFlexible": "Auto-adjust width",
@@ -1344,30 +913,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "Hoán đổi với cột dưới",
 	"move": "Di chuyển",
 	"deckStackLeft": "Xếp chồng với cột bên trái",
-	"deckPopRight": "Xếp chồng với cột bên trái",
-	"remove": "Xóa"
+	"deckPopRight": "Xếp chồng với cột bên trái"
 }
 </locale>
 
 <locale lang="json" locale="zh-CN">
 {
-	"settings": "设置",
-	"reload": "刷新",
 	"deckConfigureColumn": "列设置",
-	"deckColumnsLabels": {
-		"main": "主列",
-		"widgets": "小工具",
-		"notifications": "通知",
-		"tl": "时间线",
-		"antenna": "天线",
-		"list": "列表",
-		"channel": "频道",
-		"mentions": "提及",
-		"direct": "指定用户",
-		"roleTimeline": "角色时间线",
-		"chat": "私信"
-	},
-	"name": "名称",
 	"width": "宽度",
 	"deckUsedAsMinWidthWhenFlexible": "如果启用 “自适应宽度”，此为最小宽度",
 	"deckFlexible": "自适应宽度",
@@ -1377,30 +929,13 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "向下移动",
 	"move": "移动",
 	"deckStackLeft": "向左折叠",
-	"deckPopRight": "向右弹出",
-	"remove": "删除"
+	"deckPopRight": "向右弹出"
 }
 </locale>
 
 <locale lang="json" locale="zh-TW">
 {
-	"settings": "設定",
-	"reload": "重新整理",
 	"deckConfigureColumn": "欄位的設定",
-	"deckColumnsLabels": {
-		"main": "主列",
-		"widgets": "小工具",
-		"notifications": "通知",
-		"tl": "時間軸",
-		"antenna": "天線",
-		"list": "清單",
-		"channel": "頻道",
-		"mentions": "提及",
-		"direct": "指定使用者",
-		"roleTimeline": "角色時間軸",
-		"chat": "聊天"
-	},
-	"name": "名稱",
 	"width": "寬度",
 	"deckUsedAsMinWidthWhenFlexible": "如果啟用「自動調整寬度」，此為最小寬度",
 	"deckFlexible": "自動調整寬度",
@@ -1410,7 +945,6 @@ function onDrop(ev: DragEvent) {
 	"deckSwapDown": "往下移動",
 	"move": "移動 ",
 	"deckStackLeft": "向左折疊",
-	"deckPopRight": "向右彈出",
-	"remove": "刪除"
+	"deckPopRight": "向右彈出"
 }
 </locale>

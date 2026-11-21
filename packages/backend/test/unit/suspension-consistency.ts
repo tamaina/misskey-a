@@ -12,12 +12,16 @@ import { GlobalModule } from '@features/boot/backend/assembly/GlobalModule.js';
 import { DI } from '@/di-symbols.js';
 import { UserSuspendService } from '@features/moderation/backend/services/UserSuspendService.js';
 import { UserFollowingService } from '@features/relationships/backend/services/UserFollowingService.js';
-import type { InstanceEntityService } from '@features/instance/backend/serializers/InstanceEntityService.js';
+import type { entities } from 'misskey-js';
+import { InstanceEntityService } from '@features/instance/backend/serializers/InstanceEntityService.js';
 import type { FollowingsRepository, InstancesRepository, MiUser, UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import { EndpointImplementation as FederationStats } from '@features/federation/backend/endpoints/federation/stats.js';
+import { createProcedureClient } from '@orpc/server';
+import type { ApiActor, ApiContext, ApiServices } from '@features/api/backend/transport/context.js';
+import { createFederationStatsProcedure } from '@features/federation/backend/endpoints/federation/stats.js';
 import { secureRndstr } from '@features/auth/backend/utility/secure-rndstr.js';
-import { FollowingIsFollowerSuspended1791310067731 as SuspensionSchemaMigration } from '../../migration/1791310067731-FollowingIsFollowerSuspended.js';
-import { FollowingIsFollowerSuspendedCopySuspendedState1791310067732 as SuspensionBackfillMigration } from '../../migration/1791310067732-FollowingIsFollowerSuspendedCopySuspendedState.js';
+import { RemoteSuspend1751848750315 as RemoteSuspensionMigration } from '../../migration/1751848750315-RemoteSuspend.js';
+import { FollowingIsFollowerSuspended1752410859370 as SuspensionSchemaMigration } from '../../migration/1752410859370-FollowingIsFollowerSuspended.js';
+import { FollowingIsFollowerSuspendedCopySuspendedState1752410900000 as SuspensionBackfillMigration } from '../../migration/1752410900000-FollowingIsFollowerSuspendedCopySuspendedState.js';
 
 describe('suspension consistency', () => {
 	let app: TestingModule;
@@ -39,14 +43,18 @@ describe('suspension consistency', () => {
 		suspension = app.get(UserSuspendService);
 		vi.spyOn(suspension as any, 'postSuspend').mockResolvedValue(undefined);
 		vi.spyOn(suspension as any, 'postUnsuspend').mockResolvedValue(undefined);
+		const pack = vi.fn(async () => mockDeep<entities.UserLite>());
 		following = Object.assign(Object.create(UserFollowingService.prototype), {
 			usersRepository: users,
 			followingsRepository: followings,
 			followRequestsRepository: app.get(DI.followRequestsRepository),
 			idService: { gen: () => secureRndstr(16) },
 			cacheService: { userFollowingsCache: { refresh: vi.fn() } },
-			globalEventService: { publishInternalEvent: vi.fn() },
+			globalEventService: { publishInternalEvent: vi.fn(), publishMainStream: vi.fn() },
+			webhookService: { enqueueUserWebhook: vi.fn() },
+			notificationService: { createNotification: vi.fn() },
 			userEntityService: {
+				pack,
 				isRemoteUser: (user: MiUser) => user.host != null,
 				isLocalUser: (user: MiUser) => user.host == null,
 				isSuspendedEither: (user: MiUser) => user.isSuspended || ('isRemoteSuspended' in user && user.isRemoteSuspended === true),
@@ -93,6 +101,47 @@ describe('suspension consistency', () => {
 		expect((await followings.findOneByOrFail({ followerId: actor.id })).isFollowerSuspended).toBe(current.isSuspended);
 	});
 
+	function remoteActor(actor: MiUser) {
+		if (actor.host == null) throw new Error('remote fixture required');
+		return { id: actor.id, host: actor.host };
+	}
+
+	test.each([true, false])('remote suspension agrees with follow insertion in either order (follow first: %s)', async followFirst => {
+		const actor = await user();
+		const target = await user(null);
+		if (followFirst) await follow(actor, target);
+		await suspension.suspendFromRemote(remoteActor(actor));
+		if (!followFirst) await follow(actor, target); // stale pre-suspension object
+		expect((await users.findOneByOrFail({ id: actor.id })).isSuspended).toBe(false);
+		expect((await followings.findOneByOrFail({ followerId: actor.id })).isFollowerSuspended).toBe(true);
+	});
+
+	test.each(['local', 'remote'] as const)('clearing the %s flag preserves the other hold and following identity', async clear => {
+		const actor = await user();
+		const target = await user(null);
+		await follow(actor, target);
+		const original = await followings.findOneByOrFail({ followerId: actor.id });
+		await suspension.suspend(actor, actor);
+		await suspension.suspendFromRemote(remoteActor(actor));
+		if (clear === 'local') await suspension.unsuspend(actor, actor);
+		else await suspension.unsuspendFromRemote(remoteActor(actor));
+		const held = await followings.findOneByOrFail({ id: original.id });
+		expect(held.isFollowerSuspended).toBe(true);
+		if (clear === 'local') await suspension.unsuspendFromRemote(remoteActor(actor));
+		else await suspension.unsuspend(actor, actor);
+		expect((await followings.findOneByOrFail({ id: original.id })).isFollowerSuspended).toBe(false);
+		expect(await followings.countBy({ followerId: actor.id })).toBe(1);
+	});
+
+	test('concurrent local and remote changes serialize with follow creation under the shared row lock', async () => {
+		const actor = await user();
+		const target = await user(null);
+		await Promise.all([follow(actor, target), suspension.suspend(actor, actor), suspension.suspendFromRemote(remoteActor(actor)), suspension.unsuspend(actor, actor)]);
+		const current = await users.findOneByOrFail({ id: actor.id });
+		expect(current.isRemoteSuspended).toBe(true);
+		expect((await followings.findOneByOrFail({ followerId: actor.id })).isFollowerSuspended).toBe(current.isSuspended || current.isRemoteSuspended);
+	});
+
 	test('mutual following excludes either suspended direction and restores on unsuspend', async () => {
 		const a = await user();
 		const b = await user();
@@ -135,9 +184,12 @@ describe('suspension consistency', () => {
 				await suspension.suspend(b, b);
 			}
 		}
-		const packer = { packMany: async (values: unknown[]) => values } as unknown as InstanceEntityService;
-		const endpoint = new FederationStats(instances, followings, packer);
-		const result = await endpoint.exec({ limit: 1 }, null, null);
+		const packer = new InstanceEntityService(app.get(DI.meta), { isModerator: async () => false }, { isBlockedHost: () => false, isDeliverSuspendedSoftware: () => undefined, isMediaSilencedHost: () => false, isSilencedHost: () => false });
+		const services = mockDeep<ApiServices<ApiActor>>();
+		services.authenticate.mockResolvedValue([null, null]);
+		const context: ApiContext<ApiActor> = { services, credential: null, ip: '127.0.0.1', headers: {} };
+		const endpoint = createProcedureClient(createFederationStatsProcedure({ instancesRepository: instances, followingsRepository: followings, instanceEntityService: packer }), { context });
+		const result = await endpoint({ limit: 1 });
 		expect(result.topSubInstances[0]).toMatchObject({ host: hosts[0], followersCount: 2 });
 		expect(result.topPubInstances[0]).toMatchObject({ host: hosts[0], followingCount: 1 });
 		expect(result.otherFollowersCount).toBe(1);
@@ -145,9 +197,12 @@ describe('suspension consistency', () => {
 	});
 
 	test('statistics handle no relationships', async () => {
-		const packer = { packMany: async (values: unknown[]) => values } as unknown as InstanceEntityService;
-		const endpoint = new FederationStats(instances, followings, packer);
-		expect(await endpoint.exec({ limit: 1 }, null, null)).toEqual({
+		const packer = new InstanceEntityService(app.get(DI.meta), { isModerator: async () => false }, { isBlockedHost: () => false, isDeliverSuspendedSoftware: () => undefined, isMediaSilencedHost: () => false, isSilencedHost: () => false });
+		const services = mockDeep<ApiServices<ApiActor>>();
+		services.authenticate.mockResolvedValue([null, null]);
+		const context: ApiContext<ApiActor> = { services, credential: null, ip: '127.0.0.1', headers: {} };
+		const endpoint = createProcedureClient(createFederationStatsProcedure({ instancesRepository: instances, followingsRepository: followings, instanceEntityService: packer }), { context });
+		expect(await endpoint({ limit: 1 })).toEqual({
 			topSubInstances: [], topPubInstances: [], otherFollowersCount: 0, otherFollowingCount: 0,
 		});
 	});
@@ -179,6 +234,33 @@ describe('suspension consistency', () => {
 			expect(columns).toHaveLength(0);
 			await schema.up(runner);
 			await backfill.up(runner);
+			await runner.commitTransaction();
+			const pending = await users.manager.connection.driver.createSchemaBuilder().log();
+			expect(pending.upQueries).toEqual([]);
+			expect(pending.downQueries).toEqual([]);
+		} finally {
+			if (runner.isTransactionActive) await runner.rollbackTransaction();
+			await runner.release();
+		}
+	});
+	test.each([[false, false], [true, false], [false, true], [true, true]])('original remote suspension migration preserves following hold for local=%s, remote=%s across down/up', async (localHeld, remoteHeld) => {
+		const actor = await user();
+		const target = await user(null);
+		await follow(actor, target);
+		if (localHeld) await suspension.suspend(actor, actor);
+		if (remoteHeld) await suspension.suspendFromRemote(remoteActor(actor));
+		const original = await followings.findOneByOrFail({ followerId: actor.id });
+		const runner = users.manager.connection.createQueryRunner();
+		await runner.connect();
+		try {
+			await runner.startTransaction();
+			const migration = new RemoteSuspensionMigration();
+			await migration.down(runner);
+			expect(await runner.query(`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'user' AND column_name = 'isRemoteSuspended'`)).toHaveLength(0);
+			expect(await runner.query('SELECT id, "isFollowerSuspended" FROM "following" WHERE "followerId" = $1', [actor.id])).toEqual([{ id: original.id, isFollowerSuspended: localHeld || remoteHeld }]);
+			await migration.up(runner);
+			expect(await runner.query('SELECT "isSuspended", "isRemoteSuspended" FROM "user" WHERE id = $1', [actor.id])).toEqual([{ isSuspended: localHeld, isRemoteSuspended: false }]);
+			expect(await runner.query('SELECT "isFollowerSuspended" FROM "following" WHERE id = $1', [original.id])).toEqual([{ isFollowerSuspended: localHeld || remoteHeld }]);
 			await runner.commitTransaction();
 			const pending = await users.manager.connection.driver.createSchemaBuilder().log();
 			expect(pending.upQueries).toEqual([]);

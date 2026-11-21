@@ -4,26 +4,17 @@
  */
 
 import { Injectable, Inject } from '@nestjs/common';
-import { Ajv } from 'ajv';
+import * as v from 'valibot';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { Logger } from '@features/runtime/backend/logging/logger.js';
 import type { AntennasRepository } from '@features/persistence/backend/repositories/models.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
-import { toLegacyJsonSchema } from '@features/api/backend/index.js';
-import { exportedAntenna } from '../../contract/antenna-export.js';
-import type { ExportedAntenna } from '../../contract/antenna-export.js';
+import { importedAntennaSchema } from '@features/portability/backend/antenna-artifact.schema.js';
 import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import { DBAntennaImportJobData } from '@features/runtime/backend/queue/types.js';
 import type * as Bull from 'bullmq';
-
-const exportedAntennaSchema = toLegacyJsonSchema(exportedAntenna, {
-	target: 'openapi-3.0',
-	typeMode: 'ignore',
-});
-
-const validate = new Ajv().compile<ExportedAntenna>(exportedAntennaSchema);
 
 @Injectable()
 export class ImportAntennasProcessorService {
@@ -41,15 +32,21 @@ export class ImportAntennasProcessorService {
 	}
 
 	@bindThis
-	public async process(job: Bull.Job<DBAntennaImportJobData>): Promise<void> {
+	public async process(job: Pick<Bull.Job<DBAntennaImportJobData>, 'data'>): Promise<void> {
 		const now = new Date();
 		try {
-			for (const antenna of job.data.antenna) {
-				if (antenna.keywords.length === 0 || antenna.keywords[0].every(x => x === '')) continue;
-				if (!validate(antenna)) {
+			// Non-array JSON remains queued, then fails at the same asynchronous processing stage.
+			if (!Array.isArray(job.data.antenna) && typeof job.data.antenna !== 'string') throw new TypeError('Antenna artifact is not iterable');
+			for (const entry of job.data.antenna) {
+				const parsed = v.safeParse(importedAntennaSchema, entry);
+				if (!parsed.success) {
 					this.logger.warn('Validation Failed');
 					continue;
 				}
+				const antenna = parsed.output;
+				if (antenna.keywords.length === 0 || antenna.keywords[0].every(x => x === '')) continue;
+				const users = antenna.src === 'list' && antenna.userListAccts !== null ? antenna.userListAccts : antenna.users;
+				if (users === undefined) throw new TypeError('Missing antenna user list accounts');
 				const result = await this.antennasRepository.insertOne({
 					id: this.idService.gen(now.getTime()),
 					lastUsedAt: now,
@@ -59,7 +56,7 @@ export class ImportAntennasProcessorService {
 					userListId: null,
 					keywords: antenna.keywords,
 					excludeKeywords: antenna.excludeKeywords,
-					users: (antenna.src === 'list' && antenna.userListAccts !== null ? antenna.userListAccts : antenna.users).filter(Boolean),
+					users: users.filter(Boolean),
 					caseSensitive: antenna.caseSensitive,
 					localOnly: antenna.localOnly,
 					excludeBots: antenna.excludeBots,
@@ -70,8 +67,8 @@ export class ImportAntennasProcessorService {
 				this.logger.succ('Antenna created: ' + result.id);
 				this.globalEventService.publishInternalEvent('antennaCreated', result);
 			}
-		} catch (err: any) {
-			this.logger.error(err);
+		} catch (err) {
+			this.logger.error(err instanceof Error ? err : String(err));
 		}
 	}
 }

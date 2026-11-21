@@ -3,31 +3,22 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { chartUsersDefinition, chartInput, chartUsersOutput } from '../../../contract/chart-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-import { UsersChart } from '../../charts/users.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-const contractProjection = projectEndpointContract(chartUsersDefinition);
+import { decodeScalarInput } from '@features/api/backend/transport/middleware.js';
+import { chartUsersContract, chartUsersGetContract } from './users.contract.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import type { StatisticsDependencies } from '../../api.implementation.js';
+export function createUsersProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['users']) {
+	return createApiProcedure<Actor>()(chartUsersContract)
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null)));
+}
+export function createUsersGetProcedure<Actor extends ApiActor>(deps: StatisticsDependencies['charts']['users']) {
+	return createApiProcedure<Actor>()(chartUsersGetContract)
+		.use(decodeScalarInput<Actor>({ limit: 'integer', offset: 'integer' }))
+		.handler(async ({ input }) => projectChart(await deps.getChart(input.span, input.limit, input.offset ? new Date(input.offset) : null)));
+}
 
-export const meta = {
-	tags: ['charts', 'users'],
-
-	res: contractProjection.response,
-
-	allowGet: true,
-	cacheSec: 60 * 60,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof chartInput, typeof chartUsersOutput> {
-	constructor(
-		private usersChart: UsersChart,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return await this.usersChart.getChart(ps.span, ps.limit, ps.offset ? new Date(ps.offset) : null);
-		});
-	}
+function projectChart(value: Awaited<ReturnType<StatisticsDependencies['charts']['users']['getChart']>>) {
+	return { local: { total: value.local.total.map(item => item), inc: value.local.inc.map(item => item), dec: value.local.dec.map(item => item) }, remote: { total: value.remote.total.map(item => item), inc: value.remote.inc.map(item => item), dec: value.remote.dec.map(item => item) } };
 }

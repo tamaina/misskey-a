@@ -3,26 +3,25 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { channelContract, channelErrors } from '@features/channels/contract';
-import { legacyChannelSchemas } from '@features/channels/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-export const meta = {
-	tags: ['channels'],
+import { channelsUnfavoriteContract, channelsUnfavoriteErrors } from './unfavorite.contract.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
 
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:channels',
-
-	errors: channelErrors['channels/unfavorite'],
-} as const;
-
-export const paramDef = legacyChannelSchemas['channels/unfavorite'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('channelCommands', commands => createContractTransportEndpoint(meta, paramDef, channelContract['channels/unfavorite'], async (params, user) => commands['channels/unfavorite'](params, {
-	context: { actor: user },
-})));
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { ChannelsRepository, ChannelFavoritesRepository } from '@features/persistence/backend/repositories/models.js';
+export interface ChannelsUnfavoriteDependencies {
+	channelsRepository: ChannelsRepository;
+	channelFavoritesRepository: ChannelFavoritesRepository;
+}
+export function createChannelsUnfavoriteProcedure<Actor extends MiLocalUser>(deps: ChannelsUnfavoriteDependencies) {
+	return createApiProcedure<Actor>()(channelsUnfavoriteContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const channel = await deps.channelsRepository.findOneBy({ id: input.channelId });
+			if (channel == null) throw apiError(channelsUnfavoriteErrors.noSuchChannel);
+			await deps.channelFavoritesRepository.delete({ userId: actor.id, channelId: channel.id });
+		});
+}

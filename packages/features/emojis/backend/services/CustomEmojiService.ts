@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { FetchEmojisHostTypes, FetchEmojisSortKeys } from '../../contract/fetch-options.js';
+import type { FetchEmojisHostTypes, FetchEmojisSortKeys } from '../fetch-options.js';
 import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { In, IsNull } from 'typeorm';
@@ -20,8 +20,8 @@ import type { EmojisRepository, MiRole, MiUser } from '@features/persistence/bac
 import type { MiEmoji } from '../models/Emoji.js';
 import type { Serialized } from '@features/runtime/backend/types.js';
 
-export { fetchEmojisHostTypes, fetchEmojisSortKeys } from '../../contract/fetch-options.js';
-export type { FetchEmojisHostTypes, FetchEmojisSortKeys } from '../../contract/fetch-options.js';
+export { fetchEmojisHostTypes, fetchEmojisSortKeys } from '../fetch-options.js';
+export type { FetchEmojisHostTypes, FetchEmojisSortKeys } from '../fetch-options.js';
 
 const parseEmojiStrRegexp = /^([-\w]+)(?:@([\w.-]+))?$/;
 

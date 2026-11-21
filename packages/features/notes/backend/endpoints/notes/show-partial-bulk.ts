@@ -2,37 +2,25 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineNotesShowPartialBulkDefinition, inlineNotesShowPartialBulkInput, inlineNotesShowPartialBulkOutput } from '../../../contract/endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
+import { toPackedRecord } from '../../../../users/backend/json-value.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { GetterService } from '@features/api/backend/transport/GetterService.js';
 
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
-import { GetterService } from '@features/api/backend/transport/GetterService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { notesShowPartialBulkContract } from './show-partial-bulk.contract.js';
+import type { MiLocalUser } from "@features/users/backend/models/User.js";
 
-const contractProjection = projectEndpointContract(inlineNotesShowPartialBulkDefinition);
+export interface NotesShowPartialBulkDependencies {
+	noteEntityService: Pick<NoteEntityService, 'fetchDiffs'>;
+}
+export function createNotesShowPartialBulkProcedure(deps: NotesShowPartialBulkDependencies) {
+	return createApiProcedure<MiLocalUser>()(notesShowPartialBulkContract).handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
 
-export const meta = {
-	tags: ['notes'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-
-	errors: {
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineNotesShowPartialBulkInput, typeof inlineNotesShowPartialBulkOutput> {
-	constructor(
-		private noteEntityService: NoteEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return await this.noteEntityService.fetchDiffs(ps.noteIds, me?.id ?? null);
+					return await deps.noteEntityService.fetchDiffs(ps.noteIds, me?.id ?? null);
+			})();
+			return result.map(note => ({ id: note.id, reactions: toPackedRecord(note.reactions), reactionEmojis: toPackedRecord(note.reactionEmojis) }));
 		});
-	}
 }

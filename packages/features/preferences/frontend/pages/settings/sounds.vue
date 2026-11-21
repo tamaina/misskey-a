@@ -52,17 +52,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 		</FormSection>
 
-		<MkButton danger @click="reset()"><i class="ti ti-reload"></i> {{ $locale.sfc.default }}</MkButton>
+		<MkButton danger @click="reset()"><i class="ti ti-reload"></i> {{ globalLocale.env.default }}</MkButton>
 	</div>
 </SearchMarker>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref } from 'vue';
 import XSound from '@features/preferences/frontend/pages/settings/sounds.sound.vue';
-import type { Ref } from 'vue';
-import type { SoundType, OperationType } from '@features/preferences/frontend/utility/sound.js';
-import type { SoundStore } from '@features/preferences/frontend/state/def.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import MkRange from '@features/ui/frontend/components/MkRange.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -76,6 +74,12 @@ import MkPreferenceContainer from '@features/preferences/frontend/components/MkP
 import { PREF_DEF } from '@features/preferences/frontend/state/def.js';
 import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
 import { getInitialPrefValue } from '@features/preferences/frontend/state/manager.js';
+import type { SoundStore } from '@features/preferences/frontend/state/def.js';
+import type { SoundType, OperationType } from '@features/preferences/frontend/utility/sound.js';
+import type { Ref } from 'vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const notUseSound = prefer.model('sound.notUseSound');
 const useSoundOnlyWhenActive = prefer.model('sound.useSoundOnlyWhenActive');
@@ -92,7 +96,7 @@ const sounds = ref<Record<OperationType, Ref<SoundStore>>>({
 function getSoundTypeName(f: SoundType): string {
 	switch (f) {
 		case null:
-			return $locale.value.sfc.none;
+			return globalLocale.value.env.none;
 		case '_driveFile_':
 			return $locale.value.sfc.soundSettingsDriveFile;
 		default:
@@ -147,8 +151,6 @@ definePage(() => ({
 		"reaction": "On choosing a reaction",
 		"chatMessage": "Chat Messages"
 	},
-	"default": "افتراضي",
-	"none": "لا شيء",
 	"soundSettingsDriveFile": "Use an audio file in Drive."
 }
 </locale>
@@ -167,8 +169,6 @@ definePage(() => ({
 		"reaction": "Quan se selecciona una reacció ",
 		"chatMessage": "Missatges del xat"
 	},
-	"default": "Per defecte",
-	"none": "Res",
 	"soundSettingsDriveFile": "Fer servir un fitxer d'àudio del disc"
 }
 </locale>
@@ -187,8 +187,6 @@ definePage(() => ({
 		"reaction": "On choosing a reaction",
 		"chatMessage": "Chat Messages"
 	},
-	"default": "Výchozí",
-	"none": "Žádný",
 	"soundSettingsDriveFile": "Use an audio file in Drive."
 }
 </locale>
@@ -207,8 +205,6 @@ definePage(() => ({
 		"reaction": "On choosing a reaction",
 		"chatMessage": "Chat Messages"
 	},
-	"default": "Default",
-	"none": "None",
 	"soundSettingsDriveFile": "Use an audio file in Drive."
 }
 </locale>
@@ -227,8 +223,6 @@ definePage(() => ({
 		"reaction": "Auswählen einer Reaktion",
 		"chatMessage": "Chat-Nachrichten"
 	},
-	"default": "Standard",
-	"none": "Nichts",
 	"soundSettingsDriveFile": "Audiodatei aus dem Drive verwenden"
 }
 </locale>
@@ -247,8 +241,6 @@ definePage(() => ({
 		"reaction": "On choosing a reaction",
 		"chatMessage": "Chat Messages"
 	},
-	"default": "Default",
-	"none": "None",
 	"soundSettingsDriveFile": "Use an audio file in Drive."
 }
 </locale>
@@ -267,8 +259,6 @@ definePage(() => ({
 		"reaction": "Al seleccionar una reacción",
 		"chatMessage": "Mensajes del Chat"
 	},
-	"default": "Predeterminado",
-	"none": "Ninguna",
 	"soundSettingsDriveFile": "Usar un archivo de audio en Drive"
 }
 </locale>
@@ -287,8 +277,6 @@ definePage(() => ({
 		"reaction": "Lors de la sélection de la réaction",
 		"chatMessage": "Chat Messages"
 	},
-	"default": "Par défaut",
-	"none": "Rien",
 	"soundSettingsDriveFile": "Utiliser un effet sonore sur le Disque"
 }
 </locale>
@@ -307,8 +295,6 @@ definePage(() => ({
 		"reaction": "Ketika memilih reaksi",
 		"chatMessage": "Obrolan pengguna"
 	},
-	"default": "Bawaan",
-	"none": "Tidak ada",
 	"soundSettingsDriveFile": "Menggunakan berkas audio dalam Drive"
 }
 </locale>
@@ -327,8 +313,6 @@ definePage(() => ({
 		"reaction": "Quando seleziono una reazione",
 		"chatMessage": "Messaggio di chat"
 	},
-	"default": "Predefinito",
-	"none": "Nessuna",
 	"soundSettingsDriveFile": "Suoni del Drive"
 }
 </locale>
@@ -347,8 +331,6 @@ definePage(() => ({
 		"reaction": "リアクション選択時",
 		"chatMessage": "ダイレクトメッセージ"
 	},
-	"default": "デフォルト",
-	"none": "なし",
 	"soundSettingsDriveFile": "ドライブの音声を使用"
 }
 </locale>
@@ -367,8 +349,6 @@ definePage(() => ({
 		"reaction": "ツッコミ選んどるとき",
 		"chatMessage": "チャットしよか"
 	},
-	"default": "デフォルト",
-	"none": "なし",
 	"soundSettingsDriveFile": "ドライブん中の音使う"
 }
 </locale>
@@ -387,8 +367,6 @@ definePage(() => ({
 		"reaction": "On choosing a reaction",
 		"chatMessage": "Chat Messages"
 	},
-	"default": "Default",
-	"none": "None",
 	"soundSettingsDriveFile": "Use an audio file in Drive."
 }
 </locale>
@@ -407,8 +385,6 @@ definePage(() => ({
 		"reaction": "On choosing a reaction",
 		"chatMessage": "Chat Messages"
 	},
-	"default": "Default",
-	"none": "None",
 	"soundSettingsDriveFile": "Use an audio file in Drive."
 }
 </locale>
@@ -427,8 +403,6 @@ definePage(() => ({
 		"reaction": "리액션 선택",
 		"chatMessage": "채팅 메시지"
 	},
-	"default": "기본값",
-	"none": "없음",
 	"soundSettingsDriveFile": "드라이브에 있는 오디오를 사용"
 }
 </locale>
@@ -447,8 +421,6 @@ definePage(() => ({
 		"reaction": "On choosing a reaction",
 		"chatMessage": "Chat Messages"
 	},
-	"default": "Standaard",
-	"none": "Niets",
 	"soundSettingsDriveFile": "Use an audio file in Drive."
 }
 </locale>
@@ -467,8 +439,6 @@ definePage(() => ({
 		"reaction": "On choosing a reaction",
 		"chatMessage": "Chat Messages"
 	},
-	"default": "Standard",
-	"none": "Ingen",
 	"soundSettingsDriveFile": "Use an audio file in Drive."
 }
 </locale>
@@ -487,8 +457,6 @@ definePage(() => ({
 		"reaction": "On choosing a reaction",
 		"chatMessage": "Chat Messages"
 	},
-	"default": "Domyślne",
-	"none": "Brak",
 	"soundSettingsDriveFile": "Use an audio file in Drive."
 }
 </locale>
@@ -507,8 +475,6 @@ definePage(() => ({
 		"reaction": "Ao selecionar uma reação",
 		"chatMessage": "Mensagens em Conversas"
 	},
-	"default": "Predefinição",
-	"none": "Nenhum",
 	"soundSettingsDriveFile": "Usar um arquivo de áudio do Drive."
 }
 </locale>
@@ -527,8 +493,6 @@ definePage(() => ({
 		"reaction": "При выборе реакции",
 		"chatMessage": "Открыть личные сообщения"
 	},
-	"default": "По умолчанию",
-	"none": "Ничего",
 	"soundSettingsDriveFile": "Использовать аудиофайл с Диска."
 }
 </locale>
@@ -547,8 +511,6 @@ definePage(() => ({
 		"reaction": "On choosing a reaction",
 		"chatMessage": "Chat Messages"
 	},
-	"default": "Predvolené",
-	"none": "Žiadne",
 	"soundSettingsDriveFile": "Use an audio file in Drive."
 }
 </locale>
@@ -567,8 +529,6 @@ definePage(() => ({
 		"reaction": "เมื่อเลือกรีแอคชั่น",
 		"chatMessage": "ข้อความของแชต"
 	},
-	"default": "ค่าเริ่มต้น",
-	"none": "ไม่มี",
 	"soundSettingsDriveFile": "ใช้เสียงจากไดรฟ์"
 }
 </locale>
@@ -587,8 +547,6 @@ definePage(() => ({
 		"reaction": "Reaksiyon seçimi hakkında",
 		"chatMessage": "Sohbet Mesajları"
 	},
-	"default": "Varsayılan",
-	"none": "Hiçbiri",
 	"soundSettingsDriveFile": "Drive'da bir ses dosyası kullanın."
 }
 </locale>
@@ -607,8 +565,6 @@ definePage(() => ({
 		"reaction": "On choosing a reaction",
 		"chatMessage": "Chat Messages"
 	},
-	"default": "Default",
-	"none": "None",
 	"soundSettingsDriveFile": "Use an audio file in Drive."
 }
 </locale>
@@ -627,8 +583,6 @@ definePage(() => ({
 		"reaction": "On choosing a reaction",
 		"chatMessage": "Написати цьому користувачу"
 	},
-	"default": "За умовчанням",
-	"none": "Відсутній",
 	"soundSettingsDriveFile": "Use an audio file in Drive."
 }
 </locale>
@@ -647,8 +601,6 @@ definePage(() => ({
 		"reaction": "On choosing a reaction",
 		"chatMessage": "Chat Messages"
 	},
-	"default": "Mặc định",
-	"none": "Không",
 	"soundSettingsDriveFile": "Use an audio file in Drive."
 }
 </locale>
@@ -667,8 +619,6 @@ definePage(() => ({
 		"reaction": "添加回应",
 		"chatMessage": "私信"
 	},
-	"default": "默认",
-	"none": "无",
 	"soundSettingsDriveFile": "使用网盘内的音频"
 }
 </locale>
@@ -687,8 +637,6 @@ definePage(() => ({
 		"reaction": "選擇反應時",
 		"chatMessage": "聊天訊息"
 	},
-	"default": "預設",
-	"none": "無",
 	"soundSettingsDriveFile": "使用雲端硬碟的音效檔案"
 }
 </locale>

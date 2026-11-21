@@ -4,7 +4,7 @@
  */
 
 import type * as v from 'valibot';
-import type { Packed, PackedModels, packedSchemas } from '../built/contracts/index/contract/packed.js';
+import type { Packed, PackedModels, packedSchemas } from '../built/contracts/index/backend/packed.schema.js';
 
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true : false;
 type Assert<T extends true> = T;

@@ -2,66 +2,55 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedNotesChildrenDefinition, packedNotesChildrenInput, packedNotesChildrenOutput } from '../../../contract/packed-endpoint-definitions.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPackedNote } from '@features/notes/backend/note.schema.js';
 import { Brackets } from 'typeorm';
-import { Inject, Injectable } from '@nestjs/common';
-import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
 
 import { QueryService } from '../../services/QueryService.js';
 import { NoteEntityService } from '../../serializers/NoteEntityService.js';
-import { DI } from '@/di-symbols.js';
+import { notesChildrenContract } from './children.contract.js';
+import type { NotesRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from "@features/users/backend/models/User.js";
 
-const contractProjection = projectEndpointContract(packedNotesChildrenDefinition);
+export interface NotesChildrenDependencies {
+	notesRepository: NotesRepository;
+	noteEntityService: Pick<NoteEntityService, 'packMany'>;
+	queryService: Pick<QueryService, 'makePaginationQuery' | 'generateVisibilityQuery' | 'generateBaseNoteFilteringQuery'>;
+}
+export function createNotesChildrenProcedure(deps: NotesChildrenDependencies) {
+	return createApiProcedure<MiLocalUser>()(notesChildrenContract).handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
 
-export const meta = {
-	tags: ['notes'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedNotesChildrenInput, typeof packedNotesChildrenOutput> {
-	constructor(
-		@Inject(DI.notesRepository)
-		private notesRepository: NotesRepository,
-
-		private noteEntityService: NoteEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere(new Brackets(qb => {
-					qb
-						.where('note.replyId = :noteId', { noteId: ps.noteId })
-						.orWhere(new Brackets(qb => {
+					const query = deps.queryService.makePaginationQuery(deps.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+						.andWhere(new Brackets(qb => {
 							qb
-								.where('note.renoteId = :noteId', { noteId: ps.noteId })
-								.andWhere(new Brackets(qb => {
+								.where('note.replyId = :noteId', { noteId: ps.noteId })
+								.orWhere(new Brackets(qb => {
 									qb
-										.where('note.text IS NOT NULL')
-										.orWhere('note.fileIds != \'{}\'')
-										.orWhere('note.hasPoll = TRUE');
+										.where('note.renoteId = :noteId', { noteId: ps.noteId })
+										.andWhere(new Brackets(qb => {
+											qb
+												.where('note.text IS NOT NULL')
+												.orWhere('note.fileIds != \'{}\'')
+												.orWhere('note.hasPoll = TRUE');
+										}));
 								}));
-						}));
-				}))
-				.innerJoinAndSelect('note.user', 'user')
-				.leftJoinAndSelect('note.reply', 'reply')
-				.leftJoinAndSelect('note.renote', 'renote')
-				.leftJoinAndSelect('reply.user', 'replyUser')
-				.leftJoinAndSelect('renote.user', 'renoteUser');
+						}))
+						.innerJoinAndSelect('note.user', 'user')
+						.leftJoinAndSelect('note.reply', 'reply')
+						.leftJoinAndSelect('note.renote', 'renote')
+						.leftJoinAndSelect('reply.user', 'replyUser')
+						.leftJoinAndSelect('renote.user', 'renoteUser');
 
-			this.queryService.generateVisibilityQuery(query, me);
-			this.queryService.generateBaseNoteFilteringQuery(query, me);
+					deps.queryService.generateVisibilityQuery(query, me);
+					deps.queryService.generateBaseNoteFilteringQuery(query, me);
 
-			const notes = await query.limit(ps.limit).getMany();
+					const notes = await query.limit(ps.limit).getMany();
 
-			return await this.noteEntityService.packMany(notes, me);
+					return await deps.noteEntityService.packMany(notes, me);
+			})();
+			return result.map(toPackedNote);
 		});
-	}
 }

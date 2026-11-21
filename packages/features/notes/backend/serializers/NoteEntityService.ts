@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { EntityNotFoundError, In } from 'typeorm';
 import { ModuleRef } from '@nestjs/core';
 import { DI } from '@/di-symbols.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiNote } from '../models/Note.js';
@@ -16,6 +16,7 @@ import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DebounceLoader } from '@features/runtime/backend/async/loader.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { shouldHideNoteByTime } from '../utility/should-hide-note-by-time.js';
+import { isQuotePacked, isRenotePacked } from '../utility/is-renote.js';
 import { ReactionsBufferingService } from '../services/ReactionsBufferingService.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
 import type { OnModuleInit } from '@nestjs/common';
@@ -194,7 +195,7 @@ export class NoteEntityService implements OnModuleInit {
 	}
 
 	@bindThis
-	private async populatePoll(note: MiNote, meId: MiUser['id'] | null) {
+	private async populatePoll(note: Pick<MiNote, 'id'>, meId: MiUser['id'] | null) {
 		const poll = await this.pollsRepository.findOneByOrFail({ noteId: note.id });
 		const choices = poll.choices.map(c => ({
 			text: c,
@@ -230,6 +231,19 @@ export class NoteEntityService implements OnModuleInit {
 			expiresAt: poll.expiresAt?.toISOString() ?? null,
 			choices,
 		};
+	}
+
+	@bindThis
+	public async withMyPollVotes(note: Packed<'Note'>, meId: MiUser['id'] | null): Promise<Packed<'Note'>> {
+		const [poll, renote, reply] = await Promise.all([
+			note.poll ? this.populatePoll(note, meId) : note.poll,
+			note.renote ? this.withMyPollVotes(note.renote, meId) : note.renote,
+			note.reply ? this.withMyPollVotes(note.reply, meId) : note.reply,
+		]);
+
+		if (poll === note.poll && renote === note.renote && reply === note.reply) return note;
+
+		return { ...note, poll, renote, reply };
 	}
 
 	@bindThis
@@ -271,6 +285,23 @@ export class NoteEntityService implements OnModuleInit {
 		}
 
 		return undefined;
+	}
+
+	@bindThis
+	public async withMyRenoteReaction(note: Packed<'Note'>, meId: MiUser['id'] | null): Promise<Packed<'Note'>> {
+		if (meId == null) return note;
+		if (!isRenotePacked(note) || isQuotePacked(note)) return note;
+		if (note.renote == null || Object.keys(note.renote.reactions).length === 0) return note;
+
+		const myReaction = await this.populateMyReaction(note.renote, meId);
+
+		return {
+			...note,
+			renote: {
+				...note.renote,
+				myReaction,
+			},
+		};
 	}
 
 	@bindThis

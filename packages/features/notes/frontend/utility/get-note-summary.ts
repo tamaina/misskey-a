@@ -3,9 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
 import FeatureLocaleMessages from '@features/notes/frontend/ts-messages.vue';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
+import type { Locale } from 'i18n';
+
+function getGlobalLocale() {
+	return useLocale<Locale>(import.meta.url).value.env;
+}
 
 /**
  * 投稿を表す文字列を取得します。
@@ -41,7 +47,7 @@ export const getNoteSummary = (note?: Misskey.entities.Note | Misskey.entities.N
 	}
 
 	if ('deletedAt' in note && note.deletedAt) {
-		return `(${FeatureLocaleMessages.$locale.deletedNote})`;
+		return `(${getGlobalLocale().deletedNote})`;
 	}
 
 	if ('isHidden' in note && note.isHidden) {
@@ -59,12 +65,12 @@ export const getNoteSummary = (note?: Misskey.entities.Note | Misskey.entities.N
 
 	// ファイルが添付されているとき
 	if (_opts.showFiles && (note.files || []).length !== 0) {
-		summary += ` (${interpolateLocaleParameters(FeatureLocaleMessages.$locale.withNFiles, { n: note.files!.length })})`;
+		summary += ` (${interpolateLocaleParameters(getGlobalLocale().withNFiles, { n: note.files!.length })})`;
 	}
 
 	// 投票が添付されているとき
 	if (_opts.showPoll && note.poll) {
-		summary += ` (${FeatureLocaleMessages.$locale.poll})`;
+		summary += ` (${getGlobalLocale().poll})`;
 	}
 
 	// 返信のとき

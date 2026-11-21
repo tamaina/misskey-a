@@ -113,8 +113,8 @@ function close() {
 <locale lang="json" locale="ar-SA">
 {
 	"aboutX": "عن {x}",
-	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
-	"correspondingSourceIsAvailable": "The corresponding source code is available at {anchor}",
+	"aboutMisskeyThisIsModifiedVersion": "يستخدم {name} نسخة معدّلة من Misskey الأصلي.",
+	"correspondingSourceIsAvailable": "الشيفرة المصدرية لهذه النسخة متاحة عبر {anchor}",
 	"aboutMisskey": "عن Misskey",
 	"gotIt": "فهِمت"
 }
@@ -133,8 +133,8 @@ function close() {
 <locale lang="json" locale="cs-CZ">
 {
 	"aboutX": "O {x}",
-	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
-	"correspondingSourceIsAvailable": "The corresponding source code is available at {anchor}",
+	"aboutMisskeyThisIsModifiedVersion": "{name} používá upravenou verzi původního Misskey.",
+	"correspondingSourceIsAvailable": "Odpovídající zdrojový kód je dostupný na {anchor}",
 	"aboutMisskey": "O Misskey",
 	"gotIt": "Rozumím!"
 }
@@ -142,11 +142,11 @@ function close() {
 
 <locale lang="json" locale="da-DK">
 {
-	"aboutX": "About {x}",
-	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
-	"correspondingSourceIsAvailable": "The corresponding source code is available at {anchor}",
-	"aboutMisskey": "About Misskey",
-	"gotIt": "Got it!"
+	"aboutX": "Om {x}",
+	"aboutMisskeyThisIsModifiedVersion": "{name} bruger en ændret version af den oprindelige Misskey.",
+	"correspondingSourceIsAvailable": "Den tilhørende kildekode er tilgængelig på {anchor}",
+	"aboutMisskey": "Om Misskey",
+	"gotIt": "Forstået!"
 }
 </locale>
 
@@ -183,7 +183,7 @@ function close() {
 <locale lang="json" locale="fr-FR">
 {
 	"aboutX": "À propos de {x}",
-	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"aboutMisskeyThisIsModifiedVersion": "{name} utilise une version modifiée du Misskey original.",
 	"correspondingSourceIsAvailable": "Le code source correspondant est disponible à {anchor}",
 	"aboutMisskey": "À propos de Misskey",
 	"gotIt": "J’ai compris !"
@@ -224,7 +224,7 @@ function close() {
 {
 	"aboutX": "{x}について",
 	"aboutMisskeyThisIsModifiedVersion": "{name}はオリジナルのMisskeyをいじったバージョンをつこうてるで。",
-	"correspondingSourceIsAvailable": "{anchor}",
+	"correspondingSourceIsAvailable": "このバージョンのソースコードは{anchor}から見られるで。",
 	"aboutMisskey": "Misskeyってなんや？",
 	"gotIt": "ほい"
 }
@@ -232,20 +232,20 @@ function close() {
 
 <locale lang="json" locale="kab-KAB">
 {
-	"aboutX": "About {x}",
-	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
-	"correspondingSourceIsAvailable": "The corresponding source code is available at {anchor}",
-	"aboutMisskey": "About Misskey",
-	"gotIt": "Got it!"
+	"aboutX": "Ɣef {x}",
+	"aboutMisskeyThisIsModifiedVersion": "{name} iseqdac lqem yettwabeddlen n Misskey aneṣli.",
+	"correspondingSourceIsAvailable": "Tangalt n uɣbalu n lqem-a tella deg {anchor}",
+	"aboutMisskey": "Ɣef Misskey",
+	"gotIt": "Gziɣ!"
 }
 </locale>
 
 <locale lang="json" locale="kn-IN">
 {
-	"aboutX": "About {x}",
-	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
-	"correspondingSourceIsAvailable": "The corresponding source code is available at {anchor}",
-	"aboutMisskey": "About Misskey",
+	"aboutX": "{x} ಕುರಿತು",
+	"aboutMisskeyThisIsModifiedVersion": "{name} ಮೂಲ Misskeyಯ ಮಾರ್ಪಡಿಸಿದ ಆವೃತ್ತಿಯನ್ನು ಬಳಸುತ್ತದೆ.",
+	"correspondingSourceIsAvailable": "ಈ ಆವೃತ್ತಿಯ ಮೂಲ ಕೋಡ್ {anchor} ನಲ್ಲಿ ಲಭ್ಯವಿದೆ",
+	"aboutMisskey": "Misskey ಕುರಿತು",
 	"gotIt": "ಅರ್ಥವಾಯಿತು!"
 }
 </locale>
@@ -263,7 +263,7 @@ function close() {
 <locale lang="json" locale="nl-NL">
 {
 	"aboutX": "Over {x}",
-	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"aboutMisskeyThisIsModifiedVersion": "{name} gebruikt een aangepaste versie van de oorspronkelijke Misskey.",
 	"correspondingSourceIsAvailable": "De bijbehorende broncode is beschikbaar bij {anchor}",
 	"aboutMisskey": "Over Misskey",
 	"gotIt": "Begrepen"
@@ -273,8 +273,8 @@ function close() {
 <locale lang="json" locale="no-NO">
 {
 	"aboutX": "Om {x}",
-	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
-	"correspondingSourceIsAvailable": "The corresponding source code is available at {anchor}",
+	"aboutMisskeyThisIsModifiedVersion": "{name} bruker en endret versjon av den opprinnelige Misskey.",
+	"correspondingSourceIsAvailable": "Den tilhørende kildekoden er tilgjengelig på {anchor}",
 	"aboutMisskey": "Om Misskey",
 	"gotIt": "Skjønner"
 }
@@ -283,7 +283,7 @@ function close() {
 <locale lang="json" locale="pl-PL">
 {
 	"aboutX": "O {x}",
-	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"aboutMisskeyThisIsModifiedVersion": "{name} korzysta ze zmodyfikowanej wersji oryginalnego Misskey.",
 	"correspondingSourceIsAvailable": "Odpowiedni kod źródłowy jest dostępny pod {anchor}.",
 	"aboutMisskey": "O Misskey",
 	"gotIt": "Rozumiem!"
@@ -303,7 +303,7 @@ function close() {
 <locale lang="json" locale="ru-RU">
 {
 	"aboutX": "Описание {x}",
-	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"aboutMisskeyThisIsModifiedVersion": "{name} использует изменённую версию оригинального Misskey.",
 	"correspondingSourceIsAvailable": "Соответствующий исходный код можно найти по адресу {anchor} ",
 	"aboutMisskey": "О Misskey",
 	"gotIt": "Ясно!"
@@ -313,8 +313,8 @@ function close() {
 <locale lang="json" locale="sk-SK">
 {
 	"aboutX": "O {x}",
-	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
-	"correspondingSourceIsAvailable": "The corresponding source code is available at {anchor}",
+	"aboutMisskeyThisIsModifiedVersion": "{name} používa upravenú verziu pôvodného Misskey.",
+	"correspondingSourceIsAvailable": "Príslušný zdrojový kód je dostupný na {anchor}",
 	"aboutMisskey": "O Misskey",
 	"gotIt": "Rozumiem!"
 }
@@ -342,18 +342,18 @@ function close() {
 
 <locale lang="json" locale="ug-CN">
 {
-	"aboutX": "About {x}",
-	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
-	"correspondingSourceIsAvailable": "The corresponding source code is available at {anchor}",
-	"aboutMisskey": "About Misskey",
-	"gotIt": "Got it!"
+	"aboutX": "{x} ھەققىدە",
+	"aboutMisskeyThisIsModifiedVersion": "{name} ئەسلى Misskey نىڭ ئۆزگەرتىلگەن نۇسخىسىنى ئىشلىتىدۇ.",
+	"correspondingSourceIsAvailable": "بۇ نۇسخىنىڭ مەنبە كودى {anchor} دا بار",
+	"aboutMisskey": "Misskey ھەققىدە",
+	"gotIt": "چۈشەندىم!"
 }
 </locale>
 
 <locale lang="json" locale="uk-UA">
 {
 	"aboutX": "Про {x}",
-	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"aboutMisskeyThisIsModifiedVersion": "{name} використовує змінену версію оригінального Misskey.",
 	"correspondingSourceIsAvailable": "Відповідний вихідний код доступний за посиланням: {anchor}",
 	"aboutMisskey": "Про Misskey",
 	"gotIt": "Зрозуміло!"
@@ -363,7 +363,7 @@ function close() {
 <locale lang="json" locale="vi-VN">
 {
 	"aboutX": "Giới thiệu {x}",
-	"aboutMisskeyThisIsModifiedVersion": "{name} uses a modified version of the original Misskey.",
+	"aboutMisskeyThisIsModifiedVersion": "{name} sử dụng phiên bản đã chỉnh sửa của Misskey gốc.",
 	"correspondingSourceIsAvailable": "Mã nguồn có thể được xem tại {anchor}",
 	"aboutMisskey": "Về Misskey",
 	"gotIt": "Hiểu rồi!"
@@ -387,5 +387,145 @@ function close() {
 	"correspondingSourceIsAvailable": "對應的原始碼可以在 {anchor} 處找到。",
 	"aboutMisskey": "關於 Misskey",
 	"gotIt": "知道了"
+}
+</locale>
+
+<locale lang="json" locale="bn-BD">
+{
+	"aboutX": "{x} সম্পর্কে",
+	"aboutMisskeyThisIsModifiedVersion": "{name} মূল Misskey-এর একটি পরিবর্তিত সংস্করণ ব্যবহার করছে।",
+	"correspondingSourceIsAvailable": "সংশ্লিষ্ট সোর্স কোড {anchor} থেকে পাওয়া যায়।",
+	"aboutMisskey": "Misskey সম্পর্কে",
+	"gotIt": "বুঝেছি"
+}
+</locale>
+
+<locale lang="json" locale="el-GR">
+{
+	"aboutX": "Σχετικά με {x}",
+	"aboutMisskeyThisIsModifiedVersion": "Το {name} χρησιμοποιεί μια τροποποιημένη έκδοση του αρχικού Misskey.",
+	"correspondingSourceIsAvailable": "Ο αντίστοιχος πηγαίος κώδικας είναι διαθέσιμος στο {anchor}.",
+	"aboutMisskey": "Σχετικά με το Misskey",
+	"gotIt": "Τό'πιασα!"
+}
+</locale>
+
+<locale lang="json" locale="fa-IR">
+{
+	"aboutX": "دربارهٔ {x}",
+	"aboutMisskeyThisIsModifiedVersion": "{name} از نسخه‌ای تغییریافته از Misskey اصلی استفاده می‌کند.",
+	"correspondingSourceIsAvailable": "کد منبع مربوطه از طریق {anchor} در دسترس است.",
+	"aboutMisskey": "دربارهٔ Misskey",
+	"gotIt": "متوجه شدم"
+}
+</locale>
+
+<locale lang="json" locale="hr-HR">
+{
+	"aboutX": "O {x}",
+	"aboutMisskeyThisIsModifiedVersion": "{name} koristi izmijenjenu verziju izvornog Misskeyja.",
+	"correspondingSourceIsAvailable": "Odgovarajući izvorni kod dostupan je na {anchor}.",
+	"aboutMisskey": "O Misskeyju",
+	"gotIt": "Razumijem"
+}
+</locale>
+
+<locale lang="json" locale="ht-HT">
+{
+	"aboutX": "Konsènan {x}",
+	"aboutMisskeyThisIsModifiedVersion": "{name} sèvi ak yon vèsyon modifye Misskey orijinal la.",
+	"correspondingSourceIsAvailable": "Kòd sous ki koresponn lan disponib nan {anchor}.",
+	"aboutMisskey": "Konsènan Misskey",
+	"gotIt": "Konprann"
+}
+</locale>
+
+<locale lang="json" locale="hu-HU">
+{
+	"aboutX": "{x} névjegye",
+	"aboutMisskeyThisIsModifiedVersion": "{name} az eredeti Misskey módosított változatát használja.",
+	"correspondingSourceIsAvailable": "A megfelelő forráskód itt érhető el: {anchor}.",
+	"aboutMisskey": "A Misskey névjegye",
+	"gotIt": "Rendben"
+}
+</locale>
+
+<locale lang="json" locale="jbo-EN">
+{
+	"aboutX": "srana la'o gy. {x} .gy.",
+	"aboutMisskeyThisIsModifiedVersion": "la'o gy. {name} .gy. cu pilno la'o gy. Misskey .gy. poi pu se galfi",
+	"correspondingSourceIsAvailable": "lo se ciska poi platu lo samru'e cu se cpacu fi la'o gy. {anchor} .gy.",
+	"aboutMisskey": "srana la'o gy. Misskey .gy.",
+	"gotIt": "mi jimpe"
+}
+</locale>
+
+<locale lang="json" locale="ko-GS">
+{
+	"aboutX": "{x}에 대해서",
+	"aboutMisskeyThisIsModifiedVersion": "{name}넌 원래 Misskey럴 곤친 버전얼 서고 잇십니다.",
+	"correspondingSourceIsAvailable": "요 소스 코드넌 {anchor}서 받아볼 수 잇십니다.",
+	"aboutMisskey": "Misskey넌예",
+	"gotIt": "알것어예"
+}
+</locale>
+
+<locale lang="json" locale="lo-LA">
+{
+	"aboutX": "ກ່ຽວກັບ {x}",
+	"aboutMisskeyThisIsModifiedVersion": "{name} ໃຊ້ Misskey ລຸ້ນທີ່ດັດແປງຈາກຕົ້ນສະບັບ.",
+	"correspondingSourceIsAvailable": "ສາມາດເບິ່ງລະຫັດຕົ້ນສະບັບທີ່ກ່ຽວຂ້ອງໄດ້ທີ່ {anchor}.",
+	"aboutMisskey": "ກ່ຽວກັບ Misskey",
+	"gotIt": "ເຂົ້າໃຈແລ້ວ!"
+}
+</locale>
+
+<locale lang="json" locale="ro-RO">
+{
+	"aboutX": "Despre {x}",
+	"aboutMisskeyThisIsModifiedVersion": "{name} folosește o versiune modificată a software-ului Misskey original.",
+	"correspondingSourceIsAvailable": "Codul sursă corespunzător este disponibil la {anchor}",
+	"aboutMisskey": "Despre Misskey",
+	"gotIt": "Am înțeles!"
+}
+</locale>
+
+<locale lang="json" locale="si-LK">
+{
+	"aboutX": "{x} ගැන",
+	"aboutMisskeyThisIsModifiedVersion": "{name} භාවිත කරන්නේ මුල් Misskey හි වෙනස් කළ අනුවාදයකි.",
+	"correspondingSourceIsAvailable": "අදාළ මූලාශ්‍ර කේතය {anchor} වෙතින් ලබා ගත හැක.",
+	"aboutMisskey": "Misskey ගැන",
+	"gotIt": "තේරුණා"
+}
+</locale>
+
+<locale lang="json" locale="sv-SE">
+{
+	"aboutX": "Om {x}",
+	"aboutMisskeyThisIsModifiedVersion": "{name} använder en modifierad version av det ursprungliga Misskey.",
+	"correspondingSourceIsAvailable": "Den tillhörande källkoden finns tillgänglig på {anchor}.",
+	"aboutMisskey": "Om Misskey",
+	"gotIt": "Uppfattat!"
+}
+</locale>
+
+<locale lang="json" locale="tl-PH">
+{
+	"aboutX": "Tungkol sa {x}",
+	"aboutMisskeyThisIsModifiedVersion": "Gumagamit ang {name} ng binagong bersiyon ng orihinal na Misskey.",
+	"correspondingSourceIsAvailable": "Makukuha ang kaukulang source code sa {anchor}.",
+	"aboutMisskey": "Tungkol sa Misskey",
+	"gotIt": "Naiintindihan ko"
+}
+</locale>
+
+<locale lang="json" locale="uz-UZ">
+{
+	"aboutX": "{x} haqida",
+	"aboutMisskeyThisIsModifiedVersion": "{name} asl Misskey dasturining o‘zgartirilgan versiyasidan foydalanadi.",
+	"correspondingSourceIsAvailable": "Tegishli manba kodi {anchor} orqali mavjud.",
+	"aboutMisskey": "Misskey haqida",
+	"gotIt": "Tushunarli!"
 }
 </locale>

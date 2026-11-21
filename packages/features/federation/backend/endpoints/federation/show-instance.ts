@@ -3,41 +3,29 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedFederationShowInstanceDefinition, packedFederationShowInstanceInput, packedFederationShowInstanceOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { toFederationInstance } from '../../federation.schema.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import type { InstancesRepository } from '@features/persistence/backend/repositories/models.js';
-import { InstanceEntityService } from '@features/instance/backend/serializers/InstanceEntityService.js';
-import { UtilityService } from '../../services/UtilityService.js';
-import { DI } from '@/di-symbols.js';
-
-const contractProjection = projectEndpointContract(packedFederationShowInstanceDefinition);
-
-export const meta = {
-	tags: ['federation'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedFederationShowInstanceInput, typeof packedFederationShowInstanceOutput> {
-	constructor(
-		@Inject(DI.instancesRepository)
-		private instancesRepository: InstancesRepository,
-
-		private utilityService: UtilityService,
-		private instanceEntityService: InstanceEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const instance = await this.instancesRepository
-				.findOneBy({ host: this.utilityService.toPuny(ps.host) });
-
-			return instance ? await this.instanceEntityService.pack(instance, me) : null;
+import type { ApiActor } from '../../../../api/backend/transport/context.js';
+import { federationShowInstanceContract } from './show-instance.contract.js';
+import type { InstancesRepository } from '../../../../persistence/backend/repositories/models.js';
+import type { InstanceEntityService } from '../../../../instance/backend/serializers/InstanceEntityService.js';
+import type { UtilityService } from '../../services/UtilityService.js';
+export interface FederationShowInstanceDependencies {
+	instancesRepository: InstancesRepository;
+	utilityService: Pick<UtilityService, 'toPuny'>;
+	instanceEntityService: Pick<InstanceEntityService, 'pack'>;
+}
+export function createFederationShowInstanceProcedure<Actor extends ApiActor>(deps: FederationShowInstanceDependencies) {
+	return createApiProcedure<Actor>()(federationShowInstanceContract)
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const result = await (async () => {
+				const instance = await deps.instancesRepository
+					.findOneBy({ host: deps.utilityService.toPuny(ps.host) });
+				return instance ? toFederationInstance(await deps.instanceEntityService.pack(instance, me)) : null;
+			})();
+			return result;
 		});
-	}
 }

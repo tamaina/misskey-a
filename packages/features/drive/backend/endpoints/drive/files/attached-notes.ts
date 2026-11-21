@@ -3,73 +3,52 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedDriveFilesAttachedNotesDefinition, packedDriveFilesAttachedNotesInput, packedDriveFilesAttachedNotesOutput } from '../../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { toPackedNote } from '@features/notes/backend/note.schema.js';
+import { driveFilesAttachedNotesErrors } from './attached-notes.contract.js';
 import type { NotesRepository, DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
 import { QueryService } from '@features/notes/backend/services/QueryService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
-import { DI } from '@/di-symbols.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { driveManagementContract } from '../../../api.definition.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
-const contractProjection = projectEndpointContract(packedDriveFilesAttachedNotesDefinition);
+export interface DriveFilesAttachedNotesDependencies {
+	driveFilesRepository: DriveFilesRepository;
+	notesRepository: NotesRepository;
+	noteEntityService: Pick<NoteEntityService, 'packMany'>;
+	queryService: Pick<QueryService, 'makePaginationQuery'>;
+	roleService: Pick<RoleService, 'isModerator'>;
+}
+export function createDriveFilesAttachedNotesProcedure(deps: DriveFilesAttachedNotesDependencies) {
+	return createApiProcedure<MiLocalUser>()(driveManagementContract['drive/files/attached-notes']).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
+				const _ip = context.ip;
+				const _headers = context.headers;
+				// Fetch file
+				const file = await deps.driveFilesRepository.findOneBy({
+					id: ps.fileId,
+					userId: await deps.roleService.isModerator(me) ? undefined : me.id,
+				});
 
-export const meta = {
-	tags: ['drive', 'notes'],
+				if (file == null) {
+					throw apiError(driveFilesAttachedNotesErrors.noSuchFile);
+				}
 
-	requireCredential: true,
+				const query = deps.queryService.makePaginationQuery(deps.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate);
+				query.andWhere(':file <@ note.fileIds', { file: [file.id] });
 
-	kind: 'read:drive',
+				const notes = await query.limit(ps.limit).getMany();
 
-	description: 'Find the notes to which the given file is attached.',
-
-	res: contractProjection.response,
-
-	errors: {
-		noSuchFile: {
-			message: 'No such file.',
-			code: 'NO_SUCH_FILE',
-			id: 'c118ece3-2e4b-4296-99d1-51756e32d232',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedDriveFilesAttachedNotesInput, typeof packedDriveFilesAttachedNotesOutput> {
-	constructor(
-		@Inject(DI.driveFilesRepository)
-		private driveFilesRepository: DriveFilesRepository,
-
-		@Inject(DI.notesRepository)
-		private notesRepository: NotesRepository,
-
-		private noteEntityService: NoteEntityService,
-		private queryService: QueryService,
-		private roleService: RoleService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			// Fetch file
-			const file = await this.driveFilesRepository.findOneBy({
-				id: ps.fileId,
-				userId: await this.roleService.isModerator(me) ? undefined : me.id,
-			});
-
-			if (file == null) {
-				throw new ApiError(meta.errors.noSuchFile);
-			}
-
-			const query = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate);
-			query.andWhere(':file <@ note.fileIds', { file: [file.id] });
-
-			const notes = await query.limit(ps.limit).getMany();
-
-			return await this.noteEntityService.packMany(notes, me, {
-				detail: true,
-			});
+				return await deps.noteEntityService.packMany(notes, me, {
+					detail: true,
+				});
+			})();
+			return result.map(toPackedNote);
 		});
-	}
 }

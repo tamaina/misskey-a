@@ -23,13 +23,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span v-if="usernameState === 'wait'" style="color:#999"><MkLoading :em="true"/> {{ $locale.sfc.checking }}</span>
 					<span v-else-if="usernameState === 'ok'" style="color: var(--MI_THEME-success)"><i class="ti ti-check ti-fw"></i> {{ $locale.sfc.available }}</span>
 					<span v-else-if="usernameState === 'unavailable'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ $locale.sfc.unavailable }}</span>
-					<span v-else-if="usernameState === 'error'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ $locale.sfc.error }}</span>
+					<span v-else-if="usernameState === 'error'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ globalLocale.env.error }}</span>
 					<span v-else-if="usernameState === 'invalid-format'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ $locale.sfc.usernameInvalidFormat }}</span>
 					<span v-else-if="usernameState === 'min-range'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ $locale.sfc.tooShort }}</span>
 					<span v-else-if="usernameState === 'max-range'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ $locale.sfc.tooLong }}</span>
 				</template>
 			</MkInput>
-			<MkInput v-if="instance.emailRequiredForSignup" v-model="email" :debounce="true" type="email" :spellcheck="false" required data-testid="signup-email" @update:modelValue="onChangeEmail">
+			<MkInput v-if="instance.emailRequiredForSignup" v-model="email" :debounce="true" type="email" :spellcheck="false" required data-testid="signup-email" @input="onInputEmail" @update:modelValue="onChangeEmail">
 				<template #label>{{ $locale.sfc.emailAddress }} <div v-tooltip:dialog="$locale.sfc.signupEmailAddressInfo" class="_button _help"><i class="ti ti-help-circle"></i></div></template>
 				<template #prefix><i class="ti ti-mail"></i></template>
 				<template #caption>
@@ -42,7 +42,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<span v-else-if="emailState === 'unavailable:mx'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ $locale.sfc.emailUnavailableMx }}</span>
 					<span v-else-if="emailState === 'unavailable:smtp'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ $locale.sfc.emailUnavailableSmtp }}</span>
 					<span v-else-if="emailState === 'unavailable'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ $locale.sfc.unavailable }}</span>
-					<span v-else-if="emailState === 'error'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ $locale.sfc.error }}</span>
+					<span v-else-if="emailState === 'error'" style="color: var(--MI_THEME-error)"><i class="ti ti-alert-triangle ti-fw"></i> {{ globalLocale.env.error }}</span>
 				</template>
 			</MkInput>
 			<MkInput v-model="password" type="password" autocomplete="new-password" required data-testid="signup-password" @update:modelValue="onChangePassword">
@@ -79,19 +79,23 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, computed } from 'vue';
 import { toUnicode } from 'punycode.js';
 import * as Misskey from 'misskey-js';
 import * as config from '@features/boot/frontend/shared/config.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
-import type { Captcha } from '@features/auth/frontend/components/MkCaptcha.vue';
 import MkCaptcha from '@features/auth/frontend/components/MkCaptcha.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { instance } from '@features/instance/frontend/instance.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { login } from '@features/auth/frontend/accounts.js';
+import type { Captcha } from '@features/auth/frontend/components/MkCaptcha.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	autoSet?: boolean;
@@ -127,8 +131,8 @@ const mCaptchaResponse = ref<string | null>(null);
 const reCaptchaResponse = ref<string | null>(null);
 const turnstileResponse = ref<string | null>(null);
 const testcaptchaResponse = ref<string | null>(null);
-const usernameAbortController = ref<null | AbortController>(null);
-const emailAbortController = ref<null | AbortController>(null);
+let usernameAbortController: AbortController | null = null;
+let emailAbortController: AbortController | null = null;
 
 const shouldDisableSubmitting = computed((): boolean => {
 	return submitting.value ||
@@ -168,6 +172,10 @@ function getPasswordStrength(source: string): number {
 }
 
 function onChangeUsername(): void {
+	// 前の値の問い合わせの結果で状態を上書きしないよう中断する
+	usernameAbortController?.abort();
+	usernameAbortController = null;
+
 	if (username.value === '') {
 		usernameState.value = null;
 		return;
@@ -186,38 +194,56 @@ function onChangeUsername(): void {
 		}
 	}
 
-	if (usernameAbortController.value != null) {
-		usernameAbortController.value.abort();
-	}
 	usernameState.value = 'wait';
-	usernameAbortController.value = new AbortController();
+	const abortController = new AbortController();
+	usernameAbortController = abortController;
 
 	misskeyApi('username/available', {
 		username: username.value,
-	}, undefined, usernameAbortController.value.signal).then(result => {
+	}, undefined, abortController.signal).then(result => {
+		if (abortController.signal.aborted) return;
 		usernameState.value = result.available ? 'ok' : 'unavailable';
 	}).catch((err) => {
+		if (abortController.signal.aborted) return;
 		if (err.name !== 'AbortError') {
 			usernameState.value = 'error';
 		}
 	});
 }
 
+// 入力欄は debounce されていて email が更新されるのは遅延後なので、
+// それまでの間に前のアドレスの確認結果で送信できてしまわないよう、打鍵の時点で状態をクリアする
+function onInputEmail(ev: Event): void {
+	// type="email" は前後の空白を取り除くので、打鍵しても値が変わらないことがある。
+	// その場合は update:modelValue が来ないので、状態を維持するか、クリア済みならここで確認し直す
+	if ((ev.target as HTMLInputElement).value === email.value) {
+		if (emailState.value === null) onChangeEmail();
+		return;
+	}
+
+	emailAbortController?.abort();
+	emailAbortController = null;
+	emailState.value = null;
+}
+
 function onChangeEmail(): void {
+	// 前の値の問い合わせの結果で状態を上書きしないよう中断する
+	emailAbortController?.abort();
+	emailAbortController = null;
+
 	if (email.value === '') {
 		emailState.value = null;
 		return;
 	}
 
-	if (emailAbortController.value != null) {
-		emailAbortController.value.abort();
-	}
 	emailState.value = 'wait';
-	emailAbortController.value = new AbortController();
+	const abortController = new AbortController();
+	emailAbortController = abortController;
 
 	misskeyApi('email-address/available', {
 		emailAddress: email.value,
-	}, undefined, emailAbortController.value.signal).then(result => {
+	}, undefined, abortController.signal).then(result => {
+		if (abortController.signal.aborted) return;
 		emailState.value = result.available ? 'ok' :
 			result.reason === 'used' ? 'unavailable:used' :
 			result.reason === 'format' ? 'unavailable:format' :
@@ -227,6 +253,7 @@ function onChangeEmail(): void {
 			result.reason === 'smtp' ? 'unavailable:smtp' :
 			'unavailable';
 	}).catch((err) => {
+		if (abortController.signal.aborted) return;
 		if (err.name !== 'AbortError') {
 			emailState.value = 'error';
 		}
@@ -254,6 +281,7 @@ function onChangePasswordRetype(): void {
 
 async function onSubmit(): Promise<void> {
 	if (submitting.value) return;
+	if (instance.emailRequiredForSignup && emailState.value !== 'ok') return;
 	submitting.value = true;
 
 	const signupPayload: Misskey.entities.SignupRequest = {
@@ -314,7 +342,7 @@ function onSignupApiError() {
 
 	os.alert({
 		type: 'error',
-		text: $locale.value.sfc.somethingHappened,
+		text: globalLocale.value.env.somethingHappened,
 	});
 }
 </script>
@@ -342,7 +370,6 @@ function onSignupApiError() {
 	"checking": "التحقق جارٍ",
 	"available": "متوفر",
 	"unavailable": "غير متوفر",
-	"error": "خطأ",
 	"usernameInvalidFormat": "يمكنك استخدام A-z، a-z، 0-9، _",
 	"tooShort": "قصير جدًا",
 	"tooLong": "طويل جدًا",
@@ -363,8 +390,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "غير متطابقتان",
 	"start": "البداية",
 	"signupAlmostThere": "كدت تنتهي",
-	"signupEmailSent": "أرسلت رسالة تأكيد إلى بريدك الإلكتروني ({email})، أنقر على الرابط الموجود فيها لإكمال التسجيل.",
-	"somethingHappened": "حدث خطأ"
+	"signupEmailSent": "أرسلت رسالة تأكيد إلى بريدك الإلكتروني ({email})، أنقر على الرابط الموجود فيها لإكمال التسجيل."
 }
 </locale>
 
@@ -377,7 +403,6 @@ function onSignupApiError() {
 	"checking": "Comprovació en curs...",
 	"available": "Disponible",
 	"unavailable": "No és disponible",
-	"error": "Error",
 	"usernameInvalidFormat": "Pots fer servir lletres (majúscules i minúscules), números i barres baixes (\"_\")",
 	"tooShort": "Massa curt",
 	"tooLong": "Massa llarg",
@@ -398,8 +423,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "No coincideix",
 	"start": "Comença",
 	"signupAlmostThere": "Ja quasi estem",
-	"signupEmailSent": "S'ha enviat un correu de confirmació a ({email}). Si us plau, fes clic a l'enllaç per completar el registre.",
-	"somethingHappened": "S'ha produït un error"
+	"signupEmailSent": "S'ha enviat un correu de confirmació a ({email}). Si us plau, fes clic a l'enllaç per completar el registre."
 }
 </locale>
 
@@ -412,7 +436,6 @@ function onSignupApiError() {
 	"checking": "Ověřuji",
 	"available": "K dispozici",
 	"unavailable": "Není k dispozici",
-	"error": "Chyba",
 	"usernameInvalidFormat": "Písmena, čísla a _ jsou povolená.",
 	"tooShort": "Příliš krátké",
 	"tooLong": "Příliš dlouhé",
@@ -433,8 +456,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Hesla se neschodují",
 	"start": "Začít",
 	"signupAlmostThere": "Už to skoro je",
-	"signupEmailSent": "Na vaši e-mailovou adresu ({email}) byl odeslán potvrzovací e-mail. Kliknutím na přiložený odkaz dokončete vytvoření účtu.",
-	"somethingHappened": "Jejda. Něco se nepovedlo."
+	"signupEmailSent": "Na vaši e-mailovou adresu ({email}) byl odeslán potvrzovací e-mail. Kliknutím na přiložený odkaz dokončete vytvoření účtu."
 }
 </locale>
 
@@ -447,7 +469,6 @@ function onSignupApiError() {
 	"checking": "Checking...",
 	"available": "Available",
 	"unavailable": "Not available",
-	"error": "Error",
 	"usernameInvalidFormat": "You can use upper- and lowercase letters, numbers, and underscores.",
 	"tooShort": "Too short",
 	"tooLong": "Too long",
@@ -468,8 +489,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Does not match",
 	"start": "Begin",
 	"signupAlmostThere": "Almost there",
-	"signupEmailSent": "A confirmation email has been sent to your email address ({email}). Please click the included link to complete account creation.",
-	"somethingHappened": "An error has occurred"
+	"signupEmailSent": "A confirmation email has been sent to your email address ({email}). Please click the included link to complete account creation."
 }
 </locale>
 
@@ -482,7 +502,6 @@ function onSignupApiError() {
 	"checking": "Wird überprüft …",
 	"available": "Verfügbar",
 	"unavailable": "Unverfügbar",
-	"error": "Fehler",
 	"usernameInvalidFormat": "Du kannst Klein- und Großbuchstaben, Zahlen sowie Unterstriche verwenden",
 	"tooShort": "Zu kurz",
 	"tooLong": "Zu lang",
@@ -503,8 +522,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Stimmt nicht überein",
 	"start": "Anfangen",
 	"signupAlmostThere": "Fast geschafft",
-	"signupEmailSent": "An deine Email-Adresse ({email}) wurde soeben eine Bestätigungsmail geschickt. Bitte klicke auf den enthaltenen Link, um die Erstellung deines Benutzerkontos abzuschließen.",
-	"somethingHappened": "Ein Fehler ist aufgetreten"
+	"signupEmailSent": "An deine Email-Adresse ({email}) wurde soeben eine Bestätigungsmail geschickt. Bitte klicke auf den enthaltenen Link, um die Erstellung deines Benutzerkontos abzuschließen."
 }
 </locale>
 
@@ -517,7 +535,6 @@ function onSignupApiError() {
 	"checking": "Checking...",
 	"available": "Available",
 	"unavailable": "Not available",
-	"error": "Error",
 	"usernameInvalidFormat": "You can use upper- and lowercase letters, numbers, and underscores.",
 	"tooShort": "Too short",
 	"tooLong": "Too long",
@@ -538,8 +555,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Does not match",
 	"start": "Begin",
 	"signupAlmostThere": "Almost there",
-	"signupEmailSent": "A confirmation email has been sent to your email address ({email}). Please click the included link to complete account creation.",
-	"somethingHappened": "An error has occurred"
+	"signupEmailSent": "A confirmation email has been sent to your email address ({email}). Please click the included link to complete account creation."
 }
 </locale>
 
@@ -552,7 +568,6 @@ function onSignupApiError() {
 	"checking": "Comprobando",
 	"available": "Disponible",
 	"unavailable": "No disponible",
-	"error": "Error",
 	"usernameInvalidFormat": "utiliza letras, números y/o -.",
 	"tooShort": "Demasiado corto",
 	"tooLong": "Demasiado largo",
@@ -573,8 +588,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Las contraseñas no coinciden",
 	"start": "Comenzar",
 	"signupAlmostThere": "Ya falta poco",
-	"signupEmailSent": "Se envió un correo de verificación a la dirección {email}. Acceda al link enviado en el correo para completar el ingreso.",
-	"somethingHappened": "Ocurrió un error"
+	"signupEmailSent": "Se envió un correo de verificación a la dirección {email}. Acceda al link enviado en el correo para completar el ingreso."
 }
 </locale>
 
@@ -587,7 +601,6 @@ function onSignupApiError() {
 	"checking": "Vérification en cours...",
 	"available": "Disponible",
 	"unavailable": "Non disponible",
-	"error": "Erreur",
 	"usernameInvalidFormat": "Le nom d'utilisateur peut contenir uniquement des lettres (minuscules et/ou majuscules), des chiffres et des _",
 	"tooShort": "Trop court",
 	"tooLong": "Trop long",
@@ -608,8 +621,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Les mots de passe ne correspondent pas",
 	"start": "Commencer",
 	"signupAlmostThere": "Bientôt fini",
-	"signupEmailSent": "Un courriel de confirmation vient d'être envoyé à l'adresse que vous avez renseignée ({email}). Cliquez sur le lien contenu dans le message pour terminer la création de votre compte.",
-	"somethingHappened": "Une erreur est survenue"
+	"signupEmailSent": "Un courriel de confirmation vient d'être envoyé à l'adresse que vous avez renseignée ({email}). Cliquez sur le lien contenu dans le message pour terminer la création de votre compte."
 }
 </locale>
 
@@ -622,7 +634,6 @@ function onSignupApiError() {
 	"checking": "Memeriksa",
 	"available": "Tersedia",
 	"unavailable": "Tidak tersedia",
-	"error": "Galat",
 	"usernameInvalidFormat": "Hanya dapat menerima karakter a-z, A-Z dan angka 0-9.",
 	"tooShort": "Terlalu pendek",
 	"tooLong": "Terlalu panjang",
@@ -643,8 +654,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Kata sandi tidak sama",
 	"start": "Mulai",
 	"signupAlmostThere": "Hampir selesai",
-	"signupEmailSent": "Konfirmasi surel telah dikirimkan ke alamat surel kamu ({email}). Mohon klik tautan yang tercantum di dalamnya untuk menyelesaikan pembuatan akun.",
-	"somethingHappened": "Terjadi kesalahan"
+	"signupEmailSent": "Konfirmasi surel telah dikirimkan ke alamat surel kamu ({email}). Mohon klik tautan yang tercantum di dalamnya untuk menyelesaikan pembuatan akun."
 }
 </locale>
 
@@ -657,7 +667,6 @@ function onSignupApiError() {
 	"checking": "Confermando",
 	"available": "Disponibile",
 	"unavailable": "Non puoi usarlo",
-	"error": "Errore",
 	"usernameInvalidFormat": "Il nome utente deve avere solo caratteri alfanumerici e trattino basso '_'",
 	"tooShort": "Troppo breve",
 	"tooLong": "Troppo lungo",
@@ -678,8 +687,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Le password non corrispondono.",
 	"start": "Inizia!",
 	"signupAlmostThere": "Quasi completo",
-	"signupEmailSent": "Abbiamo spedito una e-mail di conferma all'indirizzo indicato ({email}). Per completare la registrazione del profilo, accedere al link contenuto nell'e-mail appena spedita.",
-	"somethingHappened": "Si è verificato un problema"
+	"signupEmailSent": "Abbiamo spedito una e-mail di conferma all'indirizzo indicato ({email}). Per completare la registrazione del profilo, accedere al link contenuto nell'e-mail appena spedita."
 }
 </locale>
 
@@ -692,7 +700,6 @@ function onSignupApiError() {
 	"checking": "確認しています",
 	"available": "利用できます",
 	"unavailable": "利用できません",
-	"error": "エラー",
 	"usernameInvalidFormat": "a~z、A~Z、0~9、_が使えます",
 	"tooShort": "短すぎます",
 	"tooLong": "長すぎます",
@@ -713,8 +720,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "一致していません",
 	"start": "始める",
 	"signupAlmostThere": "ほとんど完了です",
-	"signupEmailSent": "入力されたメールアドレス({email})宛に確認のメールが送信されました。メールに記載されたリンクにアクセスすると、アカウントの作成が完了します。メールに記載されているリンクの有効期限は30分です。",
-	"somethingHappened": "問題が発生しました"
+	"signupEmailSent": "入力されたメールアドレス({email})宛に確認のメールが送信されました。メールに記載されたリンクにアクセスすると、アカウントの作成が完了します。メールに記載されているリンクの有効期限は30分です。"
 }
 </locale>
 
@@ -727,7 +733,6 @@ function onSignupApiError() {
 	"checking": "確認しとるで",
 	"available": "使えるで",
 	"unavailable": "利用できん",
-	"error": "おかしなったで",
 	"usernameInvalidFormat": "a~z、A~Z、0~9、_が使えるで",
 	"tooShort": "短すぎやろ！",
 	"tooLong": "長すぎやろ！",
@@ -748,8 +753,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "ちゃうで？",
 	"start": "始める",
 	"signupAlmostThere": "ほぼ終わったようなもんや",
-	"signupEmailSent": "さっき入れたメアド({email})宛に確認メールを送ったで。メールに書かれたリンク押してアカウント作るの終わらしてな。\nメールの認証リンクの期限は30分や。",
-	"somethingHappened": "なんかあかんわ"
+	"signupEmailSent": "さっき入れたメアド({email})宛に確認メールを送ったで。メールに書かれたリンク押してアカウント作るの終わらしてな。\nメールの認証リンクの期限は30分や。"
 }
 </locale>
 
@@ -762,7 +766,6 @@ function onSignupApiError() {
 	"checking": "Checking...",
 	"available": "Available",
 	"unavailable": "Not available",
-	"error": "Error",
 	"usernameInvalidFormat": "You can use upper- and lowercase letters, numbers, and underscores.",
 	"tooShort": "Too short",
 	"tooLong": "Too long",
@@ -783,8 +786,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Does not match",
 	"start": "Begin",
 	"signupAlmostThere": "Almost there",
-	"signupEmailSent": "A confirmation email has been sent to your email address ({email}). Please click the included link to complete account creation.",
-	"somethingHappened": "An error has occurred"
+	"signupEmailSent": "A confirmation email has been sent to your email address ({email}). Please click the included link to complete account creation."
 }
 </locale>
 
@@ -797,7 +799,6 @@ function onSignupApiError() {
 	"checking": "Checking...",
 	"available": "Available",
 	"unavailable": "Not available",
-	"error": "Error",
 	"usernameInvalidFormat": "You can use upper- and lowercase letters, numbers, and underscores.",
 	"tooShort": "Too short",
 	"tooLong": "Too long",
@@ -818,8 +819,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Does not match",
 	"start": "Begin",
 	"signupAlmostThere": "Almost there",
-	"signupEmailSent": "A confirmation email has been sent to your email address ({email}). Please click the included link to complete account creation.",
-	"somethingHappened": "An error has occurred"
+	"signupEmailSent": "A confirmation email has been sent to your email address ({email}). Please click the included link to complete account creation."
 }
 </locale>
 
@@ -832,7 +832,6 @@ function onSignupApiError() {
 	"checking": "확인하는 중입니다",
 	"available": "사용 가능합니다",
 	"unavailable": "사용할 수 없습니다",
-	"error": "오류",
 	"usernameInvalidFormat": "a~z, A~Z, 0-9, _를 사용할 수 있습니다",
 	"tooShort": "너무 짧습니다",
 	"tooLong": "너무 깁니다",
@@ -853,8 +852,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "일치하지 않습니다",
 	"start": "시작하기",
 	"signupAlmostThere": "거의 다 끝났습니다",
-	"signupEmailSent": "입력하신 메일 주소({email})로 확인 메일을 보내드렸습니다. 가입을 완료하시려면 보내드린 메일에 있는 링크로 접속해 주세요.",
-	"somethingHappened": "오류가 발생했습니다"
+	"signupEmailSent": "입력하신 메일 주소({email})로 확인 메일을 보내드렸습니다. 가입을 완료하시려면 보내드린 메일에 있는 링크로 접속해 주세요."
 }
 </locale>
 
@@ -867,7 +865,6 @@ function onSignupApiError() {
 	"checking": "Wordt gecheckt ...",
 	"available": "Beschikbaar",
 	"unavailable": "Onbeschikbaar",
-	"error": "Fout",
 	"usernameInvalidFormat": "Je kunt kleine letters, hoofdletters, cijfers en onderstrepingstekens gebruiken.",
 	"tooShort": "Te kort",
 	"tooLong": "Te lang",
@@ -888,8 +885,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Komt niet overeen",
 	"start": "Aan de slag",
 	"signupAlmostThere": "Almost there",
-	"signupEmailSent": "A confirmation email has been sent to your email address ({email}). Please click the included link to complete account creation.",
-	"somethingHappened": "Er is iets misgegaan."
+	"signupEmailSent": "A confirmation email has been sent to your email address ({email}). Please click the included link to complete account creation."
 }
 </locale>
 
@@ -902,7 +898,6 @@ function onSignupApiError() {
 	"checking": "Checking...",
 	"available": "Tilgjengelig",
 	"unavailable": "Utilgjengelig",
-	"error": "Feil",
 	"usernameInvalidFormat": "You can use upper- and lowercase letters, numbers, and underscores.",
 	"tooShort": "For kort",
 	"tooLong": "For langt",
@@ -923,8 +918,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Does not match",
 	"start": "Begin",
 	"signupAlmostThere": "Almost there",
-	"signupEmailSent": "A confirmation email has been sent to your email address ({email}). Please click the included link to complete account creation.",
-	"somethingHappened": "En feil har oppstått"
+	"signupEmailSent": "A confirmation email has been sent to your email address ({email}). Please click the included link to complete account creation."
 }
 </locale>
 
@@ -937,7 +931,6 @@ function onSignupApiError() {
 	"checking": "Sprawdzam",
 	"available": "Dostępna",
 	"unavailable": "Niedostępna",
-	"error": "Błąd",
 	"usernameInvalidFormat": "może zawierać litery, cyfry i podkreślniki.",
 	"tooShort": "Zbyt krótka",
 	"tooLong": "Zbyt długa",
@@ -958,8 +951,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Hasła nie pasują do siebie",
 	"start": "Rozpocznij",
 	"signupAlmostThere": "Prawie na miejscu",
-	"signupEmailSent": "E-mail z potwierdzeniem został wysłany na Twój adres e-mail ({email}). Kliknij dołączony link, aby dokończyć tworzenie konta.",
-	"somethingHappened": "Coś poszło nie tak"
+	"signupEmailSent": "E-mail z potwierdzeniem został wysłany na Twój adres e-mail ({email}). Kliknij dołączony link, aby dokończyć tworzenie konta."
 }
 </locale>
 
@@ -972,7 +964,6 @@ function onSignupApiError() {
 	"checking": "Verificando...",
 	"available": "Disponível",
 	"unavailable": "Não disponível",
-	"error": "Erro",
 	"usernameInvalidFormat": "Pode utilizar letras maiúsculas e minúsculas, números e sublinhado (_)",
 	"tooShort": "Muito curto",
 	"tooLong": "Muito longo",
@@ -993,8 +984,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "As senhas não coincidem",
 	"start": "começar",
 	"signupAlmostThere": "Quase pronto",
-	"signupEmailSent": "Um e-mail de confirmação foi enviado para o endereço de e-mail fornecido ({email}). Acesse o link fornecido no e-mail para concluir a criação de sua conta.",
-	"somethingHappened": "Ocorreu um erro"
+	"signupEmailSent": "Um e-mail de confirmação foi enviado para o endereço de e-mail fornecido ({email}). Acesse o link fornecido no e-mail para concluir a criação de sua conta."
 }
 </locale>
 
@@ -1007,7 +997,6 @@ function onSignupApiError() {
 	"checking": "Проверка",
 	"available": "Доступно",
 	"unavailable": "Не доступно",
-	"error": "Ошибка",
 	"usernameInvalidFormat": "Можно использовать только латинские буквы (A—Z, a—z), цифры (0—9) и знак подчёркивания (_)",
 	"tooShort": "Слишком короткий",
 	"tooLong": "Слишком длинный",
@@ -1028,8 +1017,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Не совпадают",
 	"start": "Начать",
 	"signupAlmostThere": "Почти готово!",
-	"signupEmailSent": "На указанный вами адрес электронной почты ({email}) отправлено письмо. Перейдите по ссылке в письме, чтобы завершить регистрацию.",
-	"somethingHappened": "Что-то пошло не так"
+	"signupEmailSent": "На указанный вами адрес электронной почты ({email}) отправлено письмо. Перейдите по ссылке в письме, чтобы завершить регистрацию."
 }
 </locale>
 
@@ -1042,7 +1030,6 @@ function onSignupApiError() {
 	"checking": "Overujem...",
 	"available": "Dostupné",
 	"unavailable": "Nedostupné",
-	"error": "Chyba",
 	"usernameInvalidFormat": "Povolené sú písmená, čísla a _.",
 	"tooShort": "Príliš krátke",
 	"tooLong": "Príliš dlhé",
@@ -1063,8 +1050,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Heslá nie sú rovnaké",
 	"start": "Začať",
 	"signupAlmostThere": "Skoro na konci",
-	"signupEmailSent": "Na vašu emailovú adresu ({email}) sme odoslali email. Vytvorenie účtu dokončíte kliknutím na odkaz v emaili.",
-	"somethingHappened": "Ups. Niečo sa nepodarilo."
+	"signupEmailSent": "Na vašu emailovú adresu ({email}) sme odoslali email. Vytvorenie účtu dokončíte kliknutím na odkaz v emaili."
 }
 </locale>
 
@@ -1077,7 +1063,6 @@ function onSignupApiError() {
 	"checking": "Checking",
 	"available": "พร้อมใช้งาน",
 	"unavailable": "ไม่พร้อมใช้",
-	"error": "ผิดพลาด!",
 	"usernameInvalidFormat": "สามารถใช้ a~z A~Z 0~9 และ _ ได้",
 	"tooShort": "สั้นเกินไปนะ",
 	"tooLong": "ยาวเกินไปนะ",
@@ -1098,8 +1083,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "ไม่ถูกต้อง",
 	"start": "เริ่ม",
 	"signupAlmostThere": "เกือบจะเสร็จแล้ว",
-	"signupEmailSent": "อีเมลยืนยันได้ถูกส่งไปยังที่อยู่อีเมลที่คุณป้อน ({email}) แล้ว กรุณาติดตามลิงก์ในอีเมลเพื่อสร้างบัญชีให้เสร็จสมบูรณ์ ลิงก์ที่ให้ไว้จะหมดอายุใน 30 นาที",
-	"somethingHappened": "อุ๊ย ! มีอะไรบางอย่างผิดพลาด"
+	"signupEmailSent": "อีเมลยืนยันได้ถูกส่งไปยังที่อยู่อีเมลที่คุณป้อน ({email}) แล้ว กรุณาติดตามลิงก์ในอีเมลเพื่อสร้างบัญชีให้เสร็จสมบูรณ์ ลิงก์ที่ให้ไว้จะหมดอายุใน 30 นาที"
 }
 </locale>
 
@@ -1112,7 +1096,6 @@ function onSignupApiError() {
 	"checking": "Kontrol ediliyor...",
 	"available": "Kullanılabilir",
 	"unavailable": "Kullanılamaz",
-	"error": "Hata",
 	"usernameInvalidFormat": "Büyük ve küçük harfler, rakamlar ve alt çizgi kullanabilirsin. (a~z、A~Z、0~9)",
 	"tooShort": "Çok kısa",
 	"tooLong": "Çok uzun",
@@ -1133,8 +1116,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Eşleşmedi",
 	"start": "Başla",
 	"signupAlmostThere": "Neredeyse vardık",
-	"signupEmailSent": "Onay e-postası E-Posta adresine ({email}) gönderilmiştir. Hesap oluşturma işlemini tamamlamak için e-postadaki bağlantıya tıkla.",
-	"somethingHappened": "Bir hata oluştu"
+	"signupEmailSent": "Onay e-postası E-Posta adresine ({email}) gönderilmiştir. Hesap oluşturma işlemini tamamlamak için e-postadaki bağlantıya tıkla."
 }
 </locale>
 
@@ -1147,7 +1129,6 @@ function onSignupApiError() {
 	"checking": "Checking...",
 	"available": "Available",
 	"unavailable": "Not available",
-	"error": "Error",
 	"usernameInvalidFormat": "You can use upper- and lowercase letters, numbers, and underscores.",
 	"tooShort": "Too short",
 	"tooLong": "Too long",
@@ -1168,8 +1149,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Does not match",
 	"start": "Begin",
 	"signupAlmostThere": "Almost there",
-	"signupEmailSent": "A confirmation email has been sent to your email address ({email}). Please click the included link to complete account creation.",
-	"somethingHappened": "An error has occurred"
+	"signupEmailSent": "A confirmation email has been sent to your email address ({email}). Please click the included link to complete account creation."
 }
 </locale>
 
@@ -1182,7 +1162,6 @@ function onSignupApiError() {
 	"checking": "Перевірка…",
 	"available": "Доступно",
 	"unavailable": "Недоступно",
-	"error": "Помилка",
 	"usernameInvalidFormat": "літери, цифри та _ є прийнятними",
 	"tooShort": "Занадто короткий",
 	"tooLong": "Занадто довгий",
@@ -1203,8 +1182,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Паролі не співпадають",
 	"start": "Розпочати",
 	"signupAlmostThere": "Майже готово",
-	"signupEmailSent": "A confirmation email has been sent to your email address ({email}). Please click the included link to complete account creation.",
-	"somethingHappened": "Щось пішло не так"
+	"signupEmailSent": "A confirmation email has been sent to your email address ({email}). Please click the included link to complete account creation."
 }
 </locale>
 
@@ -1217,7 +1195,6 @@ function onSignupApiError() {
 	"checking": "Đang kiểm tra...",
 	"available": "Khả dụng",
 	"unavailable": "Không sử dụng được",
-	"error": "Lỗi",
 	"usernameInvalidFormat": "Bạn có thể dùng viết hoa/viết thường, chữ số, và dấu gạch dưới.",
 	"tooShort": "Quá ngắn",
 	"tooLong": "Quá dài",
@@ -1238,8 +1215,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "Không trùng khớp",
 	"start": "Bắt đầu",
 	"signupAlmostThere": "Gần xong rồi",
-	"signupEmailSent": "Một email xác minh đã được gửi đến địa chỉ email ({email}) của bạn. Vui lòng nhấn vào liên kết trong đó để hoàn tất việc tạo tài khoản.",
-	"somethingHappened": "Xảy ra lỗi"
+	"signupEmailSent": "Một email xác minh đã được gửi đến địa chỉ email ({email}) của bạn. Vui lòng nhấn vào liên kết trong đó để hoàn tất việc tạo tài khoản."
 }
 </locale>
 
@@ -1252,7 +1228,6 @@ function onSignupApiError() {
 	"checking": "正在确认",
 	"available": "可用",
 	"unavailable": "不可用",
-	"error": "错误",
 	"usernameInvalidFormat": "可使用大小写英文字母、数字和下划线。",
 	"tooShort": "过短",
 	"tooLong": "过长",
@@ -1273,8 +1248,7 @@ function onSignupApiError() {
 	"passwordNotMatched": "密码不一致",
 	"start": "开始",
 	"signupAlmostThere": "即将完成",
-	"signupEmailSent": "已将确认邮件发送至您输入的电子邮件地址 ({email})。请访问电子邮件中的链接以完成帐户创建。",
-	"somethingHappened": "出错了"
+	"signupEmailSent": "已将确认邮件发送至您输入的电子邮件地址 ({email})。请访问电子邮件中的链接以完成帐户创建。"
 }
 </locale>
 
@@ -1287,7 +1261,6 @@ function onSignupApiError() {
 	"checking": "確認中",
 	"available": "可用的",
 	"unavailable": "不可用的",
-	"error": "錯誤",
 	"usernameInvalidFormat": "可使用大小寫英文字母、數字和底線",
 	"tooShort": "過短",
 	"tooLong": "過長",
@@ -1308,7 +1281,6 @@ function onSignupApiError() {
 	"passwordNotMatched": "密碼不一致",
 	"start": "開始",
 	"signupAlmostThere": "即將完成",
-	"signupEmailSent": "已發送確認郵件至您輸入的電子郵件地址（{email}）。請開啟電子郵件中的連結完成註冊。",
-	"somethingHappened": "發生錯誤"
+	"signupEmailSent": "已發送確認郵件至您輸入的電子郵件地址（{email}）。請開啟電子郵件中的連結完成註冊。"
 }
 </locale>

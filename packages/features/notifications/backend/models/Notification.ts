@@ -10,7 +10,7 @@ import { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
 import { MiRole } from '@features/roles/backend/models/Role.js';
 import { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import { MiNoteDraft } from '@features/notes/backend/models/NoteDraft.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 
 // misskey-js の notificationTypes と同期すべし
 export type MiNotification = {

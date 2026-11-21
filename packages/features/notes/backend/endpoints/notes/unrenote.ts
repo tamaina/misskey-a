@@ -3,22 +3,24 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { legacyNotesCommandSchemas } from '../../commands.js';
-import { notesCommandErrors, notesCommandsContract } from '../../../contract/index.js';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import ms from 'ms';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { notesUnrenoteContract, notesUnrenoteErrors } from './unrenote.contract.js';
 
-export const meta = {
-	tags: ['notes'],
-	requireCredential: true,
-	kind: 'write:notes',
-	limit: { duration: ms('1hour'), max: 300, minInterval: ms('1sec') },
-	errors: notesCommandErrors['notes/unrenote'],
-} as const;
-
-export const paramDef = legacyNotesCommandSchemas['notes/unrenote'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('notesCommands', commands =>
-	createContractTransportEndpoint(meta, paramDef, notesCommandsContract['notes/unrenote'], async (params, user) => commands['notes/unrenote'](params, { context: { actor: user } })));
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import type { NotesCommandDependencies } from '../../command.dependencies.js';
+import { getCommandNote } from '../../get-command-note.js';
+import { readErrorId } from '../../request.schema.js';
+export function createNotesUnrenoteProcedure(deps: NotesCommandDependencies) {
+	return createApiProcedure<MiLocalUser>()(notesUnrenoteContract).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			const note = await getCommandNote(deps, input.noteId, notesUnrenoteErrors.noSuchNote);
+			const renotes = await deps.findRenotesByUserAndRenote(actor.id, note.id);
+			for (const renote of renotes) {
+				const author = await deps.findUserByIdOrFail(actor.id);
+				// This was deliberately fire-and-forget in the legacy handler.
+				deps.deleteNote(author, renote);
+			}
+		});
+}

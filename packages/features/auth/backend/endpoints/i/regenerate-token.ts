@@ -3,42 +3,52 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidIRegenerateTokenDefinition, voidIRegenerateTokenInput, voidIRegenerateTokenOutput } from '../../../contract/void-endpoint-definitions.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
-import { Inject, Injectable } from '@nestjs/common';
-
 import type { UsersRepository, UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
-import { generateNativeUserToken } from '../../utility/token.js';
-import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
-import { DI } from '@/di-symbols.js';
+import { UserAuthService } from '../../services/UserAuthService.js';
+import { regenerateToken } from '../../token-regeneration.js';
+import type { TokenRegenerationDependencies } from '../../token-regeneration.js';
+import { assertLegacyMfaManagement } from '../../mfa-policy.js';
 
-const contractProjection = projectEndpointContract(voidIRegenerateTokenDefinition);
+import { IRegenerateTokenContract } from '../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
 export const meta = {
-	requireCredential: true,
 
-	secure: true,
 } as const;
+export interface IRegenerateTokenDependencies extends TokenRegenerationDependencies {
+	usersRepository: UsersRepository;
+	userProfilesRepository: UserProfilesRepository;
+	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
+}
+export function createIRegenerateTokenProcedure(deps: IRegenerateTokenDependencies) {
+	return createApiProcedure<MiLocalUser>()(IRegenerateTokenContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
+			const freshUser = await deps.usersRepository.findOneByOrFail({ id: me.id });
+			if (!freshUser.token) throw new Error('authentication failed');
+			const oldToken = freshUser.token;
+			if (!context.browserSession && context.credential !== oldToken) throw new Error('authentication failed');
 
-export const paramDef = contractProjection.input;
+			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
+			assertLegacyMfaManagement(profile);
+			const expected = { ...profile };
 
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidIRegenerateTokenInput, typeof voidIRegenerateTokenOutput> {
-	constructor(
-		@Inject(DI.usersRepository)
-		private usersRepository: UsersRepository,
+			if (profile.twoFactorEnabled) {
+				if (ps.token == null) {
+					throw new Error('authentication failed');
+				}
 
-		@Inject(DI.userProfilesRepository)
-		private userProfilesRepository: UserProfilesRepository,
-
-		private globalEventService: GlobalEventService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const freshUser = await this.usersRepository.findOneByOrFail({ id: me.id });
-			const oldToken = freshUser.token!;
-
-			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: me.id });
+				try {
+					await deps.userAuthService.twoFactorAuthenticate(profile, ps.token);
+				} catch (_) {
+					throw new Error('authentication failed');
+				}
+			}
 
 			// Compare password
 			const same = await bcrypt.compare(ps.password, profile.password!);
@@ -47,15 +57,8 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 				throw new Error('incorrect password');
 			}
 
-			const newToken = generateNativeUserToken();
-
-			await this.usersRepository.update(me.id, {
-				token: newToken,
-			});
-
-			// Publish event
-			this.globalEventService.publishInternalEvent('userTokenRegenerated', { id: me.id, oldToken, newToken });
-			this.globalEventService.publishMainStream(me.id, 'myTokenRegenerated');
-		});
-	}
+			await regenerateToken(deps, me.id, { kind: 'legacy', nativeToken: oldToken, profile: expected, session: context.browserSession });
+		})();
+		return result;
+	});
 }

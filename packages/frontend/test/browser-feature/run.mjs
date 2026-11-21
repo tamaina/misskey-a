@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { build, preview } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { chromium, expect } from '@playwright/test';
-import locales from 'i18n';
+import { locales } from '../unit/pruned-global-locale-baseline.ts';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.ts';
 
 const root = fileURLToPath(new URL('../../', import.meta.url));

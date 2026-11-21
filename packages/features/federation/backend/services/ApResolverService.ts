@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { FederatedInstanceService } from './FederatedInstanceService.js';
 import { Inject, Injectable, Scope } from '@nestjs/common';
 import { IsNull, Not } from 'typeorm';
 import type { MiLocalUser, MiRemoteUser } from '@features/users/backend/models/User.js';
@@ -66,6 +67,7 @@ export class Resolver {
 		private httpRequestService: HttpRequestService,
 		private apRendererService: ApRendererService,
 		private apDbResolverService: ApDbResolverService,
+		private federatedInstanceService: FederatedInstanceService,
 		private loggerService: LoggerService,
 	) {
 		this.history = new Set();
@@ -131,8 +133,9 @@ export class Resolver {
 			this.user = await this.systemAccountService.fetch('actor');
 		}
 
+		const peer = this.user ? await this.federatedInstanceService.fetch(host) : null;
 		const object = (this.user
-			? await this.apRequestService.signedGet(value, this.user, allowSoftfail) as IObject
+			? await this.apRequestService.signedGet(value, this.user, allowSoftfail, undefined, peer?.httpMessageSignaturesImplementationLevel) as IObject
 			: await this.httpRequestService.getActivityJson(value, undefined, allowSoftfail)) as IObject;
 
 		if (

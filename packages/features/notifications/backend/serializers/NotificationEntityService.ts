@@ -11,7 +11,7 @@ import type { FollowRequestsRepository, NotesRepository, MiUser, UsersRepository
 import { awaitAll } from '@features/runtime/backend/async/await-all.js';
 import type { MiGroupedNotification, MiNotification } from '../models/Notification.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { FilterUnionByProperty, groupedNotificationTypes } from '@features/runtime/backend/types.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
@@ -266,6 +266,7 @@ export class NotificationEntityService implements OnModuleInit {
 				});
 			case 'login':
 			case 'createToken':
+				return { ...packedBase, type: notification.type };
 			case 'test':
 				return await awaitAll({
 					...packedCommon,
@@ -386,7 +387,7 @@ export class NotificationEntityService implements OnModuleInit {
 		if (notifier == null) return false;
 		if (notifier.host && userMutedInstances.has(notifier.host)) return false;
 
-		if (notifier.isSuspended) return false;
+		if (this.userEntityService.isSuspendedEither(notifier)) return false;
 
 		return true;
 	}

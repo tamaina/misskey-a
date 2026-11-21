@@ -18,18 +18,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { markRaw } from 'vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import MkNote from '@features/notes/frontend/components/MkNote.vue';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const paginator = markRaw(new Paginator('i/favorites', {
 	limit: 10,
 }));
 
 definePage(() => ({
-	title: $locale.value.sfc.favorites,
+	title: globalLocale.value.env.favorites,
 	icon: 'ti ti-star',
 }));
 </script>
@@ -43,196 +47,168 @@ definePage(() => ({
 
 <locale locale="ar-SA" lang="json">
 {
-	"noNotes": "لم يُعثر على أية ملاحظات",
-	"favorites": "المفضلات"
+	"noNotes": "لم يُعثر على أية ملاحظات"
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
-	"noNotes": "Cap nota",
-	"favorites": "Favorits"
+	"noNotes": "Cap nota"
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
-	"noNotes": "Žádné poznámky",
-	"favorites": "Oblíbené"
+	"noNotes": "Žádné poznámky"
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
-	"noNotes": "No notes",
-	"favorites": "Favorites"
+	"noNotes": "No notes"
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
-	"noNotes": "Keine Notizen gefunden",
-	"favorites": "Favoriten"
+	"noNotes": "Keine Notizen gefunden"
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
-	"noNotes": "No notes",
-	"favorites": "Favorites"
+	"noNotes": "No notes"
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
-	"noNotes": "No hay notas",
-	"favorites": "Favoritos"
+	"noNotes": "No hay notas"
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
-	"noNotes": "Aucune note",
-	"favorites": "Favoris"
+	"noNotes": "Aucune note"
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
-	"noNotes": "Belum ada catatan",
-	"favorites": "Favorit"
+	"noNotes": "Belum ada catatan"
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
-	"noNotes": "Nessuna nota!",
-	"favorites": "Preferiti"
+	"noNotes": "Nessuna nota!"
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
-	"noNotes": "ノートはありません",
-	"favorites": "お気に入り"
+	"noNotes": "ノートはありません"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
-	"noNotes": "ノートはあらへん",
-	"favorites": "お気に入り"
+	"noNotes": "ノートはあらへん"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
-	"noNotes": "No notes",
-	"favorites": "Favorites"
+	"noNotes": "No notes"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
-	"noNotes": "ಟಿಪ್ಪಣಿಗಳಿಲ್ಲ",
-	"favorites": "ಮೆಚ್ಚಿನವುಗಳು"
+	"noNotes": "ಟಿಪ್ಪಣಿಗಳಿಲ್ಲ"
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
-	"noNotes": "노트가 없습니다",
-	"favorites": "즐겨찾기"
+	"noNotes": "노트가 없습니다"
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
-	"noNotes": "Geen notities",
-	"favorites": "Toevoegen aan favorieten"
+	"noNotes": "Geen notities"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
-	"noNotes": "Ingen Notes",
-	"favorites": "Favoritter"
+	"noNotes": "Ingen Notes"
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
-	"noNotes": "Brak wpisów",
-	"favorites": "Ulubione"
+	"noNotes": "Brak wpisów"
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
-	"noNotes": "Sem notas",
-	"favorites": "Favoritos"
+	"noNotes": "Sem notas"
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
-	"noNotes": "Нет ни одной заметки",
-	"favorites": "Избранное"
+	"noNotes": "Нет ни одной заметки"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
-	"noNotes": "Žiadne poznámky",
-	"favorites": "Obľúbené"
+	"noNotes": "Žiadne poznámky"
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
-	"noNotes": "ไม่มีโน้ต",
-	"favorites": "รายการโปรด"
+	"noNotes": "ไม่มีโน้ต"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
-	"noNotes": "Not yok",
-	"favorites": "Favoriler"
+	"noNotes": "Not yok"
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
-	"noNotes": "No notes",
-	"favorites": "Favorites"
+	"noNotes": "No notes"
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
-	"noNotes": "Немає нотаток",
-	"favorites": "Обране"
+	"noNotes": "Немає нотаток"
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
-	"noNotes": "Chưa có bài viết nào.",
-	"favorites": "Lượt thích"
+	"noNotes": "Chưa có bài viết nào."
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
-	"noNotes": "没有帖子",
-	"favorites": "收藏"
+	"noNotes": "没有帖子"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
-	"noNotes": "無貼文",
-	"favorites": "我的最愛"
+	"noNotes": "無貼文"
 }
 </locale>

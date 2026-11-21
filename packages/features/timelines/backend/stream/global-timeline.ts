@@ -4,7 +4,7 @@
  */
 
 import { Inject, Injectable, Scope } from '@nestjs/common';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import { MetaService } from '@features/instance/backend/services/MetaService.js';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
@@ -38,7 +38,7 @@ export class GlobalTimelineChannel extends Channel {
 
 	@bindThis
 	public async init(params: JsonObject) {
-		const policies = await this.roleService.getUserPolicies(this.user ? this.user.id : null);
+		const policies = await this.roleService.getUserPolicies(this.user ? this.user.id : null, this.connection.isNativeOutput);
 		if (!policies.gtlAvailable) return;
 
 		this.withRenotes = !!(params.withRenotes ?? true);
@@ -67,16 +67,7 @@ export class GlobalTimelineChannel extends Channel {
 		// eslint-disable-next-line no-param-reassign -- これ以降元の Note オブジェクトは見てはいけないので、いっそ再代入した方が安全
 		note = filtered;
 
-		if (this.user) {
-			if (isRenotePacked(note) && !isQuotePacked(note)) {
-				if (note.renote && Object.keys(note.renote.reactions).length > 0) {
-					const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
-					note.renote.myReaction = myRenoteReaction;
-				}
-			}
-		}
-
-		this.send('note', note);
+		this.send('note', await this.noteEntityService.withMyRenoteReaction(note, this.user?.id ?? null));
 	}
 
 	@bindThis

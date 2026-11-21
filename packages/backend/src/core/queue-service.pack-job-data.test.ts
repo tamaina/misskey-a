@@ -5,7 +5,7 @@
 
 import { expect, test } from 'vitest';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 
 type JobSnapshotInput = {
 	id?: string;

@@ -9,6 +9,13 @@ import { logManager } from '@features/runtime/backend/logging/logging-runtime.js
 import type { LogManager } from '@features/runtime/backend/logging/LogManager.js';
 import type { LogTraceContext } from '@features/runtime/backend/logging/types.js';
 
+declare module 'fastify' {
+	interface FastifyContextConfig {
+		/** Keep private protocol payloads out of inherited access-log hooks. */
+		sensitiveAccessLogBody?: boolean;
+	}
+}
+
 type AccessRequestState = {
 	traceContext?: LogTraceContext;
 	errorType?: string;
@@ -146,6 +153,10 @@ export function registerHttpAccessLog(fastify: FastifyInstance, manager: LogMana
 			return;
 		}
 
+		if (request.routeOptions.config.sensitiveAccessLogBody === true) {
+			done(null, payload);
+			return;
+		}
 		const bodyConfiguration = manager.getAccessLogConfiguration().bodies;
 		const state = states.get(request) ?? {};
 		if (bodyConfiguration.request && !('requestBody' in state)) {

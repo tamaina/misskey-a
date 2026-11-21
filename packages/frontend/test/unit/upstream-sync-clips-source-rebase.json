@@ -1,0 +1,227 @@
+[
+  {
+    "file": "packages/features/navigation/frontend/ui/deck.vue",
+    "currentSha256": "49d17eff41a3d99e90c53600a8fec778ccd4444a3dd166e7ee76e2df7e6d7949",
+    "baselineSha256": "42eab0099dd1de2c2af063ae1a40a31d5a9e8515e2c161205975a6a0aaaad4da",
+    "edits": [
+      {
+        "start": 7329,
+        "end": 7411,
+        "current": "import XClipColumn from '@features/collections/frontend/ui/deck/clip-column.vue';\n",
+        "baseline": ""
+      },
+      {
+        "start": 8584,
+        "end": 8604,
+        "current": "\tclip: XClipColumn,\n",
+        "baseline": ""
+      },
+      {
+        "start": 14695,
+        "end": 14741,
+        "current": "\t\t\"chat\": \"Chat with user\",\n\t\t\"clip\": \"مِشبك\"\n",
+        "baseline": "\t\t\"chat\": \"Chat with user\"\n"
+      },
+      {
+        "start": 15992,
+        "end": 16050,
+        "current": "\t\t\"chat\": \"Xateja amb aquest usuari\",\n\t\t\"clip\": \"Retalls\"\n",
+        "baseline": "\t\t\"chat\": \"Xateja amb aquest usuari\"\n"
+      },
+      {
+        "start": 17293,
+        "end": 17342,
+        "current": "\t\t\"chat\": \"Chat with user\",\n\t\t\"clip\": \"Oříznout\"\n",
+        "baseline": "\t\t\"chat\": \"Chat with user\"\n"
+      },
+      {
+        "start": 18528,
+        "end": 18573,
+        "current": "\t\t\"chat\": \"Chat with user\",\n\t\t\"clip\": \"Clip\"\n",
+        "baseline": "\t\t\"chat\": \"Chat with user\"\n"
+      },
+      {
+        "start": 19849,
+        "end": 19914,
+        "current": "\t\t\"chat\": \"Mit dem Benutzer chatten\",\n\t\t\"clip\": \"Clip erstellen\"\n",
+        "baseline": "\t\t\"chat\": \"Mit dem Benutzer chatten\"\n"
+      },
+      {
+        "start": 21170,
+        "end": 21215,
+        "current": "\t\t\"chat\": \"Chat with user\",\n\t\t\"clip\": \"Clip\"\n",
+        "baseline": "\t\t\"chat\": \"Chat with user\"\n"
+      },
+      {
+        "start": 22494,
+        "end": 22532,
+        "current": "\t\t\"chat\": \"Chatear\",\n\t\t\"clip\": \"Clip\"\n",
+        "baseline": "\t\t\"chat\": \"Chatear\"\n"
+      },
+      {
+        "start": 23814,
+        "end": 23859,
+        "current": "\t\t\"chat\": \"Chat with user\",\n\t\t\"clip\": \"Clip\"\n",
+        "baseline": "\t\t\"chat\": \"Chat with user\"\n"
+      },
+      {
+        "start": 25048,
+        "end": 25095,
+        "current": "\t\t\"chat\": \"Obrolan pengguna\",\n\t\t\"clip\": \"Klip\"\n",
+        "baseline": "\t\t\"chat\": \"Obrolan pengguna\"\n"
+      },
+      {
+        "start": 26337,
+        "end": 26393,
+        "current": "\t\t\"chat\": \"Chatta con questa persona\",\n\t\t\"clip\": \"Clip\"\n",
+        "baseline": "\t\t\"chat\": \"Chatta con questa persona\"\n"
+      },
+      {
+        "start": 27505,
+        "end": 27546,
+        "current": "\t\t\"chat\": \"ダイレクトメッセージ\",\n\t\t\"clip\": \"クリップ\"\n",
+        "baseline": "\t\t\"chat\": \"ダイレクトメッセージ\"\n"
+      },
+      {
+        "start": 28465,
+        "end": 28503,
+        "current": "\t\t\"chat\": \"チャットしよか\",\n\t\t\"clip\": \"クリップ\"\n",
+        "baseline": "\t\t\"chat\": \"チャットしよか\"\n"
+      },
+      {
+        "start": 29560,
+        "end": 29605,
+        "current": "\t\t\"chat\": \"Chat with user\",\n\t\t\"clip\": \"Clip\"\n",
+        "baseline": "\t\t\"chat\": \"Chat with user\"\n"
+      },
+      {
+        "start": 30798,
+        "end": 30843,
+        "current": "\t\t\"chat\": \"Chat with user\",\n\t\t\"clip\": \"Clip\"\n",
+        "baseline": "\t\t\"chat\": \"Chat with user\"\n"
+      },
+      {
+        "start": 31887,
+        "end": 31920,
+        "current": "\t\t\"chat\": \"채팅하기\",\n\t\t\"clip\": \"클립\"\n",
+        "baseline": "\t\t\"chat\": \"채팅하기\"\n"
+      },
+      {
+        "start": 33001,
+        "end": 33055,
+        "current": "\t\t\"chat\": \"Chat with user\",\n\t\t\"clip\": \"Clip aanmaken\"\n",
+        "baseline": "\t\t\"chat\": \"Chat with user\"\n"
+      },
+      {
+        "start": 34241,
+        "end": 34286,
+        "current": "\t\t\"chat\": \"Chat with user\",\n\t\t\"clip\": \"Clip\"\n",
+        "baseline": "\t\t\"chat\": \"Chat with user\"\n"
+      },
+      {
+        "start": 35477,
+        "end": 35522,
+        "current": "\t\t\"chat\": \"Chat with user\",\n\t\t\"clip\": \"Klip\"\n",
+        "baseline": "\t\t\"chat\": \"Chat with user\"\n"
+      },
+      {
+        "start": 36724,
+        "end": 36777,
+        "current": "\t\t\"chat\": \"Conversar com usuário\",\n\t\t\"clip\": \"Clipe\"\n",
+        "baseline": "\t\t\"chat\": \"Conversar com usuário\"\n"
+      },
+      {
+        "start": 37936,
+        "end": 37995,
+        "current": "\t\t\"chat\": \"Открыть личные сообщения\",\n\t\t\"clip\": \"Подборка\"\n",
+        "baseline": "\t\t\"chat\": \"Открыть личные сообщения\"\n"
+      },
+      {
+        "start": 39159,
+        "end": 39204,
+        "current": "\t\t\"chat\": \"Chat with user\",\n\t\t\"clip\": \"Klip\"\n",
+        "baseline": "\t\t\"chat\": \"Chat with user\"\n"
+      },
+      {
+        "start": 40390,
+        "end": 40427,
+        "current": "\t\t\"chat\": \"แชตเลย\",\n\t\t\"clip\": \"คลิป\"\n",
+        "baseline": "\t\t\"chat\": \"แชตเลย\"\n"
+      },
+      {
+        "start": 41605,
+        "end": 41642,
+        "current": "\t\t\"chat\": \"Sohbet\",\n\t\t\"clip\": \"Klip\"\n",
+        "baseline": "\t\t\"chat\": \"Sohbet\"\n"
+      },
+      {
+        "start": 42904,
+        "end": 42949,
+        "current": "\t\t\"chat\": \"Chat with user\",\n\t\t\"clip\": \"Clip\"\n",
+        "baseline": "\t\t\"chat\": \"Chat with user\"\n"
+      },
+      {
+        "start": 44154,
+        "end": 44214,
+        "current": "\t\t\"chat\": \"Написати цьому користувачу\",\n\t\t\"clip\": \"Добірка\"\n",
+        "baseline": "\t\t\"chat\": \"Написати цьому користувачу\"\n"
+      },
+      {
+        "start": 45371,
+        "end": 45424,
+        "current": "\t\t\"chat\": \"Chat with user\",\n\t\t\"clip\": \"Lưu bài viết\"\n",
+        "baseline": "\t\t\"chat\": \"Chat with user\"\n"
+      },
+      {
+        "start": 46410,
+        "end": 46441,
+        "current": "\t\t\"chat\": \"私信\",\n\t\t\"clip\": \"便签\"\n",
+        "baseline": "\t\t\"chat\": \"私信\"\n"
+      },
+      {
+        "start": 47284,
+        "end": 47315,
+        "current": "\t\t\"chat\": \"聊天\",\n\t\t\"clip\": \"摘錄\"\n",
+        "baseline": "\t\t\"chat\": \"聊天\"\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/preferences/frontend/deck.ts",
+    "currentSha256": "500806d804b9a94724089af3dc0afaffe1d7dbde0b8f42e012a4e06354ca5aa5",
+    "baselineSha256": "ffaf1c6f0ca6e50de0f07772959dd6e229cc83d8ef9e0bd8c7385c83cf94c433",
+    "edits": [
+      {
+        "start": 1312,
+        "end": 1321,
+        "current": "\t'clip',\n",
+        "baseline": ""
+      },
+      {
+        "start": 1608,
+        "end": 1626,
+        "current": "\tclipId?: string;\n",
+        "baseline": ""
+      },
+      {
+        "start": 1845,
+        "end": 1917,
+        "current": "\t// The cache for the name of the antenna, channel, list, role, or clip\n",
+        "baseline": "\t// The cache for the name of the antenna, channel, list, or role\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/runtime/frontend/cache.ts",
+    "currentSha256": "11b08365998f3f01711e8379eef088537a565332dc5bd7a572f9da6e979f099d",
+    "baselineSha256": "54adb2d9e8f5eaa8652bbf2f51d503d6d769808264245702f6a91842d915bbf7",
+    "edits": [
+      {
+        "start": 930,
+        "end": 1061,
+        "current": "export const favoritedClipsCache = new Cache<Misskey.entities.Clip[]>(1000 * 60 * 30, () => misskeyApi('clips/my-favorites', {}));\n",
+        "baseline": ""
+      }
+    ]
+  }
+]

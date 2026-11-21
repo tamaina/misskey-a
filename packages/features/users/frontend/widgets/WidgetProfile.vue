@@ -26,7 +26,7 @@ import { useWidgetPropsManager } from '../../../ui/frontend/widgets/widget.js';
 import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../ui/frontend/widgets/widget.js';
 import type { FormWithDefault, GetFormResultType } from '@features/ui/frontend/utility/form.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
-import { userPage } from '@features/users/frontend/filters/user.js';
+import { userPage } from '@features/users/frontend/shared/user.js';
 
 const $i = ensureSignin();
 

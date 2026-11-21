@@ -2,59 +2,42 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedNotesDraftsListDefinition, packedNotesDraftsListInput, packedNotesDraftsListOutput } from '../../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
-import type { MiNoteDraft, NoteDraftsRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPackedNoteDraft } from '@features/notes/backend/note.schema.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { QueryService } from '../../../services/QueryService.js';
 import { NoteDraftEntityService } from '../../../serializers/NoteDraftEntityService.js';
+import { notesDraftsListContract } from './list.contract.js';
+import type { MiNoteDraft, NoteDraftsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { MiLocalUser } from "@features/users/backend/models/User.js";
 
-const contractProjection = projectEndpointContract(packedNotesDraftsListDefinition);
+export interface NotesDraftsListDependencies {
+	noteDraftsRepository: NoteDraftsRepository;
+	queryService: Pick<QueryService, 'makePaginationQuery'>;
+	noteDraftEntityService: Pick<NoteDraftEntityService, 'packMany'>;
+}
+export function createNotesDraftsListProcedure(deps: NotesDraftsListDependencies) {
+	return createApiProcedure<MiLocalUser>()(notesDraftsListContract).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const result = await (async () => {
+				const ps = input;
+				const me = context.principal;
 
-export const meta = {
-	tags: ['notes', 'drafts'],
+					const query = deps.queryService.makePaginationQuery<MiNoteDraft>(deps.noteDraftsRepository.createQueryBuilder('drafts'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
+						.andWhere('drafts.userId = :meId', { meId: me.id });
 
-	requireCredential: true,
+					if (ps.scheduled === true) {
+						query.andWhere('drafts.isActuallyScheduled = true');
+					} else if (ps.scheduled === false) {
+						query.andWhere('drafts.isActuallyScheduled = false');
+					}
 
-	prohibitMoved: true,
+					const drafts = await query
+						.limit(ps.limit)
+						.getMany();
 
-	kind: 'read:account',
-
-	res: contractProjection.response,
-
-	errors: {
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedNotesDraftsListInput, typeof packedNotesDraftsListOutput> {
-	constructor(
-		@Inject(DI.noteDraftsRepository)
-		private noteDraftsRepository: NoteDraftsRepository,
-
-		private queryService: QueryService,
-		private noteDraftEntityService: NoteDraftEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.queryService.makePaginationQuery<MiNoteDraft>(this.noteDraftsRepository.createQueryBuilder('drafts'), ps.sinceId, ps.untilId, ps.sinceDate, ps.untilDate)
-				.andWhere('drafts.userId = :meId', { meId: me.id });
-
-			if (ps.scheduled === true) {
-				query.andWhere('drafts.isActuallyScheduled = true');
-			} else if (ps.scheduled === false) {
-				query.andWhere('drafts.isActuallyScheduled = false');
-			}
-
-			const drafts = await query
-				.limit(ps.limit)
-				.getMany();
-
-			return await this.noteDraftEntityService.packMany(drafts, me);
+					return await deps.noteDraftEntityService.packMany(drafts, me);
+			})();
+			return result.map(toPackedNoteDraft);
 		});
-	}
 }

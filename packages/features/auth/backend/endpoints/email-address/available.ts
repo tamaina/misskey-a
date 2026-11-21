@@ -2,32 +2,25 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineEmailAddressAvailableDefinition, inlineEmailAddressAvailableInput, inlineEmailAddressAvailableOutput } from '../../../contract/endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { EmailService } from '@features/email/backend/services/EmailService.js';
 
-const contractProjection = projectEndpointContract(inlineEmailAddressAvailableDefinition);
+import { EmailAddressAvailableContract } from '../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
 	tags: ['users'],
 
-	requireCredential: false,
-
-	res: contractProjection.response,
 } as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineEmailAddressAvailableInput, typeof inlineEmailAddressAvailableOutput> {
-	constructor(
-		private emailService: EmailService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return await this.emailService.validateEmailForAccount(ps.emailAddress);
-		});
-	}
+export interface EmailAddressAvailableDependencies {
+	emailService: Pick<EmailService, 'validateEmailForAccount'>;
+}
+export function createEmailAddressAvailableProcedure(deps: EmailAddressAvailableDependencies) {
+	return createApiProcedure<MiLocalUser>()(EmailAddressAvailableContract).handler(async ({ input, context }) => {
+		const ps = input;
+		const result = await (async () => {
+			return await deps.emailService.validateEmailForAccount(ps.emailAddress);
+		})();
+		return result;
+	});
 }

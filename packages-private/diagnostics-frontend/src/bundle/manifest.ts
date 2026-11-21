@@ -5,6 +5,7 @@
 
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import { localeEntryManifestFile, parseLocaleEntryManifest } from '../../../../packages/features/web/shared/locale-entry-manifest';
 import { fileExists, fileSize, normalizePath, traverseDirectory } from './fs-utils';
 
 export type BundleManifestChunk = {
@@ -91,8 +92,8 @@ export function collectStartupManifestKeys(manifest: BundleManifest) {
  * manifest 上の出力パスを実ファイルへ解決する。`scripts/` 配下はロケール別に
  * 複製されて出力されるため、代表ロケールのものへ読み替える。
  */
-export async function resolveBuiltFile(outDir: string, file: string) {
-	if (file.startsWith('scripts/')) {
+export async function resolveBuiltFile(outDir: string, file: string, sharedScripts = false) {
+	if (file.startsWith('scripts/') && !sharedScripts) {
 		const localizedFile = file.slice('scripts/'.length);
 		const localizedPath = path.join(outDir, locale, localizedFile);
 		if (await fileExists(localizedPath)) {
@@ -114,13 +115,21 @@ export async function collectBundleReport(repoDir: string): Promise<CollectedBun
 	const outDir = path.join(repoDir, 'built/_frontend_vite_');
 	const manifestPath = path.join(outDir, 'manifest.json');
 	const manifest = JSON.parse(await fs.readFile(manifestPath, 'utf8')) as BundleManifest;
+	// Use host entry selection, not file-presence fallback: old builds contain both
+	// raw scripts and localized copies, but browsers consume the localized copies.
+	const localeManifestPath = path.join(outDir, localeEntryManifestFile);
+	const localeEntry = await fileExists(localeManifestPath)
+		? parseLocaleEntryManifest(JSON.parse(await fs.readFile(localeManifestPath, 'utf8'))).entries[locale]
+		: undefined;
+	const entryKey = findEntryKey(manifest);
+	const sharedScripts = localeEntry !== undefined && entryKey !== null && localeEntry === manifest[entryKey].file;
 	const chunksByFile = new Map<string, FileEntry>();
 	const comparableChunks = new Map<string, FileEntry>();
 	const chunksByManifestKey = new Map<string, FileEntry>();
 
 	for (const [manifestKey, chunk] of Object.entries(manifest)) {
 		if (!chunk.file.endsWith('.js')) continue;
-		const builtFile = await resolveBuiltFile(outDir, chunk.file);
+		const builtFile = await resolveBuiltFile(outDir, chunk.file, sharedScripts);
 		const comparisonKey = stableChunkKey(chunk);
 		let entry = chunksByFile.get(builtFile.relativePath);
 		if (entry == null) {
@@ -149,7 +158,7 @@ export async function collectBundleReport(repoDir: string): Promise<CollectedBun
 
 	// manifest に載らないロケール別チャンクも合計サイズには含めたいので拾っておく
 	const localeDir = path.join(outDir, locale);
-	if (await fileExists(localeDir)) {
+	if (!sharedScripts && await fileExists(localeDir)) {
 		for await (const fullPath of traverseDirectory(localeDir)) {
 			if (!fullPath.endsWith('.js')) continue;
 			const relativePath = normalizePath(path.relative(outDir, fullPath));

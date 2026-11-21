@@ -3,13 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import type { SystemWebhookEventType } from '../../contract/system-webhook-events.js';
+import type { SystemWebhookEventType } from '../webhook-events.schema.js';
 import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
 import { Serialized } from '@features/runtime/backend/types.js';
 import { id } from '@features/persistence/backend/models/util/id.js';
 
-export { systemWebhookEventTypes } from '../../contract/system-webhook-events.js';
-export type { SystemWebhookEventType } from '../../contract/system-webhook-events.js';
+export { systemWebhookEventTypes } from '../webhook-events.schema.js';
+export type { SystemWebhookEventType } from '../webhook-events.schema.js';
 
 @Entity('system_webhook')
 export class MiSystemWebhook {

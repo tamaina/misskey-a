@@ -16,6 +16,8 @@ import type {
 	PublicKeyCredentialRequestOptionsJSON,
 } from '@simplewebauthn/browser';
 
+import type { I2faRegisterKeyResponse } from './autogen/entities.js';
+
 export * from './autogen/entities.js';
 export * from './autogen/models.js';
 
@@ -138,7 +140,11 @@ export type SignupPendingResponse = {
 	i: string,
 };
 
+export type SigninProgressChallenge = { ticket: string; browserSecret: string; nonce: string; version: number };
+
 export type SigninFlowRequest = {
+	progressMode?: 'v1';
+	authenticationProgress?: SigninProgressChallenge;
 	username: string;
 	password?: string;
 	token?: string;
@@ -156,11 +162,18 @@ export type SigninFlowResponse = {
 	i: string;
 } | {
 	finished: false;
-	next: 'captcha' | 'password' | 'totp';
+	next: 'captcha' | 'password';
+} | {
+	finished: false;
+	next: 'totp';
+	authenticationProgress?: SigninProgressChallenge;
+	availableFactors?: ('totp' | 'passkey' | 'recovery')[];
 } | {
 	finished: false;
 	next: 'passkey';
+	authenticationProgress?: SigninProgressChallenge;
 	authRequest: PublicKeyCredentialRequestOptionsJSON;
+	availableFactors?: ('totp' | 'passkey' | 'recovery')[];
 };
 
 export type SigninWithPasskeyRequest = {
@@ -175,6 +188,10 @@ export type SigninWithPasskeyInitResponse = {
 
 export type SigninWithPasskeyResponse = {
 	signinResponse: SigninFlowResponse & { finished: true };
+	passwordFlowRequired?: never;
+} | {
+	passwordFlowRequired: true;
+	signinResponse?: never;
 };
 
 export type I2faKeyDoneRequest = {
@@ -183,6 +200,10 @@ export type I2faKeyDoneRequest = {
 	name: string;
 	credential: RegistrationResponseJSON;
 };
+
+// Canonical routes preserve the established browser WebAuthn request/response types.
+export type I2faPasskeyDoneRequest = I2faKeyDoneRequest;
+export type I2faPasskeyRegisterResponse = I2faRegisterKeyResponse;
 
 type Values<T extends Record<PropertyKey, unknown>> = T[keyof T];
 

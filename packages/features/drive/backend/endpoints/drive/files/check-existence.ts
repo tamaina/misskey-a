@@ -3,37 +3,23 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { inlineDriveFilesCheckExistenceDefinition, inlineDriveFilesCheckExistenceInput, inlineDriveFilesCheckExistenceOutput } from '../../../../contract/endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { DriveFilesRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
+import { driveManagementContract } from '../../../api.definition.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
-const contractProjection = projectEndpointContract(inlineDriveFilesCheckExistenceDefinition);
-
-export const meta = {
-	tags: ['drive'],
-
-	requireCredential: true,
-
-	kind: 'read:drive',
-
-	description: 'Check if a given file exists.',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof inlineDriveFilesCheckExistenceInput, typeof inlineDriveFilesCheckExistenceOutput> {
-	constructor(
-		@Inject(DI.driveFilesRepository)
-		private driveFilesRepository: DriveFilesRepository,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const exist = await this.driveFilesRepository.exists({
+export interface DriveFilesCheckExistenceDependencies {
+	driveFilesRepository: DriveFilesRepository;
+}
+export function createDriveFilesCheckExistenceProcedure(deps: DriveFilesCheckExistenceDependencies) {
+	return createApiProcedure<MiLocalUser>()(driveManagementContract['drive/files/check-existence']).use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const _ip = context.ip;
+			const _headers = context.headers;
+			const exist = await deps.driveFilesRepository.exists({
 				where: {
 					md5: ps.md5,
 					userId: me.id,
@@ -42,5 +28,4 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 
 			return exist;
 		});
-	}
 }

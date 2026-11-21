@@ -2,25 +2,22 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { avatarDecorationCommandsContract } from '../../../../contract/index.js';
-import { legacyAvatarDecorationCommandSchemas } from '@features/avatar-decorations/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
-
-export const meta = {
-	tags: ['admin'],
-
-	requireCredential: true,
-	requiredRolePolicy: 'canManageAvatarDecorations',
-	kind: 'write:admin:avatar-decorations',
-
-	errors: {},
-} as const;
-
-export const paramDef = legacyAvatarDecorationCommandSchemas['admin/avatar-decorations/update'].input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('avatarDecorationCommands', commands => createContractTransportEndpoint(meta, paramDef, avatarDecorationCommandsContract['admin/avatar-decorations/update'], async (params, user) => commands['admin/avatar-decorations/update'](params, {
-	context: { actor: user },
-})));
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { avatarDecorationsContract } from '../../../api.definition.js';
+import type { AvatarDecorationsDependencies } from '../../../api.implementation.js';
+export interface AvatarDecorationUpdateDependencies<Actor extends ApiActor> {
+	avatarDecorationService: Pick<AvatarDecorationsDependencies<Actor>['avatarDecorationService'], 'update'>;
+}
+export function createAvatarDecorationUpdateProcedure<Actor extends ApiActor>(deps: AvatarDecorationUpdateDependencies<Actor>) {
+	return createApiProcedure<Actor>()(avatarDecorationsContract.update)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const actor = context.principal;
+			await deps.avatarDecorationService.update(input.id, {
+				name: input.name, description: input.description, url: input.url,
+				roleIdsThatCanBeUsedThisDecoration: input.roleIdsThatCanBeUsedThisDecoration, category: input.category,
+			}, actor);
+		});
+}

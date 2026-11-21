@@ -3,65 +3,35 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedNotesClipsDefinition, packedNotesClipsInput, packedNotesClipsOutput } from '../../../contract/packed-endpoint-definitions.js';
+import { toPackedClip } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { collectionsContract } from '../../api.definition.js';
+import type { CollectionsDependencies } from '../../api.implementation.js';
 import { In } from 'typeorm';
-import { Inject, Injectable } from '@nestjs/common';
-import type { ClipNotesRepository, ClipsRepository } from '@features/persistence/backend/repositories/models.js';
-
-import { ClipEntityService } from '../../serializers/ClipEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { GetterService } from '@features/api/backend/transport/GetterService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(packedNotesClipsDefinition);
-
-export const meta = {
-	tags: ['clips', 'notes'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-
-	errors: {
-		noSuchNote: {
-			message: 'No such note.',
-			code: 'NO_SUCH_NOTE',
-			id: '47db1a1c-b0af-458d-8fb4-986e4efafe1e',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedNotesClipsInput, typeof packedNotesClipsOutput> {
-	constructor(
-		@Inject(DI.clipsRepository)
-		private clipsRepository: ClipsRepository,
-
-		@Inject(DI.clipNotesRepository)
-		private clipNotesRepository: ClipNotesRepository,
-
-		private clipEntityService: ClipEntityService,
-		private getterService: GetterService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const note = await this.getterService.getNote(ps.noteId).catch(err => {
-				if (err.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw new ApiError(meta.errors.noSuchNote);
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { collectionsErrors } from '../../api.errors.js';
+export interface NotesClipsDependencies<Actor extends ApiActor> {
+	getterService: Pick<CollectionsDependencies<Actor>['getterService'], 'getNote'>;
+	clipNotesRepository: Pick<CollectionsDependencies<Actor>['clipNotesRepository'], 'findBy'>;
+	clipsRepository: Pick<CollectionsDependencies<Actor>['clipsRepository'], 'findBy'>;
+	clipEntityService: Pick<CollectionsDependencies<Actor>['clipEntityService'], 'packMany'>;
+}
+export function createNotesClipsProcedure<Actor extends ApiActor>(deps: NotesClipsDependencies<Actor>) {
+	return createApiProcedure<Actor>()(collectionsContract.notesClips)
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const note = await deps.getterService.getNote(ps.noteId).catch(err => {
+				if (err !== null && typeof err === 'object' && 'id' in err && err.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw apiError(collectionsErrors.notesClips.noSuchNote);
 				throw err;
 			});
-
-			const clipNotes = await this.clipNotesRepository.findBy({
+			const clipNotes = await deps.clipNotesRepository.findBy({
 				noteId: note.id,
 			});
-
-			const clips = await this.clipsRepository.findBy({
+			const clips = await deps.clipsRepository.findBy({
 				id: In(clipNotes.map(x => x.clipId)),
 				isPublic: true,
 			});
-
-			return await this.clipEntityService.packMany(clips, me);
+			return (await deps.clipEntityService.packMany(clips, me)).map(toPackedClip);
 		});
-	}
 }

@@ -8,7 +8,7 @@ import type { } from '../models/Blocking.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiFollowRequest } from '../models/FollowRequest.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import type { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 
 export class FollowRequestEntityService {

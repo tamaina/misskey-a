@@ -3,70 +3,36 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidPagesUnlikeDefinition, voidPagesUnlikeInput, voidPagesUnlikeOutput } from '../../../contract/void-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+
+import { requirePrincipal } from '../../../../api/backend/transport/middleware.js';
+
+import { pagesUnlikeContract, pagesUnlikeErrors } from './unlike.contract.js';
 import type { PagesRepository, PageLikesRepository } from '@features/persistence/backend/repositories/models.js';
-
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(voidPagesUnlikeDefinition);
-
-export const meta = {
-	tags: ['pages'],
-
-	requireCredential: true,
-
-	prohibitMoved: true,
-
-	kind: 'write:page-likes',
-
-	errors: {
-		noSuchPage: {
-			message: 'No such page.',
-			code: 'NO_SUCH_PAGE',
-			id: 'a0d41e20-1993-40bd-890e-f6e560ae648e',
-		},
-
-		notLiked: {
-			message: 'You have not liked that page.',
-			code: 'NOT_LIKED',
-			id: 'f5e586b0-ce93-4050-b0e3-7f31af5259ee',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidPagesUnlikeInput, typeof voidPagesUnlikeOutput> {
-	constructor(
-		@Inject(DI.pagesRepository)
-		private pagesRepository: PagesRepository,
-
-		@Inject(DI.pageLikesRepository)
-		private pageLikesRepository: PageLikesRepository,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const page = await this.pagesRepository.findOneBy({ id: ps.pageId });
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+export interface PagesUnlikeDependencies {
+	pagesRepository: Pick<PagesRepository, 'decrement' | 'findOneBy'>;
+	pageLikesRepository: Pick<PageLikesRepository, 'delete' | 'findOneBy'>;
+}
+export function createPagesUnlikeProcedure(deps: PagesUnlikeDependencies) {
+	return createApiProcedure<MiLocalUser>()(pagesUnlikeContract)
+		.use(requirePrincipal<MiLocalUser>())
+		.handler(async ({ input: ps, context }) => {
+			const me = context.principal;
+			const page = await deps.pagesRepository.findOneBy({ id: ps.pageId });
 			if (page == null) {
-				throw new ApiError(meta.errors.noSuchPage);
+				throw apiError(pagesUnlikeErrors.noSuchPage);
 			}
-
-			const exist = await this.pageLikesRepository.findOneBy({
+			const exist = await deps.pageLikesRepository.findOneBy({
 				pageId: page.id,
 				userId: me.id,
 			});
-
 			if (exist == null) {
-				throw new ApiError(meta.errors.notLiked);
+				throw apiError(pagesUnlikeErrors.notLiked);
 			}
-
 			// Delete like
-			await this.pageLikesRepository.delete(exist.id);
-
-			this.pagesRepository.decrement({ id: page.id }, 'likedCount', 1);
+			await deps.pageLikesRepository.delete(exist.id);
+			deps.pagesRepository.decrement({ id: page.id }, 'likedCount', 1);
 		});
-	}
 }

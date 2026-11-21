@@ -38,6 +38,7 @@ type Source = {
 	port?: number;
 	socket?: string;
 	trustProxy?: FastifyServerOptions['trustProxy'];
+	enableMcp?: boolean;
 	chmodSocket?: string;
 	enableIpRateLimit?: boolean;
 	disableHsts?: boolean;
@@ -136,6 +137,8 @@ export type Config = {
 	port: number;
 	socket: string | undefined;
 	trustProxy: NonNullable<FastifyServerOptions['trustProxy']>;
+	/** Explicit opt-in for the existing native API's MCP transport. */
+	enableMcp?: boolean;
 	chmodSocket: string | undefined;
 	enableIpRateLimit: boolean;
 	disableHsts: boolean | undefined;
@@ -293,6 +296,7 @@ export function loadConfig(): Config {
 		publishTarballInsteadOfProvideRepositoryUrl: !!config.publishTarballInsteadOfProvideRepositoryUrl,
 		setupPassword: config.setupPassword,
 		url: url.origin,
+		enableMcp: config.enableMcp === true,
 		port: config.port ?? parseInt(process.env.PORT ?? '', 10),
 		socket: config.socket,
 		trustProxy: config.trustProxy ?? [
@@ -336,9 +340,9 @@ export function loadConfig(): Config {
 		threadPoolSize: config.threadPoolSize ?? 1,
 		outgoingAddress: config.outgoingAddress,
 		outgoingAddressFamily: config.outgoingAddressFamily,
-		deliverJobConcurrency: config.deliverJobConcurrency,
-		inboxJobConcurrency: config.inboxJobConcurrency,
-		relationshipJobConcurrency: config.relationshipJobConcurrency,
+		deliverJobConcurrency: validateJobConcurrency('deliverJobConcurrency', config.deliverJobConcurrency),
+		inboxJobConcurrency: validateJobConcurrency('inboxJobConcurrency', config.inboxJobConcurrency),
+		relationshipJobConcurrency: validateJobConcurrency('relationshipJobConcurrency', config.relationshipJobConcurrency),
 		deliverJobPerSec: config.deliverJobPerSec,
 		inboxJobPerSec: config.inboxJobPerSec,
 		relationshipJobPerSec: config.relationshipJobPerSec,
@@ -367,6 +371,15 @@ function tryCreateUrl(url: string) {
 	} catch (_) {
 		throw new Error(`url="${url}" is not a valid URL.`);
 	}
+}
+
+function validateJobConcurrency(key: string, value: number | undefined) {
+	if (value == null) return undefined;
+	// BullMQ の Worker は 1 未満の concurrency を受け付けないため、起動時に設定キーを明示して落とす
+	if (typeof value !== 'number' || !Number.isFinite(value) || value < 1) {
+		throw new Error(`${key}=${JSON.stringify(value)} is invalid. It must be a finite number greater than or equal to 1.`);
+	}
+	return value;
 }
 
 function convertRedisOptions(options: RedisOptionsSource, host: string): RedisOptionsResolved {

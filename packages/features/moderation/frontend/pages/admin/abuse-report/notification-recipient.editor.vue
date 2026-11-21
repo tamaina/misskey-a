@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div class="_spacer" style="--MI_SPACER-min: 20px; --MI_SPACER-max: 28px; flex-grow: 1;">
 			<div :class="$style.root" class="_gaps_m">
 				<MkInput v-model="title">
-					<template #label>{{ $locale.sfc.title }}</template>
+					<template #label>{{ globalLocale.env.title }}</template>
 				</MkInput>
 				<MkSelect v-model="method" :items="methodDef">
 					<template #label>{{ $locale.sfc.abuseReportNotificationRecipientRecipientType }}</template>
@@ -52,8 +52,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 
 		<div :class="$style.footer" class="_buttonsCenter">
-			<MkButton primary rounded :disabled="disableSubmitButton" @click="onSubmitClicked"><i class="ti ti-check"></i> {{ $locale.sfc.ok }}</MkButton>
-			<MkButton rounded @click="onCancelClicked"><i class="ti ti-x"></i> {{ $locale.sfc.cancel }}</MkButton>
+			<MkButton primary rounded :disabled="disableSubmitButton" @click="onSubmitClicked"><i class="ti ti-check"></i> {{ globalLocale.env.ok }}</MkButton>
+			<MkButton rounded @click="onCancelClicked"><i class="ti ti-x"></i> {{ globalLocale.env.cancel }}</MkButton>
 		</div>
 	</div>
 	<div v-else>
@@ -63,9 +63,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, onMounted, ref, useTemplateRef, toRefs } from 'vue';
 import { entities } from 'misskey-js';
-import type { MkSystemWebhookResult } from '@features/integrations/frontend/components/MkSystemWebhookEditor.impl.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
@@ -76,6 +76,10 @@ import { showSystemWebhookEditorDialog } from '@features/integrations/frontend/c
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkDivider from '@features/ui/frontend/components/MkDivider.vue';
 import * as os from '@features/ui/frontend/os.js';
+import type { MkSystemWebhookResult } from '@features/integrations/frontend/components/MkSystemWebhookEditor.impl.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const emit = defineEmits<{
 	(ev: 'submitted'): void;
@@ -184,7 +188,7 @@ async function onSubmitClicked() {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (ex: any) {
 			const msg = ex.message ?? $locale.value.sfc.internalServerErrorDescription;
-			await os.alert({ type: 'error', title: $locale.value.sfc.error, text: msg });
+			await os.alert({ type: 'error', title: globalLocale.value.env.error, text: msg });
 			dialogEl.value?.close();
 			emit('canceled');
 		}
@@ -219,7 +223,7 @@ async function onEditSystemWebhookClicked() {
 async function fetchSystemWebhooks() {
 	await loadingScope(async () => {
 		systemWebhooks.value = [
-			{ id: null, name: $locale.value.sfc.createNew },
+			{ id: null, name: globalLocale.value.env.createNew },
 			...await misskeyApi('admin/system-webhook/list', { }),
 		];
 	});
@@ -277,7 +281,7 @@ onMounted(async () => {
 				// eslint-disable-next-line
 			} catch (ex: any) {
 				const msg = ex.message ?? $locale.value.sfc.internalServerErrorDescription;
-				await os.alert({ type: 'error', title: $locale.value.sfc.error, text: msg });
+				await os.alert({ type: 'error', title: globalLocale.value.env.error, text: msg });
 				dialogEl.value?.close();
 				emit('canceled');
 			}
@@ -334,20 +338,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Add recipient for reports",
 	"abuseReportNotificationRecipientModifyRecipient": "Edit a recipient for reports",
-	"title": "العنوان",
 	"abuseReportNotificationRecipientRecipientType": "Notification type",
 	"abuseReportNotificationRecipientNotifiedUser": "Users to notify",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook to use",
 	"enable": "تشغيل",
-	"ok": " حسناً",
-	"cancel": " إلغاء",
 	"abuseReportNotificationRecipientRecipientTypeMail": "البريد الإلكتروني ",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Send the email to moderators' email addresses when you receive reports.",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Send a notification to System Webhook when you receive or resolve reports.",
-	"internalServerErrorDescription": "واجه الخادم خطأ غي متوقع.",
-	"error": "خطأ",
-	"createNew": "أنشِئ جديد"
+	"internalServerErrorDescription": "واجه الخادم خطأ غي متوقع."
 }
 </locale>
 
@@ -355,20 +354,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Afegeix un destinatari a l'informe de moderació ",
 	"abuseReportNotificationRecipientModifyRecipient": "Editar un destinatari en l'informe de moderació ",
-	"title": "Títol",
 	"abuseReportNotificationRecipientRecipientType": "Tipus de notificació ",
 	"abuseReportNotificationRecipientNotifiedUser": "Usuaris que s'han de notificar ",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook que s'ha de fer servir",
 	"enable": "Habilita",
-	"ok": "OK",
-	"cancel": "Cancel·lar",
 	"abuseReportNotificationRecipientRecipientTypeMail": "Correu electrònic",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Enviar un correu electrònic a tots els moderadors quan es rep un informe de moderació ",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Enviar una notificació al SystemWebhook quan es rebi o es resolgui un informe de moderació ",
-	"internalServerErrorDescription": "El servidor ha fallat de manera inexplicable.",
-	"error": "Error",
-	"createNew": "Crear"
+	"internalServerErrorDescription": "El servidor ha fallat de manera inexplicable."
 }
 </locale>
 
@@ -376,20 +370,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Add recipient for reports",
 	"abuseReportNotificationRecipientModifyRecipient": "Edit a recipient for reports",
-	"title": "Titulek",
 	"abuseReportNotificationRecipientRecipientType": "Notification type",
 	"abuseReportNotificationRecipientNotifiedUser": "Users to notify",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook to use",
 	"enable": "Povolit",
-	"ok": "Potvrdit",
-	"cancel": "Zrušit",
 	"abuseReportNotificationRecipientRecipientTypeMail": "Email",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Send the email to moderators' email addresses when you receive reports.",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Send a notification to System Webhook when you receive or resolve reports.",
-	"internalServerErrorDescription": "Server narazil na neočekávanou chybu.",
-	"error": "Chyba",
-	"createNew": "Vytvořit nový"
+	"internalServerErrorDescription": "Server narazil na neočekávanou chybu."
 }
 </locale>
 
@@ -397,20 +386,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Add recipient for reports",
 	"abuseReportNotificationRecipientModifyRecipient": "Edit a recipient for reports",
-	"title": "Title",
 	"abuseReportNotificationRecipientRecipientType": "Notification type",
 	"abuseReportNotificationRecipientNotifiedUser": "Users to notify",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook to use",
 	"enable": "Enable",
-	"ok": "OK",
-	"cancel": "Cancel",
 	"abuseReportNotificationRecipientRecipientTypeMail": "Email",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Send the email to moderators' email addresses when you receive reports.",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Send a notification to System Webhook when you receive or resolve reports.",
-	"internalServerErrorDescription": "The server has run into an unexpected error.",
-	"error": "Error",
-	"createNew": "Create new"
+	"internalServerErrorDescription": "The server has run into an unexpected error."
 }
 </locale>
 
@@ -418,20 +402,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Meldungsempfänger hinzufügen",
 	"abuseReportNotificationRecipientModifyRecipient": "Bearbeite einen Empfänger für Meldungen",
-	"title": "Titel",
 	"abuseReportNotificationRecipientRecipientType": "Art der Benachrichtigung",
 	"abuseReportNotificationRecipientNotifiedUser": "Zu benachrichtigender Benutzer",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Zu verwendender Webhook",
 	"enable": "Aktivieren",
-	"ok": "OK",
-	"cancel": "Abbrechen",
 	"abuseReportNotificationRecipientRecipientTypeMail": "Email",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Die Benachrichtigung wird bei Eingang einer Meldung an die E-Mail-Adressen der Moderatoren gesendet",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Sendet eine Benachrichtigung an den System Webhook, wenn eine Meldung eingegangen ist oder gelöst wurde",
-	"internalServerErrorDescription": "Im Server ist ein unerwarteter Fehler aufgetreten.",
-	"error": "Fehler",
-	"createNew": "Neu erstellen"
+	"internalServerErrorDescription": "Im Server ist ein unerwarteter Fehler aufgetreten."
 }
 </locale>
 
@@ -439,20 +418,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Add recipient for reports",
 	"abuseReportNotificationRecipientModifyRecipient": "Edit a recipient for reports",
-	"title": "Title",
 	"abuseReportNotificationRecipientRecipientType": "Notification type",
 	"abuseReportNotificationRecipientNotifiedUser": "Users to notify",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook to use",
 	"enable": "Enable",
-	"ok": "OK",
-	"cancel": "Cancel",
 	"abuseReportNotificationRecipientRecipientTypeMail": "Email",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Send the email to moderators' email addresses when you receive reports.",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Send a notification to System Webhook when you receive or resolve reports.",
-	"internalServerErrorDescription": "The server has run into an unexpected error.",
-	"error": "Error",
-	"createNew": "Create new"
+	"internalServerErrorDescription": "The server has run into an unexpected error."
 }
 </locale>
 
@@ -460,20 +434,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Añadir destinatario a los informes",
 	"abuseReportNotificationRecipientModifyRecipient": "Editar un destinatario en el informe de moderación\n",
-	"title": "Título",
 	"abuseReportNotificationRecipientRecipientType": "Tipo de notificación",
 	"abuseReportNotificationRecipientNotifiedUser": "Usuarios a notificar",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook a utilizar",
 	"enable": "Activar",
-	"ok": "OK",
-	"cancel": "Cancelar",
 	"abuseReportNotificationRecipientRecipientTypeMail": "Correo",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Enviar un correo electrónico a todos los moderadores cuando reciban un informe de moderación",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Enviar una notificación al SystemWebhook cuando se reciba o se resuelva un informe de moderación",
-	"internalServerErrorDescription": "El servidor tuvo un error inesperado.",
-	"error": "Error",
-	"createNew": "Crear Nuevo"
+	"internalServerErrorDescription": "El servidor tuvo un error inesperado."
 }
 </locale>
 
@@ -481,20 +450,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Add recipient for reports",
 	"abuseReportNotificationRecipientModifyRecipient": "Edit a recipient for reports",
-	"title": "Titre",
 	"abuseReportNotificationRecipientRecipientType": "Notification type",
 	"abuseReportNotificationRecipientNotifiedUser": "Users to notify",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook to use",
 	"enable": "Activer",
-	"ok": "OK",
-	"cancel": "Annuler",
 	"abuseReportNotificationRecipientRecipientTypeMail": "E-mail ",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Send the email to moderators' email addresses when you receive reports.",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Send a notification to System Webhook when you receive or resolve reports.",
-	"internalServerErrorDescription": "Une erreur inattendue s'est produite sur le serveur.",
-	"error": "Erreur",
-	"createNew": "Créer"
+	"internalServerErrorDescription": "Une erreur inattendue s'est produite sur le serveur."
 }
 </locale>
 
@@ -502,20 +466,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Tambah penerima laporan",
 	"abuseReportNotificationRecipientModifyRecipient": "Edit a recipient for reports",
-	"title": "Judul",
 	"abuseReportNotificationRecipientRecipientType": "Notification type",
 	"abuseReportNotificationRecipientNotifiedUser": "Users to notify",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook to use",
 	"enable": "Aktifkan",
-	"ok": "Oke",
-	"cancel": "Batalkan",
 	"abuseReportNotificationRecipientRecipientTypeMail": "Surel",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Send the email to moderators' email addresses when you receive reports.",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Send a notification to System Webhook when you receive or resolve reports.",
-	"internalServerErrorDescription": "Peladen sedang mengalami galat tak terduga",
-	"error": "Galat",
-	"createNew": "Buat baru"
+	"internalServerErrorDescription": "Peladen sedang mengalami galat tak terduga"
 }
 </locale>
 
@@ -523,20 +482,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Aggiungi destinatario della segnalazione",
 	"abuseReportNotificationRecipientModifyRecipient": "Modifica destinatario della segnalazione",
-	"title": "Titolo",
 	"abuseReportNotificationRecipientRecipientType": "Tipo di notifica",
 	"abuseReportNotificationRecipientNotifiedUser": "Profili da notificare",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook da usare",
 	"enable": "Abilita",
-	"ok": "OK",
-	"cancel": "Annulla",
 	"abuseReportNotificationRecipientRecipientTypeMail": "Email",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Quando ricevi un abuso, notifica l'amministrazione via email",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Spedire una notifica al SystemWebhook specificato (sia quando si riceve una segnalazione, che quando viene risolta)",
-	"internalServerErrorDescription": "Si è verificato un errore imprevisto all'interno del server",
-	"error": "Errore",
-	"createNew": "Crea"
+	"internalServerErrorDescription": "Si è verificato un errore imprevisto all'interno del server"
 }
 </locale>
 
@@ -544,20 +498,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "通報の通知先を追加",
 	"abuseReportNotificationRecipientModifyRecipient": "通報の通知先を編集",
-	"title": "タイトル",
 	"abuseReportNotificationRecipientRecipientType": "通知先の種類",
 	"abuseReportNotificationRecipientNotifiedUser": "通知先ユーザー",
 	"abuseReportNotificationRecipientNotifiedWebhook": "使用するWebhook",
 	"enable": "有効にする",
-	"ok": "OK",
-	"cancel": "キャンセル",
 	"abuseReportNotificationRecipientRecipientTypeMail": "メール",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "モデレーター権限を持つユーザーのメールアドレスに通知を送ります(通報を受けた時のみ)",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "指定したSystemWebhookに通知を送ります(通報を受けた時と通報を解決した時にそれぞれ発信)",
-	"internalServerErrorDescription": "サーバー内部で予期しないエラーが発生しました。",
-	"error": "エラー",
-	"createNew": "新規作成"
+	"internalServerErrorDescription": "サーバー内部で予期しないエラーが発生しました。"
 }
 </locale>
 
@@ -565,20 +514,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "通報の通知先を追加",
 	"abuseReportNotificationRecipientModifyRecipient": "通報の通知先を編集",
-	"title": "タイトル",
 	"abuseReportNotificationRecipientRecipientType": "通知先の種類",
 	"abuseReportNotificationRecipientNotifiedUser": "通知先ユーザー",
 	"abuseReportNotificationRecipientNotifiedWebhook": "使用するWebhook",
 	"enable": "有効にするで",
-	"ok": "ええで",
-	"cancel": "やめる",
 	"abuseReportNotificationRecipientRecipientTypeMail": "メール",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "モデレーター権限を持つユーザーのメアドに通知を送るで(通報を受けた時のみ)",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "指定したSystemWebhookに通知を送るで(通報を受けた時と通報を解決した時にそれぞれ発信)",
-	"internalServerErrorDescription": "サーバーでなんか変なこと起こっとるわ。",
-	"error": "おかしなったで",
-	"createNew": "新しく作るで"
+	"internalServerErrorDescription": "サーバーでなんか変なこと起こっとるわ。"
 }
 </locale>
 
@@ -586,20 +530,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Add recipient for reports",
 	"abuseReportNotificationRecipientModifyRecipient": "Edit a recipient for reports",
-	"title": "Title",
 	"abuseReportNotificationRecipientRecipientType": "Notification type",
 	"abuseReportNotificationRecipientNotifiedUser": "Users to notify",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook to use",
 	"enable": "Enable",
-	"ok": "IH",
-	"cancel": "Cancel",
 	"abuseReportNotificationRecipientRecipientTypeMail": "Imayl",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Send the email to moderators' email addresses when you receive reports.",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Send a notification to System Webhook when you receive or resolve reports.",
-	"internalServerErrorDescription": "The server has run into an unexpected error.",
-	"error": "Error",
-	"createNew": "Create new"
+	"internalServerErrorDescription": "The server has run into an unexpected error."
 }
 </locale>
 
@@ -607,20 +546,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Add recipient for reports",
 	"abuseReportNotificationRecipientModifyRecipient": "Edit a recipient for reports",
-	"title": "Title",
 	"abuseReportNotificationRecipientRecipientType": "Notification type",
 	"abuseReportNotificationRecipientNotifiedUser": "Users to notify",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook to use",
 	"enable": "Enable",
-	"ok": "ಸರಿ",
-	"cancel": "ರದ್ದು",
 	"abuseReportNotificationRecipientRecipientTypeMail": "Email",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Send the email to moderators' email addresses when you receive reports.",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Send a notification to System Webhook when you receive or resolve reports.",
-	"internalServerErrorDescription": "The server has run into an unexpected error.",
-	"error": "Error",
-	"createNew": "Create new"
+	"internalServerErrorDescription": "The server has run into an unexpected error."
 }
 </locale>
 
@@ -628,20 +562,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "신고 수신자 추가",
 	"abuseReportNotificationRecipientModifyRecipient": "신고 수신자 편집",
-	"title": "제목",
 	"abuseReportNotificationRecipientRecipientType": "알림 종류",
 	"abuseReportNotificationRecipientNotifiedUser": "알릴 유저",
 	"abuseReportNotificationRecipientNotifiedWebhook": "사용할 Webhook",
 	"enable": "사용",
-	"ok": "확인",
-	"cancel": "취소",
 	"abuseReportNotificationRecipientRecipientTypeMail": "이메일",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "모더레이터 권한을 가진 유저의 이메일 주소에 알림을 보냅니다 (신고를 받은 때에만)",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "지정한 SystemWebhook에 알림을 보냅니다 (신고를 받은 때와 해결했을 때에 송신)",
-	"internalServerErrorDescription": "내부 서버에서 예기치 않은 오류가 발생했습니다.",
-	"error": "오류",
-	"createNew": "새로 만들기"
+	"internalServerErrorDescription": "내부 서버에서 예기치 않은 오류가 발생했습니다."
 }
 </locale>
 
@@ -649,20 +578,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Add recipient for reports",
 	"abuseReportNotificationRecipientModifyRecipient": "Edit a recipient for reports",
-	"title": "Titel",
 	"abuseReportNotificationRecipientRecipientType": "Notification type",
 	"abuseReportNotificationRecipientNotifiedUser": "Users to notify",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook to use",
 	"enable": "Inschakelen",
-	"ok": "Ok",
-	"cancel": "Annuleren",
 	"abuseReportNotificationRecipientRecipientTypeMail": "Email",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Send the email to moderators' email addresses when you receive reports.",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Send a notification to System Webhook when you receive or resolve reports.",
-	"internalServerErrorDescription": "The server has run into an unexpected error.",
-	"error": "Fout",
-	"createNew": "Nieuwe aanmaken"
+	"internalServerErrorDescription": "The server has run into an unexpected error."
 }
 </locale>
 
@@ -670,20 +594,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Add recipient for reports",
 	"abuseReportNotificationRecipientModifyRecipient": "Edit a recipient for reports",
-	"title": "Tittel",
 	"abuseReportNotificationRecipientRecipientType": "Notification type",
 	"abuseReportNotificationRecipientNotifiedUser": "Users to notify",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook to use",
 	"enable": "Enable",
-	"ok": "OK",
-	"cancel": "Avbryt",
 	"abuseReportNotificationRecipientRecipientTypeMail": "E-post",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Send the email to moderators' email addresses when you receive reports.",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Send a notification to System Webhook when you receive or resolve reports.",
-	"internalServerErrorDescription": "The server has run into an unexpected error.",
-	"error": "Feil",
-	"createNew": "Create new"
+	"internalServerErrorDescription": "The server has run into an unexpected error."
 }
 </locale>
 
@@ -691,20 +610,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Add recipient for reports",
 	"abuseReportNotificationRecipientModifyRecipient": "Edit a recipient for reports",
-	"title": "Tytuł",
 	"abuseReportNotificationRecipientRecipientType": "Notification type",
 	"abuseReportNotificationRecipientNotifiedUser": "Users to notify",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook to use",
 	"enable": "Włącz",
-	"ok": "OK",
-	"cancel": "Anuluj",
 	"abuseReportNotificationRecipientRecipientTypeMail": "Adres e-mail",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Send the email to moderators' email addresses when you receive reports.",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Send a notification to System Webhook when you receive or resolve reports.",
-	"internalServerErrorDescription": "Niespodziewany błąd po stronie serwera",
-	"error": "Błąd",
-	"createNew": "Utwórz nowy"
+	"internalServerErrorDescription": "Niespodziewany błąd po stronie serwera"
 }
 </locale>
 
@@ -712,20 +626,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Adicionar destinatário para relatórios de abuso",
 	"abuseReportNotificationRecipientModifyRecipient": "Editar destinatários para relatórios de abuso",
-	"title": "Título",
 	"abuseReportNotificationRecipientRecipientType": "TIpo de notificação",
 	"abuseReportNotificationRecipientNotifiedUser": "Usuários para notificar",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook usado",
 	"enable": "Habilitar",
-	"ok": "OK",
-	"cancel": "Cancelar",
 	"abuseReportNotificationRecipientRecipientTypeMail": "E-mail",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Enviar o email aos endereços dos moderadores ao receber relatório de abuso.",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Enviar uma notificação ao SystemWebhook quando você receber um resolver um relatório de abuso.",
-	"internalServerErrorDescription": "Houve um erro inesperado no servidor.",
-	"error": "Erro",
-	"createNew": "Criar novo"
+	"internalServerErrorDescription": "Houve um erro inesperado no servidor."
 }
 </locale>
 
@@ -733,20 +642,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Add recipient for reports",
 	"abuseReportNotificationRecipientModifyRecipient": "Edit a recipient for reports",
-	"title": "Заголовок",
 	"abuseReportNotificationRecipientRecipientType": "Notification type",
 	"abuseReportNotificationRecipientNotifiedUser": "Users to notify",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Используемый Вебхук",
 	"enable": "Включить",
-	"ok": "Подтвердить",
-	"cancel": "Отмена",
 	"abuseReportNotificationRecipientRecipientTypeMail": "Электронная почта",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Вебхук",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Уведомлять модераторов по почте (только при поступлении жалоб)",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Отправить уведомление Системному Вебхуку при получении или разрешении жалоб.",
-	"internalServerErrorDescription": "Внутри сервера произошла непредвиденная ошибка.",
-	"error": "Ошибка",
-	"createNew": "Новый документ"
+	"internalServerErrorDescription": "Внутри сервера произошла непредвиденная ошибка."
 }
 </locale>
 
@@ -754,20 +658,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Add recipient for reports",
 	"abuseReportNotificationRecipientModifyRecipient": "Edit a recipient for reports",
-	"title": "Nadpis",
 	"abuseReportNotificationRecipientRecipientType": "Notification type",
 	"abuseReportNotificationRecipientNotifiedUser": "Users to notify",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook to use",
 	"enable": "Povoliť",
-	"ok": "OK",
-	"cancel": "Zrušiť",
 	"abuseReportNotificationRecipientRecipientTypeMail": "Email",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Send the email to moderators' email addresses when you receive reports.",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Send a notification to System Webhook when you receive or resolve reports.",
-	"internalServerErrorDescription": "The server has run into an unexpected error.",
-	"error": "Chyba",
-	"createNew": "Vytvoriť nový"
+	"internalServerErrorDescription": "The server has run into an unexpected error."
 }
 </locale>
 
@@ -775,20 +674,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "เพิ่มปลายทางการแจ้งเตือนการรายงาน",
 	"abuseReportNotificationRecipientModifyRecipient": "แก้ไขปลายทางการแจ้งเตือนการรายงาน",
-	"title": "หัวข้อ",
 	"abuseReportNotificationRecipientRecipientType": "ประเภทของปลายทางการแจ้งเตือน\n",
 	"abuseReportNotificationRecipientNotifiedUser": "ผู้ใช้ที่ได้รับการแจ้งเตือน",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook ที่ใช้",
 	"enable": "เปิดใช้งาน",
-	"ok": "ตกลง",
-	"cancel": "ยกเลิก",
 	"abuseReportNotificationRecipientRecipientTypeMail": "อีเมล",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "ส่งการแจ้งเตือนไปยังที่อยู่อีเมลของผู้ควบคุม (เฉพาะเมื่อได้รับการรายงาน)",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "ส่งการแจ้งเตือนไปยัง SystemWebhook ที่กำหนด (จะส่งเมื่อได้รับการรายงานและเมื่อการรายงานได้รับการแก้ไข)",
-	"internalServerErrorDescription": "เกิดข้อผิดพลาดที่ไม่คาดคิดภายในเซิร์ฟเวอร์",
-	"error": "ผิดพลาด!",
-	"createNew": "สร้างใหม่"
+	"internalServerErrorDescription": "เกิดข้อผิดพลาดที่ไม่คาดคิดภายในเซิร์ฟเวอร์"
 }
 </locale>
 
@@ -796,20 +690,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Raporlar için alıcı ekle",
 	"abuseReportNotificationRecipientModifyRecipient": "Raporlar için alıcıyı düzenle",
-	"title": "Başlık",
 	"abuseReportNotificationRecipientRecipientType": "Bildirim türü",
 	"abuseReportNotificationRecipientNotifiedUser": "Bildirilecek kullanıcılar",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Kullanılacak webhook",
 	"enable": "Etkin",
-	"ok": "Tamam",
-	"cancel": "Vazgeç",
 	"abuseReportNotificationRecipientRecipientTypeMail": "E-Posta",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Raporları aldığınızda, E-Postayı moderatörlerin e-posta adreslerine gönderin.",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Raporları aldığınızda veya çözdüğünüzde Sistem Webhook'una bir bildirim gönderin.",
-	"internalServerErrorDescription": "Sunucu beklenmedik bir hatayla karşılaştı.",
-	"error": "Hata",
-	"createNew": "Yeni oluştur"
+	"internalServerErrorDescription": "Sunucu beklenmedik bir hatayla karşılaştı."
 }
 </locale>
 
@@ -817,20 +706,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Add recipient for reports",
 	"abuseReportNotificationRecipientModifyRecipient": "Edit a recipient for reports",
-	"title": "Title",
 	"abuseReportNotificationRecipientRecipientType": "Notification type",
 	"abuseReportNotificationRecipientNotifiedUser": "Users to notify",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook to use",
 	"enable": "Enable",
-	"ok": "ماقۇل",
-	"cancel": "Cancel",
 	"abuseReportNotificationRecipientRecipientTypeMail": "Email",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Send the email to moderators' email addresses when you receive reports.",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Send a notification to System Webhook when you receive or resolve reports.",
-	"internalServerErrorDescription": "The server has run into an unexpected error.",
-	"error": "Error",
-	"createNew": "Create new"
+	"internalServerErrorDescription": "The server has run into an unexpected error."
 }
 </locale>
 
@@ -838,20 +722,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Add recipient for reports",
 	"abuseReportNotificationRecipientModifyRecipient": "Edit a recipient for reports",
-	"title": "Тема",
 	"abuseReportNotificationRecipientRecipientType": "Notification type",
 	"abuseReportNotificationRecipientNotifiedUser": "Users to notify",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook to use",
 	"enable": "Увімкнути",
-	"ok": "OK",
-	"cancel": "Скасувати",
 	"abuseReportNotificationRecipientRecipientTypeMail": "E-mail",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Send the email to moderators' email addresses when you receive reports.",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Send a notification to System Webhook when you receive or resolve reports.",
-	"internalServerErrorDescription": "На сервері сталася неочікувана помилка.",
-	"error": "Помилка",
-	"createNew": "Створити новий"
+	"internalServerErrorDescription": "На сервері сталася неочікувана помилка."
 }
 </locale>
 
@@ -859,20 +738,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "Add recipient for reports",
 	"abuseReportNotificationRecipientModifyRecipient": "Edit a recipient for reports",
-	"title": "Tựa đề",
 	"abuseReportNotificationRecipientRecipientType": "Notification type",
 	"abuseReportNotificationRecipientNotifiedUser": "Users to notify",
 	"abuseReportNotificationRecipientNotifiedWebhook": "Webhook to use",
 	"enable": "Bật",
-	"ok": "Đồng ý",
-	"cancel": "Hủy",
 	"abuseReportNotificationRecipientRecipientTypeMail": "Email",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "Send the email to moderators' email addresses when you receive reports.",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "Send a notification to System Webhook when you receive or resolve reports.",
-	"internalServerErrorDescription": "Trong chủ máy lỗi bất ngờ xảy ra",
-	"error": "Lỗi",
-	"createNew": "Tạo mới"
+	"internalServerErrorDescription": "Trong chủ máy lỗi bất ngờ xảy ra"
 }
 </locale>
 
@@ -880,20 +754,15 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "新建举报通知",
 	"abuseReportNotificationRecipientModifyRecipient": "编辑举报通知",
-	"title": "标题",
 	"abuseReportNotificationRecipientRecipientType": "通知类型",
 	"abuseReportNotificationRecipientNotifiedUser": "通知的用户",
 	"abuseReportNotificationRecipientNotifiedWebhook": "使用的 webhook",
 	"enable": "启用",
-	"ok": "OK",
-	"cancel": "取消",
 	"abuseReportNotificationRecipientRecipientTypeMail": "邮箱",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "当收到新举报时，向持有监察员权限的用户发送通知邮件",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "当收到新举报及举报被处理时，使用指定的 SystemWebhook 发送通知",
-	"internalServerErrorDescription": "内部服务器发生了预期外的错误",
-	"error": "错误",
-	"createNew": "新建"
+	"internalServerErrorDescription": "内部服务器发生了预期外的错误"
 }
 </locale>
 
@@ -901,19 +770,14 @@ onMounted(async () => {
 {
 	"abuseReportNotificationRecipientCreateRecipient": "新增接收檢舉的通知對象",
 	"abuseReportNotificationRecipientModifyRecipient": "編輯接收檢舉的通知對象",
-	"title": "標題",
 	"abuseReportNotificationRecipientRecipientType": "通知對象的種類",
 	"abuseReportNotificationRecipientNotifiedUser": "通知的使用者",
 	"abuseReportNotificationRecipientNotifiedWebhook": "使用的 Webhook",
 	"enable": "啟用",
-	"ok": "OK",
-	"cancel": "取消",
 	"abuseReportNotificationRecipientRecipientTypeMail": "電子郵件",
 	"abuseReportNotificationRecipientRecipientTypeWebhook": "Webhook",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsMail": "寄送到擁有監察員權限的使用者電子郵件地址（僅在收到檢舉時）",
 	"abuseReportNotificationRecipientRecipientTypeCaptionsWebhook": "向指定的 SystemWebhook 發送通知（在收到檢舉和解決檢舉時發送）",
-	"internalServerErrorDescription": "內部伺服器出現意外錯誤。",
-	"error": "錯誤",
-	"createNew": "新建"
+	"internalServerErrorDescription": "內部伺服器出現意外錯誤。"
 }
 </locale>

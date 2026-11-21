@@ -1,0 +1,186 @@
+[
+  {
+    "file": "packages/features/drive/frontend/components/MkDrive.file.vue",
+    "currentSha256": "a3757b8af5ab0ac7e4d2e0d03608668357e097d7d4f584d9a6c3d5dffe442383",
+    "baselineSha256": "203e1cdb791b4fe96e9ae2f3f24f4d03f7bcbefd267a1f8afbff5b9d6cca9649",
+    "edits": [
+      {
+        "start": 116,
+        "end": 210,
+        "current": "\t:class=\"[$style.root, { [$style.isSelected]: isSelected, [$style.isDisabled]: isDisabled }]\"\n",
+        "baseline": "\t:class=\"[$style.root, { [$style.isSelected]: isSelected }]\"\n"
+      },
+      {
+        "start": 2038,
+        "end": 2061,
+        "current": "\tisDisabled?: boolean;\n",
+        "baseline": ""
+      },
+      {
+        "start": 2089,
+        "end": 2109,
+        "current": "\tisDisabled: false,\n",
+        "baseline": ""
+      },
+      {
+        "start": 2500,
+        "end": 2532,
+        "current": "\tif (props.isDisabled) return;\n\n",
+        "baseline": ""
+      },
+      {
+        "start": 3716,
+        "end": 3878,
+        "current": "\t\t}\n\t}\n\n\t&.isDisabled {\n\t\tcursor: not-allowed;\n\n\t\t.thumbnail {\n\t\t\topacity: 0.5;\n\t\t}\n\n\t\t.name {\n\t\t\topacity: 0.5;\n\t\t}\n\n\t\t&:hover,\n\t\t&:active {\n\t\t\tbackground: none;\n",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/drive/frontend/components/MkDriveFileSelectDialog.vue",
+    "currentSha256": "bad6954fbd20cc0b992001abc296452a20126e1f391deaf51d85e8dbb48b0487",
+    "baselineSha256": "9887002ca93a96b305cc6d9a7542bb5d0e2b7b90955d979b36f7d803f3cb5c93",
+    "edits": [
+      {
+        "start": 519,
+        "end": 675,
+        "current": "\t<MkDrive :multiple=\"multiple\" select=\"file\" :initialFolder=\"initialFolder\" :excludeSensitive=\"excludeSensitive\" @changeSelectedFiles=\"onChangeSelection\"/>\n",
+        "baseline": "\t<MkDrive :multiple=\"multiple\" select=\"file\" :initialFolder=\"initialFolder\" @changeSelectedFiles=\"onChangeSelection\"/>\n"
+      },
+      {
+        "start": 1051,
+        "end": 1101,
+        "current": "\tmultiple?: boolean;\n\texcludeSensitive?: boolean;\n",
+        "baseline": "\tmultiple: boolean;\n"
+      },
+      {
+        "start": 1109,
+        "end": 1153,
+        "current": "\tmultiple: false,\n\texcludeSensitive: false,\n",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/drive/frontend/utility/drive.ts",
+    "currentSha256": "1aed66a80e73330e491d56563e6e720aca400ba08b0177af28f8c1caa3b34eb2",
+    "baselineSha256": "02a6dc6bb2430a235aa8d09dbef66141201a3a4467a2ce9cf929b7ac0932cf64",
+    "edits": [
+      {
+        "start": 6017,
+        "end": 6046,
+        "current": "\texcludeSensitive?: boolean;\n",
+        "baseline": ""
+      },
+      {
+        "start": 6326,
+        "end": 6382,
+        "current": "\t\t\texcludeSensitive: options.excludeSensitive ?? false,\n",
+        "baseline": ""
+      }
+    ]
+  },
+  {
+    "file": "packages/features/users/frontend/pages/settings/profile.vue",
+    "currentSha256": "322bc325b91ef157eff996bf12152990e90705ec2e37c9de3141ee578baea8ad",
+    "baselineSha256": "5e20f8ada79277ff2d9ca1c7479829332c1b304c90d7a9206cb14ed7b442c9a9",
+    "edits": [
+      {
+        "start": 8316,
+        "end": 8421,
+        "current": "import { updateCurrentAccount, updateCurrentAccountPartial } from '@features/auth/frontend/accounts.js';\n",
+        "baseline": ""
+      },
+      {
+        "start": 10559,
+        "end": 10662,
+        "current": "\t}).then((res) => {\n\t\tupdateCurrentAccount(res);\n\t}).catch(() => {\n\t\t// エラーダイアログは apiWithDialog 側で表示済み\n",
+        "baseline": ""
+      },
+      {
+        "start": 10667,
+        "end": 10668,
+        "current": "\n",
+        "baseline": ""
+      },
+      {
+        "start": 11050,
+        "end": 11448,
+        "current": "\t\t}, undefined, {\n\t\t\t'71bb5e53-4742-4609-b465-36081e131208': {\n\t\t\t\ttitle: $locale.value.sfc.cannotSelectSensitiveMedia,\n\t\t\t\ttext: $locale.value.sfc.cannotSelectSensitiveMediaDescription,\n\t\t\t},\n\t\t}).catch(() => null); // エラーダイアログは apiWithDialog 側で表示済み\n\t\tif (i == null) return;\n\n\t\tupdateCurrentAccountPartial({\n\t\t\tavatarId: i.avatarId,\n\t\t\tavatarUrl: i.avatarUrl,\n\t\t\tavatarBlurhash: i.avatarBlurhash,\n",
+        "baseline": ""
+      },
+      {
+        "start": 11454,
+        "end": 11454,
+        "current": "",
+        "baseline": "\t\t$i.avatarId = i.avatarId;\n\t\t$i.avatarUrl = i.avatarUrl;\n"
+      },
+      {
+        "start": 12285,
+        "end": 12365,
+        "current": "\t\t\tchooseDriveFile({ multiple: false, excludeSensitive: true }).then(files => {\n",
+        "baseline": "\t\t\tchooseDriveFile({ multiple: false }).then(files => {\n"
+      },
+      {
+        "start": 12397,
+        "end": 12943,
+        "current": "\t}, ...($i.avatarId != null ? [\n\t\t\t{ type: 'divider' as const },\n\t\t\t{\n\t\t\t\ttype: 'button' as const,\n\t\t\t\ttext: $locale.value.sfc.detach,\n\t\t\t\ticon: 'ti ti-circle-x',\n\t\t\t\taction: () => {\n\t\t\t\t\tos.apiWithDialog('i/update', {\n\t\t\t\t\t\tavatarId: null,\n\t\t\t\t\t}).then((res) => {\n\t\t\t\t\t\tupdateCurrentAccountPartial({\n\t\t\t\t\t\t\tavatarId: res.avatarId,\n\t\t\t\t\t\t\tavatarUrl: res.avatarUrl,\n\t\t\t\t\t\t\tavatarBlurhash: res.avatarBlurhash,\n\t\t\t\t\t\t});\n\t\t\t\t\t}).catch(() => {\n\t\t\t\t\t\t// エラーダイアログは apiWithDialog 側で表示済み\n\t\t\t\t\t});\n\t\t\t\t},\n\t\t\t},\n\t\t] : [])], ev.currentTarget ?? ev.target);\n",
+        "baseline": "\t}], ev.currentTarget ?? ev.target);\n"
+      },
+      {
+        "start": 13126,
+        "end": 13486,
+        "current": "\t\t}, undefined, {\n\t\t\t'e148b34c-9f33-4300-93e0-7817008fb366': {\n\t\t\t\ttitle: $locale.value.sfc.cannotSelectSensitiveMedia,\n\t\t\t\ttext: $locale.value.sfc.cannotSelectSensitiveMediaDescription,\n\t\t\t},\n\t\t}).catch(() => null); // エラーダイアログは apiWithDialog 側で表示済み\n\t\tif (i == null) return;\n\t\tupdateCurrentAccountPartial({\n\t\t\tbannerId: i.bannerId,\n\t\t\tbannerUrl: i.bannerUrl,\n",
+        "baseline": ""
+      },
+      {
+        "start": 13492,
+        "end": 13492,
+        "current": "",
+        "baseline": "\t\t$i.bannerId = i.bannerId;\n\t\t$i.bannerUrl = i.bannerUrl;\n"
+      },
+      {
+        "start": 14286,
+        "end": 14366,
+        "current": "\t\t\tchooseDriveFile({ multiple: false, excludeSensitive: true }).then(files => {\n",
+        "baseline": "\t\t\tchooseDriveFile({ multiple: false }).then(files => {\n"
+      },
+      {
+        "start": 14398,
+        "end": 14893,
+        "current": "\t}, ...($i.bannerId ? [\n\t\t\t{ type: 'divider' as const },\n\t\t\t{\n\t\t\t\ttype: 'button' as const,\n\t\t\t\ttext: $locale.value.sfc.detach,\n\t\t\t\ticon: 'ti ti-circle-x',\n\t\t\t\taction: () => {\n\t\t\t\t\tos.apiWithDialog('i/update', {\n\t\t\t\t\t\tbannerId: null,\n\t\t\t\t\t}).then((res) => {\n\t\t\t\t\t\tupdateCurrentAccountPartial({\n\t\t\t\t\t\t\tbannerId: res.bannerId,\n\t\t\t\t\t\t\tbannerUrl: res.bannerUrl,\n\t\t\t\t\t\t});\n\t\t\t\t\t}).catch(() => {\n\t\t\t\t\t\t// エラーダイアログは apiWithDialog 側で表示済み\n\t\t\t\t\t});\n\t\t\t\t},\n\t\t\t},\n\t\t] : [])], ev.currentTarget ?? ev.target);\n",
+        "baseline": "\t}], ev.currentTarget ?? ev.target);\n"
+      },
+      {
+        "start": 20783,
+        "end": 21236,
+        "current": "\t\"qr\": \"Codi QR\",\n\t\"cannotSelectSensitiveMedia\": \"No podeu seleccionar mitjans sensibles\",\n\t\"cannotSelectSensitiveMediaDescription\": \"Si aquest error apareix tot i que no heu marcat el contingut com a sensible vosaltres mateixos, pot ser que s'hagi considerat un mitjà sensible per una detecció automàtica.\\nSi, d'acord amb les normes del servidor, no cal que ho sigui, desactiveu la configuració de contingut sensible del fitxer i torneu-ho a provar.\"\n",
+        "baseline": "\t\"qr\": \"Codi QR\"\n"
+      },
+      {
+        "start": 33128,
+        "end": 33537,
+        "current": "\t\"qr\": \"Código QR\",\n\t\"cannotSelectSensitiveMedia\": \"No se puede seleccionar contenido sensible\",\n\t\"cannotSelectSensitiveMediaDescription\": \"Si te aparece este error sin haber marcado el contenido como sensible, es posible que el archivo se haya clasificado como tal de manera automática.\\nSi no va en contra de las normas del servidor,  quita la marca de contenido sensible del archivo e inténtalo de nuevo.\"\n",
+        "baseline": "\t\"qr\": \"Código QR\"\n"
+      },
+      {
+        "start": 42543,
+        "end": 42793,
+        "current": "\t\"qr\": \"二次元コード\",\n\t\"detach\": \"外す\",\n\t\"cannotSelectSensitiveMedia\": \"センシティブなメディアは選択できません\",\n\t\"cannotSelectSensitiveMediaDescription\": \"自分でセンシティブ設定を行っていないのにこのエラーが出ている場合、自動判定によりセンシティブなメディアとされている可能性があります。\\nサーバーの規則に照らして不要な場合は、ファイルのセンシティブ設定を解除してもう一度お試しください。\"\n",
+        "baseline": "\t\"qr\": \"二次元コード\"\n"
+      },
+      {
+        "start": 50663,
+        "end": 50905,
+        "current": "\t\"qr\": \"QR 코드\",\n\t\"cannotSelectSensitiveMedia\": \"민감한 미디어는 선택할 수 없습니다.\",\n\t\"cannotSelectSensitiveMediaDescription\": \"자신이 민감함 설정을 하고 있지 않음에도 이 에러가 나온 경우, 자동 판정에 의해 민감한 미디어로 간주됐을 수 있습니다.\\n서버의 규칙과 대조했을 때 불필요한 경우에는 파일의 민감함 설정을 해제하고 한 번 더 시도해 주십시오.\"\n",
+        "baseline": "\t\"qr\": \"QR 코드\"\n"
+      },
+      {
+        "start": 77908,
+        "end": 78074,
+        "current": "\t\"qr\": \"二维码\",\n\t\"cannotSelectSensitiveMedia\": \"无法选择敏感媒体\",\n\t\"cannotSelectSensitiveMediaDescription\": \"若并未自行设为敏感媒体却仍出现此错误，则可能是自动判定将其归类为敏感媒体。如果依服务器规则其并非敏感媒体，则可解除设置再试一次。\"\n",
+        "baseline": "\t\"qr\": \"二维码\"\n"
+      }
+    ]
+  }
+]

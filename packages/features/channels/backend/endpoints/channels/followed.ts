@@ -3,42 +3,32 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedChannelsFollowedDefinition, packedChannelsFollowedInput, packedChannelsFollowedOutput } from '../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
+import { toPackedChannel } from '../../api.dto.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
+import { type QueryService } from '@features/notes/backend/services/QueryService.js';
+
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { type ChannelEntityService } from '../../serializers/ChannelEntityService.js';
+import { channelsFollowedContract } from './followed.contract.js';
 import type { ChannelFollowingsRepository } from '@features/persistence/backend/repositories/models.js';
-import { QueryService } from '@features/notes/backend/services/QueryService.js';
-import { ChannelEntityService } from '../../serializers/ChannelEntityService.js';
-import { DI } from '@/di-symbols.js';
 
-const contractProjection = projectEndpointContract(packedChannelsFollowedDefinition);
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
-export const meta = {
-	tags: ['channels', 'account'],
-
-	requireCredential: true,
-
-	kind: 'read:channels',
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedChannelsFollowedInput, typeof packedChannelsFollowedOutput> {
-	constructor(
-		@Inject(DI.channelFollowingsRepository)
-		private channelFollowingsRepository: ChannelFollowingsRepository,
-
-		private channelEntityService: ChannelEntityService,
-		private queryService: QueryService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			const query = this.queryService
+export interface ChannelsFollowedDependencies {
+	channelFollowingsRepository: ChannelFollowingsRepository;
+	channelEntityService: ChannelEntityService;
+	queryService: QueryService;
+}
+export function createChannelsFollowedProcedure<Actor extends MiLocalUser>(deps: ChannelsFollowedDependencies) {
+	return createApiProcedure<Actor>()(channelsFollowedContract)
+		.use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
+			const query = deps.queryService
 				.makePaginationQuery(
-					this.channelFollowingsRepository.createQueryBuilder(),
+					deps.channelFollowingsRepository.createQueryBuilder(),
 					ps.sinceId,
 					ps.untilId,
 					ps.sinceDate,
@@ -50,8 +40,6 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 			const followings = await query
 				.limit(ps.limit)
 				.getMany();
-
-			return await Promise.all(followings.map(x => this.channelEntityService.pack(x.followeeId, me)));
+			return (await Promise.all(followings.map(x => deps.channelEntityService.pack(x.followeeId, me)))).map(toPackedChannel);
 		});
-	}
 }

@@ -44,7 +44,7 @@ describe('CheckModeratorsActivityProcessorService', () => {
 
 	// --------------------------------------------------------------------------------------
 
-	async function createUser(data: Partial<MiUser> = {}, profile: Partial<MiUserProfile> = {}): Promise<MiUser> {
+	async function createUser(data: Partial<Pick<MiUser, 'lastActiveDate'>> = {}, profile: Partial<Pick<MiUserProfile, 'email' | 'emailVerified'>> = {}): Promise<MiUser> {
 		const id = idService.gen();
 		const user = await usersRepository
 			.insert({

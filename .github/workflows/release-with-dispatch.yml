@@ -3,16 +3,15 @@ name: "Release Manager [Dispatch]"
 on:
   workflow_dispatch:
     inputs:
-      ## Specify the type of the next release.
-      #version_increment_type:
-      #  type: choice
-      #  description: 'VERSION INCREMENT TYPE'
-      #  default: 'patch'
-      #  required: false
-      #  options:
-      #    - 'major'
-      #    - 'minor'
-      #    - 'patch'
+      version_increment_type:
+        type: choice
+        description: 'SEMVER INCREMENT (first 2026 transition always targets 9000.0.0)'
+        default: 'patch'
+        required: true
+        options:
+          - 'major'
+          - 'minor'
+          - 'patch'
       merge:
         type: boolean
         description: 'MERGE RELEASE BRANCH TO MAIN'
@@ -21,6 +20,11 @@ on:
         type: boolean
         description: 'Start Release Candidate'
         default: false
+
+# Serialize release mutations across branches; never cancel an active release.
+concurrency:
+  group: release-manager
+  cancel-in-progress: false
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -83,8 +87,8 @@ jobs:
       package_jsons_to_rewrite: ${{ vars.PACKAGE_JSONS_TO_REWRITE }}
       use_external_app_to_release: true
       indent: ${{ vars.INDENT }}
-      draft_prerelease_channel: alpha
-      ready_start_prerelease_channel: beta
+      draft_prerelease_channel: beta
+      ready_start_prerelease_channel: rc
       prerelease_channel: ${{ inputs.start-rc && 'rc' || '' }}
       reset_number_on_channel_change: true
     secrets:
@@ -94,43 +98,51 @@ jobs:
   create-target:
     uses: misskey-dev/release-manager-actions/.github/workflows/create-target.yml@v2
     needs: get-pr
-    if: ${{ needs.get-pr.outputs.pr_number == '' }}
+    if: ${{ needs.get-pr.outputs.pr_number == '' && inputs.merge != true && inputs.start-rc != true }}
     with:
       user: 'github-actions[bot]'
-      # The script for version increment.
-      # process.env.CURRENT_VERSION: The current version.
-      #
-      # Misskey calender versioning (yyyy.MM.patch) example
+      # Release Manager appends the channel and .0; return only the SemVer core.
       version_increment_script: |
-        const now = new Date();
-        const year = now.toLocaleDateString('en-US', { year: 'numeric', timeZone: 'Asia/Tokyo' });
-        const month = now.toLocaleDateString('en-US', { month: 'numeric', timeZone: 'Asia/Tokyo' });
-        const [major, minor, _patch] = process.env.CURRENT_VERSION.split('.');
-        const patch = Number(_patch.split('-')[0]);
-        if (Number.isNaN(patch)) {
-          console.error('Invalid patch version', year, month, process.env.CURRENT_VERSION, major, minor, _patch);
-          throw new Error('Invalid patch version');
+        const increment = '${{ inputs.version_increment_type }}';
+        if (!['major', 'minor', 'patch'].includes(increment)) {
+          throw new Error('Expected version_increment_type: major, minor or patch');
         }
-        if (year !== major || month !== minor) {
-          return `${year}.${month}.0`;
-        } else {
-          return `${major}.${minor}.${patch + 1}`;
+        const current = process.env.CURRENT_VERSION;
+        const match = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-(?:alpha|beta|rc)\.(0|[1-9]\d*))?$/.exec(current ?? '');
+        if (!match) throw new Error('Invalid current release version');
+        const [major, minor, patch] = match.slice(1, 4).map(Number);
+        if (!match.slice(1).filter(value => value !== undefined).every(value => Number.isSafeInteger(Number(value)))) {
+          throw new Error('Version components must be safe integers');
         }
-      ##Semver example
-      #version_increment_script: |
-      #  const [major, minor, patch] = process.env.CURRENT_VERSION.split('.');
-      #  if ("${{ inputs.version_increment_type }}" === "major") {
-      #    return `${Number(major) + 1}.0.0`;
-      #  } else if ("${{ inputs.version_increment_type }}" === "minor") {
-      #    return `${major}.${Number(minor) + 1}.0`;
-      #  } else {
-      #    return `${major}.${minor}.${Number(patch) + 1}`;
-      #  }
+        // One-time migration from this fork's existing calendar series only.
+        // Check repository history before Release Manager rewrites any files.
+        const transition = major === 2026 && minor >= 1 && minor <= 12;
+        if (!transition && major < 9000) throw new Error('Expected the 2026 calendar series or independent SemVer >= 9000');
+        const next = transition ? [9000, 0, 0]
+          : increment === 'major' ? [major + 1, 0, 0]
+          : increment === 'minor' ? [major, minor + 1, 0]
+          : [major, minor, patch + 1];
+        if (!next.every(Number.isSafeInteger)) throw new Error('Version increment exceeds safe integers');
+        const tags = await github.paginate(github.rest.git.listMatchingRefs, { ...context.repo, ref: 'tags/' });
+        for (const tag of tags) {
+          const released = /^(?:v)?(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-|$)/.exec(tag.ref.slice('refs/tags/'.length));
+          if (!released || Number(released[1]) < 9000) continue;
+          const core = released.slice(1, 4).map(Number);
+          const difference = next.map((value, index) => value - core[index]).find(value => value !== 0) ?? 0;
+          if (difference <= 0) throw new Error('Target must exceed every existing independent release tag; update the release branch');
+        }
+        const prs = await github.paginate(github.rest.pulls.list, {
+          ...context.repo, state: 'open', base: '${{ vars.STABLE_BRANCH }}',
+        });
+        if (prs.some(pr => /^Release: /.test(pr.title))) {
+          throw new Error('An existing release PR must be completed before creating another target');
+        }
+        return next.join('.');
       package_jsons_to_rewrite: ${{ vars.PACKAGE_JSONS_TO_REWRITE }}
       use_external_app_to_release: true
       indent: ${{ vars.INDENT }}
       stable_branch: ${{ vars.STABLE_BRANCH }}
-      draft_prerelease_channel: alpha
+      draft_prerelease_channel: beta
     secrets:
       RELEASE_APP_ID: ${{ secrets.RELEASE_APP_ID }}
       RELEASE_APP_PRIVATE_KEY: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}

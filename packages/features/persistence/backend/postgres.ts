@@ -13,6 +13,7 @@ import { bindThis } from '@features/runtime/backend/decorators.js';
 
 import { MiAbuseUserReport } from '@features/moderation/backend/models/AbuseUserReport.js';
 import { MiAbuseReportNotificationRecipient } from '@features/moderation/backend/models/AbuseReportNotificationRecipient.js';
+import { MiOAuthApproval } from '@features/auth/backend/models/OAuthApproval.js';
 import { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
 import { MiAd } from '@features/instance/backend/models/Ad.js';
 import { MiAnnouncement } from '@features/announcements/backend/models/Announcement.js';
@@ -20,6 +21,7 @@ import { MiAnnouncementRead } from '@features/announcements/backend/models/Annou
 import { MiAntenna } from '@features/timelines/backend/models/Antenna.js';
 import { MiApp } from '@features/auth/backend/models/App.js';
 import { MiAvatarDecoration } from '@features/avatar-decorations/backend/models/AvatarDecoration.js';
+import { MiBrowserSession } from '@features/auth/backend/models/BrowserSession.js';
 import { MiAuthSession } from '@features/auth/backend/models/AuthSession.js';
 import { MiBlocking } from '@features/relationships/backend/models/Blocking.js';
 import { MiChannelFollowing } from '@features/channels/backend/models/ChannelFollowing.js';
@@ -83,8 +85,8 @@ import { MiChatMessage } from '@features/chat/backend/models/ChatMessage.js';
 import { MiChatRoom } from '@features/chat/backend/models/ChatRoom.js';
 import { MiChatRoomMembership } from '@features/chat/backend/models/ChatRoomMembership.js';
 import { MiChatRoomInvitation } from '@features/chat/backend/models/ChatRoomInvitation.js';
-import { MiBubbleGameRecord } from '@features/games/backend/models/BubbleGameRecord.js';
-import { MiReversiGame } from '@features/games/backend/models/ReversiGame.js';
+import { MiBubbleGameRecord } from '@features/games/bubble-game/backend/models/BubbleGameRecord.js';
+import { MiReversiGame } from '@features/games/reversi/backend/models/ReversiGame.js';
 import { MiChatApproval } from '@features/chat/backend/models/ChatApproval.js';
 import { MiSystemAccount } from '@features/users/backend/models/SystemAccount.js';
 
@@ -185,6 +187,8 @@ export const entities = [
 	MiApp,
 	MiAvatarDecoration,
 	MiAuthSession,
+	MiBrowserSession,
+	MiOAuthApproval,
 	MiAccessToken,
 	MiUser,
 	MiUserProfile,

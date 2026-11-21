@@ -10,7 +10,6 @@ import ms from 'ms';
 import sharp from 'sharp';
 import { In, IsNull } from 'typeorm';
 import fastifyStatic from '@fastify/static';
-import fastifyProxy from '@fastify/http-proxy';
 import vary from 'vary';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
@@ -39,7 +38,7 @@ import { handleRequestRedirectToOmitSearch } from '@features/runtime/backend/htt
 import { htmlSafeJsonStringify } from '@features/markup/backend/utility/json-stringify-html-safe.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { FlashEntityService } from '@features/play/backend/serializers/FlashEntityService.js';
-import { ReversiGameEntityService } from '@features/games/backend/serializers/ReversiGameEntityService.js';
+import { ReversiGameEntityService } from '@features/games/reversi/backend/serializers/ReversiGameEntityService.js';
 import { AnnouncementEntityService } from '@features/announcements/backend/serializers/AnnouncementEntityService.js';
 import { FeedService } from './FeedService.js';
 import { UrlPreviewService } from '@features/markup/backend/http/UrlPreviewService.js';
@@ -47,6 +46,7 @@ import { ClientLoggerService } from './ClientLoggerService.js';
 import { HtmlTemplateService } from './HtmlTemplateService.js';
 
 import { BasePage } from '@features/web/backend/templates/base.js';
+import { htmlToPlainText } from '@features/web/backend/utility/html-to-plain-text.js';
 import { UserPage } from '@features/users/backend/templates/user.js';
 import { NotePage } from '@features/notes/backend/templates/note.js';
 import { PagePage } from '@features/pages/backend/templates/page.js';
@@ -54,7 +54,7 @@ import { ClipPage } from '@features/collections/backend/templates/clip.js';
 import { FlashPage } from '@features/play/backend/templates/flash.js';
 import { GalleryPostPage } from '@features/collections/backend/templates/gallery-post.js';
 import { ChannelPage } from '@features/channels/backend/templates/channel.js';
-import { ReversiGamePage } from '@features/games/backend/templates/reversi-game.js';
+import { ReversiGamePage } from '@features/games/reversi/backend/templates/reversi-game.js';
 import { AnnouncementPage } from '@features/announcements/backend/templates/announcement.js';
 import { BaseEmbed } from '@features/web/backend/templates/base-embed.js';
 import { InfoCardPage } from '@features/web/backend/templates/info-card.js';
@@ -109,7 +109,7 @@ export class ClientServerService {
 		private flashsRepository: FlashsRepository,
 
 		@Inject(DI.reversiGamesRepository)
-		private reversiGamesRepository: ReversiGamesRepository,
+		private reversiGamesRepository: { findOneBy(where: { id: string }): Promise<import('../../../games/reversi/backend/models/ReversiGame.js').MiReversiGame | null> },
 
 		@Inject(DI.announcementsRepository)
 		private announcementsRepository: AnnouncementsRepository,
@@ -178,13 +178,19 @@ export class ClientServerService {
 				'purpose': 'any',
 			}],
 			'share_target': {
-				'action': '/share/',
-				'method': 'GET',
-				'enctype': 'application/x-www-form-urlencoded',
+				'action': '/sw/share',
+				'method': 'POST',
+				'enctype': 'multipart/form-data',
 				'params': {
 					'title': 'title',
 					'text': 'text',
 					'url': 'url',
+					'files': [
+						{
+							'name': 'files',
+							'accept': '*/*',
+						},
+					],
 				},
 			},
 			'shortcuts': [{
@@ -234,7 +240,9 @@ export class ClientServerService {
 				done();
 			});
 		} else {
-			console.log('[ClientServerService] Proxying to Vite dev server.');
+			this.clientLoggerService.logger.info('[ClientServerService] Proxying to Vite dev server.');
+			const fastifyProxy = import('@fastify/http-proxy');
+
 			const urlOriginWithoutPort = configUrl.origin.replace(/:\d+$/, '');
 
 			const port = (process.env.VITE_PORT ?? '5173');
@@ -440,7 +448,7 @@ export class ClientServerService {
 			return await HtmlTemplateService.replyHtml(reply, BasePage({
 				img: this.meta.bannerUrl ?? undefined,
 				title: this.meta.name ?? 'Misskey',
-				desc: this.meta.description ?? undefined,
+				desc: this.meta.description == null ? undefined : htmlToPlainText(this.meta.description),
 				...(await this.htmlTemplateService.getCommonData()),
 				...data,
 			}));
@@ -455,6 +463,7 @@ export class ClientServerService {
 				usernameLower: username.toLowerCase(),
 				host: host ?? IsNull(),
 				isSuspended: false,
+				isRemoteSuspended: false,
 				requireSigninToViewContents: false,
 			});
 
@@ -520,6 +529,7 @@ export class ClientServerService {
 				usernameLower: username.toLowerCase(),
 				host: host ?? IsNull(),
 				isSuspended: false,
+				isRemoteSuspended: false,
 			});
 
 			vary(reply.raw, 'Accept');
@@ -564,6 +574,7 @@ export class ClientServerService {
 				id: request.params.user,
 				host: IsNull(),
 				isSuspended: false,
+				isRemoteSuspended: false,
 			});
 
 			if (user == null) {
@@ -855,6 +866,7 @@ export class ClientServerService {
 
 			const clip = await this.clipsRepository.findOneBy({
 				id: request.params.clip,
+				isPublic: true,
 			});
 
 			if (clip == null) return;

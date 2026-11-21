@@ -15,7 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 >
 	<button v-if="hide" :class="$style.hidden" @click="reveal">
 		<div :class="$style.hiddenTextWrapper">
-			<b v-if="video.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ $locale.sfc.sensitive }}{{ prefer.s.dataSaver.media ? ` (${$locale.sfc.video}${video.size ? ' ' + bytes(video.size) : ''})` : '' }}</b>
+			<b v-if="video.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ globalLocale.env.sensitive }}{{ prefer.s.dataSaver.media ? ` (${$locale.sfc.video}${video.size ? ' ' + bytes(video.size) : ''})` : '' }}</b>
 			<b v-else style="display: block;"><i class="ti ti-movie"></i> {{ prefer.s.dataSaver.media && video.size ? bytes(video.size) : $locale.sfc.video }}</b>
 			<span style="display: block;">{{ $locale.sfc.clickToShow }}</span>
 		</div>
@@ -48,14 +48,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
-import type { MediaComponentExposes } from '@features/drive/frontend/types/media-component.js';
 import bytes from '@features/ui/frontend/filters/bytes.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import * as os from '@features/ui/frontend/os.js';
 import { getFileMenu } from '@features/drive/frontend/utility/get-file-menu.js';
 import { shouldHideFileByDefault, canRevealFile } from '@features/drive/frontend/utility/sensitive-file.js';
+import type { MediaComponentExposes } from '@features/drive/frontend/types/media-component.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	video: Misskey.entities.DriveFile;
@@ -209,7 +213,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="ar-SA" lang="json">
 {
-	"sensitive": "محتوى حساس",
 	"video": "فيديو",
 	"clickToShow": "اضغط للعرض"
 }
@@ -217,7 +220,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="ca-ES" lang="json">
 {
-	"sensitive": "Sensible",
 	"video": "Vídeo",
 	"clickToShow": "Fes clic per mostrar"
 }
@@ -225,7 +227,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="cs-CZ" lang="json">
 {
-	"sensitive": "NSFW",
 	"video": "Video",
 	"clickToShow": "Klikněte pro zobrazení"
 }
@@ -233,7 +234,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="da-DK" lang="json">
 {
-	"sensitive": "Sensitive",
 	"video": "Video",
 	"clickToShow": "Click to show"
 }
@@ -241,7 +241,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="de-DE" lang="json">
 {
-	"sensitive": "Sensibel",
 	"video": "Video",
 	"clickToShow": "Zum Anzeigen anklicken"
 }
@@ -249,7 +248,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="en-US" lang="json">
 {
-	"sensitive": "Sensitive",
 	"video": "Video",
 	"clickToShow": "Click to show"
 }
@@ -257,7 +255,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="es-ES" lang="json">
 {
-	"sensitive": "Marcado como sensible (NSFW)",
 	"video": "Video",
 	"clickToShow": "Haz clic para verlo"
 }
@@ -265,7 +262,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="fr-FR" lang="json">
 {
-	"sensitive": "Contenu sensible",
 	"video": "Vidéo",
 	"clickToShow": "Cliquer pour afficher"
 }
@@ -273,7 +269,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="id-ID" lang="json">
 {
-	"sensitive": "Konten sensitif",
 	"video": "Video",
 	"clickToShow": "Klik untuk melihat"
 }
@@ -281,7 +276,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="it-IT" lang="json">
 {
-	"sensitive": "Esplicito",
 	"video": "Video",
 	"clickToShow": "Media nascosto, cliccare solo se si intende vedere"
 }
@@ -289,7 +283,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="ja-JP" lang="json">
 {
-	"sensitive": "センシティブ",
 	"video": "動画",
 	"clickToShow": "クリックして表示"
 }
@@ -297,7 +290,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="ja-KS" lang="json">
 {
-	"sensitive": "気いつけて見いや",
 	"video": "動画",
 	"clickToShow": "押したら見えるで"
 }
@@ -305,7 +297,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="kab-KAB" lang="json">
 {
-	"sensitive": "Sensitive",
 	"video": "Video",
 	"clickToShow": "Click to show"
 }
@@ -313,7 +304,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="kn-IN" lang="json">
 {
-	"sensitive": "Sensitive",
 	"video": "Video",
 	"clickToShow": "Click to show"
 }
@@ -321,7 +311,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="ko-KR" lang="json">
 {
-	"sensitive": "열람 주의",
 	"video": "동영상",
 	"clickToShow": "클릭하여 보기"
 }
@@ -329,7 +318,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="nl-NL" lang="json">
 {
-	"sensitive": "NSFW",
 	"video": "Video",
 	"clickToShow": "Klik om te bekijken"
 }
@@ -337,7 +325,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="no-NO" lang="json">
 {
-	"sensitive": "Sensitive",
 	"video": "Video",
 	"clickToShow": "Klikk for å vise"
 }
@@ -345,7 +332,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="pl-PL" lang="json">
 {
-	"sensitive": "NSFW",
 	"video": "Video",
 	"clickToShow": "Kliknij, aby wyświetlić"
 }
@@ -353,7 +339,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="pt-PT" lang="json">
 {
-	"sensitive": "Conteúdo sensível",
 	"video": "Vídeo",
 	"clickToShow": "Clique para ver"
 }
@@ -361,7 +346,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="ru-RU" lang="json">
 {
-	"sensitive": "Содержимое не для всех",
 	"video": "Видео",
 	"clickToShow": "Нажмите для просмотра"
 }
@@ -369,7 +353,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="sk-SK" lang="json">
 {
-	"sensitive": "NSFW",
 	"video": "Video",
 	"clickToShow": "Kliknutím zobrazíte"
 }
@@ -377,7 +360,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="th-TH" lang="json">
 {
-	"sensitive": "เนื้อหาที่ละเอียดอ่อน",
 	"video": "วีดีโอ",
 	"clickToShow": "คลิกเพื่อแสดง"
 }
@@ -385,7 +367,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="tr-TR" lang="json">
 {
-	"sensitive": "Hassas",
 	"video": "Video",
 	"clickToShow": "Göstermek için tıklayın"
 }
@@ -393,7 +374,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="ug-CN" lang="json">
 {
-	"sensitive": "Sensitive",
 	"video": "Video",
 	"clickToShow": "Click to show"
 }
@@ -401,7 +381,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="uk-UA" lang="json">
 {
-	"sensitive": "NSFW",
 	"video": "Відео",
 	"clickToShow": "Натисніть для перегляду"
 }
@@ -409,7 +388,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="vi-VN" lang="json">
 {
-	"sensitive": "Nhạy cảm",
 	"video": "Video",
 	"clickToShow": "Nhấn để xem"
 }
@@ -417,7 +395,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="zh-CN" lang="json">
 {
-	"sensitive": "敏感内容",
 	"video": "视频",
 	"clickToShow": "点击以显示"
 }
@@ -425,7 +402,6 @@ defineExpose<MediaComponentExposes>({
 
 <locale locale="zh-TW" lang="json">
 {
-	"sensitive": "敏感內容",
 	"video": "影片",
 	"clickToShow": "點擊查看"
 }

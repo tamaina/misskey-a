@@ -81,29 +81,30 @@ export class DeliverProcessorService {
 		}
 
 		try {
-			await this.apRequestService.signedPost(job.data.user, job.data.to, job.data.content, job.data.digest);
+			await this.apRequestService.signedPost(job.data.user, job.data.to, job.data.content, job.data.digest, { level: i?.httpMessageSignaturesImplementationLevel, forceMainKey: job.data.forceMainKey });
 
 			this.apRequestChart.deliverSucc();
 			this.federationChart.deliverd(host, true);
 
 			// Update instance stats
-			process.nextTick(async () => {
-				if (i == null) return;
+			process.nextTick(() => {
+				void (async () => {
+					const instance = i ?? await this.federatedInstanceService.fetchOrRegister(host);
 
-				if (i.isNotResponding) {
-					this.federatedInstanceService.update(i.id, {
-						isNotResponding: false,
-						notRespondingSince: null,
-					});
-				}
+					if (instance.isNotResponding) {
+						await this.federatedInstanceService.update(instance.id, {
+							isNotResponding: false,
+							notRespondingSince: null,
+						});
+					}
 
-				if (this.meta.enableStatsForFederatedInstances) {
-					this.fetchInstanceMetadataService.fetchInstanceMetadata(i);
-				}
+					// Signing capability discovery is independent of optional instance statistics.
+					await this.fetchInstanceMetadataService.fetchInstanceMetadata(instance);
 
-				if (this.meta.enableChartsForFederatedInstances) {
-					this.instanceChart.requestSent(i.host, true);
-				}
+					if (this.meta.enableChartsForFederatedInstances) {
+						this.instanceChart.requestSent(instance.host, true);
+					}
+				})().catch(err => this.logger.warn('Post-delivery instance refresh failed', err));
 			});
 
 			return 'Success';

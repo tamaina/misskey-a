@@ -7,7 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <PageWithHeader :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 500px;">
 		<div v-if="state == 'fetch-session-error'">
-			<p>{{ $locale.sfc.somethingHappened }}</p>
+			<p>{{ globalLocale.env.somethingHappened }}</p>
 		</div>
 		<div v-else-if="$i && !session">
 			<MkLoading/>
@@ -34,21 +34,25 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 		<div v-else>
 			<p :class="$style.loginMessage">{{ $locale.sfc.pleaseLogin }}</p>
-			<MkSignin @login="onLogin"/>
+			<MkSignin enabled @login="onLogin"/>
 		</div>
 	</div>
 </PageWithHeader>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { onMounted, ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import XForm from '@features/auth/frontend/pages/auth.form.vue';
-import MkSignin from '@features/auth/frontend/components/MkSignin.vue';
+import MkSignin from '@features/auth/frontend/components/MkSignin.conditional.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { login } from '@features/auth/frontend/accounts.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	token: string;
@@ -79,15 +83,8 @@ onMounted(async () => {
 		});
 		session.value = result;
 
-		// 既に連携していた場合
-		if (result.app.isAuthorized) {
-			await misskeyApi('auth/accept', {
-				token: result.token,
-			});
-			accepted();
-		} else {
-			state.value = 'waiting';
-		}
+		// Reused app grants still require explicit consent and current local authentication.
+		state.value = 'waiting';
 	} catch (err) {
 		state.value = 'fetch-session-error';
 	}
@@ -112,7 +109,6 @@ definePage(() => ({
 
 <locale locale="ar-SA" lang="json">
 {
-	"somethingHappened": "حدث خطأ",
 	"denied": "رُفض الوصول",
 	"alreadyAuthorized": "This application already has access permission.",
 	"accepted": "Access granted",
@@ -125,7 +121,6 @@ definePage(() => ({
 
 <locale locale="ca-ES" lang="json">
 {
-	"somethingHappened": "S'ha produït un error",
 	"denied": "Accés denegat",
 	"alreadyAuthorized": "Aquesta aplicació ja té accés.",
 	"accepted": "Accés garantit",
@@ -138,7 +133,6 @@ definePage(() => ({
 
 <locale locale="cs-CZ" lang="json">
 {
-	"somethingHappened": "Jejda. Něco se nepovedlo.",
 	"denied": "Přístup odepřen",
 	"alreadyAuthorized": "This application already has access permission.",
 	"accepted": "Access granted",
@@ -151,7 +145,6 @@ definePage(() => ({
 
 <locale locale="da-DK" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"denied": "Access denied",
 	"alreadyAuthorized": "This application already has access permission.",
 	"accepted": "Access granted",
@@ -164,7 +157,6 @@ definePage(() => ({
 
 <locale locale="de-DE" lang="json">
 {
-	"somethingHappened": "Ein Fehler ist aufgetreten",
 	"denied": "Zugriff verweigert",
 	"alreadyAuthorized": "Dieser Anwendung wurde bereits Zugriff gewährt.",
 	"accepted": "Zugriff gewährt",
@@ -177,7 +169,6 @@ definePage(() => ({
 
 <locale locale="en-US" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"denied": "Access denied",
 	"alreadyAuthorized": "This application already has access permission.",
 	"accepted": "Access granted",
@@ -190,7 +181,6 @@ definePage(() => ({
 
 <locale locale="es-ES" lang="json">
 {
-	"somethingHappened": "Ocurrió un error",
 	"denied": "Acceso denegado",
 	"alreadyAuthorized": "Esta aplicación ya ha obtenido acceso.",
 	"accepted": "Acceso concedido.",
@@ -203,7 +193,6 @@ definePage(() => ({
 
 <locale locale="fr-FR" lang="json">
 {
-	"somethingHappened": "Une erreur est survenue",
 	"denied": "Accès refusé",
 	"alreadyAuthorized": "This application already has access permission.",
 	"accepted": "Access granted",
@@ -216,7 +205,6 @@ definePage(() => ({
 
 <locale locale="id-ID" lang="json">
 {
-	"somethingHappened": "Terjadi kesalahan",
 	"denied": "Akses ditolak",
 	"alreadyAuthorized": "Aplikasi ini sudah memiliki ijin akses.",
 	"accepted": "Access granted",
@@ -229,7 +217,6 @@ definePage(() => ({
 
 <locale locale="it-IT" lang="json">
 {
-	"somethingHappened": "Si è verificato un problema",
 	"denied": "Accesso negato",
 	"alreadyAuthorized": "Questa applicazione è già autorizzata ad accedere.",
 	"accepted": "Accesso concesso",
@@ -242,7 +229,6 @@ definePage(() => ({
 
 <locale locale="ja-JP" lang="json">
 {
-	"somethingHappened": "問題が発生しました",
 	"denied": "アクセスを拒否しました",
 	"alreadyAuthorized": "このアプリケーションは既にアクセスが許可されています。",
 	"accepted": "アクセスを許可しました",
@@ -255,7 +241,6 @@ definePage(() => ({
 
 <locale locale="ja-KS" lang="json">
 {
-	"somethingHappened": "なんかあかんわ",
 	"denied": "アクセスを拒否ったで",
 	"alreadyAuthorized": "このアプリはもうアクセスを許可してるみたいやで。",
 	"accepted": "アクセスを許可したで",
@@ -268,7 +253,6 @@ definePage(() => ({
 
 <locale locale="kab-KAB" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"denied": "Access denied",
 	"alreadyAuthorized": "This application already has access permission.",
 	"accepted": "Access granted",
@@ -281,7 +265,6 @@ definePage(() => ({
 
 <locale locale="kn-IN" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"denied": "Access denied",
 	"alreadyAuthorized": "This application already has access permission.",
 	"accepted": "Access granted",
@@ -294,7 +277,6 @@ definePage(() => ({
 
 <locale locale="ko-KR" lang="json">
 {
-	"somethingHappened": "오류가 발생했습니다",
 	"denied": "접근이 거부되었습니다",
 	"alreadyAuthorized": "이 애플리케이션은 이미 접근이 허가돼있습니다.",
 	"accepted": "접근 권한이 부여되었습니다.",
@@ -307,7 +289,6 @@ definePage(() => ({
 
 <locale locale="nl-NL" lang="json">
 {
-	"somethingHappened": "Er is iets misgegaan.",
 	"denied": "Access denied",
 	"alreadyAuthorized": "This application already has access permission.",
 	"accepted": "Access granted",
@@ -320,7 +301,6 @@ definePage(() => ({
 
 <locale locale="no-NO" lang="json">
 {
-	"somethingHappened": "En feil har oppstått",
 	"denied": "Access denied",
 	"alreadyAuthorized": "This application already has access permission.",
 	"accepted": "Access granted",
@@ -333,7 +313,6 @@ definePage(() => ({
 
 <locale locale="pl-PL" lang="json">
 {
-	"somethingHappened": "Coś poszło nie tak",
 	"denied": "Odmowa dostępu",
 	"alreadyAuthorized": "This application already has access permission.",
 	"accepted": "Access granted",
@@ -346,7 +325,6 @@ definePage(() => ({
 
 <locale locale="pt-PT" lang="json">
 {
-	"somethingHappened": "Ocorreu um erro",
 	"denied": "Acesso negado",
 	"alreadyAuthorized": "This application already has access permission.",
 	"accepted": "Acesso permitido",
@@ -359,7 +337,6 @@ definePage(() => ({
 
 <locale locale="ru-RU" lang="json">
 {
-	"somethingHappened": "Что-то пошло не так",
 	"denied": "Доступ закрыт",
 	"alreadyAuthorized": "This application already has access permission.",
 	"accepted": "Access granted",
@@ -372,7 +349,6 @@ definePage(() => ({
 
 <locale locale="sk-SK" lang="json">
 {
-	"somethingHappened": "Ups. Niečo sa nepodarilo.",
 	"denied": "Prístup zamietnutý",
 	"alreadyAuthorized": "This application already has access permission.",
 	"accepted": "Access granted",
@@ -385,7 +361,6 @@ definePage(() => ({
 
 <locale locale="th-TH" lang="json">
 {
-	"somethingHappened": "อุ๊ย ! มีอะไรบางอย่างผิดพลาด",
 	"denied": "ปฏิเสธการเข้าใช้",
 	"alreadyAuthorized": "แอปพลิเคชันนี้ได้รับอนุญาตให้เข้าถึงแล้ว",
 	"accepted": "การเข้าถึงได้รับอนุญาต",
@@ -398,7 +373,6 @@ definePage(() => ({
 
 <locale locale="tr-TR" lang="json">
 {
-	"somethingHappened": "Bir hata oluştu",
 	"denied": "Erişim reddedildi",
 	"alreadyAuthorized": "Bu uygulamaya zaten erişim izinleri verilmiş durumda.",
 	"accepted": "Erişim izni verildi",
@@ -411,7 +385,6 @@ definePage(() => ({
 
 <locale locale="ug-CN" lang="json">
 {
-	"somethingHappened": "An error has occurred",
 	"denied": "Access denied",
 	"alreadyAuthorized": "This application already has access permission.",
 	"accepted": "Access granted",
@@ -424,7 +397,6 @@ definePage(() => ({
 
 <locale locale="uk-UA" lang="json">
 {
-	"somethingHappened": "Щось пішло не так",
 	"denied": "У доступі відмовлено",
 	"alreadyAuthorized": "This application already has access permission.",
 	"accepted": "Access granted",
@@ -437,7 +409,6 @@ definePage(() => ({
 
 <locale locale="vi-VN" lang="json">
 {
-	"somethingHappened": "Xảy ra lỗi",
 	"denied": "Truy cập bị từ chối",
 	"alreadyAuthorized": "This application already has access permission.",
 	"accepted": "Access granted",
@@ -450,7 +421,6 @@ definePage(() => ({
 
 <locale locale="zh-CN" lang="json">
 {
-	"somethingHappened": "出错了",
 	"denied": "拒绝访问",
 	"alreadyAuthorized": "此应用已有访问许可。",
 	"accepted": "已允许访问",
@@ -463,7 +433,6 @@ definePage(() => ({
 
 <locale locale="zh-TW" lang="json">
 {
-	"somethingHappened": "發生錯誤",
 	"denied": "拒絕訪問",
 	"alreadyAuthorized": "此應用程式已被授予存取權限。",
 	"accepted": "已授予存取權限",

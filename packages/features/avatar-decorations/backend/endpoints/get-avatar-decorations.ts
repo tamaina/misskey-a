@@ -2,21 +2,25 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { avatarDecorationsContract } from '../../contract/index.js';
-import { legacyAvatarDecorationSchemas } from '@features/avatar-decorations/backend';
-import type { Schema } from '@features/api/backend/utility/json-schema.js';
-import { createContractTransportEndpoint } from '@features/api/backend/transport/contract-transport-endpoint.js';
-import { defineFeatureEndpoint } from '@features/api/backend/transport/feature-endpoint.js';
-
-export const meta = {
-	tags: ['users'],
-	requireCredential: false,
-	res: legacyAvatarDecorationSchemas.output as Schema,
-} as const;
-
-export const paramDef = legacyAvatarDecorationSchemas.input as Schema;
-
-export const { feature, createEndpoint } = defineFeatureEndpoint('avatarDecorations', decorations => createContractTransportEndpoint(meta, paramDef, avatarDecorationsContract['get-avatar-decorations'], async (params, user) => decorations['get-avatar-decorations'](params, {
-	context: { authenticated: user != null },
-})));
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import { avatarDecorationsContract } from '../api.definition.js';
+import type { AvatarDecorationsDependencies } from '../api.implementation.js';
+export interface GetAvatarDecorationsDependencies<Actor extends ApiActor> {
+	avatarDecorationService: Pick<AvatarDecorationsDependencies<Actor>['avatarDecorationService'], 'getAll'>;
+	readRoles: AvatarDecorationsDependencies<Actor>['readRoles'];
+}
+export function createGetAvatarDecorationsProcedure<Actor extends ApiActor>(deps: GetAvatarDecorationsDependencies<Actor>) {
+	return createApiProcedure<Actor>()(avatarDecorationsContract.get)
+		.handler(async ({ context }) => {
+			const actor = context.principal;
+			const decorations = await deps.avatarDecorationService.getAll(true);
+			const roles = await deps.readRoles();
+			const visibleRoleIds = new Set(roles.filter(role => actor !== null || role.isPublic).map(role => role.id));
+			return decorations.map(row => ({
+				id: row.id, name: row.name, description: row.description, url: row.url,
+				roleIdsThatCanBeUsedThisDecoration: row.roleIdsThatCanBeUsedThisDecoration.filter(id => visibleRoleIds.has(id)),
+				category: row.category,
+			}));
+		});
+}

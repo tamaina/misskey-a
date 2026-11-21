@@ -16,7 +16,7 @@ import { url, version, lang } from '@features/boot/frontend/shared/config.js';
 import { parseEmbedParams } from '@features/web/frontend/shared/embed-page.js';
 import { postMessageToParentWindow, setIframeId } from '@features/web/frontend/embed/post-message.js';
 import { serverContext } from '@features/boot/frontend/embed/server-context.js';
-import { useLocale, useLocalizer } from 'vite-vue-internationalization/runtime';
+import { useLocale, useLocalizer } from 'virtual:vite-vue-internationalization';
 import type bootMessages from './boot-messages.json';
 
 import type { Theme } from '@features/preferences/frontend/shared/theme.js';

@@ -2,22 +2,16 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { packedAuthSessionShowDefinition, packedAuthSessionShowInput, packedAuthSessionShowOutput } from '../../../../contract/packed-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import type { AuthSessionsRepository } from '@features/persistence/backend/repositories/models.js';
 import { AuthSessionEntityService } from '../../../serializers/AuthSessionEntityService.js';
-import { DI } from '@/di-symbols.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(packedAuthSessionShowDefinition);
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { toPackedApp } from '../../../auth.schema.js';
+import { AuthSessionShowContract } from '../../../api.definition.js';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 
 export const meta = {
 	tags: ['auth'],
-
-	requireCredential: false,
 
 	errors: {
 		noSuchSession: {
@@ -26,31 +20,27 @@ export const meta = {
 			id: 'bd72c97d-eba7-4adb-a467-f171b8847250',
 		},
 	},
-
-	res: contractProjection.response,
 } as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof packedAuthSessionShowInput, typeof packedAuthSessionShowOutput> {
-	constructor(
-		@Inject(DI.authSessionsRepository)
-		private authSessionsRepository: AuthSessionsRepository,
-
-		private authSessionEntityService: AuthSessionEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
+export interface AuthSessionShowDependencies {
+	authSessionsRepository: AuthSessionsRepository;
+	authSessionEntityService: Pick<AuthSessionEntityService, 'pack'>;
+}
+export function createAuthSessionShowProcedure(deps: AuthSessionShowDependencies) {
+	return createApiProcedure<MiLocalUser>()(AuthSessionShowContract).handler(async ({ input, context }) => {
+		const ps = input;
+		const me = context.principal;
+		const result = await (async () => {
 			// Lookup session
-			const session = await this.authSessionsRepository.findOneBy({
+			const session = await deps.authSessionsRepository.findOneBy({
 				token: ps.token,
 			});
 
 			if (session == null) {
-				throw new ApiError(meta.errors.noSuchSession);
+				throw apiError(meta.errors.noSuchSession);
 			}
 
-			return await this.authSessionEntityService.pack(session, me);
-		});
-	}
+			return await deps.authSessionEntityService.pack(session, me);
+		})();
+		return { id: result.id, app: toPackedApp(result.app), token: result.token };
+	});
 }

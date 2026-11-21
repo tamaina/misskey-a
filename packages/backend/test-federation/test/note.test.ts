@@ -1,6 +1,7 @@
 import { describe, test, beforeAll, afterAll, vi } from 'vitest';
 import assert, { rejects, strictEqual } from 'node:assert';
 import * as Misskey from 'misskey-js';
+import { waitForReplyCount } from './note-readiness.js';
 import { addCustomEmoji, createAccount, createModerator, deepStrictEqualWithExcludedFields, type LoginUser, resolveRemoteNote, resolveRemoteUser, sleep, uploadFile, waitForFollowRelation, WAIT_FOR_FEDERATION } from './utils.js';
 
 describe('Note', () => {
@@ -56,8 +57,11 @@ describe('Note', () => {
 				text: 'b',
 				replyId: _replyedNote.id,
 			})).createdNote;
-			// NOTE: the repliedCount is incremented, so fetch again
-			const replyedNote = await alice.client.request('notes/show', { noteId: _replyedNote.id });
+			// Reply counts are updated by asynchronous post-processing after creation.
+			const replyedNote = await waitForReplyCount(
+				() => alice.client.request('notes/show', { noteId: _replyedNote.id }),
+				1, WAIT_FOR_FEDERATION,
+			);
 			strictEqual(replyedNote.repliesCount, 1);
 
 			const resolvedNote = await resolveRemoteNote('a.test', note.id, bob);

@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	@closed="emit('closed')"
 >
 	<template #header>
-		<i class="ti ti-search" style="margin-right: 0.5em;"></i> {{ $locale.sfc.search }}
+		<i class="ti ti-search" style="margin-right: 0.5em;"></i> {{ globalLocale.env.search }}
 	</template>
 	<div :class="$style.root">
 		<div class="_spacer">
@@ -114,10 +114,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 		<div :class="$style.footerActions">
 			<MkButton primary @click="onSearchRequest">
-				{{ $locale.sfc.search }}
+				{{ globalLocale.env.search }}
 			</MkButton>
 			<MkButton @click="onQueryResetButtonClicked">
-				{{ $locale.sfc.reset }}
+				{{ globalLocale.env.reset }}
 			</MkButton>
 		</div>
 	</div>
@@ -125,6 +125,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref, watch } from 'vue';
 import MkWindow from '@features/ui/frontend/components/MkWindow.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
@@ -138,10 +139,13 @@ import {
 } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
 
 import * as os from '@features/ui/frontend/os.js';
+import type { Locale } from 'i18n';
 
 import type { EmojiSearchQuery } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.local.list.vue';
 import type { SortOrder } from '@features/preferences/frontend/components/MkSortOrderEditor.define.js';
 import type { GridSortOrderKey } from '@features/emojis/frontend/pages/admin/custom-emojis-manager.impl.js';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	query: EmojiSearchQuery;
@@ -217,252 +221,196 @@ async function onQueryRolesEditClicked() {
 
 <locale locale="ar-SA" lang="json">
 {
-	"search": "البحث",
 	"sortOrder": "Sort order",
-	"reset": "Reset",
 	"dialogSelectRoleTitle": "Search by role set in Emojis"
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
-	"search": "Cercar",
 	"sortOrder": "Ordenar",
-	"reset": "Reiniciar",
 	"dialogSelectRoleTitle": "Buscar Emojis per rol"
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
-	"search": "Vyhledávání",
 	"sortOrder": "Sort order",
-	"reset": "Obnovit",
 	"dialogSelectRoleTitle": "Search by role set in Emojis"
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
-	"search": "Search",
 	"sortOrder": "Sort order",
-	"reset": "Reset",
 	"dialogSelectRoleTitle": "Search by role set in Emojis"
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
-	"search": "Suchen",
 	"sortOrder": "Sortierung",
-	"reset": "Zurücksetzen",
 	"dialogSelectRoleTitle": "Suche nach dem Rollensatz in Emojis"
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
-	"search": "Search",
 	"sortOrder": "Sort order",
-	"reset": "Reset",
 	"dialogSelectRoleTitle": "Search by role set in Emojis"
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
-	"search": "Buscar",
 	"sortOrder": "Ordenar",
-	"reset": "Restablecer",
 	"dialogSelectRoleTitle": "Buscar Emojis por rol"
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
-	"search": "Rechercher",
 	"sortOrder": "Sort order",
-	"reset": "Réinitialiser",
 	"dialogSelectRoleTitle": "Search by role set in Emojis"
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
-	"search": "Cari",
 	"sortOrder": "Sort order",
-	"reset": "Reset",
 	"dialogSelectRoleTitle": "Search by role set in Emojis"
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
-	"search": "Cerca",
 	"sortOrder": "Ordine",
-	"reset": "Ripristina",
 	"dialogSelectRoleTitle": "Cerca emoji per ruolo"
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
-	"search": "検索",
 	"sortOrder": "並び順",
-	"reset": "リセット",
 	"dialogSelectRoleTitle": "絵文字に設定されたロールで検索"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
-	"search": "探す",
 	"sortOrder": "並び順",
-	"reset": "リセット",
 	"dialogSelectRoleTitle": "絵文字に設定されたロールで検索"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
-	"search": "Nadi",
 	"sortOrder": "Sort order",
-	"reset": "Reset",
 	"dialogSelectRoleTitle": "Search by role set in Emojis"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
-	"search": "ಹುಡುಕು",
 	"sortOrder": "Sort order",
-	"reset": "Reset",
 	"dialogSelectRoleTitle": "Search by role set in Emojis"
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
-	"search": "검색",
 	"sortOrder": "정렬 순서",
-	"reset": "초기화",
 	"dialogSelectRoleTitle": "이모지에 설정된 역할을 검색"
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
-	"search": "Zoeken",
 	"sortOrder": "Sort order",
-	"reset": "Herstellen",
 	"dialogSelectRoleTitle": "Search by role set in Emojis"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
-	"search": "Søk",
 	"sortOrder": "Sort order",
-	"reset": "Reset",
 	"dialogSelectRoleTitle": "Search by role set in Emojis"
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
-	"search": "Szukaj",
 	"sortOrder": "Sort order",
-	"reset": "Reset",
 	"dialogSelectRoleTitle": "Search by role set in Emojis"
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
-	"search": "Pesquisar",
 	"sortOrder": "Ordem de classificação",
-	"reset": "Redefinir",
 	"dialogSelectRoleTitle": "Buscar por cargo que pode usar esse Emoji"
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
-	"search": "Поиск",
 	"sortOrder": "Порядок сортировки",
-	"reset": "Сброс",
 	"dialogSelectRoleTitle": "Search by role set in Emojis"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
-	"search": "Hľadať",
 	"sortOrder": "Sort order",
-	"reset": "Reset",
 	"dialogSelectRoleTitle": "Search by role set in Emojis"
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
-	"search": "ค้นหา",
 	"sortOrder": "ลำดับการเรียง",
-	"reset": "รีเซ็ต",
 	"dialogSelectRoleTitle": "ค้นหาบทบาทที่ตั้งค่าไว้ด้วยเอโมจิ"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
-	"search": "Ara",
 	"sortOrder": "Sıralama düzeni",
-	"reset": "Sıfırla",
 	"dialogSelectRoleTitle": "Emojilerde rol setine göre arama yapın"
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
-	"search": "ئىزدەش",
 	"sortOrder": "Sort order",
-	"reset": "Reset",
 	"dialogSelectRoleTitle": "Search by role set in Emojis"
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
-	"search": "Пошук",
 	"sortOrder": "Sort order",
-	"reset": "Скинути",
 	"dialogSelectRoleTitle": "Search by role set in Emojis"
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
-	"search": "Tìm kiếm",
 	"sortOrder": "Sort order",
-	"reset": "cài lại",
 	"dialogSelectRoleTitle": "Search by role set in Emojis"
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
-	"search": "搜索",
 	"sortOrder": "排序方式",
-	"reset": "重置",
 	"dialogSelectRoleTitle": "按角色搜索表情符号"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
-	"search": "搜尋",
 	"sortOrder": "排序",
-	"reset": "重設",
 	"dialogSelectRoleTitle": "根據表情符號設定的角色進行搜尋"
 }
 </locale>

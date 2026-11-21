@@ -8,7 +8,7 @@ import push from 'web-push';
 import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
 import type { Config } from '@/config.js';
-import type { Packed } from '@features/index/contract/packed.js';
+import type { Packed } from '@features/index/backend/packed.schema.js';
 import { getNoteSummary } from '@features/notes/backend/utility/get-note-summary.js';
 import type { MiMeta, MiSwSubscription, SwSubscriptionsRepository } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
@@ -128,7 +128,7 @@ export class PushNotificationService implements OnApplicationShutdown {
 				//swLogger.info(err.headers);
 				//swLogger.info(err.body);
 
-				if (err.statusCode === 410) {
+				if (err.statusCode === 410 || err.statusCode === 404) {
 					this.swSubscriptionsRepository.delete({
 						userId: userId,
 						endpoint: subscription.endpoint,

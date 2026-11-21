@@ -2,35 +2,31 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { Injectable } from '@nestjs/common';
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { emptyAdminCaptchaCurrentDefinition, emptyAdminCaptchaCurrentInput, emptyAdminCaptchaCurrentOutput } from '../../../../contract/empty-input-endpoint-definitions.js';
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import { CaptchaService } from '../../../services/CaptchaService.js';
+import { AdminCaptchaCurrentContract } from '../../../api.definition.js';
 
-const contractProjection = projectEndpointContract(emptyAdminCaptchaCurrentDefinition);
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
 export const meta = {
 	tags: ['admin', 'captcha'],
 
-	requireCredential: true,
-	requireAdmin: true,
-
 	// 実態はmetaの取得であるため
-	kind: 'read:admin:meta',
 
-	res: contractProjection.response,
 } as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof emptyAdminCaptchaCurrentInput, typeof emptyAdminCaptchaCurrentOutput> {
-	constructor(
-		private captchaService: CaptchaService,
-	) {
-		super(meta, contractProjection, async () => {
-			return this.captchaService.get();
-		});
-	}
+export interface AdminCaptchaCurrentDependencies {
+	captchaService: Pick<CaptchaService, 'get'>;
+}
+export function createAdminCaptchaCurrentProcedure(deps: AdminCaptchaCurrentDependencies) {
+	return createApiProcedure<MiLocalUser>()(AdminCaptchaCurrentContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+		const result = await (async () => {
+			return deps.captchaService.get();
+		})();
+		return { provider: result.provider,
+			hcaptcha: { siteKey: result.hcaptcha.siteKey, secretKey: result.hcaptcha.secretKey },
+			mcaptcha: { siteKey: result.mcaptcha.siteKey, secretKey: result.mcaptcha.secretKey, instanceUrl: result.mcaptcha.instanceUrl },
+			recaptcha: { siteKey: result.recaptcha.siteKey, secretKey: result.recaptcha.secretKey },
+			turnstile: { siteKey: result.turnstile.siteKey, secretKey: result.turnstile.secretKey } };
+	});
 }

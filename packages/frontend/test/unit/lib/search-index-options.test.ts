@@ -6,6 +6,8 @@
 import { existsSync, globSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { createApp } from 'vue';
+import { parse } from 'vue/compiler-sfc';
+import { locales } from 'i18n';
 import {
 	createComponentLocale,
 	createInternationalization as createTestInternationalization,
@@ -43,7 +45,7 @@ test('search markers preserve SFC locale references for the public VVI runtime',
 	if (typeof configureVvi !== 'function' || !transformVvi || typeof transformVvi === 'function') {
 		throw new Error('Expected VVI config and transform hooks');
 	}
-	await configureVvi.call({} as never, { root: resolve('.'), command: 'build', base: '/vite/' } as never);
+	await configureVvi.call({} as never, { root: resolve('.'), command: 'build', base: '/vite/', build: { ssr: false } } as never);
 	const transformed = await transformVvi.handler.call({} as never, serverRulesSource, serverRulesFile);
 	const transformedCode = typeof transformed === 'string' ? transformed : transformed?.code?.toString() ?? serverRulesSource;
 	expect(transformedCode).not.toContain('<locale');
@@ -59,9 +61,9 @@ test('search markers preserve SFC locale references for the public VVI runtime',
 	const load = plugin.load;
 	if (typeof load !== 'function') throw new Error('Expected a load hook');
 	const generated = await load.call({ addWatchFile: () => {} } as never, `search-index-individual:${serverRulesFile}.ts`);
+	expect(generated).not.toContain("import { i18n }");
 	expect(generated).toContain("import { createComponentLocale } from 'vite-vue-internationalization/runtime';");
 	expect(generated).toContain("${createComponentLocale('/features/instance/frontend/pages/admin/server-rules.vue').serverRules}");
-	expect(generated).toContain("import { i18n } from '@features/runtime/frontend/i18n.js';");
 });
 
 test.each([
@@ -88,6 +90,71 @@ test('server-rules SFC locale falls back to the primary locale for a missing act
 	expect(createComponentLocale(serverRulesModuleId).serverRules).toBe('Primary server rules');
 });
 
+// These labels must stay component-local: globalLocale is invisible to the static indexer.
+const restoredSearchLabels: [string, string[]][] = [
+	['drive/frontend/pages/settings/drive.vue', ['drive']],
+	['notifications/frontend/pages/settings/notifications.vue', ['notifications']],
+	['instance/frontend/pages/admin/branding.vue', ['somethingHappened']],
+	['instance/frontend/pages/admin/settings.vue', ['info']],
+	['portability/frontend/pages/settings/account-data.vue', ['antennas']],
+	['preferences/frontend/pages/settings/preferences.vue', ['notifications']],
+	['relationships/frontend/pages/settings/mute-block.vue', ['mutedUsers', 'renote', 'blockedUsers']],
+];
+
+test('migrated settings/admin search labels survive VVI and individual index generation', async () => {
+	const vvi = pluginVvi();
+	if (typeof vvi.configResolved !== 'function' || !vvi.transform || typeof vvi.transform === 'function') throw new Error('Expected VVI hooks');
+	await vvi.configResolved.call({} as never, { root: resolve('.'), command: 'build', base: '/vite/', build: { ssr: false } } as never);
+	for (const [page, keys] of restoredSearchLabels) {
+		const file = resolve('../features', page);
+		const source = readFileSync(file, 'utf8');
+		const transformed = await vvi.transform.handler.call({} as never, source, file);
+		const code = typeof transformed === 'string' ? transformed : transformed?.code?.toString() ?? source;
+		const reference = (key: string) => `\${createComponentLocale('/features/${page}').${key}}`;
+		const expectedLabels = page.endsWith('/mute-block.vue')
+			? [reference('mutedUsers'), reference('blockedUsers'), `${reference('mutedUsers')} (${reference('renote')})`]
+			: keys.map(reference);
+		for (const input of [source, code]) {
+			const assigner = new MarkerIdAssigner();
+			const assigned = assigner.processFile(file, input)?.code;
+			const markers = collectFileMarkers(file, assigned, resolve('..'));
+			const labels = markers.map(marker => marker.label);
+			for (const label of expectedLabels) expect(labels, page).toContain(label);
+			if (page.startsWith('drive/') || page.startsWith('notifications/')) {
+				expect(markers.find(marker => !marker.parentId), page).toMatchObject({
+					path: `/settings/${keys[0]}`,
+					label: reference(keys[0]),
+				});
+			}
+			const section = page.includes('/admin/') ? 'admin' : 'settings';
+			const sectionOptions = searchIndexes.find(item => item.mainVirtualModule === `search-index:${section}`);
+			if (!sectionOptions) throw new Error('Expected section search options');
+			const options = { ...sectionOptions, componentLocaleRoot: resolve('..') };
+			const load = pluginCreateSearchIndexVirtualModule(options, assigner).load;
+			if (typeof load !== 'function') throw new Error('Expected a load hook');
+			const generated = await load.call({ addWatchFile: () => {} } as never, `search-index-individual:${file}.ts`);
+			for (const label of expectedLabels) expect(generated, page).toContain(label);
+		}
+	}
+}, 30_000);
+
+test.each(restoredSearchLabels)('%s restores search labels from the global catalog in every existing SFC language', (page, keys) => {
+	const { descriptor, errors } = parse(readFileSync(resolve('../features', page), 'utf8'));
+	expect(errors).toEqual([]);
+	const blocks = descriptor.customBlocks.filter(block => block.type === 'locale');
+	expect(blocks.map(block => block.attrs.locale)).toEqual(Object.keys(locales));
+	for (const block of blocks) {
+		const language = String(block.attrs.locale);
+		const messages = JSON.parse(block.content);
+		for (const key of keys) {
+			const expected = locales[language][key as keyof typeof locales[string]];
+			expect(typeof expected, `${language}.${key}`).toBe('string');
+			expect(expected, `${language}.${key}`).not.toBe('');
+			expect(messages[key], `${page}: ${language}.${key}`).toBe(expected);
+		}
+	}
+});
+
 for (const section of ['settings', 'admin']) {
 	test(`${section} search includes every relocated or retained view`, async () => {
 		const options = searchIndexes.find(item => item.mainVirtualModule === `search-index:${section}`)!;
@@ -108,3 +175,42 @@ for (const section of ['settings', 'admin']) {
 		for (const file of files) expect(generated).toContain(resolve(file));
 	});
 }
+
+test('privacy runtime labels do not discard static search markers', () => {
+	const file = resolve('../features/users/frontend/pages/settings/privacy.vue');
+	const assigned = new MarkerIdAssigner().processFile(file, readFileSync(file, 'utf8'))?.code;
+	const markers = collectFileMarkers(file, assigned, resolve('..'));
+	expect(markers.length).toBeGreaterThan(0);
+	expect(markers.some(marker => marker.label.includes('followApprovalTitle'))).toBe(true);
+	expect(markers.flatMap(marker => marker.texts).some(text => text.includes('setting.'))).toBe(false);
+});
+
+test('an unsupported label only skips that field and retains static labels and siblings', () => {
+	const source = `<template><SearchMarker markerId="first" :label="$locale.sfc.title"><SearchLabel>{{ setting.label }}</SearchLabel><SearchText>{{ setting.caption }}</SearchText><SearchText>{{ $locale.sfc.description }}</SearchText></SearchMarker><SearchMarker markerId="second" label="Sibling" /></template>`;
+	const markers = collectFileMarkers(serverRulesFile, source, resolve('..'));
+	expect(markers).toMatchObject([
+		{ id: 'first', label: "${createComponentLocale('/features/instance/frontend/pages/admin/server-rules.vue').title}", texts: ["${createComponentLocale('/features/instance/frontend/pages/admin/server-rules.vue').description}"] },
+		{ id: 'second', label: 'Sibling' },
+	]);
+});
+
+// Transforming every settings/admin SFC under coverage exceeds CI's default 5-second budget.
+test('virtual VVI transform retains every settings/admin file containing search markers', async () => {
+	const vvi = pluginVvi();
+	if (typeof vvi.configResolved !== 'function' || !vvi.transform || typeof vvi.transform === 'function') throw new Error('Expected VVI hooks');
+	await vvi.configResolved.call({} as never, { root: resolve('.'), command: 'build', base: '/vite/', build: { ssr: false } } as never);
+	let checked = 0;
+	for (const options of searchIndexes) {
+		for (const file of globSync(options.targetFilePaths)) {
+			const id = resolve(file);
+			const source = readFileSync(id, 'utf8');
+			if (!source.includes('<SearchMarker')) continue;
+			const transformed = await vvi.transform.handler.call({} as never, source, id);
+			const code = typeof transformed === 'string' ? transformed : transformed?.code?.toString() ?? source;
+			const assigned = new MarkerIdAssigner().processFile(id, code)?.code;
+			expect(collectFileMarkers(id, assigned, resolve('..')).length, file).toBeGreaterThan(0);
+			checked++;
+		}
+	}
+	expect(checked).toBeGreaterThanOrEqual(29);
+}, 30000);

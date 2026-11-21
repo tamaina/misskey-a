@@ -2,32 +2,17 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-
-import { projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { unionMetaDefinition } from '../../contract/union-endpoint-definitions.js';
-import { Injectable } from '@nestjs/common';
-import { LegacyMetaConfigurationProducerEndpoint } from '../legacy-meta-configuration-producer-endpoint.js';
-import { MetaEntityService } from '../serializers/MetaEntityService.js';
-
-const contractProjection = projectEndpointContract(unionMetaDefinition);
-
-export const meta = {
-	tags: ['meta'],
-
-	requireCredential: false,
-
-	res: contractProjection.response,
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends LegacyMetaConfigurationProducerEndpoint<typeof meta> {
-	constructor(
-		private metaEntityService: MetaEntityService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
-			return ps.detail ? await this.metaEntityService.packDetailed() : await this.metaEntityService.pack();
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import { toPublicMetaLite, toPublicMetaDetailed } from '../serializers/public-meta.js';
+import { metaContract } from './meta.contract.js';
+import type { ApiActor } from '@features/api/backend/transport/context.js';
+import type { InstanceApiDependencies } from '../api.implementation.js';
+export type MetaDependencies = Pick<InstanceApiDependencies, 'metaEntityService'>;
+export function createMetaProcedure<Actor extends ApiActor>(deps: MetaDependencies) {
+	return createApiProcedure<Actor>()(metaContract)
+		.handler(async ({ input, context }) => {
+			return input.detail
+				? toPublicMetaDetailed(await deps.metaEntityService.packDetailed())
+				: toPublicMetaLite(await deps.metaEntityService.pack());
 		});
-	}
 }

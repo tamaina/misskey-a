@@ -146,7 +146,7 @@ function toStories(component: string): Promise<string> {
 	const dir = dirname(component);
 	const pagePath = dir + '/';
 	const isPage = pagePath.startsWith('src/pages/')
-		|| /^\.\.\/features\/[^/]+\/frontend\/pages\//.test(pagePath);
+		|| /^\.\.\/features\/(?:[^/]+|games\/[^/]+)\/frontend\/pages\//.test(pagePath);
 	const literal =
 		<literal
 			value={toStoryTitle(component)}
@@ -463,9 +463,13 @@ function toStories(component: string): Promise<string> {
 
 		globSync('../features/users/frontend/components/MkUserSetupDialog.vue'),
 
-
 		globSync('../features/federation/frontend/components/MkInstanceCardMini.vue'),
 		globSync('../features/auth/frontend/components/MkInviteCode.vue'),
+		globSync('../features/auth/frontend/components/MkSudoDialog.vue'),
+		globSync('../features/auth/frontend/components/MkSecuritySettings.vue'),
+		globSync('../features/auth/frontend/components/MkBrowserSessions.vue'),
+		globSync('../features/auth/frontend/components/MkTokenExpiry.vue'),
+		globSync('../features/auth/frontend/components/MkSignin.vue'),
 		globSync('../features/discovery/frontend/components/MkTagItem.vue'),
 		globSync('../features/roles/frontend/components/MkRoleSelectDialog.vue'),
 
@@ -484,10 +488,11 @@ function toStories(component: string): Promise<string> {
 		globSync('../features/statistics/frontend/components/MkChartLegend.vue'),
 		globSync('../features/statistics/frontend/components/MkChartTooltip.vue'),
 		globSync('../features/chat/frontend/components/MkChatHistories.vue'),
-		globSync('../features/games/frontend/components/MkClickerGame.vue'),
+		globSync('../features/games/clicker/frontend/components/MkClickerGame.vue'),
 		globSync('../features/collections/frontend/components/MkClipPreview.vue'),
 		globSync('../features/markup/frontend/components/MkCode.core.vue'),
 		globSync('../features/markup/frontend/components/MkCode.vue'),
+		globSync('../features/markup/frontend/components/MkCodeDiff.vue'),
 		globSync('../features/markup/frontend/components/MkCodeEditor.vue'),
 		globSync('../features/markup/frontend/components/MkCodeInline.vue'),
 		globSync('../features/ui/frontend/components/MkColorInput.vue'),

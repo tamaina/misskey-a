@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import QRCodeStyling from 'qr-code-styling';
+import { qrOptions, qrcodeImageBitmap } from '@features/share/frontend/utility/qr-code.js';
+import { fetchAsDataUri } from '@features/drive/frontend/utility/fetch-as-data-uri.js';
 import { url, host } from '@features/boot/frontend/shared/config.js';
 import { getProxiedImageUrl } from '../media-proxy.js';
 import { fn as fn_watermark } from './watermark.js';
@@ -295,39 +296,25 @@ async function createTextureFromText(text: string | null, resolution = 2048) {
 async function createTextureFromQr(options: { data: string | null }, resolution = 512) {
 	const $i = ensureSignin();
 
-	const qrCodeInstance = new QRCodeStyling({
-		width: resolution,
-		height: resolution,
-		margin: 42,
-		type: 'canvas',
-		data: options.data == null || options.data === '' ? `${url}/users/${$i.id}` : options.data,
-		image: $i.avatarUrl,
-		qrOptions: {
-			typeNumber: 0,
-			mode: 'Byte',
-			errorCorrectionLevel: 'H',
-		},
-		imageOptions: {
-			hideBackgroundDots: true,
-			imageSize: 0.3,
+	let avatarDataUri: string | undefined;
+	try {
+		avatarDataUri = await fetchAsDataUri($i.avatarUrl);
+	} catch (err) {
+		console.warn('Failed to load avatar for QR code', err);
+	}
+
+	const image = await qrcodeImageBitmap(options.data == null || options.data === '' ? `${url}/users/${$i.id}` : options.data, {
+		...qrOptions,
+		size: resolution,
+		margin: 3,
+		color: '#000',
+		background: '#fff',
+		logo: avatarDataUri != null ? {
+			imageUrl: avatarDataUri,
+			size: 0.25,
 			margin: 16,
-			crossOrigin: 'anonymous',
-		},
-		dotsOptions: {
-			type: 'dots',
-		},
-		cornersDotOptions: {
-			type: 'dot',
-		},
-		cornersSquareOptions: {
-			type: 'extra-rounded',
-		},
+		} : undefined,
 	});
-
-	const blob = await qrCodeInstance.getRawData('png') as Blob | null;
-	if (blob == null) return null;
-
-	const image = await window.createImageBitmap(blob);
 
 	return image;
 }

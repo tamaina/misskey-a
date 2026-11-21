@@ -6,7 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
 import type { UsersRepository } from '@features/persistence/backend/repositories/models.js';
-import type { MiUser } from '../models/User.js';
+import type { MiLocalUser, MiUser } from '../models/User.js';
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
 import { RelayService } from '@features/federation/backend/services/RelayService.js';
 import { ApDeliverManagerService } from '@features/federation/backend/services/ApDeliverManagerService.js';
@@ -26,16 +26,43 @@ export class AccountUpdateService {
 	) {
 	}
 
-	@bindThis
-	public async publishToFollowers(userId: MiUser['id']) {
-		const user = await this.usersRepository.findOneBy({ id: userId });
-		if (user == null) throw new Error('user not found');
+	private async createUpdatePersonActivity(user: MiLocalUser) {
+		return this.apRendererService.addContext(
+			this.apRendererService.renderUpdate(await this.apRendererService.renderPerson(user), user),
+		);
+	}
 
-		// フォロワーがリモートユーザーかつ投稿者がローカルユーザーならUpdateを配信
+	@bindThis
+	public async publishToFollowers(userId: MiUser['id'], forceMainKey = false) {
+		const user = await this.usersRepository.findOneBy({ id: userId });
+		if (user == null || user.isDeleted) return;
+
 		if (this.userEntityService.isLocalUser(user)) {
-			const content = this.apRendererService.addContext(this.apRendererService.renderUpdate(await this.apRendererService.renderPerson(user), user));
-			this.apDeliverManagerService.deliverToFollowers(user, content);
-			this.relayService.deliverToRelays(user, content);
+			if (!forceMainKey) await this.apDeliverManagerService.prepareActorSigningKey(userId);
+			const content = await this.createUpdatePersonActivity(user);
+			const deliveries = [
+				this.apDeliverManagerService.deliverToFollowers(user, content, forceMainKey),
+				this.relayService.deliverToRelays(user, content, forceMainKey),
+			];
+			if (forceMainKey) await Promise.all(deliveries);
+			else void Promise.allSettled(deliveries);
+		}
+	}
+
+	@bindThis
+	public async publishToFollowersAndSharedInboxAndRelays(userId: MiUser['id']) {
+		const user = await this.usersRepository.findOneBy({ id: userId });
+		if (user == null || user.isDeleted) return;
+
+		if (this.userEntityService.isLocalUser(user)) {
+			const content = await this.createUpdatePersonActivity(user);
+			const manager = this.apDeliverManagerService.createDeliverManager(user, content);
+			manager.addAllKnowingSharedInboxRecipe();
+			manager.addFollowersRecipe();
+			await Promise.allSettled([
+				manager.execute({ forceMainKey: true }),
+				this.relayService.deliverToRelays(user, content, true),
+			]);
 		}
 	}
 }

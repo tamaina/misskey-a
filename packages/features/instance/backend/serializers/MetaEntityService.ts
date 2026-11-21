@@ -8,7 +8,7 @@ import JSON5 from 'json5';
 import type { NativeMetaLite, NativeMetaDetailed } from './native-meta.js';
 import type { MiMeta } from '../models/Meta.js';
 import type { AdsRepository } from '@features/persistence/backend/repositories/models.js';
-import { MAX_NOTE_TEXT_LENGTH } from '@features/notes/contract/note-text-limit.js';
+import { MAX_NOTE_TEXT_LENGTH } from '@features/notes/backend/request.schema.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
 import type { Config } from '@/config.js';

@@ -2,81 +2,35 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 
-import { ContractEndpoint, projectEndpointContract } from '@features/api/backend/transport/contract-endpoint.js';
-import { voidMuteCreateDefinition, voidMuteCreateInput, voidMuteCreateOutput } from '../../../contract/void-endpoint-definitions.js';
-import { Inject, Injectable } from '@nestjs/common';
-import ms from 'ms';
+import type { MiLocalUser } from '@features/users/backend/models/User.js';
+import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
+import { relationshipsContract } from '../relationships.contract.js';
+import type { RelationshipsDependencies } from '../../api.implementation.js';
 
-import type { MutingsRepository } from '@features/persistence/backend/repositories/models.js';
-import { DI } from '@/di-symbols.js';
-import { GetterService } from '@features/api/backend/transport/GetterService.js';
-import { UserMutingService } from '../../services/UserMutingService.js';
-import { ApiError } from '@features/api/backend/transport/error.js';
-
-const contractProjection = projectEndpointContract(voidMuteCreateDefinition);
-
-export const meta = {
-	tags: ['account'],
-
-	requireCredential: true,
-	prohibitMoved: true,
-
-	kind: 'write:mutes',
-
-	limit: {
-		duration: ms('1hour'),
-		max: 20,
-	},
-
-	errors: {
-		noSuchUser: {
-			message: 'No such user.',
-			code: 'NO_SUCH_USER',
-			id: '6fef56f3-e765-4957-88e5-c6f65329b8a5',
-		},
-
-		muteeIsYourself: {
-			message: 'Mutee is yourself.',
-			code: 'MUTEE_IS_YOURSELF',
-			id: 'a4619cb2-5f23-484b-9301-94c903074e10',
-		},
-
-		alreadyMuting: {
-			message: 'You are already muting that user.',
-			code: 'ALREADY_MUTING',
-			id: '7e7359cb-160c-4956-b08f-4d1c653cd007',
-		},
-	},
-} as const;
-
-export const paramDef = contractProjection.input;
-
-@Injectable()
-export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof voidMuteCreateInput, typeof voidMuteCreateOutput> {
-	constructor(
-		@Inject(DI.mutingsRepository)
-		private mutingsRepository: MutingsRepository,
-
-		private getterService: GetterService,
-		private userMutingService: UserMutingService,
-	) {
-		super(meta, contractProjection, async (ps, me) => {
+import { apiError } from '@features/api/backend/transport/orpc-error.js';
+import { relationshipsErrors } from '../relationships.errors.js';
+export function createMuteCreateProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'getterService' | 'mutingsRepository' | 'userMutingService'>) {
+	return createApiProcedure<Actor>()(relationshipsContract["mute/create"]).use(requirePrincipal<Actor>())
+		.handler(async ({ input, context }) => {
+			const ps = input;
+			const me = context.principal;
 			const muter = me;
 
 			// 自分自身
 			if (me.id === ps.userId) {
-				throw new ApiError(meta.errors.muteeIsYourself);
+				throw apiError(relationshipsErrors['mute/create'].muteeIsYourself);
 			}
 
 			// Get mutee
-			const mutee = await this.getterService.getUser(ps.userId).catch(err => {
-				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw new ApiError(meta.errors.noSuchUser);
+			const mutee = await deps.getterService.getUser(ps.userId).catch(err => {
+				if (err.id === '15348ddd-432d-49c2-8a5a-8069753becff') throw apiError(relationshipsErrors['mute/create'].noSuchUser);
 				throw err;
 			});
 
 			// Check if already muting
-			const exist = await this.mutingsRepository.exists({
+			const exist = await deps.mutingsRepository.exists({
 				where: {
 					muterId: muter.id,
 					muteeId: mutee.id,
@@ -84,14 +38,13 @@ export class EndpointImplementation extends ContractEndpoint<typeof meta, typeof
 			});
 
 			if (exist) {
-				throw new ApiError(meta.errors.alreadyMuting);
+				throw apiError(relationshipsErrors['mute/create'].alreadyMuting);
 			}
 
 			if (ps.expiresAt && ps.expiresAt <= Date.now()) {
 				return;
 			}
 
-			await this.userMutingService.mute(muter, mutee, ps.expiresAt ? new Date(ps.expiresAt) : null);
+			await deps.userMutingService.mute(muter, mutee, ps.expiresAt ? new Date(ps.expiresAt) : null);
 		});
-	}
 }

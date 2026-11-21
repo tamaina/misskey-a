@@ -1,733 +1,278 @@
----
-_lang_: "Svenska"
-headlineMisskey: "Ett nätverk kopplat av noter"
-introMisskey: "Välkommen! Misskey är en öppen och decentraliserad mikrobloggningstjänst.\nSkapa en \"not\" och dela dina tankar med alla runtomkring dig. 📡\nMed \"reaktioner\" kan du snabbt uttrycka dina känslor kring andras noter. 👍\nLåt oss utforska en ny värld! 🚀"
-poweredByMisskeyDescription: "{name} är en tjänst driven av den öppna källkodsplatformen <b>Misskey</b> (benämns \"Misskey instans\")."
-monthAndDay: "{day}/{month}"
-search: "Sök"
-notifications: "Notifikationer"
-username: "Användarnamn"
-password: "Lösenord"
-forgotPassword: "Glömt lösenord"
-fetchingAsApObject: "Hämtar från Fediversum..."
-ok: "OK"
-gotIt: "Uppfattat!"
-cancel: "Avbryt"
-noThankYou: "Nej tack"
-enterUsername: "Ange användarnamn"
-renotedBy: "Omnoterad av {user}"
-noNotes: "Inga noteringar"
-noNotifications: "Inga notifikationer"
-instance: "Instanser"
-settings: "Inställningar"
-notificationSettings: "Notifieringsinställningar"
-basicSettings: "Basinställningar"
-otherSettings: "Andra inställningar"
-openInWindow: "Öppna i ett fönster"
-profile: "Profil"
-timeline: "Tidslinje"
-noAccountDescription: "Användaren har inte skrivit en biografi än."
-login: "Logga in"
-loggingIn: "Loggar in"
-logout: "Logga ut"
-signup: "Registrera"
-uploading: "Laddar upp..."
-save: "Spara"
-users: "Användare"
-addUser: "Lägg till användare"
-favorite: "Lägg till i favoriter"
-favorites: "Favoriter"
-unfavorite: "Ta bort från favoriter"
-favorited: "Tillagd i favoriter."
-alreadyFavorited: "Redan tillagd i favoriter."
-cantFavorite: "Gick inte att lägga till i favoriter."
-pin: "Fäst till profil"
-unpin: "Lossa från profil"
-copyContent: "Kopiera innehåll"
-copyLink: "Kopiera länk"
-delete: "Radera"
-deleteAndEdit: "Radera och ändra"
-deleteAndEditConfirm: "Är du säker att du vill radera denna not och ändra den? Du kommer förlora alla reaktioner, omnoteringar och svar till den."
-addToList: "Lägg till i lista"
-sendMessage: "Skicka ett meddelande"
-copyRSS: "Kopiera RSS"
-copyUsername: "Kopiera användarnamn"
-copyUserId: "Kopiera användar-ID"
-copyNoteId: "Kopiera noter-ID"
-copyFileId: "Kopiera Fil-ID"
-copyFolderId: "Kopiera mapp-ID"
-searchUser: "Sök användare"
-reply: "Svara"
-loadMore: "Ladda mer"
-showMore: "Visa mer"
-showLess: "Stäng"
-youGotNewFollower: "följde dig"
-receiveFollowRequest: "Följarförfrågan mottagen"
-followRequestAccepted: "Följarförfrågan accepterad"
-mention: "Nämn"
-mentions: "Omnämningar"
-directNotes: "Direktnoter"
-importAndExport: "Importera / Exportera"
-import: "Importera"
-export: "Exportera"
-files: "Filer"
-download: "Nedladdning"
-driveFileDeleteConfirm: "Är du säker att du vill radera filen \"{name}\"? Noter med denna fil bifogad kommer också raderas."
-unfollowConfirm: "Är du säker att du vill avfölja {name}?"
-exportRequested: "Du har begärt en export. Detta kan ta lite tid. Den kommer läggas till i din Drive när den blir klar."
-importRequested: "Du har begärt en import. Detta kan ta lite tid."
-lists: "Listor"
-noLists: "Du har inga listor"
-note: "Not"
-notes: "Noter"
-following: "Följer"
-followers: "Följare"
-followsYou: "Följer dig"
-createList: "Skapa lista"
-manageLists: "Hantera lista"
-error: "Fel!"
-somethingHappened: "Ett fel har uppstått"
-retry: "Försök igen"
-pageLoadError: "Det gick inte att ladda sidan."
-pageLoadErrorDescription: "Detta händer oftast p.g.a. nätverksfel eller din webbläsarcache. Försök tömma din cache och testa sedan igen efter en liten stund."
-serverIsDead: "Servern svarar inte. Vänta ett litet tag och försök igen."
-youShouldUpgradeClient: "För att kunna se denna sida, vänligen ladda om sidan för att uppdatera din klient."
-enterListName: "Skriv ett namn till listan"
-privacy: "Integritet"
-makeFollowManuallyApprove: "Följarförfrågningar kräver manuellt godkännande"
-defaultNoteVisibility: "Standardsynlighet"
-follow: "Följ"
-followRequest: "Skicka följarförfrågan"
-followRequests: "Följarförfrågningar"
-unfollow: "Avfölj"
-followRequestPending: "Följarförfrågning avvaktar för svar"
-enterEmoji: "Skriv en emoji"
-renote: "Omnotera"
-unrenote: "Ta tillbaka omnotering"
-renoted: "Omnoterad."
-cantRenote: "Inlägget kunde inte bli omnoterat."
-cantReRenote: "En omnotering kan inte bli omnoterad."
-quote: "Citat"
-inChannelRenote: "Omnotera inom kanalen"
-inChannelQuote: "I kanal citat"
-pinnedNote: "Fästad not"
-pinned: "Fäst till profil"
-you: "Du"
-clickToShow: "Klicka för att visa"
-sensitive: "Känsligt innehåll"
-add: "Lägg till"
-reaction: "Reaktioner"
-reactions: "Reaktioner"
-reactionSettingDescription2: "Dra för att omordna, klicka för att radera, tryck \"+\" för att lägga till."
-rememberNoteVisibility: "Komihåg notvisningsinställningar"
-attachCancel: "Ta bort bilaga"
-markAsSensitive: "Markera som känsligt innehåll"
-unmarkAsSensitive: "Avmarkera som känsligt innehåll"
-enterFileName: "Ange filnamn"
-mute: "Tysta"
-unmute: "Avtysta"
-block: "Blockera"
-unblock: "Avblockera"
-suspend: "Suspendera"
-unsuspend: "Ta bort suspenderingen"
-blockConfirm: "Är du säker att du vill blockera kontot?"
-unblockConfirm: "Är du säkert att du vill avblockera kontot?"
-suspendConfirm: "Är du säker att du vill suspendera detta konto?"
-unsuspendConfirm: "Är du säker att du vill avsuspendera detta konto?"
-selectList: "Välj lista"
-editList: "Redigera lista"
-selectChannel: "Välj en kanal"
-selectAntenna: "Välj en antenn"
-editAntenna: "Redigera en antenn"
-selectWidget: "Välj en widget"
-editWidgets: "Redigera widgets"
-editWidgetsExit: "Avsluta redigering"
-customEmojis: "Anpassa emoji"
-emoji: "Emoji"
-emojis: "Emoji"
-emojiName: "Emoji namn"
-emojiUrl: "Emoji länk"
-addEmoji: "Lägg till emoji"
-settingGuide: "Rekommenderade inställningar"
-cacheRemoteFiles: "Spara externa filer till cachen"
-cacheRemoteFilesDescription: "När denna inställning är avstängd kommer externa filer laddas direkt från den externa instansen. Genom att stänga av detta kommer lagringsutrymme minska i användning men kommer öka datatrafiken eftersom miniatyrer inte kommer genereras."
-flagAsBot: "Markera konto som bot"
-flagAsBotDescription: "Aktivera det här alternativet om kontot är kontrollerat av ett program. Om aktiverat kommer den fungera som en flagga för andra utvecklare för att hindra ändlösa kedjor med andra bottar. Det kommer också få Misskeys interna system att hantera kontot som en bot."
-flagAsCat: "Markera konto som katt"
-flagAsCatDescription: "Aktivera denna inställning för att markera kontot som en katt."
-flagShowTimelineReplies: "Visa svar i tidslinje"
-flagShowTimelineRepliesDescription: "Visar användarsvar till andra användares noter i tidslinjen om aktiverad."
-autoAcceptFollowed: "Godkänn följarförfrågningar från användare du följer automatiskt"
-addAccount: "Lägg till konto"
-loginFailed: "Inloggningen misslyckades"
-showOnRemote: "Se på extern instans"
-general: "Allmänt"
-wallpaper: "Bakgrundsbild"
-setWallpaper: "Välj bakgrund"
-removeWallpaper: "Ta bort bakgrund"
-searchWith: "Sök: {q}"
-youHaveNoLists: "Du har inga listor"
-followConfirm: "Är du säker att du vill följa {name}?"
-proxyAccount: "Proxykonto"
-proxyAccountDescription: "Ett proxykonto är ett konto som agerar som en extern följare för användare under vissa villkor. Till exempel, när en användare lägger till en extern användare till en lista så kommer den externa användarens aktivitet inte levireras till instansen om ingen lokal användare följer det kontot, så proxykontot används istället."
-host: "Värd"
-selectUser: "Välj användare"
-recipient: "Mottagare"
-annotation: "Kommentarer"
-federation: "Federation"
-instances: "Instanser"
-registeredAt: "Registrerad på"
-latestRequestReceivedAt: "Senaste begäran mottagen"
-latestStatus: "Senaste status"
-storageUsage: "Använt lagringsutrymme"
-charts: "Diagram"
-perHour: "Per timme"
-perDay: "Per dag"
-stopActivityDelivery: "Sluta skicka aktiviteter"
-blockThisInstance: "Blockera instans"
-operations: "Operationer"
-software: "Mjukvara"
-version: "Version"
-metadata: "Metadata"
-withNFiles: "{n} fil(er)"
-monitor: "Övervakning"
-jobQueue: "Jobbkö"
-cpuAndMemory: "CPU och minne"
-network: "Nätverk"
-disk: "Disk"
-instanceInfo: "Instansinformation"
-statistics: "Statistik"
-clearQueue: "Rensa kö"
-clearQueueConfirmTitle: "Är du säker att du vill rensa kön?"
-clearQueueConfirmText: "Om någon not är olevererad i kön kommer den inte federeras. Vanligtvis behövs inte denna handling."
-clearCachedFiles: "Rensa cache"
-clearCachedFilesConfirm: "Är du säker att du vill radera alla cachade externa filer?"
-blockedInstances: "Blockerade instanser"
-blockedInstancesDescription: "Lista adressnamn av instanser som du vill blockera. Listade instanser kommer inte längre kommunicera med denna instans."
-muteAndBlock: "Tystningar och blockeringar"
-mutedUsers: "Tystade användare"
-blockedUsers: "Blockerade användare"
-noUsers: "Det finns inga användare"
-editProfile: "Redigera profil"
-noteDeleteConfirm: "Är du säker på att du vill ta bort denna not?"
-pinLimitExceeded: "Du kan inte fästa fler noter"
-done: "Klar"
-processing: "Bearbetar..."
-preview: "Förhandsvisning"
-default: "Standard"
-defaultValueIs: "Standard: {value}"
-noCustomEmojis: "Det finns ingen emoji"
-noJobs: "Det finns inga jobb"
-federating: "Federerar"
-blocked: "Blockerad"
-suspended: "Suspenderad"
-all: "Allt"
-subscribing: "Prenumererar"
-publishing: "Publiceras"
-notResponding: "Svarar inte"
-instanceFollowing: "Följer på instans"
-instanceFollowers: "Följare av instans"
-instanceUsers: "Användare av denna instans"
-changePassword: "Ändra lösenord"
-security: "Säkerhet"
-retypedNotMatch: "Inmatningen matchar inte"
-currentPassword: "Nuvarande lösenord"
-newPassword: "Nytt lösenord"
-newPasswordRetype: "Bekräfta lösenord"
-attachFile: "Bifoga filer"
-more: "Mer!"
-featured: "Utvalda"
-usernameOrUserId: "Användarnamn eller användar-id"
-noSuchUser: "Kan inte hitta användaren"
-lookup: "Sökning"
-announcements: "Nyheter"
-imageUrl: "Bild-URL"
-remove: "Radera"
-removed: "Borttaget"
-removeAreYouSure: "Är du säker att du vill radera \"{x}\"?"
-deleteAreYouSure: "Är du säker att du vill radera \"{x}\"?"
-resetAreYouSure: "Vill du återställa?"
-saved: "Sparad"
-upload: "Ladda upp"
-keepOriginalUploading: "Behåll originalbild"
-keepOriginalUploadingDescription: "Sparar den originellt uppladdade bilden i sitt i befintliga skick. Om avstängd, kommer en webbversion bli genererad vid uppladdning."
-fromDrive: "Från Drive"
-fromUrl: "Från en länk"
-uploadFromUrl: "Ladda upp från länk"
-uploadFromUrlDescription: "Länken av filen du vill ladda upp"
-uploadFromUrlRequested: "Uppladdning begärd"
-uploadFromUrlMayTakeTime: "Det kan ta tid tills att uppladdningen blir klar."
-explore: "Utforska"
-messageRead: "Läs"
-noMoreHistory: "Det finns ingen mer historik"
-nUsersRead: "läst av {n}"
-agreeTo: "Jag accepterar {0}"
-agree: "Överens"
-termsOfService: "Användarvillkor"
-start: "Kom igång"
-home: "Hem"
-remoteUserCaution: "Då denna användaren kommer från en fjärrinstans, kan informationen visad vara ofullständig."
-activity: "Aktivitet"
-images: "Bilder"
-image: "Bilder"
-birthday: "Födelsedag"
-yearsOld: "{age} år gammal"
-registeredDate: "Gick med"
-location: "Plats"
-theme: "Teman"
-themeForLightMode: "Tema att använda i Ljust Läge"
-themeForDarkMode: "Tema att använda i Mörkt Läge"
-light: "Ljust"
-dark: "Mörk"
-lightThemes: "Ljusa teman"
-darkThemes: "Mörka teman"
-syncDeviceDarkMode: "Synka Mörkt Läge med din enhets inställningar"
-drive: "Drive"
-fileName: "Filnamn"
-selectFile: "Välj en fil"
-selectFiles: "Välj filer"
-selectFolder: "Välj en mapp"
-selectFolders: "Välj mappar"
-renameFile: "Byt namn på filen"
-folderName: "Mappnamn"
-createFolder: "Skapa en mapp"
-renameFolder: "Byt namn på mappen"
-deleteFolder: "Ta bort mappen"
-addFile: "Lägg till fil"
-emptyDrive: "Din Drive är tom"
-emptyFolder: "Denna mappen är tom"
-unableToDelete: "Kunde inte ta bort"
-inputNewFileName: "Ange nytt filnamn"
-inputNewDescription: "Ange ny bildtext"
-inputNewFolderName: "Ange nytt mappnamn"
-circularReferenceFolder: "Destinationsmappen är en undermapp av mappen du vill flytta."
-hasChildFilesOrFolders: "Då denna mappen inte är tom, kan den inte tas bort."
-copyUrl: "Kopiera URL"
-rename: "Byt namn"
-avatar: "Profilbild"
-banner: "Banner"
-reload: "Ladda om"
-doNothing: "Ignorera"
-reloadConfirm: "Vill du ladda om tidslinjen?"
-watch: "Titta"
-accept: "Tillåt"
-reject: "Neka"
-normal: "Normal"
-instanceName: "Instansnamn"
-instanceDescription: "Instansbeskrivning"
-maintainerEmail: "Administratörens epost"
-tosUrl: "URL till användarvillkår"
-thisYear: "Detta året"
-thisMonth: "Denna månaden"
-today: "Idag"
-dayX: "{day}"
-monthX: "{month}"
-yearX: "{year}"
-pages: "Sidor"
-integration: "Integrationer"
-connectService: "Anslut"
-disconnectService: "Koppla från"
-enableLocalTimeline: "Aktivera lokal tidslinje"
-enableGlobalTimeline: "Aktivera global tidslinje"
-registration: "Registrera"
-invite: "Inbjudan"
-inMb: "I megabyte"
-bannerUrl: "URL till banner-bilden"
-basicInfo: "Grundläggande info"
-pinnedUsers: "Fästa användare"
-pinnedPages: "Fästa sidor"
-pinnedNotes: "Fästad not"
-hcaptcha: "hCaptcha"
-enableHcaptcha: "Aktivera hCaptcha"
-hcaptchaSiteKey: "Webbplatsnyckel"
-hcaptchaSecretKey: "Hemlig nyckel"
-mcaptchaSiteKey: "Webbplatsnyckel"
-mcaptchaSecretKey: "Hemlig nyckel"
-recaptcha: "reCAPTCHA"
-enableRecaptcha: "Aktivera reCAPTCHA"
-recaptchaSiteKey: "Webbplatsnyckel"
-recaptchaSecretKey: "Hemlig nyckel"
-turnstile: "Turnstile"
-enableTurnstile: "Aktivera Turnstile"
-turnstileSiteKey: "Webbplatsnyckel"
-turnstileSecretKey: "Hemlig nyckel"
-antennas: "Antenner"
-manageAntennas: "Hantera Antenner"
-name: "Namn"
-antennaSource: "Antennkälla"
-antennaKeywords: "Nyckelord att lyssna efter"
-antennaExcludeKeywords: "Nyckelord att exkludera"
-antennaKeywordsDescription: "Separera med mellanslag för en AND kondition, eller med nya linjer för en OR kondition"
-notifyAntenna: "Notifiera om nya noter"
-withFileAntenna: "Endast noter med filer"
-enableServiceworker: "Aktivera pushnotiser i denna webbläsaren"
-antennaUsersDescription: "Ange ett användarnamn per linje"
-withReplies: "Med svar"
-notesAndReplies: "Inlägg och svar"
-silence: "Tystnad"
-recentlyUpdatedUsers: "Nyligen aktiva användare"
-recentlyRegisteredUsers: "Nyligen registrerade användare"
-exploreFediverse: "Utforska Fediverse"
-popularTags: "Populära taggar"
-userList: "Listor"
-about: "Om"
-aboutMisskey: "Om Misskey"
-administrator: "Administratör"
-2fa: "Tvåfaktorsautentisering"
-totp: "Autentiseringsapp"
-moderator: "Moderator"
-passwordLessLogin: "Lösenordsfri inloggning"
-passwordLessLoginDescription: "Tillåter lösenordsfri inloggning med endast en säkerhetsnyckel eller en passkey."
-resetPassword: "Återställ Lösenord"
-newPasswordIs: "Det nya lösenordet är \"{password}\""
-share: "Dela"
-markAsReadAllTalkMessages: "Markera alla meddelanden som lästa"
-help: "Hjälp"
-close: "Stäng"
-invites: "Inbjudan"
-members: "Medlemmar"
-transfer: "Överför"
-text: "Text"
-enable: "Aktivera"
-next: "Nästa"
-retype: "Ange igen"
-invitations: "Inbjudan"
-invitationCode: "Inbjudningskod"
-available: "Tillgängligt"
-weakPassword: "Svagt Lösenord"
-normalPassword: "Medel Lösenord"
-strongPassword: "Starkt Lösenord"
-signinWith: "Logga in med {x}"
-signinFailed: "Kan inte logga in. Det angivna användarnamnet eller lösenordet är felaktigt."
-or: "eller"
-language: "Språk"
-aboutX: "Om {x}"
-category: "Kategori"
-tags: "Taggar"
-createAccount: "Skapa ett konto"
-existingAccount: "Existerande konto"
-regenerate: "Regenerera"
-fontSize: "Textstorlek"
-openImageInNewTab: "Öppna bild i ny flik"
-appearance: "Utseende"
-clientSettings: "Klientinställningar"
-accountSettings: "Kontoinställningar"
-numberOfDays: "Antal dagar"
-objectStorageUseSSL: "Använd SSL"
-serverLogs: "Serverloggar"
-deleteAll: "Radera alla"
-sounds: "Ljud"
-sound: "Ljud"
-listen: "Lyssna"
-none: "Ingen"
-volume: "Volym"
-notUseSound: "Inaktivera ljud"
-chooseEmoji: "Välj en emoji"
-recentUsed: "Senast använd"
-install: "Installera"
-uninstall: "Avinstallera"
-deleteAllFiles: "Radera alla filer"
-deleteAllFilesConfirm: "Är du säker på att du vill radera alla filer?"
-menu: "Meny"
-addItem: "Lägg till objekt"
-serviceworkerInfo: "Måste vara aktiverad för pushnotiser."
-enableInfiniteScroll: "Ladda mer automatiskt"
-enablePlayer: "Öppna videospelare"
-description: "Beskrivning"
-permission: "Behörigheter"
-enableAll: "Aktivera alla"
-disableAll: "Inaktivera alla"
-edit: "Ändra"
-enableEmail: "Aktivera epost-utskick"
-email: "E-post"
-emailAddress: "E-postadress"
-smtpHost: "Värd"
-smtpUser: "Användarnamn"
-smtpPass: "Lösenord"
-emptyToDisableSmtpAuth: "Lämna användarnamn och lösenord tomt för att avaktivera SMTP verifiering"
-makeActive: "Aktivera"
-copy: "Kopiera"
-overview: "Översikt"
-logs: "Logg"
-database: "Databas"
-channel: "kanal"
-create: "Skapa"
-other: "Mer"
-abuseReports: "Rapporter"
-reportAbuse: "Rapporter"
-reportAbuseOf: "Rapportera {name}"
-abuseReported: "Din rapport har skickats. Tack så mycket."
-send: "Skicka"
-openInNewTab: "Öppna i ny flik"
-createNew: "Skapa ny"
-private: "Privat"
-i18nInfo: "Misskey översätts till många olika språk av volontärer. Du kan hjälpa till med översättningen på {link}."
-accountInfo: "Kontoinformation"
-followersCount: "Antal följare"
-yes: "Ja"
-no: "Nej"
-clips: "Klipp"
-duplicate: "Duplicera"
-reloadToApplySetting: "Inställningen tillämpas efter sidan laddas om. Vill du göra det nu?"
-clearCache: "Rensa cache"
-onlineUsersCount: "{n} användare är online"
-nUsers: "{n} användare"
-nNotes: "{n} Noter"
-backgroundColor: "Bakgrundsbild"
-textColor: "Text"
-saveAs: "Spara som..."
-saveConfirm: "Spara ändringar?"
-youAreRunningUpToDateClient: "Klienten du använder är uppdaterat."
-newVersionOfClientAvailable: "Ny version av klienten är tillgänglig."
-editCode: "Redigera kod"
-publish: "Publicera"
-typingUsers: "{users} skriver"
-goBack: "Tillbaka"
-addDescription: "Lägg till beskrivning"
-info: "Om"
-online: "Online"
-active: "Aktiv"
-offline: "Offline"
-enabled: "Aktiverad"
-quickAction: "Snabbåtgärder"
-user: "Användare"
-gallery: "Galleri"
-popularPosts: "Populära inlägg"
-customCssWarn: "Den här inställningen borde bara ändrats av en som har rätta kunskaper. Om du ställer in det här fel så kan klienten sluta fungera rätt."
-global: "Global"
-squareAvatars: "Visa fyrkantiga profilbilder"
-sent: "Skicka"
-searchResult: "Sökresultat"
-learnMore: "Läs mer"
-misskeyUpdated: "Misskey har uppdaterats!"
-translate: "Översätt"
-controlPanel: "Kontrollpanel"
-manageAccounts: "Hantera konton"
-incorrectPassword: "Fel lösenord."
-hide: "Dölj"
-welcomeBackWithName: "Välkommen tillbaka, {name}"
-clickToFinishEmailVerification: "Tryck på [{ok}] för att slutföra bekräftelsen på e-postadressen."
-size: "Storlek"
-searchByGoogle: "Sök"
-indefinitely: "Aldrig"
-tenMinutes: "10 minuter"
-oneHour: "En timme"
-oneDay: "En dag"
-oneWeek: "En vecka"
-oneMonth: "En månad"
-threeMonths: "3 månader"
-oneYear: "1 år"
-threeDays: "3 dagar"
-file: "Filer"
-deleteAccount: "Radera konto"
-label: "Etikett"
-cannotUploadBecauseNoFreeSpace: "Kan inte ladda upp filen för att det finns inget lagringsutrymme kvar."
-cannotUploadBecauseExceedsFileSizeLimit: "Kan inte ladda upp filen för att den är större än filstorleksgränsen."
-beta: "Beta"
-enableAutoSensitive: "Automatisk NSFW markering"
-enableAutoSensitiveDescription: "Tillåter automatiskt detektering och marketing av NSFW media genom Maskininlärning när möjligt. Även om denna inställningen är avaktiverad, kan det vara aktiverat på hela instansen."
-move: "Flytta"
-pushNotification: "Pushnotiser"
-subscribePushNotification: "Aktivera pushnotiser"
-unsubscribePushNotification: "Avaktivera pushnotiser"
-pushNotificationAlreadySubscribed: "Pushnotiser är redan aktiverade"
-pushNotificationNotSupported: "Din webbläsare eller instans har inte stöd för pushnotiser"
-windowMaximize: "Maximera"
-windowMinimize: "Minimera"
-windowRestore: "Återställ"
-tools: "Verktyg"
-like: "Gilla"
-pleaseDonate: "Misskey är en gratis programvara som används på {host}. Donera gärna för att göra utvecklingen ständigt, tack!"
-roles: "Roll"
-role: "Roll"
-color: "Färg"
-resetPasswordConfirm: "Återställ verkligen ditt lösenord?"
-dataSaver: "Databesparing"
-icon: "Profilbild"
-forYou: "För dig"
-replies: "Svara"
-renotes: "Omnotera"
-loadReplies: "Visa svar"
-loadConversation: "Visa konversation"
-authentication: "Autentisering"
-sourceCode: "Källkod"
-doReaction: "Lägg till reaktion"
-code: "Kod"
-gameRetry: "Försök igen"
-inquiry: "Kontakt"
-tryAgain: "Försök igen senare"
-signinWithPasskey: "Logga in med nyckel"
-unknownWebAuthnKey: "Okänd nyckel"
-information: "Om"
-previewingThemeRestore: "Återställ"
-_imageEditing:
-  _vars:
-    filename: "Filnamn"
-_chat:
-  invitations: "Inbjudan"
-  members: "Medlemmar"
-  home: "Hem"
-  send: "Skicka"
-_delivery:
-  stop: "Suspenderad"
-  _type:
-    none: "Publiceras"
-_initialAccountSetting:
-  profileSetting: "Profilinställningar"
-_initialTutorial:
-  _reaction:
-    title: "Vad är reaktioner?"
+_lang_: 'Svenska'
+search: 'Sök'
+ok: 'OK'
+cancel: 'Avbryt'
+notificationSettings: 'Notifieringsinställningar'
+save: 'Spara'
+favorites: 'Favoriter'
+delete: 'Radera'
+lists: 'Listor'
+notes: 'Noter'
+following: 'Följer'
+somethingHappened: 'Ett fel har uppstått'
+customEmojis: 'Anpassa emoji'
+mutedUsers: 'Tystade användare'
+blockedUsers: 'Blockerade användare'
+reload: 'Ladda om'
+accept: 'Tillåt'
+reject: 'Neka'
+antennas: 'Antenner'
+close: 'Stäng'
+edit: 'Ändra'
+copy: 'Kopiera'
+clips: 'Klipp'
 _achievements:
   _types:
     _open3windows:
-      title: "Flera Fönster"
-      description: "Ha minst 3 fönster öppna samtidigt"
-_role:
-  edit: "Redigera roll"
-_ffVisibility:
-  public: "Publicera"
-  private: "Privat"
-_accountDelete:
-  accountDelete: "Radera konto"
-_ad:
-  back: "Tillbaka"
-_gallery:
-  like: "Gilla"
-_email:
-  _follow:
-    title: "följde dig"
-_aboutMisskey:
-  source: "Källkod"
-  projectMembers: "Projektmedlemmar"
-_channel:
-  setBanner: "Välj banner"
-  removeBanner: "Ta bort banner"
-  nameAndDescription: "Namn och beskrivning"
-_menuDisplay:
-  hide: "Dölj"
-_theme:
-  description: "Beskrivning"
-  color: "Färg"
-  keys:
-    mention: "Nämn"
-    renote: "Omnotera"
-_sfx:
-  note: "Noter"
-  notification: "Notifikationer"
-_ago:
-  justNow: "Just nu"
-_2fa:
-  step3Title: "Ange en autentiseringskod"
-  renewTOTPCancel: "Nej tack"
-_permissions:
-  "read:reactions": "Visa dina reaktioner"
-  "write:reactions": "Redigera dina reaktioner"
-  "write:admin:delete-account": "Radera användarkonto"
-  "write:admin:roles": "Hantera roller"
-  "read:admin:roles": "Visa roller"
-_antennaSources:
-  all: "Alla noter"
-  homeTimeline: "Noter från följda användare"
-  users: "Noter från specifika användare"
-  userList: "Noter från en specificerad lista av användare"
-_widgets:
-  profile: "Profil"
-  instanceInfo: "Instansinformation"
-  notifications: "Notifikationer"
-  timeline: "Tidslinje"
-  activity: "Aktivitet"
-  federation: "Federation"
-  jobQueue: "Jobbkö"
-  _userList:
-    chooseList: "Välj lista"
-_widgetOptions:
-  _clock:
-    size: "Storlek"
-_cw:
-  hide: "Dölj"
-  show: "Ladda mer"
-  chars: "{count} tecken"
-  files: "{count} fil(er)"
-_poll:
-  infinite: "Aldrig"
-_visibility:
-  home: "Hem"
-  followers: "Följare"
-  specified: "Direktnoter"
-_postForm:
-  _howToUse:
-    menu_title: "Meny"
-_profile:
-  name: "Namn"
-  username: "Användarnamn"
-  metadataLabel: "Etikett"
-  changeAvatar: "Ändra profilbild"
-  changeBanner: "Ändra banner"
-_exportOrImport:
-  allNotes: "Alla noter"
-  followingList: "Följer"
-  muteList: "Tysta"
-  blockingList: "Blockera"
-  userLists: "Listor"
-_charts:
-  federation: "Federation"
-  activeUsers: "Aktiva användare"
-_timelines:
-  home: "Hem"
-  global: "Global"
-_play:
-  summary: "Beskrivning"
-_pages:
-  blocks:
-    image: "Bilder"
+      title: 'Flera Fönster'
 _notification:
-  youWereFollowed: "följde dig"
-  unreadAntennaNote: "Antenn {name}"
-  _types:
-    follow: "Följer"
-    mention: "Nämn"
-    renote: "Omnotera"
-    quote: "Citat"
-    reaction: "Reaktioner"
-    login: "Logga in"
+  youWereFollowed: 'följde dig'
+  unreadAntennaNote: 'Antenn {name}'
   _actions:
-    reply: "Svara"
-    renote: "Omnotera"
+    reply: 'Svara'
+    renote: 'Omnotera'
+  _types:
+    all: 'すべて'
+    note: 'ユーザーの新規投稿'
+    follow: 'Följer'
+    mention: 'Nämn'
+    reply: 'リプライ'
+    renote: 'Omnotera'
+    quote: 'Citat'
+    reaction: 'Reaktioner'
+    pollEnded: 'アンケートが終了'
+    scheduledNotePosted: '予約投稿が成功した'
+    scheduledNotePostFailed: '予約投稿が失敗した'
+    receiveFollowRequest: 'フォロー申請を受け取った'
+    followRequestAccepted: 'フォローが受理された'
+    roleAssigned: 'ロールが付与された'
+    chatRoomInvitationReceived: 'ダイレクトメッセージのグループへ招待された'
+    achievementEarned: '実績の獲得'
+    exportCompleted: 'エクスポートが完了した'
+    login: 'Logga in'
+    createToken: 'アクセストークンの作成'
+    test: '通知のテスト'
+    app: '連携アプリからの通知'
+next: 'Nästa'
+upload: 'Ladda upp'
+preview: 'Förhandsvisning'
+name: 'Namn'
+description: 'Beskrivning'
+none: 'Ingen'
+all: 'Allt'
+default: 'Standard'
+error: 'Fel!'
+users: 'Användare'
+permission: '権限'
+adminPermission: '管理者権限'
+enableAll: '全て有効にする'
+disableAll: '全て無効にする'
+generateAccessToken: 'アクセストークンの発行'
+enableAllAdmin: '管理者権限をすべて有効化'
+disableAllAdmin: '管理者権限をすべて無効化'
+add: '追加'
+remove: '削除'
+'yes': 'はい'
+'no': 'いいえ'
+gotIt: 'わかった'
+continue: '続ける'
+create: '作成'
+createNew: '新規作成'
+settings: '設定'
+share: '共有'
+more: 'もっと！'
+showMore: 'もっと見る'
+showLess: 'Stäng'
+done: '完了'
+download: 'ダウンロード'
+update: '更新'
+retry: '再試行'
+goBack: '戻る'
+learnMore: '詳しく'
+info: '情報'
+filter: 'フィルタ'
+install: 'インストール'
+invite: '招待'
+rename: '名前を変更'
+copyUrl: 'URLをコピー'
+embed: '埋め込み'
+processing: '処理中'
+fromDrive: 'ドライブから'
+fromX: '{x}から'
+visibility: '公開範囲'
+public: 'パブリック'
+private: '非公開'
+sensitive: 'センシティブ'
+markAsSensitive: 'センシティブとして設定'
+unmarkAsSensitive: 'センシティブを解除する'
+deletedNote: '削除されたノート'
+poll: 'アンケート'
+drive: 'ドライブ'
+timeline: 'タイムライン'
+clip: 'クリップ'
+memo: 'メモ'
+overview: '概要'
+oneDay: '1日'
+oneHour: '1時間'
+oneMonth: '1ヶ月'
+oneWeek: '1週間'
+indefinitely: '無期限'
+period: '期限'
+createdAt: '作成日時'
+updatedAt: '更新日時'
+showRepliesToOthersInTimeline: 'TLに他の人への返信を含める'
+visibilityDisableFederation: '連合なし'
+removeAreYouSure: '「{x}」を削除しますか？'
+deleteAreYouSure: '「{x}」を削除しますか？'
+resetAreYouSure: 'リセットしますか？'
+driveFileDeleteConfirm: 'ファイル「{name}」を削除しますか？このファイルを使用した一部のコンテンツも削除されます。'
+follow: 'フォロー'
+followers: 'フォロワー'
+favorite: 'お気に入り'
+unfavorite: 'お気に入り解除'
+mute: 'ミュート'
+administrator: '管理者'
+moderator: 'モデレーター'
+announcements: 'お知らせ'
+channel: 'チャンネル'
+notifications: '通知'
+user: 'ユーザー'
+noteOf: '{user}のノート'
+userSaysSomething: '{name}が何かを言いました'
+charts: 'チャート'
+noName: '名前はありません'
+withNFiles: '{n}つのファイル'
+imageUrl: '画像URL'
+termsOfService: '利用規約'
+privacyPolicy: 'プライバシーポリシー'
+high: '高'
+medium: '中'
+low: '低'
+quote: '引用'
+localOnly: 'ローカルのみ'
+show: '表示'
+reply: '返信'
+renote: 'リノート'
+_timelines:
+  home: 'ホーム'
+  local: 'ローカル'
+  social: 'ソーシャル'
+  global: 'グローバル'
+_visibility:
+  public: 'パブリック'
+  publicDescription: '全てのユーザーに公開'
+  home: 'ホーム'
+  homeDescription: 'ホームタイムラインのみに公開'
+  followers: 'フォロワー'
+  followersDescription: '自分のフォロワーのみに公開'
+  specified: '指名'
+  specifiedDescription: '指定したユーザーのみに公開'
+  disableFederation: '連合なし'
+  disableFederationDescription: '他サーバーへの配信を行いません'
 _deck:
-  addColumn: "Lägg till kolumn"
-  deleteProfile: "Radera profil"
   _columns:
-    notifications: "Notifikationer"
-    tl: "Tidslinje"
-    antenna: "Antenner"
-    list: "Listor"
-    channel: "kanal"
-    mentions: "Omnämningar"
-    direct: "Direktnoter"
-_webhookSettings:
-  name: "Namn"
-  active: "Aktiverad"
-_abuseReport:
-  _notificationRecipient:
-    _recipientType:
-      mail: "E-post"
-_moderationLogTypes:
-  suspend: "Suspendera"
-  resetPassword: "Återställ Lösenord"
-_reversi:
-  blackOrWhite: "Svart/Vit"
-  rules: "Regler"
-  black: "Svart"
-  white: "Vit"
-_selfXssPrevention:
-  warning: "VARNING"
-_search:
-  searchScopeAll: "Allt"
-_watermarkEditor:
-  scale: "Storlek"
-  image: "Bilder"
-_imageEffector:
-  _fxProps:
-    scale: "Storlek"
-    size: "Storlek"
-    color: "Färg"
+    main: 'メイン'
+    widgets: 'ウィジェット'
+    notifications: '通知'
+    tl: 'タイムライン'
+    antenna: 'アンテナ'
+    list: 'リスト'
+    channel: 'チャンネル'
+    mentions: 'メンション'
+    direct: '指名'
+    roleTimeline: 'ロールタイムライン'
+    chat: 'ダイレクトメッセージ'
+    clip: 'クリップ'
+_permissions:
+  "access:mcp": 'MCPに接続する（通常のAPI権限・公開範囲に従い、本人の非公開ノートも読み取れる場合があります）'
+  "read:account": 'アカウントの情報を見る'
+  "write:account": 'アカウントの情報を変更する'
+  "read:blocks": 'ブロックを見る'
+  "write:blocks": 'ブロックを操作する'
+  "read:drive": 'ドライブを見る'
+  "write:drive": 'ドライブを操作する'
+  "read:favorites": 'お気に入りを見る'
+  "write:favorites": 'お気に入りを操作する'
+  "read:following": 'フォローの情報を見る'
+  "write:following": 'フォロー・フォロー解除する'
+  "read:messaging": 'ダイレクトメッセージを見る'
+  "write:messaging": 'ダイレクトメッセージを操作する'
+  "read:mutes": 'ミュートを見る'
+  "write:mutes": 'ミュートを操作する'
+  "write:notes": 'ノートを作成・削除する'
+  "read:notifications": '通知を見る'
+  "write:notifications": '通知を操作する'
+  "read:reactions": 'Visa dina reaktioner'
+  "write:reactions": 'Redigera dina reaktioner'
+  "write:votes": '投票する'
+  "read:pages": 'ページを見る'
+  "write:pages": 'ページを操作する'
+  "read:page-likes": 'ページのいいねを見る'
+  "write:page-likes": 'ページのいいねを操作する'
+  "read:user-groups": 'ユーザーグループを見る'
+  "write:user-groups": 'ユーザーグループを操作する'
+  "read:channels": 'チャンネルを見る'
+  "write:channels": 'チャンネルを操作する'
+  "read:gallery": 'ギャラリーを見る'
+  "write:gallery": 'ギャラリーを操作する'
+  "read:gallery-likes": 'ギャラリーのいいねを見る'
+  "write:gallery-likes": 'ギャラリーのいいねを操作する'
+  "read:flash": 'Playを見る'
+  "write:flash": 'Playを操作する'
+  "read:flash-likes": 'Playのいいねを見る'
+  "write:flash-likes": 'Playのいいねを操作する'
+  "read:admin:abuse-user-reports": 'ユーザーからの通報を見る'
+  "write:admin:delete-account": 'Radera användarkonto'
+  "write:admin:delete-all-files-of-a-user": 'ユーザーのすべてのファイルを削除する'
+  "read:admin:index-stats": 'データベースインデックスに関する情報を見る'
+  "read:admin:table-stats": 'データベーステーブルに関する情報を見る'
+  "read:admin:user-ips": 'ユーザーのIPアドレスを見る'
+  "read:admin:meta": 'インスタンスのメタデータを見る'
+  "write:admin:reset-password": 'ユーザーのパスワードをリセットする'
+  "write:admin:resolve-abuse-user-report": 'ユーザーからの通報を解決する'
+  "write:admin:send-email": 'メールを送る'
+  "read:admin:server-info": 'サーバーの情報を見る'
+  "read:admin:show-moderation-log": 'モデレーションログを見る'
+  "read:admin:show-user": 'ユーザーのプライベートな情報を見る'
+  "write:admin:suspend-user": 'ユーザーを凍結する'
+  "write:admin:unset-mfa": 'ユーザーの二要素認証を解除する'
+  "write:admin:unset-user-avatar": 'ユーザーのアバターを削除する'
+  "write:admin:unset-user-banner": 'ユーザーのバーナーを削除する'
+  "write:admin:unsuspend-user": 'ユーザーの凍結を解除する'
+  "write:admin:meta": 'インスタンスのメタデータを操作する'
+  "write:admin:user-note": 'モデレーションノートを操作する'
+  "write:admin:roles": 'Hantera roller'
+  "read:admin:roles": 'Visa roller'
+  "write:admin:relays": 'リレーを操作する'
+  "read:admin:relays": 'リレーを見る'
+  "write:admin:invite-codes": '招待コードを操作する'
+  "read:admin:invite-codes": '招待コードを見る'
+  "write:admin:announcements": 'お知らせを操作する'
+  "read:admin:announcements": 'お知らせを見る'
+  "write:admin:avatar-decorations": 'アバターデコレーションを操作する'
+  "read:admin:avatar-decorations": 'アバターデコレーションを見る'
+  "write:admin:federation": '連合に関する情報を操作する'
+  "write:admin:account": 'ユーザーアカウントを操作する'
+  "read:admin:account": 'ユーザーに関する情報を見る'
+  "write:admin:emoji": '絵文字を操作する'
+  "read:admin:emoji": '絵文字を見る'
+  "write:admin:queue": 'ジョブキューを操作する'
+  "read:admin:queue": 'ジョブキューに関する情報を見る'
+  "write:admin:promo": 'プロモーションノートを操作する'
+  "write:admin:drive": 'ユーザーのドライブを操作する'
+  "read:admin:drive": 'ユーザーのドライブの関する情報を見る'
+  "read:admin:stream": '管理者用のWebsocket APIを使う'
+  "write:admin:ad": '広告を操作する'
+  "read:admin:ad": '広告を見る'
+  "write:invite-codes": '招待コードを作成する'
+  "read:invite-codes": '招待コードを取得する'
+  "write:clip-favorite": 'クリップのいいねを操作する'
+  "read:clip-favorite": 'クリップのいいねを見る'
+  "read:federation": '連合に関する情報を取得する'
+  "write:report-abuse": '違反を報告する'
+  "write:chat": 'ダイレクトメッセージを操作する'
+  "read:chat": 'ダイレクトメッセージを閲覧する'
+_cw:
+  hide: '隠す'
+  show: 'もっと見る'
+hide: '隠す'
