@@ -5,8 +5,8 @@
 
 import { vi } from 'vitest';
 import createFetchMock from 'vitest-fetch-mock';
-import type { Ref } from 'vue';
 import { ref } from 'vue';
+import type { Ref } from 'vue';
 
 const fetchMocker = createFetchMock(vi);
 fetchMocker.enableMocks();
@@ -48,7 +48,10 @@ vi.stubGlobal('localStorage', localStorageMock);
 // 中でlocalStorageを使うので上と順番を変えてはいけない
 const { default: locales } = await import('i18n');
 
-fetchMocker.mockIf(/^\/assets\/locales\/.*\.json$/, async () => {
+fetchMocker.mockIf(request => {
+	const requestUrl = new URL(request.url);
+	return requestUrl.origin === window.location.origin && /^\/assets\/locales\/.*\.json$/.test(requestUrl.pathname);
+}, async () => {
 	return {
 		status: 200,
 		body: JSON.stringify(locales['en-US']),
@@ -72,7 +75,7 @@ export const preferState: Record<string, unknown> = {
 	mutingEmojis: [],
 };
 
-export let preferReactive: Record<string, Ref<unknown>> = {};
+export const preferReactive: Record<string, Ref<unknown>> = {};
 
 for (const key in preferState) {
 	if (preferState[key] !== undefined) {
@@ -82,7 +85,6 @@ for (const key in preferState) {
 
 // XXX: store somehow becomes undefined in vitest?
 vi.mock('@features/preferences/frontend/preferences.js', () => {
-
 	return {
 		prefer: {
 			s: preferState,
