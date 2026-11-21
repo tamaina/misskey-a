@@ -81,7 +81,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<div v-if="maxTextLength - textLength < 100" :class="['_acrylic', $style.textCount, { [$style.textOver]: textLength > maxTextLength }]">{{ maxTextLength - textLength }}</div>
 	</div>
 	<input v-show="withHashtags" ref="hashtagsInputEl" v-model="hashtags" :class="$style.hashtags" :placeholder="$locale.sfc.hashtags" list="hashtags">
-	<XPostFormAttaches v-model="files" @detach="detachFile" @changeSensitive="updateFileSensitive" @changeName="updateFileName"/>
+	<XPostFormAttaches v-model="files" v-model:savingAltText="savingAltText" @detach="detachFile" @changeSensitive="updateFileSensitive" @changeName="updateFileName"/>
 	<div v-if="uploader.items.value.length > 0" style="padding: 12px;">
 		<MkTip k="postFormUploader">
 			{{ $locale.sfc.postFormUploaderTip }}
@@ -203,6 +203,7 @@ const { preparing: preparingPost, run: preparePost } = createPostPreparationGuar
 const posted = ref(false);
 const text = ref(props.initialText ?? '');
 const files = ref(props.initialFiles ?? []);
+const savingAltText = ref(false);
 const poll = ref<PollEditorModelValue | null>(null);
 const useCw = ref<boolean>(!!props.initialCw);
 const showPreview = ref(store.s.showPreview);
@@ -317,7 +318,7 @@ const cwTextLength = computed((): number => {
 const maxCwTextLength = 100;
 
 const canPost = computed((): boolean => {
-	return !props.mock && !preparingPost.value && !posting.value && !posted.value && !uploader.uploading.value && (uploader.items.value.length === 0 || uploader.readyForUpload.value) &&
+	return !props.mock && !preparingPost.value && !posting.value && !posted.value && !savingAltText.value && !uploader.uploading.value && (uploader.items.value.length === 0 || uploader.readyForUpload.value) &&
 		(
 			1 <= textLength.value ||
 			1 <= files.value.length ||
@@ -961,6 +962,8 @@ async function uploadFiles() {
 }
 
 async function confirmMissingImageAltText(): Promise<boolean> {
+	// A caption save may have started while note preparation was awaiting an upload.
+	if (savingAltText.value) return false;
 	return await confirmImageAltText(prefer.s.warnMissingImageAltText, files.value, async () => {
 		const { canceled, result } = await os.actions({
 			type: 'warning',
