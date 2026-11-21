@@ -1474,7 +1474,9 @@ definePage(() => ({
 	"deck": "Escriptori",
 	"customCss": "CSS personalitzat",
 	"selectList": "Tria una llista",
-	"notifications": "Notificacions"
+	"notifications": "Notificacions",
+	"autoplayEmbededPlayerOfUrlPreview": "Reprodueix automàticament el reproductor incrustat per a les previsualitzacions d'URL",
+	"expandUrlPreviewAutomatically": "Expandir automàticament les previsualitzacions d'URL"
 }
 </locale>
 
@@ -2738,7 +2740,9 @@ definePage(() => ({
 	"deck": "Deck",
 	"customCss": "CSS personalizzato",
 	"selectList": "Seleziona una lista",
-	"notifications": "Notifiche"
+	"notifications": "Notifiche",
+	"autoplayEmbededPlayerOfUrlPreview": "Riproduci automaticamente le anteprime URL multimediali",
+	"expandUrlPreviewAutomatically": "Espansione automatica delle anteprime URL"
 }
 </locale>
 
@@ -3530,7 +3534,9 @@ definePage(() => ({
 	"deck": "덱",
 	"customCss": "CSS 사용자화",
 	"selectList": "리스트 선택",
-	"notifications": "알림"
+	"notifications": "알림",
+	"autoplayEmbededPlayerOfUrlPreview": "URL 미리보기의 임베드 플레이어 자동 재생",
+	"expandUrlPreviewAutomatically": "URL 미리보기 자동확장"
 }
 </locale>
 

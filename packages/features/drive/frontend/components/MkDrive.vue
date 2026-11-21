@@ -998,7 +998,8 @@ onBeforeUnmount(() => {
 	"dropHereToUpload": "Arrossega els arxius fins aquí per pujar-los al servidor",
 	"emptyDrive": "El teu Disc és buit",
 	"emptyFolder": "La carpeta està buida",
-	"move": "Mou"
+	"move": "Mou",
+	"uploadFolderDeletionConfirm": "Aquesta carpeta ha estat designada com a destinació predeterminada per a les pujades. Si l'elimineu, ja no serà la destinació predeterminada i els fitxers pujaran al directori arrel."
 }
 </locale>
 
@@ -1262,7 +1263,8 @@ onBeforeUnmount(() => {
 	"dropHereToUpload": "Trascina qui il tuo file per caricarlo",
 	"emptyDrive": "Il Drive è vuoto",
 	"emptyFolder": "La cartella è vuota",
-	"move": "Sposta"
+	"move": "Sposta",
+	"uploadFolderDeletionConfirm": "Questa cartella è scelta come destinazione predefinita per i caricamenti. Eliminandola, la destinazione predefinita scompare e i file vengono caricati alla radice."
 }
 </locale>
 
@@ -1428,7 +1430,8 @@ onBeforeUnmount(() => {
 	"dropHereToUpload": "업로드할 파일을 여기로 드롭하십시오",
 	"emptyDrive": "드라이브가 비어 있습니다",
 	"emptyFolder": "폴더가 비어 있습니다",
-	"move": "이동"
+	"move": "이동",
+	"uploadFolderDeletionConfirm": "이 폴더는 기본 업로드 위치로 지정되어 있습니다. 삭제하면 기본 업로드 위치 지정이 해제되고, 이후 파일은 루트 폴더에 업로드됩니다."
 }
 </locale>
 
