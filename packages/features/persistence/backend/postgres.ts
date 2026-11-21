@@ -7,7 +7,6 @@
 import pg from 'pg';
 import { DataSource, Logger, type QueryRunner } from 'typeorm';
 import { entities as charts } from '@features/statistics/backend/charts/registry.js';
-import { Config } from '@/config.js';
 import { Logger as MisskeyLogger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 
@@ -86,9 +85,11 @@ import { MiChatRoom } from '@features/chat/backend/models/ChatRoom.js';
 import { MiChatRoomMembership } from '@features/chat/backend/models/ChatRoomMembership.js';
 import { MiChatRoomInvitation } from '@features/chat/backend/models/ChatRoomInvitation.js';
 import { MiBubbleGameRecord } from '@features/games/bubble-game/backend/models/BubbleGameRecord.js';
+import { MiMahjongRoom } from '@features/games/mahjong/backend/models/MahjongRoom.js';
 import { MiReversiGame } from '@features/games/reversi/backend/models/ReversiGame.js';
 import { MiChatApproval } from '@features/chat/backend/models/ChatApproval.js';
 import { MiSystemAccount } from '@features/users/backend/models/SystemAccount.js';
+import { Config } from '@/config.js';
 
 pg.types.setTypeParser(20, Number);
 
@@ -258,6 +259,7 @@ export const entities = [
 	MiChatApproval,
 	MiBubbleGameRecord,
 	MiReversiGame,
+	MiMahjongRoom,
 	...charts,
 ];
 

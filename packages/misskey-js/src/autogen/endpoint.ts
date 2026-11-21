@@ -103,6 +103,18 @@ import type {
 	FlashSearchResponse,
 	UsersFlashsRequest,
 	UsersFlashsResponse,
+	MahjongCreateRequest,
+	MahjongCreateResponse,
+	MahjongRoomsRequest,
+	MahjongRoomsResponse,
+	MahjongShowRequest,
+	MahjongShowResponse,
+	MahjongReadyRequest,
+	MahjongReadyResponse,
+	MahjongCancelRequest,
+	MahjongCancelResponse,
+	MahjongSubmitRequest,
+	MahjongSubmitResponse,
 	BubbleGameRankingRequest,
 	BubbleGameRankingResponse,
 	BubbleGameRegisterRequest,
@@ -862,6 +874,12 @@ export type Endpoints = {
 	'flash/update': { req: FlashUpdateRequest; res: EmptyResponse };
 	'flash/search': { req: FlashSearchRequest; res: FlashSearchResponse };
 	'users/flashs': { req: UsersFlashsRequest; res: UsersFlashsResponse };
+	'mahjong/create': { req: MahjongCreateRequest; res: MahjongCreateResponse };
+	'mahjong/rooms': { req: MahjongRoomsRequest; res: MahjongRoomsResponse };
+	'mahjong/show': { req: MahjongShowRequest; res: MahjongShowResponse };
+	'mahjong/ready': { req: MahjongReadyRequest; res: MahjongReadyResponse };
+	'mahjong/cancel': { req: MahjongCancelRequest; res: MahjongCancelResponse };
+	'mahjong/submit': { req: MahjongSubmitRequest; res: MahjongSubmitResponse };
 	'bubble-game/ranking': { req: BubbleGameRankingRequest; res: BubbleGameRankingResponse };
 	'bubble-game/register': { req: BubbleGameRegisterRequest; res: EmptyResponse };
 	'reversi/cancel-match': { req: ReversiCancelMatchRequest; res: EmptyResponse };
