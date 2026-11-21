@@ -24,6 +24,12 @@ describe('UserSearchService', () => {
 	let userProfilesRepository: UserProfilesRepository;
 
 	const accounts = new Map<string, MiUser>();
+	const packUsers = (ids: string[]) => ids.map(id => {
+		const user = accounts.get(id);
+		if (!user) throw new Error(`Missing fixture account: ${id}`);
+		return user;
+	});
+	const packMany = vi.fn(packUsers);
 
 	let root: MiUser;
 	let alice: MiUser;
@@ -101,7 +107,7 @@ describe('UserSearchService', () => {
 					},
 					{
 						provide: UserEntityService, useFactory: vi.fn(() => ({
-							packMany: (ids: string[]) => ids.map(id => accounts.get(id)!),
+							packMany,
 							pack: (user: MiUser) => user,
 						})),
 					},
@@ -170,6 +176,18 @@ describe('UserSearchService', () => {
 			await usersRepository.update(bob.id, { [flag]: true });
 			const matches = await service.searchByUsernameAndHost({ username: 'bob', host: '.' }, { preferLocalExactMatch: true }, root);
 			expect(matches).toEqual([]);
+		});
+
+		test('keeps higher-ranked suggestions within the limit when packing changes their order', async () => {
+			const bobcat = await createUser({ username: 'Bobcat', usernameLower: 'bobcat' });
+			await setActive([bobbi, bobcat]);
+			await createFollowings(root, [bobcat]);
+			// The production packer can return the fetched rows in a different order.
+			packMany.mockImplementationOnce(ids => packUsers(ids.toReversed()));
+
+			const users = await service.searchByUsernameAndHost({ username: 'bob', host: '.' }, { limit: 2, preferLocalExactMatch: true }, root);
+			expect(users.map(user => user.id)).toEqual([bob.id, bobcat.id]);
+			expect(packMany).toHaveBeenLastCalledWith([bob.id, bobcat.id], root, { schema: 'UserLite' });
 		});
 
 		test('フォロー中のアクティブユーザのうち、"al"から始まる人が全員ヒットする', async () => {

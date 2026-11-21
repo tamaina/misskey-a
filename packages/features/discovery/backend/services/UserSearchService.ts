@@ -93,17 +93,19 @@ export class UserSearchService {
 		}
 
 		const schema = opts?.detail ? 'UserDetailed' : 'UserLite';
-		const suggestions = await this.userEntityService.packMany([...resultSet].slice(0, limit), me, { schema });
-		if (!localExact) return suggestions;
-
-		const exact = await this.generateUserQueryBuilder({ host: '.' })
+		const rankedIds = [...resultSet].slice(0, limit);
+		const exact = localExact ? await this.generateUserQueryBuilder({ host: '.' })
+			.select('user.id')
 			.andWhere('user.usernameLower = :username', { username: localExact })
 			.andWhere('user.isDeleted = FALSE')
-			.getOne();
-		if (!exact) return suggestions;
+			.getRawOne<{ user_id: MiUser['id'] }>() : undefined;
+		if (!exact) return this.userEntityService.packMany(rankedIds, me, { schema });
 
-		const match = suggestions.find(user => user.id === exact.id) ?? await this.userEntityService.pack(exact, me, { schema });
-		return [match, ...suggestions.filter(user => user.id !== exact.id)].slice(0, limit);
+		// Apply the limit to ranked IDs first. packMany fetches rows without preserving input order.
+		const ids = [exact.user_id, ...rankedIds.filter(id => id !== exact.user_id)].slice(0, limit);
+		const users = await this.userEntityService.packMany(ids, me, { schema });
+		const usersById = new Map(users.map(user => [user.id, user]));
+		return ids.flatMap(id => usersById.get(id) ?? []);
 	}
 
 	/**
