@@ -1,0 +1,218 @@
+[
+  {
+    "file": "packages/features/collections/frontend/ui/deck/clip-column.vue",
+    "currentSha256": "c8c4c841d6993e0b8e0aa933575c8334055c62cb70d8831ed89398c7efd7663e",
+    "baselineSha256": "75fa37f977b344b84af0735954b19e620bb843955073321626c5b2ea9951e16b",
+    "edits": [
+      {
+        "start": 6302,
+        "end": 6334,
+        "current": "\t\"selectClip\": \"Clip auswählen\"\n",
+        "baseline": "\t\"selectClip\": \"クリップを選択\"\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/drive/frontend/components/MkDrive.folder.vue",
+    "currentSha256": "1df4a30017e45b633f1e521e2f9dd8c9b405b0ebfd9e75e6defd32dd68d70b11",
+    "baselineSha256": "99343776d176c987a4ee9b8b70672126be499f704f61846e0b896a7a4345f5ca",
+    "edits": [
+      {
+        "start": 11061,
+        "end": 11345,
+        "current": "\t\"uploadFolder\": \"Carpeta per defecte on desar els arxius pujats\",\n\t\"uploadFolderDeletionConfirm\": \"Aquesta carpeta ha estat designada com a destinació predeterminada per a les pujades. Si l'elimineu, ja no serà la destinació predeterminada i els fitxers pujaran al directori arrel.\"\n",
+        "baseline": "\t\"uploadFolder\": \"Carpeta per defecte on desar els arxius pujats\"\n"
+      },
+      {
+        "start": 15981,
+        "end": 16236,
+        "current": "\t\"uploadFolder\": \"Destinazione caricamento predefinita\",\n\t\"uploadFolderDeletionConfirm\": \"Questa cartella è scelta come destinazione predefinita per i caricamenti. Eliminandola, la destinazione predefinita scompare e i file vengono caricati alla radice.\"\n",
+        "baseline": "\t\"uploadFolder\": \"Destinazione caricamento predefinita\"\n"
+      },
+      {
+        "start": 18671,
+        "end": 18810,
+        "current": "\t\"uploadFolder\": \"기본 업로드 위치\",\n\t\"uploadFolderDeletionConfirm\": \"이 폴더는 기본 업로드 위치로 지정되어 있습니다. 삭제하면 기본 업로드 위치 지정이 해제되고, 이후 파일은 루트 폴더에 업로드됩니다.\"\n",
+        "baseline": "\t\"uploadFolder\": \"기본 업로드 위치\"\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/drive/frontend/components/MkDrive.vue",
+    "currentSha256": "7f87fa79b0d519375b3a1c96a65d7d8f6ce7464c6e5c6e21cef940ef7d2c427b",
+    "baselineSha256": "065b3c28b90738f7932921253d25b1625536c09dba78f8af9709f8db4e1f9724",
+    "edits": [
+      {
+        "start": 29802,
+        "end": 30035,
+        "current": "\t\"move\": \"Mou\",\n\t\"uploadFolderDeletionConfirm\": \"Aquesta carpeta ha estat designada com a destinació predeterminada per a les pujades. Si l'elimineu, ja no serà la destinació predeterminada i els fitxers pujaran al directori arrel.\"\n",
+        "baseline": "\t\"move\": \"Mou\"\n"
+      },
+      {
+        "start": 43674,
+        "end": 43891,
+        "current": "\t\"move\": \"Sposta\",\n\t\"uploadFolderDeletionConfirm\": \"Questa cartella è scelta come destinazione predefinita per i caricamenti. Eliminandola, la destinazione predefinita scompare e i file vengono caricati alla radice.\"\n",
+        "baseline": "\t\"move\": \"Sposta\"\n"
+      },
+      {
+        "start": 50802,
+        "end": 50926,
+        "current": "\t\"move\": \"이동\",\n\t\"uploadFolderDeletionConfirm\": \"이 폴더는 기본 업로드 위치로 지정되어 있습니다. 삭제하면 기본 업로드 위치 지정이 해제되고, 이후 파일은 루트 폴더에 업로드됩니다.\"\n",
+        "baseline": "\t\"move\": \"이동\"\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/drive/frontend/ts-messages.vue",
+    "currentSha256": "e4f831eaa0c7a5ba40fdbbc1f70a874acecbd40939ecf6d7ff4f11570a04f1ae",
+    "baselineSha256": "8e002efab7ef21785d0fba9af465d30669dce603d90b06c8e34c34503c7063d9",
+    "edits": [
+      {
+        "start": 3160,
+        "end": 3409,
+        "current": "\t\"sensitiveMediaRevealConfirm\": \"Aquest contingut potser sensible. Segur que ho vols revelar?\",\n\t\"cannotUploadBecauseNoSuchFolder\": \"No es pot trobar la carpeta de pujada. Si us plau, comproveu la configuració de la ubicació de pujada per defecte.\"\n",
+        "baseline": "\t\"sensitiveMediaRevealConfirm\": \"Aquest contingut potser sensible. Segur que ho vols revelar?\"\n"
+      },
+      {
+        "start": 16821,
+        "end": 17029,
+        "current": "\t\"sensitiveMediaRevealConfirm\": \"Questo allegato è esplicito, vuoi vederlo?\",\n\t\"cannotUploadBecauseNoSuchFolder\": \"Impossibile trovare la cartella predefinita per i caricamenti. Controllare le impostazioni.\"\n",
+        "baseline": "\t\"sensitiveMediaRevealConfirm\": \"Questo allegato è esplicito, vuoi vederlo?\"\n"
+      },
+      {
+        "start": 23926,
+        "end": 24061,
+        "current": "\t\"sensitiveMediaRevealConfirm\": \"민감한 미디어입니다. 표시할까요?\",\n\t\"cannotUploadBecauseNoSuchFolder\": \"업로드할 폴더를 찾을 수 없습니다. 기본 업로드 위치 설정을 확인해 주세요.\"\n",
+        "baseline": "\t\"sensitiveMediaRevealConfirm\": \"민감한 미디어입니다. 표시할까요?\"\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/instance/frontend/pages/admin/email-settings.vue",
+    "currentSha256": "559953e4975af9a2be417cf5aa6c21e9194beb1f8392afdf07fdf9cd1c73abbc",
+    "baselineSha256": "aec79ea64a2705fed03d5c29e07f28b4664a50541fce89896b4fbc22aca2e4ff",
+    "edits": [
+      {
+        "start": 24911,
+        "end": 24963,
+        "current": "\t\"emptyToDisableSmtpAuth\": \"将用户名和密码留空可以禁用 SMTP 验证\",\n",
+        "baseline": "\t\"emptyToDisableSmtpAuth\": \"用户名和密码留空可以禁用 SMTP 验证\",\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/instance/frontend/pages/admin/settings.vue",
+    "currentSha256": "aeae30385fdd1474da19474883fa111eb89696fe803e1d78a468e7c2dabfd6c9",
+    "baselineSha256": "b9d891d4feb433306a4bf91e1f2d0172d37f33e09877dfc28dc3ad34ea4288ea",
+    "edits": [
+      {
+        "start": 198671,
+        "end": 198847,
+        "current": "\t\"cacheRemoteFilesDescription\": \"启用此设定时，将在此服务器上缓存远程文件。虽然可以加快图片显示的速度，但是相对的会消耗大量的服务器存储空间。用户角色内的网盘容量决定了这个远程用户能在服务器上保留多少缓存。当超出了这个限制时，旧的文件将从缓存中被删除，成为链接。当禁用此设定时，则是从一开始就将远程文件保留为链接。\",\n",
+        "baseline": "\t\"cacheRemoteFilesDescription\": \"启用此设定时，将在此服务器上缓存远程文件。虽然可以加快图片显示的速度，但是相对的会消耗大量的服务器存储空间。用户角色内的网盘容量决定了这个远程用户能在服务器上保留多少缓存。当超出了这个限制时，旧的文件将从缓存中被删除，成为链接。当禁用此设定时，则是从一开始就将远程文件保留为链接。此时推荐将  的 proxyRemoteFiles 设置为 true 以优化缩略图生成及保护用户隐私。\",\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/moderation/frontend/pages/admin-user.vue",
+    "currentSha256": "521e911c6da233c914b956d6d04d93013017da172dc8d4b4976585c4660406f0",
+    "baselineSha256": "f2b0301b1dc11ec05a388bdf0a063f47bf200aa9ebbb2f646be75cbd1f64326a",
+    "edits": [
+      {
+        "start": 30386,
+        "end": 30443,
+        "current": "\t\"unsetMfa\": \"Zwei-Faktor-Authentisierung deaktivieren\",\n",
+        "baseline": "\t\"unsetMfa\": \"Reset two-factor authentication\",\n"
+      },
+      {
+        "start": 30984,
+        "end": 31074,
+        "current": "\t\"unsetMfaConfirm\": \"Möchtest du die Zwei-Faktor-Authentisierung wirklich deaktivieren?\",\n",
+        "baseline": "\t\"unsetMfaConfirm\": \"Are you sure you want to reset two-factor authentication?\",\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/notes/frontend/ts-messages.vue",
+    "currentSha256": "6cedb96357008df170806fe1bf37239d8b12ff0455c43dd8b2caec8f451e2608",
+    "baselineSha256": "005cfda90478f0f75a3708d5a036056b5ef01c6009be04a2f143e8a9db2bbf8e",
+    "edits": [
+      {
+        "start": 10881,
+        "end": 10972,
+        "current": "\t\"removeNoteFromAntennaConfirm\": \"Möchtest du wirklich diese Notiz aus {name} entfernen?\",\n",
+        "baseline": "\t\"removeNoteFromAntennaConfirm\": \"Are you sure you want to remove this note from {name}?\",\n"
+      },
+      {
+        "start": 11480,
+        "end": 11534,
+        "current": "\t\"removeFromAntenna\": \"Aus dieser Antenne entfernen\",\n",
+        "baseline": "\t\"removeFromAntenna\": \"Remove from this antenna\",\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/notifications/frontend/pages/settings/notifications.vue",
+    "currentSha256": "9d0344ef071a178ed1dd83339c24b0b883bfb5ad587162dc29969a75d05ba41b",
+    "baselineSha256": "77b7f2cf1e34903e16b91d3178c0a105dbcc30174b44c7e20a71f867e8e04575",
+    "edits": [
+      {
+        "start": 13333,
+        "end": 13404,
+        "current": "\t\"notifyUsers\": \"Benutzer mit aktivierten Beitragsbenachrichtigungen\",\n",
+        "baseline": "\t\"notifyUsers\": \"Users with post notifications enabled\",\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/preferences/frontend/pages/settings/custom-css.vue",
+    "currentSha256": "e61d14c7f13427b2630012d4f8fcb8d09ce0f67e76201fe08198010e92f54f20",
+    "baselineSha256": "3dcf6a3f6268ce8dfe481ac1a05d482d0f2aea36879d9ba433ca68ce0dc73e6c",
+    "edits": [
+      {
+        "start": 12768,
+        "end": 12827,
+        "current": "\t\"customCssWarn\": \"进行这些设置必须具备相关的基础知识，不当的配置可能导致客户端无法正常使用。\",\n",
+        "baseline": "\t\"customCssWarn\": \"这些设置必须有相关的基础知识，不当的配置可能导致客户端无法正常使用。\",\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
+    "currentSha256": "e2a3288bd0f6107765accbdf5001e3e5c9b32990a989732425bf266f7339e18c",
+    "baselineSha256": "33e7852029af421de26b922a7b4c8bf1d9a38291d24dd8fdbf550b5e33cd05ae",
+    "edits": [
+      {
+        "start": 71440,
+        "end": 71691,
+        "current": "\t\"notifications\": \"Notificacions\",\n\t\"autoplayEmbededPlayerOfUrlPreview\": \"Reprodueix automàticament el reproductor incrustat per a les previsualitzacions d'URL\",\n\t\"expandUrlPreviewAutomatically\": \"Expandir automàticament les previsualitzacions d'URL\"\n",
+        "baseline": "\t\"notifications\": \"Notificacions\"\n"
+      },
+      {
+        "start": 152331,
+        "end": 152537,
+        "current": "\t\"notifications\": \"Notifiche\",\n\t\"autoplayEmbededPlayerOfUrlPreview\": \"Riproduci automaticamente le anteprime URL multimediali\",\n\t\"expandUrlPreviewAutomatically\": \"Espansione automatica delle anteprime URL\"\n",
+        "baseline": "\t\"notifications\": \"Notifiche\"\n"
+      },
+      {
+        "start": 192752,
+        "end": 192892,
+        "current": "\t\"notifications\": \"알림\",\n\t\"autoplayEmbededPlayerOfUrlPreview\": \"URL 미리보기의 임베드 플레이어 자동 재생\",\n\t\"expandUrlPreviewAutomatically\": \"URL 미리보기 자동확장\"\n",
+        "baseline": "\t\"notifications\": \"알림\"\n"
+      }
+    ]
+  },
+  {
+    "file": "packages/features/users/frontend/pages/settings/profile.vue",
+    "currentSha256": "58074426b81e5a782dfcd60b1192ca79f9229982551a0f5e60e6853cb7373443",
+    "baselineSha256": "72f1483f238092b2dba001a007660840e822f21123e6b8f5915516a4a5fe98a1",
+    "edits": [
+      {
+        "start": 39811,
+        "end": 40215,
+        "current": "\t\"qr\": \"QR Code\",\n\t\"cannotSelectSensitiveMedia\": \"Impossibile selezionare il media esplicito\",\n\t\"cannotSelectSensitiveMediaDescription\": \"Se si ottiene questo errore senza aver contrassegnato il contenuto come sensibile, il file potrebbe essere stato automaticamente classificato come tale.\\nConsiderando il regolamento del server, valutare se rimuovere l'attributo \\\"contenuto esplicito\\\" e riprovare.\"\n",
+        "baseline": "\t\"qr\": \"QR Code\"\n"
+      }
+    ]
+  }
+]

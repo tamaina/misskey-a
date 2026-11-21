@@ -13,6 +13,9 @@
 - commit ごとの収録先・除外理由は [差分棚卸し記録](https://github.com/tamaina/misskey-a/blob/develop/docs/release/9000.0.0-audit.json) を参照してください。
 
 ### General
+- 本家 develop の利用者向け修正・改善に追従（#363）。上流のバージョン番号は採用せず、9k の起動・リリース経路を維持します。
+- Client: 登録フォームの確認、リモートユーザー探索、Driveの既定アップロード先、アンテナ切り替え、画像ビューア、URLプレビュー、AiScript UIの更新を改善。
+- Server: フォロー解除・リクエスト取り消しなどの連合、リストのリアルタイム更新、プロフィール画像を管理者が解除したときの通知を修正。IPv6アドレスのHTTPプロキシに対応。
 - Enhance: 依存関係を更新（pnpm 12.17.0、NestJS 12.4.2、Nodemailer・minimatchのセキュリティ更新を含む） ([upstream #18046](https://github.com/misskey-dev/misskey/pull/18046), [#18074](https://github.com/misskey-dev/misskey/pull/18074), [#18083](https://github.com/misskey-dev/misskey/pull/18083), [#18116](https://github.com/misskey-dev/misskey/pull/18116), [#18125](https://github.com/misskey-dev/misskey/pull/18125))
 #### Enhance: Misskey 9000
 ソフトウェア名を **Misskey 9000** に変更し、リポジトリ・問い合わせ先・インスタンスの既定リンクをこのforkに変更 (#32, #50, #54)  
@@ -67,6 +70,7 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Enhance: 開発者向けにOIDCのID token検証・discovery・短命transaction・token交換と認証進行管理の基盤を追加（ログイン経路への接続は未提供） (#109, #121, #131, #135)
 
 ### Client
+- Feat: 重要なアカウント操作の本人確認ダイアログ、独立パスキーMFAを含むセキュリティ設定、ブラウザーセッション管理、アクセストークンの有効期限の指定に対応 (#188)
 - Fix: ナビゲーションとLaunchPadで、SFC側に残る文言が空になる問題を修正 (#250)
 - Fix: グローバル翻訳への移行後、ナビゲーションメニューなどの文言が空になる問題を修正
 - Refactor: 権限・種別ラベルと共通のコアUI文字列をグローバル翻訳カタログへ移しました。
@@ -107,6 +111,7 @@ Tempuraから実装を移植し、リモートユーザーのアバターデコ�
 - Fix: Service Workerの通知からのフォロー操作で、通知元のユーザーIDが文字列であることを確認するように ([a1b3e952](https://github.com/tamaina/misskey-a/commit/a1b3e952d3e6d30cef7dfa4127f069df8642424b))
 
 ### Server
+- Feat: 重要なアカウント操作の本人確認を共通化し、独立パスキーMFA・セッション管理・tokenの有効期限を追加 (#188)
 - Fix: 物理削除されたリモートユーザーの URI キャッシュが残っているとき、要求された keyId の現役所有者を探して HTTP Signature の検証が回復するように (#195)
 - Fix: ap/show で自ホストのプロフィール URL と、取得済みリモートユーザーのローカル形式 URL を解決できるように (#195)
 - Fix: 復旧コードの同時使用による二重認証や、消費済みコードの復活を防止 (#146)

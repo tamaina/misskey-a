@@ -9,8 +9,12 @@ import { packedUserLiteSchema, toPackedUserLite } from '../../users/backend/user
 export const supportedCaptchaProviders = ['none', 'hcaptcha', 'mcaptcha', 'recaptcha', 'turnstile', 'testcaptcha'] as const;
 export const packedAppSchema = v.strictObject({ id: v.string(), name: v.string(), callbackUrl: v.nullable(v.string()), permission: v.array(v.string()), secret: v.optional(v.string()), isAuthorized: v.optional(v.boolean()) });
 export const packedInviteCodeSchema = v.strictObject({ id: v.string(), code: v.string(), expiresAt: v.nullable(v.string()), createdAt: v.string(), createdBy: v.nullable(packedUserLiteSchema), usedBy: v.nullable(packedUserLiteSchema), usedAt: v.nullable(v.string()), used: v.boolean() });
+export const packedBrowserSessionSchema = v.strictObject({
+	id: v.string(), createdAt: v.string(), lastUsedAt: v.string(), lastIp: v.nullable(v.string()), lastUserAgent: v.nullable(v.string()), revokedAt: v.nullable(v.string()), current: v.boolean(),
+});
+
 // Sign-in headers are persisted jsonb business data, including nonstandard header names.
-export const packedSigninSchema = v.strictObject({ id: v.string(), createdAt: v.string(), ip: v.string(), headers: packedJsonObjectSchema, success: v.boolean() });
+export const packedSigninSchema = v.strictObject({ id: v.string(), createdAt: v.string(), ip: v.string(), headers: packedJsonObjectSchema, success: v.boolean(), browserSessionId: v.nullable(v.string()), browserSession: v.nullable(packedBrowserSessionSchema) });
 
 export type PackedApp = v.InferOutput<typeof packedAppSchema>;
 export function toPackedApp(app: PackedApp, includeSecret = false): PackedApp {
@@ -24,5 +28,5 @@ export function toPackedInviteCode(code: v.InferOutput<typeof packedInviteCodeSc
 		usedBy: code.usedBy === null ? null : toPackedUserLite(code.usedBy), usedAt: code.usedAt, used: code.used };
 }
 export function toPackedSignin(signin: v.InferOutput<typeof packedSigninSchema>): v.InferOutput<typeof packedSigninSchema> {
-	return { id: signin.id, createdAt: signin.createdAt, ip: signin.ip, headers: toPackedJsonObject(signin.headers), success: signin.success };
+	return { id: signin.id, createdAt: signin.createdAt, ip: signin.ip, headers: toPackedJsonObject(signin.headers), success: signin.success, browserSessionId: signin.browserSessionId, browserSession: signin.browserSession };
 }

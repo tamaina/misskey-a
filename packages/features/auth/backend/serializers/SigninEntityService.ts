@@ -22,6 +22,8 @@ export class SigninEntityService {
 			ip: src.ip,
 			headers: src.headers,
 			success: src.success,
+			browserSessionId: src.browserSessionId ?? null,
+			browserSession: null,
 		};
 	}
 }

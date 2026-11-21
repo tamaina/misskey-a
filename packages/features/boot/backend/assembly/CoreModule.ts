@@ -61,7 +61,7 @@ import { SearchService } from '@features/note-search/backend/services/SearchServ
 import { FanoutTimelineService } from '@features/timelines/backend/services/FanoutTimelineService.js';
 import { ChannelFollowingService } from '@features/channels/backend/services/ChannelFollowingService.js';
 import { ChatService } from '@features/chat/backend/services/ChatService.js';
-import { ReversiService } from '@features/games/backend/services/ReversiService.js';
+import { ReversiService } from '@features/games/reversi/backend/services/ReversiService.js';
 
 import { ChartLoggerService } from '@features/statistics/backend/services/ChartLoggerService.js';
 import { ChartManagementService } from '@features/statistics/backend/services/ChartManagementService.js';

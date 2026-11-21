@@ -67,6 +67,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 				v-if="selectablePermissions" v-model="selectedPermissions" :permissions="selectablePermissions"
 				:administrator="selectedAdministrator"
 			/>
+			<MkTokenExpiry v-model="expiry" :disabled="waiting"/>
+			<p v-if="!canAuthorize">{{ $locale.sfc.currentAccountRequired }}</p>
 			<slot name="consentAdditionalInfo"></slot>
 			<div>
 				<div :class="$style.accountSelectorLabel">
@@ -84,7 +86,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</div>
 			<div class="_buttonsCenter">
 				<MkButton rounded @click="clickCancel">{{ globalLocale.env.reject }}</MkButton>
-				<MkButton rounded gradate :disabled="selectablePermissions !== undefined && !permissions?.length && selectedPermissions.length === 0" @click="clickAccept">{{ globalLocale.env.accept }}</MkButton>
+				<MkButton rounded gradate :disabled="!canAuthorize || (selectablePermissions !== undefined && !permissions?.length && selectedPermissions.length === 0)" @click="clickAccept">{{ globalLocale.env.accept }}</MkButton>
 			</div>
 		</div>
 		<div v-else-if="phase === 'success'" key="success" :class="$style.root" class="_gaps_s">
@@ -125,13 +127,17 @@ import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { $i } from '@features/auth/frontend/i.js';
-import { getAccounts, getAccountWithSigninDialog, getAccountWithSignupDialog } from '@features/auth/frontend/accounts.js';
+import { getAccounts, getAccountWithSigninDialog, getAccountWithSignupDialog, login } from '@features/auth/frontend/accounts.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 import * as os from '@features/ui/frontend/os.js';
 import { getProxiedImageUrl } from '@features/drive/frontend/utility/media-proxy.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import { ensureSudo } from '../utility/ensure-sudo.js';
+import { isSameLiveCredential } from '../utility/live-account.js';
+import { selectedCredentialExpiry, useCredentialOperation } from '../utility/use-credential-operation.js';
 import MkPermissionSelect from './MkPermissionSelect.vue';
+import MkTokenExpiry from './MkTokenExpiry.vue';
 import type { Locale } from 'i18n';
 
 const globalLocale = useLocale<Locale>(import.meta.url);
@@ -147,10 +153,12 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-	(ev: 'accept', token: string, permissions?: string[]): void;
+	(ev: 'accept', token: string, permissions?: string[], expiresAt?: string): void;
 	(ev: 'deny', token: string): void;
 }>();
 
+const expiry = ref<string | null>(null);
+const operation = useCredentialOperation(() => { expiry.value = null; waiting.value = false; });
 const waiting = ref(true);
 const _waiting = computed(() => waiting.value || props.manualWaiting);
 const phase = ref<'accountSelect' | 'consent' | 'success' | 'denied' | 'failed'>('accountSelect');
@@ -162,6 +170,8 @@ const selectedAdministrator = computed(() => {
 });
 
 const selectedUser = ref<string | null>(null);
+
+const canAuthorize = computed(() => { const user = selectedUser.value ? users.value.get(selectedUser.value) : undefined; return !!user && isSameLiveCredential(user.id, user.token, $i?.id, $i?.token); });
 
 const users = ref(new Map<string, Misskey.entities.UserDetailed & { token: string; }>());
 
@@ -211,10 +221,7 @@ function clickAddAccount(ev: PointerEvent) {
 			getAccountWithSigninDialog().then(async (res) => {
 				if (res != null) {
 					os.success();
-					await init();
-					if (users.value.has(res.id)) {
-						selectedUser.value = res.id;
-					}
+					await login(res.token, window.location.href);
 				}
 			});
 		},
@@ -224,10 +231,7 @@ function clickAddAccount(ev: PointerEvent) {
 			getAccountWithSignupDialog().then(async (res) => {
 				if (res != null) {
 					os.success();
-					await init();
-					if (users.value.has(res.id)) {
-						selectedUser.value = res.id;
-					}
+					await login(res.token, window.location.href);
 				}
 			});
 		},
@@ -236,6 +240,11 @@ function clickAddAccount(ev: PointerEvent) {
 
 async function clickChooseAccount() {
 	if (selectedUser.value === null) return;
+	const selected = users.value.get(selectedUser.value);
+	if (selected && ($i?.id !== selected.id || !isSameLiveCredential(selected.id, selected.token, $i?.id, $i?.token))) {
+		await login(selected.token, window.location.href);
+		return;
+	}
 	if (props.selectablePermissions !== undefined) {
 		const user = users.value.get(selectedUser.value)!;
 		waiting.value = true;
@@ -268,14 +277,16 @@ function clickCancel() {
 }
 
 async function clickAccept() {
-	if (selectedUser.value === null) return;
-
-	const user = users.value.get(selectedUser.value)!;
-
-	const token = user.token;
-
-	waiting.value = true;
-	emit('accept', token, props.selectablePermissions === undefined ? undefined : [...selectedPermissions.value]);
+	if (selectedUser.value === null || !canAuthorize.value) return;
+	const user = users.value.get(selectedUser.value)!; const permissions = props.selectablePermissions === undefined ? undefined : [...selectedPermissions.value]; const targetExpiry = expiry.value;
+	await operation.run(async (current, signal) => {
+		waiting.value = true;
+		try {
+			const expiresAt = selectedCredentialExpiry(targetExpiry);
+			if (!await ensureSudo(current, signal) || !current() || !canAuthorize.value || selectedUser.value !== user.id || !$i) { if (current()) waiting.value = false; return; }
+			emit('accept', $i.token, permissions, expiresAt);
+		} catch { if (current()) showUI('failed'); }
+	});
 }
 
 function showUI(state: 'success' | 'denied' | 'failed') {
@@ -685,7 +696,8 @@ defineExpose({
 	"authPleaseGoBack": "アプリケーションに戻ってやっていってください",
 	"authDenied": "アクセスを拒否しました",
 	"existingAccount": "既存のアカウント",
-	"createAccount": "アカウントを作成"
+	"createAccount": "アカウントを作成",
+	"currentAccountRequired": "対象アカウントへ切り替え、通常のログインで個別セッションを作成してから承認してください。保存済みの別アカウントや旧トークンでは承認できません。"
 }
 </locale>
 

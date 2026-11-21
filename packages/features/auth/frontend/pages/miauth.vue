@@ -28,6 +28,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useCredentialOperation } from '../utility/use-credential-operation.js';
 import { computed, useTemplateRef } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkAuthConfirm from '@features/auth/frontend/components/MkAuthConfirm.vue';
@@ -47,24 +48,21 @@ const _permissions = computed(() => {
 });
 
 const authRoot = useTemplateRef('authRoot');
+const operation = useCredentialOperation();
 
-async function onAccept(token: string) {
-	await misskeyApi('miauth/gen-token', {
-		session: props.session,
-		name: props.name,
-		iconUrl: props.icon,
-		permission: _permissions.value,
-	}, token).then(() => {
-		if (props.callback && props.callback !== '') {
-			const cbUrl = new URL(props.callback);
-			if (['javascript:', 'file:', 'data:', 'mailto:', 'tel:', 'vbscript:'].includes(cbUrl.protocol)) throw new Error('invalid url');
-			cbUrl.searchParams.set('session', props.session);
-			window.location.href = cbUrl.toString();
-		} else {
-			authRoot.value?.showUI('success');
-		}
-	}).catch(() => {
-		authRoot.value?.showUI('failed');
+async function onAccept(token: string, _selected?: string[], expiresAt?: string) {
+	const target = { session: props.session, callback: props.callback, name: props.name, icon: props.icon, permission: [..._permissions.value] };
+	await operation.run(async current => {
+		const owns = () => current() && props.session === target.session && props.callback === target.callback;
+		try {
+			await misskeyApi('miauth/gen-token', { session: target.session, name: target.name, iconUrl: target.icon, permission: target.permission, ...(expiresAt ? { expiresAt } : {}) }, token);
+			if (!owns()) return;
+			if (target.callback) {
+				const cbUrl = new URL(target.callback);
+				if (['javascript:', 'file:', 'data:', 'mailto:', 'tel:', 'vbscript:'].includes(cbUrl.protocol)) throw new Error('invalid url');
+				cbUrl.searchParams.set('session', target.session); window.location.href = cbUrl.toString();
+			} else authRoot.value?.showUI('success');
+		} catch { if (owns()) authRoot.value?.showUI('failed'); }
 	});
 }
 

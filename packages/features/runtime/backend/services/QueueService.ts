@@ -599,11 +599,13 @@ export class QueueService {
 	}
 
 	@bindThis
-	public createDeleteAccountJob(user: ThinUser, opts: { soft?: boolean; } = {}) {
+	public createDeleteAccountJob(user: ThinUser, opts: { soft?: boolean; requiresCommittedDeletion?: true; deletionIntentId?: string; } = {}) {
 		return this.dbQueue.add('deleteAccount', {
 			user: { id: user.id },
 			soft: opts.soft,
+			...(opts.requiresCommittedDeletion ? { requiresCommittedDeletion: true as const, deletionIntentId: opts.deletionIntentId } : {}),
 		}, {
+			...(opts.requiresCommittedDeletion ? { attempts: 5, backoff: { type: 'exponential', delay: 1000 } } : {}),
 			removeOnComplete: {
 				age: 3600 * 24 * 7, // keep up to 7 days
 				count: 30,

@@ -991,36 +991,66 @@
   },
   {
     "file": "packages/features/play/frontend/widgets/WidgetAiscriptApp.vue",
-    "currentSha256": "fc0b386de1ffc3922b44173075a5d9428f212630236f633a00d2bc76291755c1",
+    "currentSha256": "5696b895230eb7c250c82e9298cc3a61a4fdc2ccb7b1ffeacb9cac604064fe4c",
     "baselineSha256": "3455debc1d437fda9e96d829dc0bb2fb76b61479d9f381cbf239b44ada5cce55",
     "edits": [
       {
-        "start": 444,
-        "end": 502,
+        "start": 298,
+        "end": 371,
+        "current": "\t\t<MkAsUi v-else-if=\"root\" :key=\"uiKey\" :component=\"root\" size=\"small\"/>\n",
+        "baseline": "\t\t<MkAsUi v-else-if=\"root\" :component=\"root\" :components=\"components\" size=\"small\"/>\n"
+      },
+      {
+        "start": 432,
+        "end": 490,
         "current": "import { onMounted, onUnmounted, ref, watch } from 'vue';\n",
         "baseline": "import { onMounted, ref, watch } from 'vue';\n"
       },
       {
-        "start": 2045,
-        "end": 2086,
+        "start": 626,
+        "end": 626,
+        "current": "",
+        "baseline": "import type { Ref } from 'vue';\n"
+      },
+      {
+        "start": 852,
+        "end": 933,
+        "current": "import type { AsUiRoot } from '@features/play/frontend/services/aiscript/ui.js';\n",
+        "baseline": "import type { AsUiComponent, AsUiRoot } from '@features/play/frontend/services/aiscript/ui.js';\n"
+      },
+      {
+        "start": 1986,
+        "end": 2027,
         "current": "let aiscript: Interpreter | null = null;\n",
         "baseline": ""
       },
       {
-        "start": 2224,
-        "end": 2306,
-        "current": "\tif (aiscript) aiscript.abort();\n\troot.value = undefined;\n\tcomponents.value = [];\n",
+        "start": 2057,
+        "end": 2079,
+        "current": "const uiKey = ref(0);\n",
+        "baseline": "const components = ref<Ref<AsUiComponent>[]>([]);\n"
+      },
+      {
+        "start": 2137,
+        "end": 2257,
+        "current": "\tif (aiscript) aiscript.abort();\n\troot.value = undefined;\n\t// MkAsUi は最初に受け取った root を描画し続けるため、実行ごとに作り直す\n\tuiKey.value++;\n",
         "baseline": ""
       },
       {
-        "start": 2337,
-        "end": 2367,
+        "start": 2288,
+        "end": 2318,
         "current": "\taiscript = new Interpreter({\n",
         "baseline": "\tconst aiscript = new Interpreter({\n"
       },
       {
-        "start": 3196,
-        "end": 3254,
+        "start": 2395,
+        "end": 2452,
+        "current": "\t\t...registerAsUiLib((_root) => {\n\t\t\troot.value = _root;\n",
+        "baseline": "\t\t...registerAsUiLib(components.value, (_root) => {\n\t\t\troot.value = _root.value;\n"
+      },
+      {
+        "start": 3123,
+        "end": 3181,
         "current": "});\n\nonUnmounted(() => {\n\tif (aiscript) aiscript.abort();\n",
         "baseline": ""
       }
@@ -1081,13 +1111,13 @@
   },
   {
     "file": "packages/features/preferences/frontend/state/def.ts",
-    "currentSha256": "c07b0eee592211ea74f510ef460ccc687cda09290abbacbc4f9a821bef98a5aa",
+    "currentSha256": "7c098ea352d1375c7bdf336e08c3a8ff23895e7c32626a3367ad8e980abb540c",
     "baselineSha256": "b92fdb65fe68f863fda024751210923b25b4f616a8245ab2b63385ff313a96e6",
     "edits": [
       {
         "start": 7457,
-        "end": 7516,
-        "current": "\tautoplayEmbededPlayerOfUrlPreview: {\n\t\tdefault: true,\n\t},\n",
+        "end": 7572,
+        "current": "\tautoplayEmbededPlayerOfUrlPreview: {\n\t\tdefault: true,\n\t},\n\texpandUrlPreviewAutomatically: {\n\t\tdefault: false,\n\t},\n",
         "baseline": ""
       }
     ],

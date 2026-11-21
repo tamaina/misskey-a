@@ -102,3 +102,44 @@ test.each(['named', 'anonymous'] as const)('%s authentication rejects an unexpec
 		expect(redis.setex).not.toHaveBeenCalled();
 	} finally { generate.mockRestore(); }
 });
+
+test.each(['named', 'anonymous'] as const)('%s login proof captures expectation before strict UV and updates the exact verified row', async route => {
+	const { service, redis, keys } = harness();
+	redis.eval.mockResolvedValue(['synthetic-challenge', 90_000]);
+	keys.update.mockResolvedValue({ affected: 1 });
+	const order: string[] = [];
+	vi.mocked(webauthn.verifyAuthenticationResponse).mockImplementation(async options => {
+		order.push('verify');
+		expect(options).toMatchObject({ requireUserVerification: true, expectedChallenge: 'synthetic-challenge', expectedRPID: 'synthetic.example', expectedOrigin: 'https://synthetic.example' });
+		return { verified: true, authenticationInfo: { credentialID: 'AQID', newCounter: 2, userVerified: true, credentialDeviceType: 'singleDevice', credentialBackedUp: false, origin: 'https://synthetic.example', rpID: 'synthetic.example' } };
+	});
+	const before = vi.fn(async key => { order.push('snapshot'); expect(Object.isFrozen(key)).toBe(true); return 'original-policy'; });
+	const result = await (route === 'named' ? service.verifyAuthenticationWithProof('synthetic-user', assertion, before) : service.verifySignInWithPasskeyWithProof('synthetic-context', assertion, before));
+	expect(order).toEqual(['snapshot', 'verify']);
+	expect(result).toMatchObject({ expected: 'original-policy', key: { id: 'AQID', userId: 'synthetic-user', publicKey: 'AQID' } });
+	expect(keys.update).toHaveBeenCalledWith({ id: 'AQID', userId: 'synthetic-user', publicKey: 'AQID', counter: 1 }, expect.objectContaining({ counter: 2 }));
+	expect(redis.eval).toHaveBeenCalledWith(expect.stringContaining('redis.call(\'PTTL\''), 1, route === 'named' ? 'webauthn:authenticationChallenge:synthetic-user' : 'webauthn:passkeyChallenge:synthetic-context');
+});
+
+test.each([null, ['synthetic', -1], ['synthetic', 0], ['synthetic', 90_001], ['synthetic', 0.5], ['synthetic', '90000']])('login proof rejects missing or unbounded remaining TTL %j', async claimed => {
+	const { service, redis, keys } = harness(); redis.eval.mockResolvedValue(claimed);
+	const before = vi.fn();
+	await expect(service.verifyAuthenticationWithProof('synthetic-user', assertion, before)).rejects.toThrow('authentication failed');
+	expect(before).not.toHaveBeenCalled(); expect(keys.update).not.toHaveBeenCalled();
+});
+
+test.each(['noUV', 'CAS'] as const)('login proof rejects %s even when verifier reports verified', async failure => {
+	const { service, redis, keys } = harness(); redis.eval.mockResolvedValue(['synthetic-challenge', 90_000]);
+	keys.update.mockResolvedValue({ affected: 0 });
+	vi.mocked(webauthn.verifyAuthenticationResponse).mockResolvedValue({ verified: true, authenticationInfo: { credentialID: 'AQID', newCounter: 2, userVerified: failure !== 'noUV', credentialDeviceType: 'singleDevice', credentialBackedUp: false, origin: 'https://synthetic.example', rpID: 'synthetic.example' } });
+	const result = service.verifyAuthenticationWithProof('synthetic-user', assertion, async () => 'original-policy');
+	if (failure === 'noUV') { expect(await result).toBeNull(); expect(keys.update).not.toHaveBeenCalled(); } else await expect(result).rejects.toThrow('authentication failed');
+});
+
+test.each([-1, Number.NaN, Number.MAX_SAFE_INTEGER])('login proof rejects an invalid stored counter %s before crypto verification', async counter => {
+	const { service, redis, keys } = harness(); redis.eval.mockResolvedValue(['synthetic-challenge', 90_000]);
+	keys.findOneBy.mockResolvedValue(Object.assign(new MiUserSecurityKey({}), { id: 'AQID', userId: 'synthetic-user', publicKey: 'AQID', counter }));
+	const before = vi.fn();
+	await expect(service.verifyAuthenticationWithProof('synthetic-user', assertion, before)).rejects.toThrow('authentication failed');
+	expect(before).not.toHaveBeenCalled(); expect(keys.update).not.toHaveBeenCalled();
+});

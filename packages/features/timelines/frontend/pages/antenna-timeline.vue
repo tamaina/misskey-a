@@ -27,6 +27,8 @@ import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
+import { antennasCache } from '@features/runtime/frontend/cache.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import type { Locale } from 'i18n';
 
 const globalLocale = useLocale<Locale>(import.meta.url);
@@ -50,6 +52,32 @@ function settings() {
 	});
 }
 
+async function chooseAntenna(ev: PointerEvent): Promise<void> {
+	const antennas = await antennasCache.fetch();
+	const items: (MenuItem | undefined)[] = [
+		...antennas.map(x => ({
+			text: x.name,
+			indicate: x.hasUnreadNote,
+			action: () => {
+				router.push('/timeline/antenna/:antennaId', {
+					params: {
+						antennaId: x.id,
+					},
+				});
+			},
+		})),
+		(antennas.length === 0 ? undefined : { type: 'divider' }),
+		{
+			icon: 'ti ti-plus',
+			text: globalLocale.value.env.createNew,
+			action: () => {
+				router.push('/my/antennas');
+			},
+		},
+	];
+	os.popupMenu(items.filter(i => i != null), ev.currentTarget ?? ev.target);
+}
+
 watch(() => props.antennaId, async () => {
 	antenna.value = await misskeyApi('antennas/show', {
 		antennaId: props.antennaId,
@@ -57,6 +85,10 @@ watch(() => props.antennaId, async () => {
 }, { immediate: true });
 
 const headerActions = computed(() => antenna.value ? [{
+	icon: 'ti ti-switch-horizontal',
+	text: $locale.value.sfc.selectAntenna,
+	handler: chooseAntenna,
+}, {
 	icon: 'ti ti-settings',
 	text: globalLocale.value.env.settings,
 	handler: settings,
@@ -119,7 +151,9 @@ definePage(() => ({
 </locale>
 
 <locale locale="ja-JP" lang="json">
-{}
+{
+	"selectAntenna": "アンテナを選択"
+}
 </locale>
 
 <locale locale="ja-KS" lang="json">

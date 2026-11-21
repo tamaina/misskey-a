@@ -26,6 +26,7 @@ const base = oc.$meta({
 	.route({ method: 'POST', path: `/${requestName}`, tags: ['drive'], description: 'Upload a new drive file. Requires write:drive permission.', spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 	.errors({
 		...commonErrors,
+		NO_SUCH_FOLDER: { status: 400, data: apiErrorData },
 		FILE_REQUIRED: { status: 400, data: apiErrorData },
 		INVALID_FILE_NAME: { status: 400, data: apiErrorData },
 		INAPPROPRIATE: { status: 400, data: apiErrorData },

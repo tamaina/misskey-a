@@ -57,6 +57,27 @@ export class DeleteAccountService {
 			});
 		}
 
+		if (this.userEntityService.isLocalUser(user)) {
+			await this.deliverDeletion(user);
+			this.queueService.createDeleteAccountJob(user, {
+				soft: false,
+			});
+		} else {
+			// リモートユーザーの削除は、完全にDBから物理削除してしまうと再度連合してきてアカウントが復活する可能性があるため、soft指定する
+			this.queueService.createDeleteAccountJob(user, {
+				soft: true,
+			});
+		}
+
+		await this.usersRepository.update(user.id, {
+			isDeleted: true,
+		});
+
+		this.globalEventService.publishInternalEvent('userChangeDeletedState', { id: user.id, isDeleted: true });
+	}
+	/** Called after the guarded deletion intent has committed, before physical deletion. */
+	@bindThis
+	public async deliverDeletion(user: { id: string; host: string | null }): Promise<void> {
 		// 物理削除する前にDelete activityを送信する
 		if (this.userEntityService.isLocalUser(user)) {
 			// 知り得る全SharedInboxにDelete配信
@@ -82,23 +103,8 @@ export class DeleteAccountService {
 			}
 
 			for (const inbox of queue) {
-				this.queueService.deliver(user, content, inbox, true);
+				await this.queueService.deliver(user, content, inbox, true);
 			}
-
-			this.queueService.createDeleteAccountJob(user, {
-				soft: false,
-			});
-		} else {
-			// リモートユーザーの削除は、完全にDBから物理削除してしまうと再度連合してきてアカウントが復活する可能性があるため、soft指定する
-			this.queueService.createDeleteAccountJob(user, {
-				soft: true,
-			});
 		}
-
-		await this.usersRepository.update(user.id, {
-			isDeleted: true,
-		});
-
-		this.globalEventService.publishInternalEvent('userChangeDeletedState', { id: user.id, isDeleted: true });
 	}
 }

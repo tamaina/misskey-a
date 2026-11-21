@@ -2,7 +2,13 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { legacyManagementOnly } from '../../../legacy-management.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
+import type { DataSource } from 'typeorm';
+import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
+import { MiUserSecurityKey } from '../../../models/UserSecurityKey.js';
+import { assertLegacyMfaManagement } from '../../../mfa-policy.js';
+import { withLockedMfaProfile } from '../../../locked-mfa-profile.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import type { UserProfilesRepository, UserSecurityKeysRepository } from '@features/persistence/backend/repositories/models.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
@@ -24,41 +30,26 @@ export const meta = {
 	},
 } as const;
 export interface I2faPasswordLessDependencies {
+	db: DataSource;
 	userProfilesRepository: UserProfilesRepository;
 	userSecurityKeysRepository: UserSecurityKeysRepository;
 	userEntityService: Pick<UserEntityService, 'packSelf'>;
 	globalEventService: Pick<GlobalEventService, 'publishMainStream'>;
 }
 export function createI2faPasswordLessProcedure(deps: I2faPasswordLessDependencies) {
-	return createApiProcedure<MiLocalUser>()(I2faPasswordLessContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(I2faPasswordLessContract).use(requirePrincipal<MiLocalUser>()).use(legacyManagementOnly()).handler(async ({ input, context }) => {
 		const ps = input;
 		const me = context.principal;
 		const result = await (async () => {
-			if (ps.value === true) {
-				// セキュリティキーがなければパスワードレスを有効にはできない
-				const keyCount = await deps.userSecurityKeysRepository.count({
-					where: {
-						userId: me.id,
-					},
-					select: {
-						id: true,
-						name: true,
-						lastUsed: true,
-					},
-				});
-
-				if (keyCount === 0) {
-					await deps.userProfilesRepository.update(me.id, {
-						usePasswordLessLogin: false,
-					});
-
-					throw apiError(meta.errors.noKey);
-				}
-			}
-
-			await deps.userProfilesRepository.update(me.id, {
-				usePasswordLessLogin: ps.value,
+			const accepted = await withLockedMfaProfile(deps.db, me.id, undefined, async (profile, manager) => {
+				assertLegacyMfaManagement(profile);
+				// Count and update under the same lock as key removal.
+				const noKey = ps.value && await manager.getRepository(MiUserSecurityKey).count({ where: { userId: me.id } }) === 0;
+				await manager.getRepository(MiUserProfile).update({ userId: me.id }, { usePasswordLessLogin: noKey ? false : ps.value });
+				return !noKey;
 			});
+			// Preserve the legacy false-setting repair even on NO_SECURITY_KEY.
+			if (!accepted) throw apiError(meta.errors.noKey);
 
 			// Publish meUpdated event
 			deps.globalEventService.publishMainStream(me.id, 'meUpdated', await deps.userEntityService.packSelf(me.id, {

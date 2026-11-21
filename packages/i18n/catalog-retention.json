@@ -2404,47 +2404,47 @@
 			"path": "close"
 		},
 		{
-			"file": "packages/features/games/frontend/pages/drop-and-fusion.game.vue",
+			"file": "packages/features/games/bubble-game/frontend/pages/drop-and-fusion.game.vue",
 			"line": 131,
 			"path": "share"
 		},
 		{
-			"file": "packages/features/games/frontend/pages/drop-and-fusion.game.vue",
+			"file": "packages/features/games/bubble-game/frontend/pages/drop-and-fusion.game.vue",
 			"line": 772,
 			"path": "areYouSure"
 		},
 		{
-			"file": "packages/features/games/frontend/pages/drop-and-fusion.vue",
+			"file": "packages/features/games/bubble-game/frontend/pages/drop-and-fusion.vue",
 			"line": 35,
 			"path": "mute"
 		},
 		{
-			"file": "packages/features/games/frontend/pages/reversi/game.board.vue",
+			"file": "packages/features/games/reversi/frontend/pages/game.board.vue",
 			"line": 134,
 			"path": "share"
 		},
 		{
-			"file": "packages/features/games/frontend/pages/reversi/game.board.vue",
+			"file": "packages/features/games/reversi/frontend/pages/game.board.vue",
 			"line": 415,
 			"path": "areYouSure"
 		},
 		{
-			"file": "packages/features/games/frontend/pages/reversi/game.setting.vue",
+			"file": "packages/features/games/reversi/frontend/pages/game.setting.vue",
 			"line": 99,
 			"path": "cancel"
 		},
 		{
-			"file": "packages/features/games/frontend/pages/reversi/game.setting.vue",
+			"file": "packages/features/games/reversi/frontend/pages/game.setting.vue",
 			"line": 211,
 			"path": "areYouSure"
 		},
 		{
-			"file": "packages/features/games/frontend/pages/reversi/index.vue",
+			"file": "packages/features/games/reversi/frontend/pages/index.vue",
 			"line": 16,
 			"path": "invite"
 		},
 		{
-			"file": "packages/features/games/frontend/pages/reversi/index.vue",
+			"file": "packages/features/games/reversi/frontend/pages/index.vue",
 			"line": 101,
 			"path": "cancel"
 		},

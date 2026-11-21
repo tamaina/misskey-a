@@ -11,7 +11,7 @@ import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { Config } from '@/config.js';
-import { ReversiService } from '@features/games/backend/services/ReversiService.js';
+import { ReversiService } from '@features/games/reversi/backend/services/ReversiService.js';
 import { QueueLoggerService } from '@features/runtime/backend/queue/QueueLoggerService.js';
 import type * as Bull from 'bullmq';
 
@@ -44,7 +44,7 @@ export class CleanProcessorService {
 		this.logger.info('Cleaning...');
 
 		this.userIpsRepository.delete({
-			createdAt: LessThan(new Date(Date.now() - (1000 * 60 * 60 * 24 * 90))),
+			lastSeenAt: LessThan(new Date(Date.now() - (1000 * 60 * 60 * 24 * 90))),
 		});
 
 		// 使われてないアンテナを停止

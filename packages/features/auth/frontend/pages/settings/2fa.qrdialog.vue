@@ -9,6 +9,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	:width="500"
 	:height="550"
 	@close="cancel"
+	@esc="cancel"
 	@closed="emit('closed')"
 >
 	<template #header>{{ $locale.sfc.setupOf2fa }}</template>
@@ -57,12 +58,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<div class="_spacer" style="--MI_SPACER-min: 20px; --MI_SPACER-max: 28px;">
 						<div class="_gaps">
 							<div>{{ $locale.sfc.twoFactorStep3Title }}</div>
-							<MkInput v-model="token" autocomplete="one-time-code" inputmode="numeric"></MkInput>
+							<MkInput v-model="token" :disabled="busy" autocomplete="one-time-code" inputmode="numeric"></MkInput>
 							<div>{{ $locale.sfc.twoFactorStep3 }}</div>
+							<MkInfo v-if="errorText?.()" warn>{{ errorText?.() }}</MkInfo>
 						</div>
 						<div class="_buttonsCenter" style="margin-top: 16px;">
-							<MkButton rounded @click="page--"><i class="ti ti-arrow-left"></i> {{ globalLocale.env.goBack }}</MkButton>
-							<MkButton primary rounded gradate @click="tokenDone">{{ globalLocale.env.continue }} <i class="ti ti-arrow-right"></i></MkButton>
+							<MkButton rounded :disabled="busy" @click="page--"><i class="ti ti-arrow-left"></i> {{ globalLocale.env.goBack }}</MkButton>
+							<MkButton primary rounded gradate :disabled="busy || !token" @click="tokenDone">{{ globalLocale.env.continue }} <i class="ti ti-arrow-right"></i></MkButton>
 						</div>
 					</div>
 				</div>
@@ -73,25 +75,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<div class="_gaps">
 							<div style="text-align: center;">{{ $locale.sfc.twoFactorSetupCompleted }}🎉</div>
 							<div style="text-align: center;">{{ $locale.sfc.twoFactorStep4 }}</div>
-							<div style="text-align: center; font-weight: bold;">{{ $locale.sfc.twoFactorCheckBackupCodesBeforeCloseThisWizard }}</div>
+							<div v-if="backupCodes?.length" style="text-align: center; font-weight: bold;">{{ $locale.sfc.twoFactorCheckBackupCodesBeforeCloseThisWizard }}</div>
 
-							<MkFolder :defaultOpen="true">
-								<template #icon><i class="ti ti-key"></i></template>
-								<template #label>{{ $locale.sfc.twoFactorBackupCodes }}</template>
+							<div v-if="backupCodes?.length" class="_gaps">
+								<MkInfo warn>{{ $locale.sfc.twoFactorBackupCodesDescription }}</MkInfo>
 
-								<div class="_gaps">
-									<MkInfo warn>{{ $locale.sfc.twoFactorBackupCodesDescription }}</MkInfo>
-
-									<div v-for="(code, i) in backupCodes" :key="code" class="_gaps_s">
-										<MkKeyValue :copy="code">
-											<template #key>#{{ i + 1 }}</template>
-											<template #value><code class="_monospace">{{ code }}</code></template>
-										</MkKeyValue>
-									</div>
-
-									<MkButton primary rounded gradate @click="downloadBackupCodes"><i class="ti ti-download"></i> {{ globalLocale.env.download }}</MkButton>
+								<div v-for="(code, i) in backupCodes" :key="code" class="_gaps_s">
+									<MkKeyValue :copy="code">
+										<template #key>#{{ i + 1 }}</template>
+										<template #value><code class="_monospace">{{ code }}</code></template>
+									</MkKeyValue>
 								</div>
-							</MkFolder>
+
+								<MkButton primary rounded gradate @click="downloadBackupCodes"><i class="ti ti-download"></i> {{ globalLocale.env.download }}</MkButton>
+							</div>
 						</div>
 						<div class="_buttonsCenter" style="margin-top: 16px;">
 							<MkButton primary rounded gradate @click="allDone">{{ globalLocale.env.done }}</MkButton>
@@ -107,15 +104,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
 import { hostname, port } from '@features/boot/frontend/shared/config.js';
-import * as Misskey from 'misskey-js';
 import { qrcode } from 'etiket/qr';
-import { useTemplateRef, computed, ref } from 'vue';
+import { useTemplateRef, computed, onBeforeUnmount, ref } from 'vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
-import * as os from '@features/ui/frontend/os.js';
-import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkLink from '@features/navigation/frontend/components/MkLink.vue';
 import { confetti } from '@features/ui/frontend/utility/confetti.js';
@@ -128,11 +122,14 @@ const globalLocale = useLocale<Locale>(import.meta.url);
 const $i = ensureSignin();
 
 const props = defineProps<{
-	twoFactorData: Misskey.entities.I2faRegisterResponse;
+	twoFactorData: { url: string };
+	complete: (token: string) => Promise<string[] | null>;
+	errorText?: () => string | null;
 }>();
 
 const emit = defineEmits<{
 	(ev: 'closed'): void;
+	(ev: 'cancel'): void;
 }>();
 
 const dialog = useTemplateRef('dialog');
@@ -144,24 +141,27 @@ const qrSvg = computed(() => qrcode(props.twoFactorData.url, {
 	background: 'transparent',
 }));
 const backupCodes = ref<string[]>();
+const busy = ref(false);
+let active = true;
+onBeforeUnmount(() => { active = false; token.value = null; backupCodes.value = undefined; });
 
 function cancel() {
+	active = false; token.value = null; backupCodes.value = undefined;
+	emit('cancel');
 	dialog.value?.close();
 }
 
 async function tokenDone() {
-	if (token.value == null) return;
-	const res = await os.apiWithDialog('i/2fa/totp/done', {
-		token: token.value.toString(), // 実装ミスなどでnumberが入る可能性を払拭できないため念のためtoString
-	});
-
-	backupCodes.value = res.backupCodes;
-
-	page.value++;
-
-	confetti({
-		duration: 1000 * 3,
-	});
+	if (!token.value || busy.value || !active) return;
+	busy.value = true;
+	try {
+		const codes = await props.complete(token.value.toString());
+		if (!active || codes === null) return;
+		backupCodes.value = codes;
+		token.value = null;
+		page.value++;
+		confetti({ duration: 1000 * 3 });
+	} finally { busy.value = false; }
 }
 
 function downloadBackupCodes() {
@@ -175,7 +175,7 @@ function downloadBackupCodes() {
 }
 
 function allDone() {
-	dialog.value?.close();
+	cancel();
 }
 </script>
 

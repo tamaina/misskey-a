@@ -45,8 +45,8 @@ import { UserListChannel } from '@features/timelines/backend/stream/user-list.js
 import { RoleTimelineChannel } from '@features/timelines/backend/stream/role-timeline.js';
 import { ChatUserChannel } from '@features/chat/backend/stream/chat-user.js';
 import { ChatRoomChannel } from '@features/chat/backend/stream/chat-room.js';
-import { ReversiChannel } from '@features/games/backend/stream/reversi.js';
-import { ReversiGameChannel } from '@features/games/backend/stream/reversi-game.js';
+import { ReversiChannel } from '@features/games/reversi/backend/stream/reversi.js';
+import { ReversiGameChannel } from '@features/games/reversi/backend/stream/reversi-game.js';
 import { sessionProviders } from '@features/auth/backend/session.providers.js';
 import { featureProviders } from '@features/index/backend/feature-providers.js';
 import { ServerService } from './ServerService.mjs';
