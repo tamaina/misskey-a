@@ -66,6 +66,9 @@ export function createDriveFileProcedure<Actor extends ApiActor, File>(deps: Cre
 		} catch (error) {
 			deps.logError(error);
 			const id = error !== null && typeof error === 'object' && 'id' in error ? error.id : undefined;
+			if (id === 'b9adda75-abe9-4c6d-bf12-b5575833960d') throw apiError({
+				code: 'NO_SUCH_FOLDER', message: 'No such folder.', id: 'b9adda75-abe9-4c6d-bf12-b5575833960d',
+			});
 			if (id === '282f77bf-5816-4f72-9264-aa14d8261a21') throw apiError({
 				code: 'INAPPROPRIATE', message: 'Cannot upload the file because it has been determined that it possibly contains inappropriate content.',
 				id: 'bec5bd69-fba3-43c9-b4fb-2894b66ad5d2',

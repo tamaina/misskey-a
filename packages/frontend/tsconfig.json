@@ -80,14 +80,19 @@
 		"./test/**/*.vue",
 		"./@types/**/*.ts",
 		"../features/*/frontend/**/*.ts",
+		"../features/games/*/frontend/**/*.ts",
 		"../features/*/frontend/**/*.vue",
+		"../features/games/*/frontend/**/*.vue",
 		"../features/*/shared/**/*.ts",
-		"../features/*/test/frontend/**/*.ts"
+		"../features/*/test/frontend/**/*.ts",
+		"../features/games/*/test/frontend/**/*.ts"
 	],
 	"exclude": [
 		"../features/*/frontend/embed/**",
+		"../features/games/*/frontend/embed/**",
 		"./src/**/*.stories.ts",
 		"../features/*/frontend/**/*.stories.ts",
+		"../features/games/*/frontend/**/*.stories.ts",
 		"../features/drive/frontend/workers/**/*.ts"
 	]
 }

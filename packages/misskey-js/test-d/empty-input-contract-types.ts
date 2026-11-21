@@ -4,7 +4,7 @@ import type { ContractEndpoints } from '../src/contract.types.js';
 import type { InferContractRouterInputs, InferContractRouterOutputs } from '@orpc/contract';
 import type { authContract } from '../built/contracts/auth/backend/api.definition.js';
 import type { PackedJsonValue } from '../built/contracts/users/backend/json-value.schema.js';
-import type { reversiInvitationsContract } from '../built/contracts/games/backend/endpoints/reversi/invitations.contract.js';
+import type { reversiInvitationsContract } from '../built/contracts/games/reversi/backend/endpoints/invitations.contract.js';
 import type { supportedCaptchaProviders } from '../built/contracts/auth/backend/auth.schema.js';
 type CaptchaProvider = typeof supportedCaptchaProviders[number];
 import type { Packed } from '../built/contracts/index/backend/packed.schema.js';

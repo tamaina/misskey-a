@@ -13,13 +13,21 @@
 		"../vue-shims.d.ts",
 		"../@types/**/*.d.ts",
 		"../../features/*/frontend/**/*.ts",
+		"../../features/games/*/frontend/**/*.ts",
 		"../../features/*/frontend/**/*.vue",
-		"../../features/*/test/frontend/**/*.ts"
+		"../../features/games/*/frontend/**/*.vue",
+		"../../features/*/test/frontend/**/*.ts",
+		"../../features/games/*/test/frontend/**/*.ts"
 	],
 	"exclude": [
+		"../../features/*/frontend/embed/**",
+		"../../features/games/*/frontend/embed/**",
 		"../../features/drive/frontend/workers/**/*.ts",
 		"../../features/*/frontend/**/*.stories.ts",
+		"../../features/games/*/frontend/**/*.stories.ts",
 		"../../features/*/frontend/**/*.stories.impl.ts",
-		"../../features/*/frontend/**/*.msw.ts"
+		"../../features/games/*/frontend/**/*.stories.impl.ts",
+		"../../features/*/frontend/**/*.msw.ts",
+		"../../features/games/*/frontend/**/*.msw.ts"
 	]
 }

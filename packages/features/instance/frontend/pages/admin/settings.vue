@@ -2668,7 +2668,7 @@ definePage(() => ({
 	"allowExternalApRedirect_description": "启用时，将允许其它服务器通过此服务器查询第三方内容，但有可能导致内容欺骗。",
 	"needToRestartServerToApply": "需要重启服务才能应用更改。",
 	"cacheRemoteFiles": "缓存远程文件",
-	"cacheRemoteFilesDescription": "启用此设定时，将在此服务器上缓存远程文件。虽然可以加快图片显示的速度，但是相对的会消耗大量的服务器存储空间。用户角色内的网盘容量决定了这个远程用户能在服务器上保留多少缓存。当超出了这个限制时，旧的文件将从缓存中被删除，成为链接。当禁用此设定时，则是从一开始就将远程文件保留为链接。此时推荐将  的 proxyRemoteFiles 设置为 true 以优化缩略图生成及保护用户隐私。",
+	"cacheRemoteFilesDescription": "启用此设定时，将在此服务器上缓存远程文件。虽然可以加快图片显示的速度，但是相对的会消耗大量的服务器存储空间。用户角色内的网盘容量决定了这个远程用户能在服务器上保留多少缓存。当超出了这个限制时，旧的文件将从缓存中被删除，成为链接。当禁用此设定时，则是从一开始就将远程文件保留为链接。",
 	"youCanCleanRemoteFilesCache": "可以使用文件管理的🗑️按钮来删除所有的缓存。",
 	"cacheRemoteSensitiveFiles": "缓存远程敏感媒体文件",
 	"cacheRemoteSensitiveFilesDescription": "如果禁用这项设定，远程服务器的敏感媒体将不会被缓存，而是直接链接。",

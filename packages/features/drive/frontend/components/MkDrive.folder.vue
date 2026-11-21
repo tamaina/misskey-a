@@ -250,7 +250,15 @@ function move() {
 	});
 }
 
-function deleteFolder() {
+async function deleteFolder() {
+	if (prefer.s.uploadFolder === props.folder.id) {
+		const { canceled } = await os.confirm({
+			type: 'warning',
+			text: $locale.value.sfc.uploadFolderDeletionConfirm,
+		});
+		if (canceled) return;
+	}
+
 	misskeyApi('drive/folders/delete', {
 		folderId: props.folder.id,
 	}).then(() => {
@@ -430,7 +438,8 @@ function onContextmenu(ev: PointerEvent) {
 	"openInWindow": "Obrir en una finestra nova",
 	"move": "Mou",
 	"copyFolderId": "Copiar ID de la carpeta",
-	"uploadFolder": "Carpeta per defecte on desar els arxius pujats"
+	"uploadFolder": "Carpeta per defecte on desar els arxius pujats",
+	"uploadFolderDeletionConfirm": "Aquesta carpeta ha estat designada com a destinació predeterminada per a les pujades. Si l'elimineu, ja no serà la destinació predeterminada i els fitxers pujaran al directori arrel."
 }
 </locale>
 
@@ -550,12 +559,14 @@ function onContextmenu(ev: PointerEvent) {
 	"openInWindow": "Apri in una finestra",
 	"move": "Sposta",
 	"copyFolderId": "Copia ID della cartella",
-	"uploadFolder": "Destinazione caricamento predefinita"
+	"uploadFolder": "Destinazione caricamento predefinita",
+	"uploadFolderDeletionConfirm": "Questa cartella è scelta come destinazione predefinita per i caricamenti. Eliminandola, la destinazione predefinita scompare e i file vengono caricati alla radice."
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
+	"uploadFolderDeletionConfirm": "このフォルダは既定アップロード先に指定されています。削除すると、既定アップロード先は解除され、ファイルはルートにアップロードされます。",
 	"unableToProcess": "操作を完了できません",
 	"circularReferenceFolder": "移動先のフォルダーは、移動するフォルダーのサブフォルダーです。",
 	"renameFolder": "フォルダー名を変更",
@@ -625,7 +636,8 @@ function onContextmenu(ev: PointerEvent) {
 	"openInWindow": "창으로 열기",
 	"move": "이동",
 	"copyFolderId": "폴더 ID 복사",
-	"uploadFolder": "기본 업로드 위치"
+	"uploadFolder": "기본 업로드 위치",
+	"uploadFolderDeletionConfirm": "이 폴더는 기본 업로드 위치로 지정되어 있습니다. 삭제하면 기본 업로드 위치 지정이 해제되고, 이후 파일은 루트 폴더에 업로드됩니다."
 }
 </locale>
 
