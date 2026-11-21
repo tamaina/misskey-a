@@ -36,7 +36,9 @@ Seat/felt presentation adapted from upstream PR #13112; see ../../README.md.
 	</div>
 	<div v-if="view.phase && !view.phase.submitted" :class="$style.actions">
 		<button v-for="action in view.phase.actions" :key="action.id" type="button" :disabled="busy || seconds === 0" :class="$style.action" @click="$emit('action', action.id)">
-			<span>{{ $locale.sfc[action.kind] }}</span>
+			<span>
+				{{ $locale.sfc[action.kind] }}<template v-if="hasSameTileAlternative(action)">（{{ action.tiles.endsWith('_') ? $locale.sfc.drawnDiscard : $locale.sfc.handDiscard }}）</template>
+			</span>
 			<span v-if="action.tiles"><Tile v-for="(tile, i) in handTiles(action.tiles)" :key="i" :tile="tile"/></span>
 		</button>
 	</div>
@@ -49,10 +51,20 @@ import Tile from './Tile.vue';
 import type { MahjongView } from '../../shared/view.schema.js';
 const props = defineProps<{ view: MahjongView; userId: string; names: Record<string, string>; busy: boolean; seconds: number }>();
 defineEmits<{ action: [id: string] }>();
+
+type Action = NonNullable<MahjongView['phase']>['actions'][number];
+
+function hasSameTileAlternative(action: Action): boolean {
+	if (action.kind !== 'discard' && action.kind !== 'riichi') return false;
+	// The core marks a discard of the just-drawn tile with a trailing underscore.
+	const alternate = action.tiles.endsWith('_') ? action.tiles.slice(0, -1) : `${action.tiles}_`;
+	return props.view.phase?.actions.some(other => other.kind === action.kind && other.tiles === alternate) ?? false;
+}
+
 const seats = computed(() => props.view.snapshot?.seats.map((seat, index) => ({ seat, index })).sort((a, b) => Number(a.seat.userId === props.userId) - Number(b.seat.userId === props.userId)) ?? []);
 </script>
 <locale locale="ja-JP" lang="json">
-{"hand":"局","honba":"本場","remaining":"残り","riichiSticks":"供託","dora":"ドラ表示牌","handTiles":"手牌","discards":"捨て牌","standings":"最終順位","ended":"対局終了 — 牌譜は公開されません","waiting":"他の参加者の操作を待っています","choose":"操作を選んでください","seconds":"秒","discard":"打牌","riichi":"リーチ","chi":"チー","pon":"ポン","kan":"カン","win":"和了","draw":"流局","pass":"見送る","continue":"次へ"}
+{"hand":"局","honba":"本場","remaining":"残り","riichiSticks":"供託","dora":"ドラ表示牌","handTiles":"手牌","discards":"捨て牌","standings":"最終順位","ended":"対局終了 — 牌譜は公開されません","waiting":"他の参加者の操作を待っています","choose":"操作を選んでください","seconds":"秒","discard":"打牌","riichi":"リーチ","handDiscard":"手出し","drawnDiscard":"ツモ切り","chi":"チー","pon":"ポン","kan":"カン","win":"和了","draw":"流局","pass":"見送る","continue":"次へ"}
 </locale>
 <style module>
 .table { padding: 20px; border-radius: 16px; background: radial-gradient(ellipse at top, #286a61, #143e39); color: #fff; box-shadow: inset 0 0 0 1px #ffffff20; }

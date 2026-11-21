@@ -37,6 +37,29 @@ test('renders only the supplied private hand, emits the offered action, and disa
 	}
 });
 
+test.each([
+	['discard', '打牌'],
+	['riichi', 'リーチ'],
+] as const)('distinguishes hand and draw variants of the same %s tile without changing action IDs', async (kind, label) => {
+	const intl = createInternationalization({ initialLocale: 'ja-JP' });
+	await intl.ready;
+	const phase = {
+		...view.phase!,
+		actions: [
+			{ id: `${kind}:s1`, kind, tiles: 's1' },
+			{ id: `${kind}:s1_`, kind, tiles: 's1_' },
+		],
+	};
+	const wrapper = render(Table, { global: { plugins: [intl] }, props: { view: { ...view, phase }, userId: 'alice', names: {}, busy: false, seconds: 30 } });
+	try {
+		await fireEvent.click(wrapper.getByRole('button', { name: `${label}（手出し） s1` }));
+		await fireEvent.click(wrapper.getByRole('button', { name: `${label}（ツモ切り） s1` }));
+		expect(wrapper.emitted().action).toEqual([[`${kind}:s1`], [`${kind}:s1_`]]);
+	} finally {
+		wrapper.unmount();
+	}
+});
+
 test('shows the ordered final scores only for a completed match', async () => {
 	const intl = createInternationalization({ initialLocale: 'ja-JP' });
 	await intl.ready;
