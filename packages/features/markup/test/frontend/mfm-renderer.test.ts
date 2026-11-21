@@ -9,13 +9,12 @@ import { createMfmRenderer } from '../../frontend/shared/mfm-renderer.js';
 import type { VNode } from 'vue';
 import type { MfmBaseProps, MfmRendererConfig } from '../../frontend/shared/mfm-renderer.js';
 
-vi.mock('@features/boot/frontend/shared/config.js', () => ({ host: 'synthetic.invalid' }));
 const component = (name: string) => defineComponent({ name, setup: () => () => h('span') });
 const components = { Url: component('Url'), Link: component('Link'), Mention: component('Mention'), A: component('A'), Time: component('Time'), Emoji: component('Emoji'), CustomEmoji: component('CustomEmoji'), Code: component('Code'), CodeInline: component('CodeInline'), Search: component('Search'), Sparkle: component('Sparkle') };
 
 function render(text: string, config: Partial<MfmRendererConfig> = {}, props: Partial<MfmBaseProps> = {}) {
 	const emit = vi.fn();
-	const node = createMfmRenderer({ components: () => components, ...config })({ text, ...props }, { emit });
+	const node = createMfmRenderer({ host: 'synthetic.invalid', components: () => components, ...config })({ text, ...props }, { emit });
 	const nodes: VNode[] = [];
 
 	function visit(value: unknown): void {
@@ -56,7 +55,7 @@ describe('shared MFM renderer', () => {
 
 	test('reads changed animation preferences on every render and preserves legacy class', () => {
 		let enabled = true;
-		const renderer = createMfmRenderer({ components: () => components, getOptions: () => ({ advancedMfm: enabled, animatedMfm: enabled }) });
+		const renderer = createMfmRenderer({ host: 'synthetic.invalid', components: () => components, getOptions: () => ({ advancedMfm: enabled, animatedMfm: enabled }) });
 		const emit = vi.fn();
 		const first = renderer({ text: '$[rainbow text]' }, { emit });
 		expect((first?.children as VNode[])[0].props?.style).toContain('animation: mfm-rainbow');
@@ -67,8 +66,8 @@ describe('shared MFM renderer', () => {
 
 	test('gates navigation and emoji menu props by the adapter capability', () => {
 		const props = { text: '', linkNavigationBehavior: 'window', enableEmojiMenu: true, enableEmojiMenuReaction: true };
-		const full = createMfmRenderer<typeof props>({ components: () => components, supports: { navigationBehavior: true, emojiMenu: true } });
-		const embedded = createMfmRenderer<typeof props>({ components: () => components });
+		const full = createMfmRenderer<typeof props>({ host: 'synthetic.invalid', components: () => components, supports: { navigationBehavior: true, emojiMenu: true } });
+		const embedded = createMfmRenderer<typeof props>({ host: 'synthetic.invalid', components: () => components });
 		for (const [renderer, supported] of [[full, true], [embedded, false]] as const) {
 			const node = renderer({ ...props, text: 'https://example.invalid :test:' }, { emit: vi.fn() });
 			const children = node?.children as VNode[];
