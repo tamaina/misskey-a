@@ -12,6 +12,9 @@ import { MiFukushuDeck } from './models/FukushuDeck.js';
 import { MiFukushuQuestion } from './models/FukushuQuestion.js';
 import { MiFukushuQuestionVersion } from './models/FukushuQuestionVersion.js';
 import { MiFukushuOperationReceipt } from './models/FukushuOperationReceipt.js';
+import { MiFukushuAnkiMedia } from './models/FukushuAnkiMedia.js';
+import { validateAnkiMedia, validateAnkiMediaReferences } from './anki-media.js';
+import type { AnkiMediaAsset } from '../shared/anki-media.schema.js';
 import type { FukushuMaterial } from '../shared/material.schema.js';
 import type { DataSource, EntityManager } from 'typeorm';
 
@@ -26,16 +29,17 @@ export class FukushuStore {
 
 	async create(ownerId: string, input: unknown, options: { deduplicateSource?: boolean } = {}) {
 		const parsed = v.safeParse(materialSchema, input);
-		if (!parsed.success) throw new MaterialError('INVALID_MATERIAL');
+		if (!parsed.success || !validateAnkiMediaReferences([], parsed.output.questions)) throw new MaterialError('INVALID_MATERIAL');
 		const material = parsed.output;
 		await this.createTransaction(ownerId, manager => this.insertMaterial(manager, ownerId, material, options.deduplicateSource));
 		return material;
 	}
 
-	async createFromApkg(ownerId: string, fileId: string, requestId: string, identity: { size: number; md5: string }, input: FukushuMaterial): Promise<void> {
+	async createFromApkg(ownerId: string, fileId: string, requestId: string, identity: { size: number; md5: string }, input: FukushuMaterial, media: AnkiMediaAsset[] = []): Promise<void> {
 		const material = v.safeParse(materialSchema, input);
 		const id = v.parse(studyRequestIdSchema, requestId);
-		if (!material.success || material.output.deck.sourceType !== 'anki-apkg') throw new MaterialError('INVALID_MATERIAL');
+		if (!material.success || material.output.deck.sourceType !== 'anki-apkg'
+			|| !await validateAnkiMedia(media, material.output.questions)) throw new MaterialError('INVALID_MATERIAL');
 		const request = JSON.stringify({ operation: 'anki-apkg', fileId });
 		await this.createTransaction(ownerId, async manager => {
 			const receipts = manager.getRepository(MiFukushuOperationReceipt);
@@ -51,8 +55,17 @@ export class FukushuStore {
 			if (source.userHost !== null || source.uri !== null || source.isLink || !/\.apkg$/i.test(source.name)
 				|| source.size !== identity.size || source.md5 !== identity.md5) throw new MaterialError('IMPORT_FAILED');
 			await this.insertMaterial(manager, ownerId, material.output, true);
+			if (media.length) await manager.getRepository(MiFukushuAnkiMedia).insert(media.map(asset => ({
+				ownerId, deckId: material.output.deck.id, id: asset.id, mimeType: asset.mimeType, data: Buffer.from(asset.data, 'base64'),
+			})));
 			await receipts.insert({ ownerId, id, request, result: JSON.stringify({ imported: true, deckId: material.output.deck.id }) });
 		});
+	}
+
+	async readAnkiMedia(ownerId: string, deckId: string, mediaId: string): Promise<AnkiMediaAsset> {
+		const media = await this.db.getRepository(MiFukushuAnkiMedia).findOneBy({ ownerId, deckId, id: mediaId });
+		if (!media) throw new MaterialError('NO_SUCH_MATERIAL');
+		return { id: media.id, mimeType: media.mimeType, data: media.data.toString('base64') };
 	}
 
 	private async createTransaction(ownerId: string, work: (manager: EntityManager) => Promise<void>) {

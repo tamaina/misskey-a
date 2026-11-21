@@ -2,6 +2,11 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 
 """Generate non-user APKG samples with the official Anki exporter (anki==25.9)."""
+import math
+import struct
+import wave
+import zlib
+from io import BytesIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -96,6 +101,44 @@ with TemporaryDirectory() as directory:
         collection.export_anki_package(
             out_path=str(here / "interactive-custom-21b.apkg"),
             options=ExportAnkiPackageOptions(legacy=False),
+            limit=None,
+        )
+    finally:
+        collection.close()
+
+
+# Media fixture: generated raster/color and test tone, no original user data.
+# Anki writes the real media map, compressed payloads and template on export.
+def chunk(kind, data):
+    return struct.pack(">I", len(data)) + kind + data + struct.pack(">I", zlib.crc32(kind + data))
+
+
+with TemporaryDirectory() as directory:
+    collection = Collection(str(Path(directory) / "collection.anki2"))
+    try:
+        deck = collection.decks.id("Anki media smoke")
+        model = collection.models.by_name("Basic")
+        assert model is not None
+        model["name"] = "Media Basic"
+        model["tmpls"][0]["qfmt"] = '<div class="prompt">{{Front}}</div>'
+        model["tmpls"][0]["afmt"] = '<strong class="answer">{{Back}}</strong>'
+        collection.models.update_dict(model)
+        pixels = bytes([0, 0, 120, 255, 255, 255, 0, 240, 255])
+        png = (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", 2, 1, 8, 6, 0, 0, 0))
+               + chunk(b"IDAT", zlib.compress(pixels)) + chunk(b"IEND", b""))
+        sound = BytesIO()
+        with wave.open(sound, "wb") as output:
+            output.setparams((1, 2, 8000, 0, "NONE", "not compressed"))
+            output.writeframes(b"".join(struct.pack("<h", int(1600 * math.sin(2 * math.pi * 440 * i / 8000)))
+                                        for i in range(1600)))
+        image_name = collection.media.write_data("test-raster.png", png)
+        audio_name = collection.media.write_data("test-tone.wav", sound.getvalue())
+        note = collection.new_note(model)
+        note.fields = [f'Test image <img src="{image_name}" alt="Test raster">', f'Test audio [sound:{audio_name}]']
+        collection.add_note(note, deck)
+        collection.export_anki_package(
+            out_path=str(here / "media-21b.apkg"),
+            options=ExportAnkiPackageOptions(legacy=False, with_media=True),
             limit=None,
         )
     finally:

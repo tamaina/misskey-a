@@ -4,8 +4,9 @@
  */
 import { createHash } from 'node:crypto';
 import { In, QueryFailedError } from 'typeorm';
-import { BackupError, decodeBackup } from './backup-codec.js';
+import { BackupError, decodeBackup, validateBackupMedia } from './backup-codec.js';
 import { MaterialError } from './store.js';
+import { MiFukushuAnkiMedia } from './models/FukushuAnkiMedia.js';
 import { MiFukushuDeck } from './models/FukushuDeck.js';
 import { MiFukushuQuestion } from './models/FukushuQuestion.js';
 import { MiFukushuQuestionVersion } from './models/FukushuQuestionVersion.js';
@@ -35,6 +36,7 @@ export class FukushuBackupRestorer {
 				if (!file || file.userId !== ownerId) throw new MaterialError('NO_SUCH_FILE');
 				if (file.userHost !== null || file.uri !== null || file.isLink || file.size !== bytes.length || file.md5 !== createHash('md5').update(bytes).digest('hex')) throw new BackupError('BACKUP_FAILED');
 				const payload = decodeBackup(bytes);
+				await validateBackupMedia(payload);
 				const id = payload.material.deck.id;
 				const decks = manager.getRepository(MiFukushuDeck);
 				const questions = manager.getRepository(MiFukushuQuestion);
@@ -65,6 +67,11 @@ export class FukushuBackupRestorer {
 				for (const batch of batches(versionRows)) await versions.insert(batch);
 				for (const batch of batches(payload.states.map(row => ({ ...row, ownerId, deckId: id })))) await states.insert(batch);
 				for (const batch of batches(reviewRows)) await reviews.insert(batch);
+				if (payload.media) {
+					await manager.getRepository(MiFukushuAnkiMedia).insert(payload.media.map(asset => ({
+						ownerId, deckId: id, id: asset.id, mimeType: asset.mimeType, data: Buffer.from(asset.data, 'base64'),
+					})));
+				}
 				return { restored: true, deckId: id, archived: payload.deckState.archivedAt !== null, questions: payload.questions.length, versions: versionRows.length, studyStates: payload.states.length, reviews: reviewRows.length };
 			});
 		} catch (error) {

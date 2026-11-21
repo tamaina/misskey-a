@@ -57,12 +57,12 @@ export async function processApkgJob(data: DbImportFukushuData, deps: ApkgJobDep
 	if (await deps.restored(ownerId, fileId, requestId, 'anki-apkg')) return;
 	const identity = { size, md5 };
 	await deps.progress(10);
-	const material = await deps.withApkg(ownerId, fileId, identity, async snapshot => {
+	const { material, media } = await deps.withApkg(ownerId, fileId, identity, async snapshot => {
 		await deps.progress(30);
 		return deps.decode(snapshot);
 	});
 	await deps.progress(80);
-	await deps.commit(ownerId, fileId, requestId, identity, material);
+	await deps.commit(ownerId, fileId, requestId, identity, material, media);
 }
 
 @Injectable()

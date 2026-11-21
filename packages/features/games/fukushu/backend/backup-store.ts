@@ -5,13 +5,15 @@
 
 import { In } from 'typeorm';
 import { MAX_BACKUP_BYTES, MAX_BACKUP_VERSIONS } from '../shared/backup.schema.js';
+import { MAX_ANKI_MEDIA_BYTES } from '../shared/anki-media.schema.js';
+import { MiFukushuAnkiMedia } from './models/FukushuAnkiMedia.js';
 import { MiFukushuDeck } from './models/FukushuDeck.js';
 import { MiFukushuQuestion } from './models/FukushuQuestion.js';
 import { MiFukushuQuestionVersion } from './models/FukushuQuestionVersion.js';
 import { MiFukushuStudyState } from './models/FukushuStudyState.js';
 import { MiFukushuReviewLog } from './models/FukushuReviewLog.js';
 import { MaterialError } from './store.js';
-import { BackupError, encodeBackup, validateBackup } from './backup-codec.js';
+import { BackupError, encodeBackup, validateBackup, validateBackupMedia } from './backup-codec.js';
 import type { BackupPayload, BackupInspection } from '../shared/backup.schema.js';
 import type { DataSource } from 'typeorm';
 
@@ -42,6 +44,15 @@ export class FukushuBackupStore {
 				budget += Number(size.bytes) + size.count * 128;
 				if (size.count > limit || budget > MAX_BACKUP_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
 			}
+			const [mediaSize] = await manager.query(
+				'SELECT COUNT(*)::int AS count, COALESCE(SUM(4 * ((octet_length(data) + 2) / 3)), 0)::text AS bytes FROM fukushu_anki_media WHERE "ownerId" = $1 AND "deckId" = $2',
+				[ownerId, id],
+			) as { count: number; bytes: string }[];
+			const mediaBudget = Number(mediaSize.bytes) + mediaSize.count * 128;
+			if (mediaSize.count > 2 || Number(mediaSize.bytes) > 2 * 4 * Math.ceil(MAX_ANKI_MEDIA_BYTES / 3)
+				|| budget + mediaBudget > MAX_BACKUP_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
+			const mediaRows = mediaSize.count ? await manager.getRepository(MiFukushuAnkiMedia)
+				.find({ where: { ownerId, deckId: id }, order: { id: 'ASC' } }) : [];
 			const questions = await manager.getRepository(MiFukushuQuestion).find({ where: { ownerId, deckId: id }, order: { position: 'ASC' } });
 			const versions = await manager.getRepository(MiFukushuQuestionVersion).createQueryBuilder('v')
 				.innerJoin(MiFukushuQuestion, 'q', 'q."ownerId" = v."ownerId" AND q.id = v."questionId"')
@@ -49,8 +60,9 @@ export class FukushuBackupStore {
 				.orderBy('v.questionId', 'ASC').addOrderBy('v.version', 'ASC').getMany();
 			const states = await manager.getRepository(MiFukushuStudyState).find({ where: { ownerId, deckId: id }, order: { questionId: 'ASC' } });
 			const reviews = await manager.getRepository(MiFukushuReviewLog).find({ where: { ownerId, deckId: id }, order: { reviewedAt: 'ASC', id: 'ASC' } });
-			return encodeBackup({
+			const payload = validateBackup({
 				exportedAt: this.clock().toISOString(), material: { deck: deck.data, questions: questions.map(q => q.data) },
+				...(mediaRows.length ? { media: mediaRows.map(({ id, mimeType, data }) => ({ id, mimeType, data: data.toString('base64') })) } : {}),
 				deckState: { revision: deck.revision, archivedAt: deck.archivedAt?.toISOString() ?? null },
 				questions: questions.map(q => ({ questionId: q.id, position: q.position, currentVersion: q.currentVersion })),
 				versions: versions.map(v => ({ questionId: v.questionId, version: v.version, recordedAt: v.recordedAt.toISOString(), kind: v.kind, data: v.data })),
@@ -59,16 +71,19 @@ export class FukushuBackupStore {
 																																	reviewedAt: r.reviewedAt.toISOString(), data: r.data, before: r.before, after: r.after, request: r.request,
 																																	schedulerVersion: r.schedulerVersion, desiredRetention: r.desiredRetention, enableFuzz: r.enableFuzz })),
 			});
+			await validateBackupMedia(payload);
+			return encodeBackup(payload);
 		});
 	}
 
 	async inspect(ownerId: string, value: BackupPayload): Promise<BackupInspection> {
 		const payload = validateBackup(value);
+		await validateBackupMedia(payload);
 		return this.db.transaction('REPEATABLE READ', async manager => {
 			await manager.query('SET TRANSACTION READ ONLY');
 			const deckId = payload.material.deck.id;
 			return {
-				format: 'misskey-fukushu-deck-backup', version: 1, restored: false,
+				format: 'misskey-fukushu-deck-backup', version: payload.media ? 2 : 1, restored: false,
 				deckId, deckName: payload.material.deck.name, exportedAt: payload.exportedAt,
 				archived: payload.deckState.archivedAt !== null, questions: payload.questions.length,
 				versions: payload.versions.length, studyStates: payload.states.length, reviews: payload.reviews.length,

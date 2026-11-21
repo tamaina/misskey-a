@@ -148,6 +148,8 @@ import type {
 	FukushuMaterialsCreateResponse,
 	FukushuMaterialsShowRequest,
 	FukushuMaterialsShowResponse,
+	FukushuMaterialsAnkiMediaRequest,
+	FukushuMaterialsAnkiMediaResponse,
 	FukushuMaterialsUpdateRequest,
 	FukushuMaterialsUpdateResponse,
 	FukushuMaterialsUpdateCardExplanationRequest,
@@ -941,6 +943,7 @@ export type Endpoints = {
 	'fukushu/materials/import': { req: FukushuMaterialsImportRequest; res: FukushuMaterialsImportResponse };
 	'fukushu/materials/create': { req: FukushuMaterialsCreateRequest; res: FukushuMaterialsCreateResponse };
 	'fukushu/materials/show': { req: FukushuMaterialsShowRequest; res: FukushuMaterialsShowResponse };
+	'fukushu/materials/anki-media': { req: FukushuMaterialsAnkiMediaRequest; res: FukushuMaterialsAnkiMediaResponse };
 	'fukushu/materials/update': { req: FukushuMaterialsUpdateRequest; res: FukushuMaterialsUpdateResponse };
 	'fukushu/materials/update-card-explanation': { req: FukushuMaterialsUpdateCardExplanationRequest; res: FukushuMaterialsUpdateCardExplanationResponse };
 	'fukushu/materials/card-versions': { req: FukushuMaterialsCardVersionsRequest; res: FukushuMaterialsCardVersionsResponse };

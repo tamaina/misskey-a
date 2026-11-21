@@ -84,8 +84,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<ol v-if="!studyActive" :class="$style.questions">
 					<li v-for="question in visibleQuestions" :key="question.id" class="_panel _gaps_s" :class="$style.panel">
 						<span v-if="!question.enabled" :class="$style.muted">{{ $locale.sfc.disabled }}</span>
-						<StaticAnkiCard :fallback="question.payload.prompt.value" :html="question.payload.ankiTemplate?.frontHtml" :css="question.payload.ankiTemplate?.css"/>
-						<details :class="$style.answer"><summary>{{ $locale.sfc.answer }}</summary><StaticAnkiCard :fallback="question.payload.answer.value" :html="question.payload.ankiTemplate?.backHtml" :css="question.payload.ankiTemplate?.css"/><p v-if="question.payload.explanation" :class="$style.content">{{ question.payload.explanation.value }}</p></details>
+						<StaticAnkiCard :deckId="question.deckId" :fallback="question.payload.prompt.value" :html="question.payload.ankiTemplate?.frontHtml" :css="question.payload.ankiTemplate?.css"/>
+						<details :class="$style.answer" @toggle="toggleAnswer(question.id, $event)">
+							<summary>{{ $locale.sfc.answer }}</summary>
+							<StaticAnkiCard :deckId="openBacks.has(question.id) ? question.deckId : undefined" :fallback="question.payload.answer.value" :html="question.payload.ankiTemplate?.backHtml" :css="question.payload.ankiTemplate?.css"/>
+							<p v-if="question.payload.explanation" :class="$style.content">{{ question.payload.explanation.value }}</p>
+						</details>
 					</li>
 				</ol>
 				<div v-if="!studyActive" :class="$style.heading">
@@ -103,7 +107,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script setup lang="ts">
 import StaticAnkiCard from '../components/StaticAnkiCard.vue';
-import { computed, onBeforeUnmount, ref } from 'vue';
+import { computed, onBeforeUnmount, reactive, ref, watch } from 'vue';
 import { $i } from '@features/auth/frontend/i.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { chooseDriveFile } from '@features/drive/frontend/utility/drive.js';
@@ -125,6 +129,7 @@ const openOnStartup = prefer.model('fukushu.openOnStartup');
 const decks = ref<Omit<FukushuMaterial['deck'], 'sourceText'>[]>([]);
 type ManagedMaterial = FukushuMaterial & { revision: number; archivedAt: string | null };
 const material = ref<ManagedMaterial | null>(null);
+const openBacks = reactive(new Set<string>());
 const archivedList = ref(false);
 const sourceActive = ref(false);
 const editing = ref(false);
@@ -144,6 +149,13 @@ const loaded = ref(false);
 const error = ref('');
 const notice = ref('');
 const pageIndex = ref(0);
+
+function toggleAnswer(questionId: string, event: Event) {
+	if ((event.currentTarget as HTMLDetailsElement).open) openBacks.add(questionId);
+	else openBacks.delete(questionId);
+}
+
+watch([pageIndex, () => material.value?.deck.id, studyActive], () => openBacks.clear());
 const pageCount = computed(() => Math.ceil((material.value?.questions.length ?? 0) / 20));
 const visibleQuestions = computed(() => material.value?.questions.slice(pageIndex.value * 20, (pageIndex.value + 1) * 20) ?? []);
 const sample = '#separator:Tab\n#html:false\n#notetype:Basic\n#deck:地理\n日本の首都は？\t東京\nフランスの首都は？\tパリ';

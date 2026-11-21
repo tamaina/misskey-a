@@ -3,8 +3,8 @@
 Refs #310; depends on #328. Design recorded before implementation.
 
 This document describes the #330 export/inspection pilot. The subsequent
-[atomic native restore](RESTORE.md) adds conflict-free insertion without changing
-this file format or enabling upstream full-database replacement.
+[atomic native restore](RESTORE.md) adds conflict-free insertion without enabling upstream full-database replacement.
+Native media backups add version 2 while retaining version 1 for decks without attachments.
 
 ## Scope and existing convention
 
@@ -21,8 +21,9 @@ checks ownership of the selected local Drive original before reading it. The
 client cannot supply an owner, URL, object-store key, or filesystem path.
 
 Drive ownership does not make the file's download URL private. The export control
-explains that the file contains material and review history and that a person
-with its URL may download it. Existing Drive storage/delivery rules are retained;
+explains that a person with the URL may download the file, including its material,
+review history and any attached media. Native deck attachments are private at
+rest and during study; the exported copy follows the usual Drive link policy. Existing Drive storage/delivery rules are retained;
 this feature does not introduce public links, access keys, or a new privacy model.
 
 ## Upstream compatibility
@@ -52,6 +53,15 @@ metadata is separate. Known upstream archive/JSON formats are explicitly rejecte
 by the native inspector, without writing or silently dropping unsupported data.
 Checksum verification detects accidental corruption, not trusted authorship.
 
+Version 1 remains unchanged for decks without stored media. Version 2 adds a
+nonempty `payload.media` array with the actual attachment bytes as Base64, their
+SHA-256 identities and MIME types. It contains no Drive URLs, local paths or
+owner identifiers. The experimental format accepts at most one canonical static
+PNG and one 16-bit PCM WAVE, up to 256 KiB each. Both current and saved card
+versions are checked against those bytes. Missing, unused, mislabeled or invalid
+attachments reject the entire file. Media-free v2 and media placeholders without
+attachments are rejected rather than silently treated as v1.
+
 ## Consistent and bounded snapshot
 
 Use a single PostgreSQL REPEATABLE READ transaction, reading only the authenticated
@@ -62,8 +72,9 @@ review request identities and timestamps. Never manufacture virtual states or
 baselines on export. Exclude owner/account IDs, tokens and unrelated Drive files.
 
 This first bounded JSON pilot has an 8 MiB file limit. Before materializing rows,
-measure decompressed JSON text plus a conservative per-row metadata allowance in
-the same transaction; enforce record-count bounds. Recheck the final serialized
+measure decompressed JSON text, Base64 expansion for stored attachments and a
+conservative per-row metadata allowance in the same transaction; enforce
+record-count bounds. Recheck the final serialized
 size. Reject a large snapshot as a whole; never truncate history or produce a
 partial file. A streaming archive for larger decks is a separate follow-up.
 Release the snapshot transaction before uploading to Drive. Always clean up the
@@ -85,8 +96,8 @@ checks are a snapshot, not a reservation or permission to apply later.
 A future restore must revalidate inside a transaction and choose an explicit
 policy: empty destination or conflict-free insertion first; never implicit replace
 or merge. Preserve upstream records whose exact historical card content is unknown
-with truthful provenance instead of fabricating version snapshots. Media/APKG,
-settings, quiz, cross-owner mapping and full-account restore remain unimplemented.
+with truthful provenance instead of fabricating version snapshots. Upstream attachment formats, settings, quiz and full-account restore remain outside
+this native backup path.
 
 ### Follow-up import boundary
 

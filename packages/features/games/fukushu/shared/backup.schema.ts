@@ -4,6 +4,7 @@
  */
 
 import * as v from 'valibot';
+import { ankiMediaAssetsSchema } from './anki-media.schema.js';
 import { learningSettingsSchema } from './upstream-records.schema.js';
 import { sourceIdSchema, materialSchema, questionSchema } from './material.schema.js';
 import { studyStateRecordSchema, reviewLogRecordSchema, storedFsrsCardSchema, studyReviewInputSchema, studyRequestIdSchema } from './study.schema.js';
@@ -25,17 +26,27 @@ export const backupPayloadSchema = v.strictObject({
 		request: studyReviewInputSchema, schedulerVersion: v.literal('ts-fsrs@5.4.1'), desiredRetention: learningSettingsSchema.entries.desiredRetention, enableFuzz: v.literal(false),
 	})), v.maxLength(10_000)),
 });
-export const backupEnvelopeSchema = v.strictObject({
-	format: v.literal('misskey-fukushu-deck-backup'), version: v.literal(1), payload: backupPayloadSchema,
-	sha256: v.pipe(v.string(), v.regex(/^[0-9a-f]{64}$/)),
-});
+const mediaBackupPayloadSchema = v.pipe(v.strictObject({
+	...backupPayloadSchema.entries,
+	media: ankiMediaAssetsSchema,
+}), v.check(payload => payload.media.length > 0 && payload.material.deck.sourceType === 'anki-apkg'));
+const digest = v.pipe(v.string(), v.regex(/^[0-9a-f]{64}$/));
+export const backupEnvelopeSchema = v.variant('version', [
+	v.strictObject({
+		format: v.literal('misskey-fukushu-deck-backup'), version: v.literal(1), payload: backupPayloadSchema, sha256: digest,
+	}),
+	v.strictObject({
+		format: v.literal('misskey-fukushu-deck-backup'), version: v.literal(2), payload: mediaBackupPayloadSchema, sha256: digest,
+	}),
+]);
+export const nativeBackupPayloadSchema = v.union([backupPayloadSchema, mediaBackupPayloadSchema]);
 export const backupInspectionSchema = v.strictObject({
-	format: v.literal('misskey-fukushu-deck-backup'), version: v.literal(1), restored: v.literal(false),
+	format: v.literal('misskey-fukushu-deck-backup'), version: v.union([v.literal(1), v.literal(2)]), restored: v.literal(false),
 	deckName: v.string(), deckId: sourceIdSchema, exportedAt: time, archived: v.boolean(),
 	questions: v.number(), versions: v.number(), studyStates: v.number(), reviews: v.number(),
 	conflicts: v.strictObject({ deck: v.boolean(), questions: v.number(), reviews: v.number() }),
 });
-export type BackupPayload = v.InferOutput<typeof backupPayloadSchema>;
+export type BackupPayload = v.InferOutput<typeof backupPayloadSchema> & { media?: v.InferOutput<typeof ankiMediaAssetsSchema> };
 export type BackupInspection = v.InferOutput<typeof backupInspectionSchema>;
 
 export const backupRestoreResultSchema = v.strictObject({

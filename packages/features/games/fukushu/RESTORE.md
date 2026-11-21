@@ -4,14 +4,19 @@ Refs #310; depends on #330. Design recorded before implementation.
 
 ## Boundary
 
-Restore one `misskey-fukushu-deck-backup` JSON v1 file owned by the normal logged-in
-user in Drive. The 8 MiB, 1,000 question, 20,000 version and 10,000 review file
-limits remain. Upstream `.fukushu`, legacy JSON, media/APKG, settings, merge,
-replacement and ID remapping are unsupported. Never infer historical question
+Restore one `misskey-fukushu-deck-backup` JSON v1 or v2 file owned by the normal
+logged-in user in Drive. Version 2 includes bounded, verified native Anki media;
+v1 remains valid for decks without attachments. The 8 MiB, 1,000 question, 20,000
+version and 10,000 review file limits remain. Upstream `.fukushu`, legacy JSON,
+direct APKG restore through this endpoint, settings, merge, replacement and ID
+remapping are unsupported. Never infer historical question
 contents, regrade answers, replay FSRS, or reset due dates.
 
 Inspection is advisory. Restore always reads the owned original again and checks
 UTF-8, bytes, MD5, SHA-256, strict schemas and every version/history reference.
+It also validates v2 media digests and binary formats and requires every media
+reference in current and saved card versions to resolve to its declared type.
+No original APKG or original owner's Drive record is needed.
 The client supplies only the Drive file ID and explicit confirmation, never an
 owner or decoded payload. Third-party API tokens remain denied by secure policy.
 
@@ -36,11 +41,12 @@ archived ones, 64 versions per card, 32 MiB saved question-version JSON, and
 using the same formula as current writers. Refuse the complete backup if it does
 not fit; never trim history to make it fit.
 
-Insert deck, current questions, saved versions, study states and reviews in FK
-order, in bounded batches within one transaction. Preserve original IDs, revisions,
+Insert deck, current questions, saved versions, study states, reviews and
+optional deck attachments in FK order, in bounded batches within one transaction.
+Restored attachments belong to the destination owner and deck. Preserve original IDs, revisions,
 positions, timestamps, archived state, scheduler parameters and request payloads.
 Do not materialize virtual baseline versions or new-card study states. Any error
-rolls back all five tables. A retry after an uncertain successful response rejects
+rolls back the entire snapshot, including its attachments. A retry after an uncertain successful response rejects
 the now-existing IDs instead of duplicating history; the UI asks the user to check
 the library/history rather than automatically retrying.
 

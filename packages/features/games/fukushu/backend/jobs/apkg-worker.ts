@@ -4,13 +4,13 @@
  */
 import { readFile } from 'node:fs/promises';
 import { text } from 'node:stream/consumers';
-import { ApkgMaterialError, readApkgMaterial } from '../apkg-material.js';
+import { ApkgMaterialError, readApkgImport } from '../apkg-material.js';
 
 async function main() {
 	const { path, name, sha256 } = JSON.parse(await text(process.stdin));
 	try {
-		const material = await readApkgMaterial(await readFile(path), name, sha256);
-		process.stdout.write(JSON.stringify({ material }));
+		const imported = await readApkgImport(await readFile(path), name, sha256);
+		process.stdout.write(JSON.stringify(imported));
 	} catch (error) {
 		if (!(error instanceof ApkgMaterialError)) throw error;
 		process.stdout.write(JSON.stringify({ error: error.code }));

@@ -12,6 +12,7 @@ import { objectInput } from '../../../api/backend/transport/input.schema.js';
 import { materialSchema, deckSchema, sourceIdSchema, questionSchema, plainContentSchema } from '../shared/material.schema.js';
 import { backupContract } from './backup.contract.js';
 import { studyContract } from './study.contract.js';
+import { ankiMediaAssetSchema, ankiMediaIdSchema } from '../shared/anki-media.schema.js';
 import type { ApiProcedureMetadata } from '../../../api/backend/transport/policy.types.js';
 import type { Meta } from '@orpc/contract';
 
@@ -71,6 +72,9 @@ export const fukushuContract = {
 	show: base.$meta({ ...read, requestName: 'fukushu/materials/show' } as const satisfies Meta & ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/fukushu/materials/show', tags: ['fukushu'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 		.input(objectInput({ id: sourceIdSchema })).output(managedMaterialSchema),
+	ankiMedia: base.$meta({ ...read, secure: true, requestName: 'fukushu/materials/anki-media' } as const satisfies Meta & ApiProcedureMetadata)
+		.route({ method: 'POST', path: '/fukushu/materials/anki-media', tags: ['fukushu'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
+		.input(objectInput({ id: sourceIdSchema, mediaId: ankiMediaIdSchema })).output(ankiMediaAssetSchema),
 	update: base.$meta({ ...write, requestName: 'fukushu/materials/update' } as const satisfies Meta & ApiProcedureMetadata)
 		.route({ method: 'POST', path: '/fukushu/materials/update', tags: ['fukushu'], spec: current => ({ ...current, security: [{ bearerAuth: [] }] }) })
 		.input(objectInput({ id: sourceIdSchema, expectedRevision: revisionSchema, ...metadataSchema.entries })).output(managementSchema),

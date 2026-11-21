@@ -6,7 +6,8 @@
 import { createHash } from 'node:crypto';
 import { isDeepStrictEqual } from 'node:util';
 import * as v from 'valibot';
-import { backupEnvelopeSchema, backupPayloadSchema, MAX_BACKUP_BYTES } from '../shared/backup.schema.js';
+import { backupEnvelopeSchema, nativeBackupPayloadSchema, MAX_BACKUP_BYTES } from '../shared/backup.schema.js';
+import { validateAnkiMedia, validateAnkiMediaReferences } from './anki-media.js';
 import type { BackupPayload } from '../shared/backup.schema.js';
 
 export class BackupError extends Error {
@@ -17,9 +18,12 @@ const digest = (value: unknown) => createHash('sha256').update(JSON.stringify(va
 
 /** Checks saved relations and continuity without regrading or invoking FSRS. */
 export function validateBackup(value: unknown): BackupPayload {
-	const parsed = v.safeParse(backupPayloadSchema, value);
+	const parsed = v.safeParse(nativeBackupPayloadSchema, value);
 	if (!parsed.success) throw new BackupError('INVALID_BACKUP');
-	const p = parsed.output;
+	return validateBackupRelations(parsed.output);
+}
+
+function validateBackupRelations(p: BackupPayload): BackupPayload {
 	const check = (ok: unknown) => { if (!ok) throw new BackupError('INVALID_BACKUP'); };
 	const questions = new Map(p.material.questions.map(q => [q.id, q]));
 	const metadata = new Map(p.questions.map(q => [q.questionId, q]));
@@ -76,12 +80,22 @@ export function validateBackup(value: unknown): BackupPayload {
 		check(isDeepStrictEqual(rows?.at(-1)?.after, state.data.card)
 			&& rows?.at(-1)?.reviewedAt === state.data.updatedAt);
 	}
+	check(validateAnkiMediaReferences(p.media ?? [], mediaQuestions(p)));
 	return p;
+}
+
+function mediaQuestions(p: BackupPayload) {
+	return [...p.material.questions, ...p.versions.map(row => row.data)];
+}
+
+/** Check binary formats after structural validation and before inspecting, exporting or restoring v2. */
+export async function validateBackupMedia(payload: BackupPayload): Promise<void> {
+	if (payload.media && !await validateAnkiMedia(payload.media, mediaQuestions(payload))) throw new BackupError('INVALID_BACKUP');
 }
 
 export function encodeBackup(value: unknown): Buffer {
 	const payload = validateBackup(value);
-	const bytes = Buffer.from(JSON.stringify({ format: 'misskey-fukushu-deck-backup', version: 1, payload, sha256: digest(payload) }));
+	const bytes = Buffer.from(JSON.stringify({ format: 'misskey-fukushu-deck-backup', version: payload.media ? 2 : 1, payload, sha256: digest(payload) }));
 	if (bytes.length > MAX_BACKUP_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
 	return bytes;
 }
@@ -94,5 +108,5 @@ export function decodeBackup(bytes: Buffer): BackupPayload {
 	if (typeof raw === 'object' && raw !== null && 'format' in raw && raw.format === 'gift-fsrs-learning-backup') throw new BackupError('UPSTREAM_BACKUP_UNSUPPORTED');
 	const parsed = v.safeParse(backupEnvelopeSchema, raw);
 	if (!parsed.success || parsed.output.sha256 !== digest((raw as { payload: unknown }).payload)) throw new BackupError('INVALID_BACKUP');
-	return validateBackup(parsed.output.payload);
+	return validateBackupRelations(parsed.output.payload);
 }

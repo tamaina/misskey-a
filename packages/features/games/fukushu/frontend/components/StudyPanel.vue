@@ -33,7 +33,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<p v-else-if="!item" role="status">{{ $locale.sfc.completed }}</p>
 		<article v-if="item" class="_gaps" :class="$style.card">
 			<span :class="$style.muted">{{ item.isNew ? $locale.sfc.newCard : $locale.sfc.reviewCard }}</span>
-			<StaticAnkiCard :fallback="item.question.payload.prompt.value" :html="item.question.payload.ankiTemplate?.frontHtml" :css="item.question.payload.ankiTemplate?.css"/>
+			<StaticAnkiCard :key="item.question.id" :deckId="deckId" :fallback="item.question.payload.prompt.value" :html="item.question.payload.ankiTemplate?.frontHtml" :css="item.question.payload.ankiTemplate?.css"/>
 			<template v-if="!revealed">
 				<template v-if="item.question.payload.typeAnswer">
 					<label>
@@ -48,7 +48,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template v-else>
 				<div class="_gaps_s" :class="$style.answer">
 					<h3>{{ $locale.sfc.answer }}</h3>
-					<StaticAnkiCard :fallback="item.question.payload.answer.value" :html="item.question.payload.ankiTemplate?.backHtml" :css="item.question.payload.ankiTemplate?.css"/>
+					<StaticAnkiCard :key="item.question.id" :deckId="deckId" :fallback="item.question.payload.answer.value" :html="item.question.payload.ankiTemplate?.backHtml" :css="item.question.payload.ankiTemplate?.css"/>
 					<p v-if="item.question.payload.explanation" :class="$style.content">{{ item.question.payload.explanation.value }}</p>
 				</div>
 				<template v-if="saved">

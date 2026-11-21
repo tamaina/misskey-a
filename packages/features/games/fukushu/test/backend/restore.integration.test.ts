@@ -10,6 +10,7 @@ import { entities } from '@features/persistence/backend/postgres.js';
 import { FukushuMaterial1794838800000 } from '../../../../../backend/migration/1794838800000-FukushuMaterial.js';
 import { FukushuMaterialManagement1794871800000 } from '../../../../../backend/migration/1794871800000-FukushuMaterialManagement.js';
 import { FukushuQuestionVersions1794880800000 } from '../../../../../backend/migration/1794880800000-FukushuQuestionVersions.js';
+import { FukushuAnkiMedia1795305600000 } from '../../../../../backend/migration/1795305600000-FukushuAnkiMedia.js';
 import { FukushuLearningSettings1795053600000 } from '../../../../../backend/migration/1795053600000-FukushuLearningSettings.js';
 import { FukushuUpstreamStore1794924000000 } from '../../../../../backend/migration/1794924000000-FukushuUpstreamStore.js';
 import { FukushuStudy1794891600000 } from '../../../../../backend/migration/1794891600000-FukushuStudy.js';
@@ -19,7 +20,7 @@ import { FukushuStudyStore } from '../../backend/study-store.js';
 import { FukushuBackupStore } from '../../backend/backup-store.js';
 import { FukushuBackupRestorer } from '../../backend/backup-restore.js';
 import { decodeBackup, encodeBackup } from '../../backend/backup-codec.js';
-import { backupFixture } from './backup-fixture.js';
+import { backupFixture, mediaBackupFixture } from './backup-fixture.js';
 import { material } from './fixture.js';
 import type { StudyReviewInput } from '../../shared/study.schema.js';
 
@@ -53,6 +54,7 @@ describe.skipIf(!socket)('atomic native restore PostgreSQL', () => {
 			await new FukushuStudy1794891600000().up(runner);
 			await new FukushuUpstreamStore1794924000000().up(runner);
 			await new FukushuLearningSettings1795053600000().up(runner);
+			await new FukushuAnkiMedia1795305600000().up(runner);
 		} finally { await runner.release(); }
 	});
 	afterAll(async () => {
@@ -74,7 +76,7 @@ describe.skipIf(!socket)('atomic native restore PostgreSQL', () => {
 
 	async function allRows() {
 		const result = [];
-		for (const table of ['fukushu_deck', 'fukushu_question', 'fukushu_question_version', 'fukushu_study_state', 'fukushu_review_log']) result.push(await db.query(`SELECT to_jsonb(t) AS value FROM ${table} t ORDER BY to_jsonb(t)::text`));
+		for (const table of ['fukushu_deck', 'fukushu_question', 'fukushu_question_version', 'fukushu_study_state', 'fukushu_review_log', 'fukushu_anki_media']) result.push(await db.query(`SELECT to_jsonb(t) AS value FROM ${table} t ORDER BY to_jsonb(t)::text`));
 		return result;
 	}
 
@@ -112,6 +114,27 @@ describe.skipIf(!socket)('atomic native restore PostgreSQL', () => {
 		expect(restoredRows.map(rows => rows.filter((row: { value: { ownerId: string } }) => row.value.ownerId === 'alice'))).toEqual(sourceRows);
 		await expect(restorer.restore('bob', id)).rejects.toThrow('BACKUP_CONFLICT');
 		expect(await allRows()).toEqual(restoredRows);
+	});
+
+	test('restores private media byte-for-byte from the backup alone and does not duplicate it on retry', async () => {
+		const payload = mediaBackupFixture();
+		const file = await upload('alice', encodeBackup(payload));
+		await restorer.restore('alice', file);
+		await db.query('DELETE FROM drive_file WHERE id = $1', [file]);
+		files.delete(file);
+		const exported = await backups.export('alice', payload.material.deck.id);
+		const snapshot = decodeBackup(exported);
+		expect(snapshot).toEqual(payload);
+		expect(await backups.inspect('bob', snapshot)).toMatchObject({ version: 2, conflicts: { deck: false, questions: 0, reviews: 0 } });
+		const restoredFile = await upload('bob', exported);
+		await restorer.restore('bob', restoredFile);
+		expect(await db.query('SELECT "ownerId", id, "mimeType", data FROM fukushu_anki_media ORDER BY "ownerId"')).toEqual(
+			['alice', 'bob'].map(ownerId => ({ ownerId, id: payload.media![0].id, mimeType: 'audio/wav', data: Buffer.from(payload.media![0].data, 'base64') })),
+		);
+		const before = await allRows();
+		await expect(restorer.restore('bob', restoredFile)).rejects.toThrow('BACKUP_CONFLICT');
+		expect(await allRows()).toEqual(before);
+		expect(await backups.export('bob', payload.material.deck.id)).toEqual(exported);
 	});
 
 	test('preserves virtual baseline/state and inserts more than one batch in original position order', async () => {
@@ -183,6 +206,18 @@ describe.skipIf(!socket)('atomic native restore PostgreSQL', () => {
 			await expect(restorer.restore('bob', await upload('bob', encodeBackup(backupFixture())))).rejects.toThrow('forced_restore_failure');
 			expect(await allRows()).toEqual(before);
 		} finally { await db.query('ALTER TABLE fukushu_review_log DROP CONSTRAINT forced_restore_failure'); }
+	});
+
+	test('rolls back the complete deck when its final media insert fails', async () => {
+		const file = await upload('bob', encodeBackup(mediaBackupFixture()));
+		await db.query('ALTER TABLE fukushu_anki_media ADD CONSTRAINT forced_media_failure CHECK (false)');
+		try {
+			await expect(restorer.restore('bob', file)).rejects.toThrow('forced_media_failure');
+			expect((await allRows()).every(rows => rows.length === 0)).toBe(true);
+		} finally {
+			await db.query('ALTER TABLE fukushu_anki_media DROP CONSTRAINT forced_media_failure');
+		}
+		await expect(restorer.restore('bob', file)).resolves.toMatchObject({ restored: true });
 	});
 
 	test('serializes duplicate restores and retains exactly one complete history', async () => {

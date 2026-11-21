@@ -44,7 +44,7 @@ async function invoke<T>(operation: () => Promise<T>): Promise<T> {
 	}
 }
 
-export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'list' | 'update' | 'archive' | 'updateCardExplanation' | 'listCardVersions' | 'showCardVersion'>, importer?: Pick<FukushuDriveImporter, 'import'>, study?: Pick<FukushuStudyStore, 'queue' | 'review' | 'history'>, backup?: { restorer?: Pick<FukushuBackupRestorer, 'restore'>; store: Pick<FukushuBackupStore, 'assertOwned'>; inspector: Pick<FukushuBackupInspector, 'inspect' | 'inspectUpstream'>; enqueue(ownerId: string, deckId: string): Promise<void> }, upstream?: { store: Pick<FukushuUpstreamStore, 'assertOwned' | 'restore' | 'show' | 'today' | 'settings' | 'updateSettings' | 'review' | 'media' | 'updateGift' | 'createGift'>; restoreJob?(ownerId: string, input: Parameters<typeof sourceRestoreJob>[4]): ReturnType<typeof sourceRestoreJob>; readGift?(ownerId: string, fileId: string): Promise<Buffer>; enqueue(ownerId: string): Promise<void> }, reminders?: Pick<FukushuReminderStore, 'settings' | 'configure'>) {
+export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' | 'readAnkiMedia' | 'list' | 'update' | 'archive' | 'updateCardExplanation' | 'listCardVersions' | 'showCardVersion'>, importer?: Pick<FukushuDriveImporter, 'import'>, study?: Pick<FukushuStudyStore, 'queue' | 'review' | 'history'>, backup?: { restorer?: Pick<FukushuBackupRestorer, 'restore'>; store: Pick<FukushuBackupStore, 'assertOwned'>; inspector: Pick<FukushuBackupInspector, 'inspect' | 'inspectUpstream'>; enqueue(ownerId: string, deckId: string): Promise<void> }, upstream?: { store: Pick<FukushuUpstreamStore, 'assertOwned' | 'restore' | 'show' | 'today' | 'settings' | 'updateSettings' | 'review' | 'media' | 'updateGift' | 'createGift'>; restoreJob?(ownerId: string, input: Parameters<typeof sourceRestoreJob>[4]): ReturnType<typeof sourceRestoreJob>; readGift?(ownerId: string, fileId: string): Promise<Buffer>; enqueue(ownerId: string): Promise<void> }, reminders?: Pick<FukushuReminderStore, 'settings' | 'configure'>) {
 	const procedure = createApiProcedure<MiLocalUser>();
 	const principal = requirePrincipal<MiLocalUser>();
 	const upstreamStore = () => { if (!upstream) throw new BackupError('BACKUP_FAILED'); return upstream.store; };
@@ -63,6 +63,7 @@ export function createFukushuRouter(store: Pick<FukushuStore, 'create' | 'show' 
 				throw err;
 			}
 		}),
+		ankiMedia: procedure(fukushuContract.ankiMedia).use(principal).handler(({ input, context }) => invoke(() => store.readAnkiMedia(context.principal.id, input.id, input.mediaId))),
 		upstreamMedia: procedure(fukushuContract.upstreamMedia).use(principal).handler(({ input, context }) => invoke(() => upstreamStore().media(context.principal.id, input.id, input.offset))),
 		upstreamCreateGift: procedure(fukushuContract.upstreamCreateGift).use(principal).handler(({ input, context }) => invoke(() => {
 			const reader = upstream?.readGift;

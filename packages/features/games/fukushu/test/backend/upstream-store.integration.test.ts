@@ -16,6 +16,7 @@ import { entities } from '@features/persistence/backend/postgres.js';
 import { FukushuMaterial1794838800000 } from '../../../../../backend/migration/1794838800000-FukushuMaterial.js';
 import { FukushuMaterialManagement1794871800000 } from '../../../../../backend/migration/1794871800000-FukushuMaterialManagement.js';
 import { FukushuQuestionVersions1794880800000 } from '../../../../../backend/migration/1794880800000-FukushuQuestionVersions.js';
+import { FukushuAnkiMedia1795305600000 } from '../../../../../backend/migration/1795305600000-FukushuAnkiMedia.js';
 import { FukushuLearningSettings1795053600000 } from '../../../../../backend/migration/1795053600000-FukushuLearningSettings.js';
 import { FukushuStudy1794891600000 } from '../../../../../backend/migration/1794891600000-FukushuStudy.js';
 import { FukushuUpstreamStore1794924000000 } from '../../../../../backend/migration/1794924000000-FukushuUpstreamStore.js';
@@ -64,7 +65,7 @@ describe.skipIf(!socket)('persistent source-shaped Fukushu', () => {
 		await db.query('CREATE TABLE "user" (id varchar(32) PRIMARY KEY)');
 		await db.query('CREATE TABLE drive_file (id varchar(32) PRIMARY KEY, name text NOT NULL DEFAULT \'fixture.gift\', "userId" varchar(32) REFERENCES "user"(id), "userHost" text, uri text, "isLink" boolean NOT NULL DEFAULT false, size integer NOT NULL, md5 text NOT NULL)');
 		const runner = db.createQueryRunner();
-		try { for (const Migration of [FukushuMaterial1794838800000, FukushuMaterialManagement1794871800000, FukushuQuestionVersions1794880800000, FukushuStudy1794891600000, FukushuUpstreamStore1794924000000, FukushuSourceChunks1794974400000, FukushuMaterialBytes1794980000000, FukushuDeckHistoryIndex1794990000000, FukushuReminder1795040000000, FukushuLearningSettings1795053600000]) await new Migration().up(runner); } finally { await runner.release(); }
+		try { for (const Migration of [FukushuMaterial1794838800000, FukushuMaterialManagement1794871800000, FukushuQuestionVersions1794880800000, FukushuStudy1794891600000, FukushuUpstreamStore1794924000000, FukushuSourceChunks1794974400000, FukushuMaterialBytes1794980000000, FukushuDeckHistoryIndex1794990000000, FukushuReminder1795040000000, FukushuLearningSettings1795053600000, FukushuAnkiMedia1795305600000]) await new Migration().up(runner); } finally { await runner.release(); }
 	});
 	afterAll(async () => { if (db.isInitialized) { try { await db.query('DROP SCHEMA fukushu_upstream_test CASCADE'); } finally { await db.destroy(); } } });
 	beforeEach(async () => { await db.query('TRUNCATE "user" CASCADE'); await db.query('INSERT INTO "user" VALUES ($1), ($2)', ['alice', 'bob']); files.clear(); });

@@ -6,7 +6,13 @@
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { expect, test } from 'vitest';
-import { readApkgMaterial } from '../../backend/apkg-material.js';
+import { readApkgImport } from '../../backend/apkg-material.js';
+
+async function readApkgMaterial(...args: Parameters<typeof readApkgImport>) {
+	const imported = await readApkgImport(...args);
+	expect(imported.media).toBeUndefined();
+	return imported.material;
+}
 
 async function fixture(name: string) {
 	const bytes = await readFile(`../features/games/fukushu/test/backend/fixtures/apkg/${name}`);
@@ -80,4 +86,37 @@ test('refuses corrupt archive bytes and wrong Drive digests', async () => {
 	await expect(readApkgMaterial(bytes, 'test.apkg', digest)).rejects.toMatchObject({ code: 'APKG_INVALID' });
 	const actual = await fixture('basic-21b.apkg');
 	await expect(readApkgMaterial(actual.bytes, 'basic-21b.apkg', digest)).rejects.toMatchObject({ code: 'APKG_INVALID' });
+});
+
+test('imports the small PNG and PCM WAVE from an actual Anki 25.09 package', async () => {
+	const name = 'media-21b.apkg';
+	const { bytes, digest } = await fixture(name);
+	const { material, media } = await readApkgImport(bytes, name, digest);
+	expect(media?.map(asset => asset.mimeType).sort()).toEqual(['audio/wav', 'image/png']);
+	const [question] = material.questions;
+	for (const { id, mimeType, data } of media!) {
+		expect(createHash('sha256').update(Buffer.from(data, 'base64')).digest('hex')).toBe(id);
+		const side = mimeType === 'image/png' ? question.payload.ankiTemplate?.frontHtml : question.payload.ankiTemplate?.backHtml;
+		expect(side).toContain(`src="fukushu-media:${id}"`);
+		expect(side).not.toContain(data);
+	}
+});
+
+test('rejects unverified media bytes and incomplete or repeated per-face references', async () => {
+	const name = 'media-21b.apkg';
+	const { bytes, digest } = await fixture(name);
+	const { material, media } = await readApkgImport(bytes, name, digest);
+	const { normalizeAnkiAsset, validateAnkiMedia, validateAnkiMediaReferences } = await import('../../backend/anki-media.js');
+	const assets = media!;
+	expect(await validateAnkiMedia(assets, material.questions)).toBe(true);
+	expect(validateAnkiMediaReferences(assets.slice(0, 1), material.questions)).toBe(false);
+	const [question] = material.questions;
+	const template = question.payload.ankiTemplate!;
+	expect(validateAnkiMediaReferences(assets, [{ ...question, payload: { ...question.payload,
+		ankiTemplate: { ...template, frontHtml: template.frontHtml + template.frontHtml },
+	} }])).toBe(false);
+	const data = Buffer.from('Not an audio file');
+	const badAudio = { data, size: data.length, id: createHash('sha256').update(data).digest('hex'), mimeType: 'audio/wav' };
+	expect(await normalizeAnkiAsset(badAudio)).toBeNull();
+	expect(await normalizeAnkiAsset({ ...badAudio, mimeType: 'audio/mpeg' })).toBeNull();
 });

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { createHash } from 'node:crypto';
 import { emptyStoredCard, review } from '../../backend/fsrs.js';
 import { material } from './fixture.js';
 import type { BackupPayload } from '../../shared/backup.schema.js';
@@ -27,4 +28,22 @@ export function backupFixture(): BackupPayload {
 			schedulerVersion: 'ts-fsrs@5.4.1', desiredRetention: 0.9, enableFuzz: false,
 		}],
 	};
+}
+
+/** One sample of synthetic PCM16, mono, 8 kHz. No user material or decoder dependency. */
+export function mediaBackupFixture(): BackupPayload {
+	const data = Buffer.from('524946462600000057415645666d74201000000001000100401f0000803e00000200100064617461020000000000', 'hex');
+	const id = createHash('sha256').update(data).digest('hex');
+	const payload = backupFixture();
+	payload.media = [{ id, mimeType: 'audio/wav', data: data.toString('base64') }];
+	payload.material.deck.sourceType = 'anki-apkg';
+	payload.material.questions[0].payload.ankiTemplate = {
+		frontHtml: '<div>Question</div>',
+		backHtml: `<div>Answer</div><audio controls="" preload="none" src="fukushu-media:${id}"></audio>`,
+		css: '',
+		source: { noteId: '1', cardId: '2', notetypeId: '3', ordinal: 0, qfmt: '{{Front}}', afmt: '{{Back}}', css: '' },
+		noteType: 'Basic',
+	};
+	payload.versions[0].data = structuredClone(payload.material.questions[0]);
+	return payload;
 }

@@ -1828,6 +1828,8 @@ declare namespace entities {
         FukushuMaterialsCreateResponse,
         FukushuMaterialsShowRequest,
         FukushuMaterialsShowResponse,
+        FukushuMaterialsAnkiMediaRequest,
+        FukushuMaterialsAnkiMediaResponse,
         FukushuMaterialsUpdateRequest,
         FukushuMaterialsUpdateResponse,
         FukushuMaterialsUpdateCardExplanationRequest,
@@ -3840,6 +3842,12 @@ type FukushuBackupRestoreRequest = ContractRequest<'fukushu/backup/restore'>;
 
 // @public (undocumented)
 type FukushuBackupRestoreResponse = ContractResponse<'fukushu/backup/restore'>;
+
+// @public (undocumented)
+type FukushuMaterialsAnkiMediaRequest = ContractRequest<'fukushu/materials/anki-media'>;
+
+// @public (undocumented)
+type FukushuMaterialsAnkiMediaResponse = ContractResponse<'fukushu/materials/anki-media'>;
 
 // @public (undocumented)
 type FukushuMaterialsArchiveRequest = ContractRequest<'fukushu/materials/archive'>;

@@ -5,9 +5,9 @@
 
 import { createHash } from 'node:crypto';
 import { expect, test } from 'vitest';
-import { decodeBackup, encodeBackup, validateBackup } from '../../backend/backup-codec.js';
+import { decodeBackup, encodeBackup, validateBackup, validateBackupMedia } from '../../backend/backup-codec.js';
 import { MAX_BACKUP_BYTES } from '../../shared/backup.schema.js';
-import { backupFixture } from './backup-fixture.js';
+import { backupFixture, mediaBackupFixture } from './backup-fixture.js';
 import type { BackupPayload } from '../../shared/backup.schema.js';
 
 test('round trips all upstream-shaped records and server history without mutation or rescheduling', () => {
@@ -17,6 +17,8 @@ test('round trips all upstream-shaped records and server history without mutatio
 	expect(snapshot).toEqual(before);
 	expect(encodeBackup(decodeBackup(bytes))).toEqual(bytes);
 	const envelope = JSON.parse(bytes.toString());
+	expect(envelope.version).toBe(1);
+	expect(envelope.payload).not.toHaveProperty('media');
 	expect(envelope.sha256).toBe(createHash('sha256').update(JSON.stringify(envelope.payload)).digest('hex'));
 	expect(envelope.payload.reviews[0].request).toEqual(before.reviews[0].request);
 	expect(envelope.payload.states[0].data).toEqual(before.states[0].data);
@@ -83,4 +85,37 @@ test('identifies upstream binary and JSON v1–3 instead of pretending to restor
 	for (const version of [1, 2, 3]) {
 		expect(() => decodeBackup(Buffer.from(JSON.stringify({ format: 'gift-fsrs-learning-backup', version })))).toThrow('UPSTREAM_BACKUP_UNSUPPORTED');
 	}
+});
+
+test('round trips the self-contained v2 format and verifies the asset bytes', async () => {
+	const payload = mediaBackupFixture();
+	const bytes = encodeBackup(payload);
+	expect(JSON.parse(bytes.toString())).toMatchObject({ version: 2, payload: { media: payload.media } });
+	expect(decodeBackup(bytes)).toEqual(payload);
+	await expect(validateBackupMedia(decodeBackup(bytes))).resolves.toBeUndefined();
+	expect(encodeBackup(decodeBackup(bytes))).toEqual(bytes);
+});
+
+test('rejects downgrade, missing media links and unreferenced attachments', () => {
+	const source = mediaBackupFixture();
+	const { media, ...noMedia } = source;
+	expect(() => encodeBackup(noMedia)).toThrow('INVALID_BACKUP');
+	expect(() => encodeBackup({ ...source, media: [] })).toThrow('INVALID_BACKUP');
+	expect(() => encodeBackup({ ...source, media: [...media!, ...media!] })).toThrow('INVALID_BACKUP');
+	expect(() => encodeBackup({ ...backupFixture(), media })).toThrow('INVALID_BACKUP');
+	const bytes = encodeBackup(source);
+	const envelope = JSON.parse(bytes.toString());
+	expect(() => decodeBackup(Buffer.from(JSON.stringify({ ...envelope, version: 1 })))).toThrow('INVALID_BACKUP');
+});
+
+test('rejects fabricated bytes even if a backup checksum and all references agree', async () => {
+	const payload = mediaBackupFixture();
+	const [asset] = payload.media!;
+	const fake = Buffer.from('not PCM wave');
+	const id = createHash('sha256').update(fake).digest('hex');
+	for (const card of [...payload.material.questions, ...payload.versions.map(v => v.data)]) {
+		card.payload.ankiTemplate!.backHtml = card.payload.ankiTemplate!.backHtml.replace(asset.id, id);
+	}
+	payload.media = [{ ...asset, id, data: fake.toString('base64') }];
+	await expect(validateBackupMedia(decodeBackup(encodeBackup(payload)))).rejects.toThrow('INVALID_BACKUP');
 });

@@ -4,6 +4,7 @@
  */
 
 // https://github.com/typeorm/typeorm/issues/2400
+import { MiFukushuAnkiMedia } from '@features/games/fukushu/backend/models/FukushuAnkiMedia.js';
 import { MiFukushuDeck } from '@features/games/fukushu/backend/models/FukushuDeck.js';
 import { MiFukushuReminder } from '@features/games/fukushu/backend/models/FukushuReminder.js';
 import { MiFukushuLearningSettings } from '@features/games/fukushu/backend/models/FukushuLearningSettings.js';
@@ -269,6 +270,7 @@ export const entities = [
 	MiChatApproval,
 	MiBubbleGameRecord,
 	MiFukushuDeck,
+	MiFukushuAnkiMedia,
 	MiFukushuUpstreamRecord,
 	MiFukushuUpstreamChunk,
 	MiFukushuReminder,

@@ -6,7 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <section class="_gaps" :aria-busy="busy">
 	<template v-if="item">
 		<div v-if="!singleStep">{{ index + 1 }} / {{ questions.length }}</div>
-		<StaticAnkiCard v-if="nativeTemplate" :fallback="item.payload.prompt.value" :html="nativeTemplate.frontHtml" :css="nativeTemplate.css"/>
+		<StaticAnkiCard v-if="nativeTemplate" :key="item.id" :deckId="item.deckId" :fallback="item.payload.prompt.value" :html="nativeTemplate.frontHtml" :css="nativeTemplate.css"/>
 		<SourceContent v-else :anki="item.payload.kind === 'flashcard' ? item.payload : undefined" :content="item.payload.prompt"/>
 		<fieldset v-if="!revealed && (!flash || needsText)" class="_gaps_s">
 			<legend>{{ $locale.sfc.answer }}</legend>
@@ -33,7 +33,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template v-else>
 			<template v-if="feedback">
 				<strong v-if="graded">{{ graded.correct ? $locale.sfc.correct : $locale.sfc.incorrect }} ({{ Math.round(graded.score) }}%)</strong>
-				<StaticAnkiCard v-if="nativeTemplate && item.payload.kind === 'flashcard'" :fallback="item.payload.answer.value" :html="nativeTemplate.backHtml" :css="nativeTemplate.css"/>
+				<StaticAnkiCard v-if="nativeTemplate && item.payload.kind === 'flashcard'" :key="item.id" :deckId="item.deckId" :fallback="item.payload.answer.value" :html="nativeTemplate.backHtml" :css="nativeTemplate.css"/>
 				<SourceContent v-for="(c, i) in nativeTemplate ? [] : solution(item.payload, $locale.sfc.yes, $locale.sfc.no)" :key="i" :anki="item.payload.kind === 'flashcard' ? item.payload : undefined" :content="c"/>
 				<SourceContent v-for="(c, i) in graded?.feedback" :key="'feedback' + i" :content="c"/>
 				<SourceContent v-if="item.payload.explanation" :content="item.payload.explanation"/>

@@ -5,10 +5,10 @@
 import { execFile } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import type { StagedApkg } from '../backup-drive.js';
-import type { FukushuMaterial } from '../../shared/material.schema.js';
+import type { ApkgImport } from '../apkg-material.js';
 
 /** Keep SQLite, decompression and untrusted deck data off the queue event loop. */
-export function decodeStagedApkg(source: StagedApkg, entry = new URL('./fukushu-apkg-worker.js', import.meta.url)): Promise<FukushuMaterial> {
+export function decodeStagedApkg(source: StagedApkg, entry = new URL('./fukushu-apkg-worker.js', import.meta.url)): Promise<ApkgImport> {
 	return new Promise((resolve, reject) => {
 		const child = execFile(process.execPath, ['--max-old-space-size=192', '--wasm-max-mem-pages=8192', fileURLToPath(entry)],
 			{ env: {}, timeout: 60_000, killSignal: 'SIGKILL', maxBuffer: 2 * 1024 ** 2, encoding: 'utf8' },
@@ -18,7 +18,7 @@ export function decodeStagedApkg(source: StagedApkg, entry = new URL('./fukushu-
 				try {
 					const result = JSON.parse(stdout);
 					if (result.error === 'APKG_UNSUPPORTED' || result.error === 'APKG_INVALID') reject(new Error(result.error));
-					else if (result.material) resolve(result.material); // validated again before persistence
+					else if (result.material) resolve(result); // validated again before persistence
 					else reject(new Error('APKG_DECODE_FAILED'));
 				} catch { reject(new Error('APKG_DECODE_FAILED')); }
 			});

@@ -78,7 +78,7 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		const password = `Fukushu-${randomUUID()}`;
 		const admin = ok(await call('admin/accounts/create', { username: 'fukushu_admin', password, setupPassword: credentials.setupPassword }));
 		credentials.admin = { username: 'fukushu_admin', password, token: admin.token, id: admin.id };
-		for (const username of ['fukushu_alice', 'fukushu_bob', 'fukushu_carol', 'fukushu_dana', 'fukushu_gift', 'fukushu_apkg']) {
+		for (const username of ['fukushu_alice', 'fukushu_bob', 'fukushu_carol', 'fukushu_dana', 'fukushu_gift', 'fukushu_apkg', 'fukushu_apkgrestore']) {
 			ok(await call('admin/accounts/create', { username, password }, admin.token));
 			// Keep the real IP rate limiter enabled: password logins are at least 1s apart.
 			await setTimeout(1100);
@@ -176,6 +176,81 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		assert.equal(history.length, 1);
 		assert.deepEqual(history[0].question.payload.ankiTemplate, card.ankiTemplate);
 	});
+	await step('Anki media stays private, then both bytes round-trip without its original APKG', async () => {
+		const owner = credentials.apkg;
+		const restoredOwner = credentials.apkgrestore;
+		const upload = async (account, data, name, type) => {
+			const form = new FormData();
+			form.set('i', account.token);
+			form.set('file', new Blob([data], { type }), name);
+			return ok(await readResponse(await fetch(`${origin}/api/drive/files/create`, {
+				method: 'POST', body: form, headers: { origin }, redirect: 'error', signal: AbortSignal.timeout(10_000),
+			})));
+		};
+		const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+		const bytes = await readFile(new URL('./backend/fixtures/apkg/media-21b.apkg', import.meta.url));
+		const original = await upload(owner, bytes, 'media.apkg', 'application/octet-stream');
+		const id = 'apkg:' + digest(bytes);
+		const job = 'fukushu/upstream/restore-job';
+		const input = { fileId: original.id, format: 'anki-apkg', requestId: randomUUID(), confirmRestore: true };
+		let status = ok(await call(job, input, owner.token));
+		for (let attempt = 0; status.status !== 'completed' && attempt < 18; attempt++) {
+			assert.ok(['waiting', 'running'].includes(status.status), `Unexpected media import status: ${JSON.stringify(status)}`);
+			await setTimeout(500);
+			status = ok(await call(job, { ...input, statusOnly: true }, owner.token));
+		}
+		assert.deepEqual(status, { status: 'completed' });
+		assert.deepEqual(ok(await call(job, input, owner.token)), status);
+		const study = ok(await call('fukushu/study/queue', { id }, owner.token));
+		const template = study.items[0].question.payload.ankiTemplate;
+		const imageId = /src="fukushu-media:([a-f0-9]{64})"/.exec(template.frontHtml)?.[1];
+		const audioId = /src="fukushu-media:([a-f0-9]{64})"/.exec(template.backHtml)?.[1];
+		assert.ok(imageId && audioId && imageId !== audioId);
+
+		const route = 'fukushu/materials/anki-media';
+		assert.equal((await call(route, { id, mediaId: imageId })).body.error.code, 'ACCESS_DENIED');
+		assert.equal((await call(route, { id, mediaId: imageId }, bob.token)).body.error.code, 'NO_SUCH_MATERIAL');
+		assert.equal((await call(route, { id, mediaId: '0'.repeat(64) }, owner.token)).body.error.code, 'NO_SUCH_MATERIAL');
+		assert.equal((await call(route, { id: 'another-deck', mediaId: imageId }, owner.token)).body.error.code, 'NO_SUCH_MATERIAL');
+		ok(await call('i/sudo/start', { password: owner.password }, owner.token));
+		const delegated = ok(await call('miauth/gen-token', { session: randomUUID(), permission: ['read:account'] }, owner.token)).token;
+		assert.equal((await call(route, { id, mediaId: imageId }, delegated, true)).body.error.code, 'ACCESS_DENIED');
+
+		ok(await call('drive/files/delete', { fileId: original.id }, owner.token), 204);
+		const assets = [];
+		for (const [mediaId, mimeType] of [[imageId, 'image/png'], [audioId, 'audio/wav']]) {
+			const asset = ok(await call(route, { id, mediaId }, owner.token));
+			assert.equal(asset.id, mediaId);
+			assert.equal(asset.mimeType, mimeType);
+			assert.equal(digest(Buffer.from(asset.data, 'base64')), mediaId);
+			assets.push(asset);
+		}
+		ok(await call('fukushu/backup/export', { id, acknowledgeDriveVisibility: true }, owner.token), 204);
+		let file;
+		const deadline = Date.now() + 16_000;
+		while (!file && Date.now() < deadline) {
+			const notifications = ok(await call('i/notifications', { includeTypes: ['exportCompleted'], limit: 10 }, owner.token));
+			const completed = notifications.find(n => n.exportedEntity === 'fukushu');
+			if (completed) file = ok(await call('drive/files/show', { fileId: completed.fileId }, owner.token));
+			else await setTimeout(350);
+		}
+		assert.ok(file);
+		assert.equal(new URL(file.url).origin, origin);
+		const download = await fetch(file.url, { redirect: 'error', signal: AbortSignal.timeout(10_000) });
+		assert.equal(download.status, 200);
+		const backupBytes = Buffer.from(await download.arrayBuffer());
+		const envelope = JSON.parse(backupBytes.toString('utf8'));
+		assert.equal(envelope.version, 2);
+		assert.deepEqual(envelope.payload.media.slice().sort((a, b) => a.id.localeCompare(b.id)), assets.slice().sort((a, b) => a.id.localeCompare(b.id)));
+		const backup = await upload(restoredOwner, backupBytes, 'media-backup.json', 'application/json');
+		assert.equal(ok(await call('fukushu/backup/inspect', { fileId: backup.id }, restoredOwner.token)).version, 2);
+		const restored = ok(await call('fukushu/backup/restore', { fileId: backup.id, confirmRestore: true }, restoredOwner.token));
+		assert.equal(restored.deckId, id);
+		for (const asset of assets) assert.deepEqual(ok(await call(route, { id, mediaId: asset.id }, restoredOwner.token)), asset);
+		const restoredStudy = ok(await call('fukushu/study/queue', { id }, restoredOwner.token));
+		assert.deepEqual(restoredStudy.items[0].question.payload.ankiTemplate, template);
+	});
+
 	let file;
 	const source = '\uFEFF#html:false\n#notetype:Basic\n#deck:実 Drive の教材\n日本の首都は？\t東京\nフランスの首都は？\tパリ\n';
 	await step('upload and list go through real Drive storage and owner authentication', async () => {

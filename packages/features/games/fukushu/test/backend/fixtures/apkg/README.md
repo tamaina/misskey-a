@@ -2,7 +2,7 @@
 
 These synthetic flashcards, authored for this repository, were exported by the
 official [Anki 25.09 Python package](https://pypi.org/project/anki/25.9/). They
-contain no personal data, media or scheduling history. Embedded stock templates
+contain no personal data or scheduling history. Embedded stock templates
 and other defaults come from [Anki 25.09](https://github.com/ankitects/anki/tree/25.09)
 (Ankitects Pty Ltd and contributors, AGPL-3.0-or-later).
 
@@ -15,6 +15,8 @@ and other defaults come from [Anki 25.09](https://github.com/ankitects/anki/tree
 - `static-custom-21b.apkg` uses a custom HTML/CSS template and synthetic tag.
   `interactive-custom-21b.apkg` changes its front into an external link and
   must be rejected rather than have its behavior silently stripped.
+
+- `media-21b.apkg`: one card with a generated 2×1 PNG and a 0.2-second synthetic PCM16 WAVE tone. The official exporter writes both embedded assets.
 
 For the separate complex source fixture, see [generated-anki-25.09.md](generated-anki-25.09.md).
 
