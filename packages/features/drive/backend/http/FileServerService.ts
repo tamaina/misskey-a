@@ -22,6 +22,8 @@ import { handleRequestRedirectToOmitSearch } from '@features/runtime/backend/htt
 import { FileServerDriveHandler } from '@features/drive/backend/http/FileServerDriveHandler.js';
 import { FileServerFileResolver } from '@features/drive/backend/http/FileServerFileResolver.js';
 import { FileServerProxyHandler } from './FileServerProxyHandler.js';
+import { AuthenticateService, AuthenticationError } from '@features/auth/backend/transport/AuthenticateService.js';
+import { DriveDownloadHandler } from './DriveDownloadHandler.js';
 import type { FastifyInstance, FastifyRequest, FastifyReply, FastifyPluginOptions } from 'fastify';
 
 @Injectable()
@@ -46,6 +48,7 @@ export class FileServerService {
 		private videoProcessingService: VideoProcessingService,
 		private internalStorageService: InternalStorageService,
 		private loggerService: LoggerService,
+		private authenticateService: AuthenticateService,
 	) {
 		this.logger = this.loggerService.getLogger('server', 'gray');
 		this.assets = resolve(this.config.rootDir, 'packages/backend/src/server/file/assets');
@@ -106,6 +109,21 @@ export class FileServerService {
 		}>('/proxy/:url*', async (request, reply) => {
 			return await this.proxyHandler.handle(request, reply)
 				.catch(err => this.errorHandler(request, reply, err));
+		});
+
+		const downloadHandler = new DriveDownloadHandler(this.authenticateService, this.driveFilesRepository, this.internalStorageService);
+		fastify.get<{ Params: { fileId: string } }>('/drive/:fileId', async (request, reply) => {
+			try {
+				return await downloadHandler.handle(request, reply);
+			} catch (error) {
+				// Do not use the public file error handler's cache or fallback semantics.
+				if (error instanceof AuthenticationError) {
+					reply.header('WWW-Authenticate', 'Bearer realm="Misskey", error="invalid_token"');
+					return reply.code(401).send();
+				}
+				this.logger.error('Drive download failed');
+				return reply.code(500).send();
+			}
 		});
 
 		done();

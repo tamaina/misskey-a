@@ -9,6 +9,8 @@ import fastifyStatic from '@fastify/static';
 import Fastify, { type FastifyInstance } from 'fastify';
 import { describe, expect, test, beforeAll, afterAll, afterEach, vi } from 'vitest';
 import sharp from 'sharp';
+import { mockDeep } from 'vitest-mock-extended';
+import type { AuthenticateService } from '@features/auth/backend/transport/AuthenticateService.js';
 import { DataSource, type Repository } from 'typeorm';
 import { initTestDb, randomString } from '../../utils.js';
 import type { SensitiveMediaDetectionService } from '@features/drive/backend/services/SensitiveMediaDetectionService.js';
@@ -170,6 +172,7 @@ describe('FileServerService', () => {
 			videoProcessingService,
 			internalStorageService,
 			loggerService,
+			mockDeep<AuthenticateService>(),
 		);
 
 		fastify = Fastify();
@@ -194,6 +197,7 @@ describe('FileServerService', () => {
 			videoProcessingService,
 			internalStorageService,
 			loggerService,
+			mockDeep<AuthenticateService>(),
 		);
 		externalFastify = Fastify();
 		await externalFastify.register(fastifyStatic, {
