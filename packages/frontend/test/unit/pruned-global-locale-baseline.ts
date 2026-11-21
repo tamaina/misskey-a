@@ -9,7 +9,7 @@ import { resolve } from 'node:path';
 import { parse } from 'vue/compiler-sfc';
 import { languages } from 'i18n';
 import { locales as productionLocales } from './catalog-history.js';
-import { restoreGlobalCatalogPilotSource } from './global-catalog-pilot-baseline.js';
+import { restoreGlobalCatalogPilotSourceAfterAltReminder as restoreGlobalCatalogPilotSource } from './global-catalog-pilot-baseline.js';
 import { restoreUpstreamDevelopBaseline } from './upstream-develop-source-rebase.js';
 import metadata from './pruned-global-locale-baseline.json';
 import type { Locale } from './pruned-global-locale-types.js';

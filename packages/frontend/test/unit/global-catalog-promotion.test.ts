@@ -15,7 +15,7 @@ import { expect, test } from 'vitest';
 import retention from '../../../i18n/catalog-retention.json';
 import history from './catalog-history.json';
 import { flattenCatalog, historicalRawLocale } from './catalog-history.js';
-import { globalCatalogPilotOwners, restoreGlobalCatalogPilotSource } from './global-catalog-pilot-baseline.js';
+import { globalCatalogPilotOwners, restoreGlobalCatalogPilotSourceAfterAltReminder as restoreGlobalCatalogPilotSource } from './global-catalog-pilot-baseline.js';
 import { locales as historicalLocales, valueAt } from './pruned-global-locale-baseline.js';
 import type { entities } from 'misskey-js';
 
@@ -83,6 +83,12 @@ test('keeps all current permission kinds, including MCP and administrator kinds'
 		expect(Object.keys(locales[language]._permissions)).toHaveLength(88);
 		expect(locales[language]._permissions['read:admin:stream']).toBeTruthy();
 	}
+});
+
+test('an unreviewed preferences edit still fails the historical proof', () => {
+	const file = 'packages/features/preferences/frontend/pages/settings/preferences.vue';
+	const source = readFileSync(resolve(root, file), 'utf8');
+	expect(() => restoreGlobalCatalogPilotSource(file, source + '\n')).toThrow(/source differs/i);
 });
 
 // The TS helper is imported before activation, as it is in Storybook and boot.

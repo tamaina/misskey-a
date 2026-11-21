@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parse } from 'vue/compiler-sfc';
+import { restoreAltReminderPreferencesBaseline } from './post-alt-reminder-preferences-source-rebase.js';
 import { locales } from 'i18n';
 import escapes from './shared-global-locale-escapes.json';
 import type { RuntimeLocaleDictionary } from 'vite-vue-internationalization/runtime';
@@ -11916,7 +11917,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
-		"currentSha256": "8fbd261879ccce03fda487c46fe08a726a0e63df49870bff649fe44cdfb284b8",
+		"currentSha256": "33e7852029af421de26b922a7b4c8bf1d9a38291d24dd8fdbf550b5e33cd05ae",
 		"baselineSha256": "b4f0d6f5bd2b505080654a35748b3c440c48306461bbb002f05767ab893a6b17",
 		"keys": [
 			"default",
@@ -12097,230 +12098,206 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 16007,
-				"end": 16415,
-				"current": "\t\t\t\t\t\t\t<SearchMarker :keywords=\"['alt text', 'accessibility', 'image', 'caption', 'attachment', 'warning']\">\n\t\t\t\t\t\t\t\t<MkPreferenceContainer k=\"warnMissingImageAltText\">\n\t\t\t\t\t\t\t\t\t<MkSwitch v-model=\"warnMissingImageAltText\">\n\t\t\t\t\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.warnMissingImageAltText }}</SearchLabel></template>\n\t\t\t\t\t\t\t\t\t</MkSwitch>\n\t\t\t\t\t\t\t\t</MkPreferenceContainer>\n\t\t\t\t\t\t\t</SearchMarker>\n\n",
-				"baseline": ""
-			},
-			{
-				"start": 18970,
-				"end": 19146,
+				"start": 18562,
+				"end": 18738,
 				"current": "\t\t\t\t\t<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->\n\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.notifications }}</SearchLabel></template>\n",
 				"baseline": "\t\t\t\t\t<template #label><SearchLabel>{{ globalLocale.env.notifications }}</SearchLabel></template>\n"
 			},
 			{
-				"start": 36178,
-				"end": 36577,
+				"start": 35770,
+				"end": 36169,
 				"current": "\t\t\t\t\t\t\t<SearchMarker :keywords=\"['url', 'preview', 'expand', 'player', 'embed']\">\n\t\t\t\t\t\t\t\t<MkPreferenceContainer k=\"expandUrlPreviewAutomatically\">\n\t\t\t\t\t\t\t\t\t<MkSwitch v-model=\"expandUrlPreviewAutomatically\">\n\t\t\t\t\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.expandUrlPreviewAutomatically }}</SearchLabel></template>\n\t\t\t\t\t\t\t\t\t</MkSwitch>\n\t\t\t\t\t\t\t\t</MkPreferenceContainer>\n\t\t\t\t\t\t\t</SearchMarker>\n\n",
 				"baseline": ""
 			},
 			{
-				"start": 41210,
-				"end": 41210,
+				"start": 40802,
+				"end": 40802,
 				"current": "",
 				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 43217,
-				"end": 43311,
+				"start": 42809,
+				"end": 42903,
 				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			},
 			{
-				"start": 43696,
-				"end": 43769,
-				"current": "const warnMissingImageAltText = prefer.model('warnMissingImageAltText');\n",
-				"baseline": ""
-			},
-			{
-				"start": 46111,
-				"end": 46196,
+				"start": 45630,
+				"end": 45715,
 				"current": "const expandUrlPreviewAutomatically = prefer.model('expandUrlPreviewAutomatically');\n",
 				"baseline": ""
 			},
 			{
-				"start": 61222,
-				"end": 61281,
+				"start": 60741,
+				"end": 60800,
 				"current": "\t\"selectList\": \"اختر قائمة\",\n\t\"notifications\": \"الإشعارات\"\n",
 				"baseline": "\t\"selectList\": \"اختر قائمة\"\n"
 			},
 			{
-				"start": 71887,
-				"end": 71955,
+				"start": 71406,
+				"end": 71474,
 				"current": "\t\"selectList\": \"Tria una llista\",\n\t\"notifications\": \"Notificacions\"\n",
 				"baseline": "\t\"selectList\": \"Tria una llista\"\n"
 			},
 			{
-				"start": 81594,
-				"end": 81655,
+				"start": 81113,
+				"end": 81174,
 				"current": "\t\"selectList\": \"Vybrat seznam\",\n\t\"notifications\": \"Oznámení\"\n",
 				"baseline": "\t\"selectList\": \"Vybrat seznam\"\n"
 			},
 			{
-				"start": 91123,
-				"end": 91189,
+				"start": 90642,
+				"end": 90708,
 				"current": "\t\"selectList\": \"Select a list\",\n\t\"notifications\": \"Notifications\"\n",
 				"baseline": "\t\"selectList\": \"Select a list\"\n"
 			},
 			{
-				"start": 101769,
-				"end": 101842,
+				"start": 101288,
+				"end": 101361,
 				"current": "\t\"selectList\": \"Liste auswählen\",\n\t\"notifications\": \"Benachrichtigungen\"\n",
 				"baseline": "\t\"selectList\": \"Liste auswählen\"\n"
 			},
 			{
-				"start": 105145,
-				"end": 105223,
-				"current": "\t\"warnMissingImageAltText\": \"Confirm before posting images without alt text\",\n",
-				"baseline": ""
-			},
-			{
-				"start": 111388,
-				"end": 111454,
+				"start": 110829,
+				"end": 110895,
 				"current": "\t\"selectList\": \"Select a list\",\n\t\"notifications\": \"Notifications\"\n",
 				"baseline": "\t\"selectList\": \"Select a list\"\n"
 			},
 			{
-				"start": 122253,
-				"end": 122327,
+				"start": 121694,
+				"end": 121768,
 				"current": "\t\"selectList\": \"Selecciona una lista\",\n\t\"notifications\": \"Notificaciones\"\n",
 				"baseline": "\t\"selectList\": \"Selecciona una lista\"\n"
 			},
 			{
-				"start": 132464,
-				"end": 132539,
+				"start": 131905,
+				"end": 131980,
 				"current": "\t\"selectList\": \"Sélectionner une liste\",\n\t\"notifications\": \"Notifications\"\n",
 				"baseline": "\t\"selectList\": \"Sélectionner une liste\"\n"
 			},
 			{
-				"start": 142407,
-				"end": 142469,
+				"start": 141848,
+				"end": 141910,
 				"current": "\t\"selectList\": \"Pilih daftar\",\n\t\"notifications\": \"Notifikasi\"\n",
 				"baseline": "\t\"selectList\": \"Pilih daftar\"\n"
 			},
 			{
-				"start": 152635,
-				"end": 152703,
+				"start": 152076,
+				"end": 152144,
 				"current": "\t\"selectList\": \"Seleziona una lista\",\n\t\"notifications\": \"Notifiche\"\n",
 				"baseline": "\t\"selectList\": \"Seleziona una lista\"\n"
 			},
 			{
-				"start": 152754,
-				"end": 152805,
+				"start": 152195,
+				"end": 152246,
 				"current": "\t\"expandUrlPreviewAutomatically\": \"URLプレビューを自動展開\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 155238,
-				"end": 155293,
-				"current": "\t\"warnMissingImageAltText\": \"画像に代替テキストがないとき、投稿前に確認する\",\n",
-				"baseline": ""
-			},
-			{
-				"start": 159842,
-				"end": 159890,
+				"start": 159228,
+				"end": 159276,
 				"current": "\t\"selectList\": \"リストを選択\",\n\t\"notifications\": \"通知\"\n",
 				"baseline": "\t\"selectList\": \"リストを選択\"\n"
 			},
 			{
-				"start": 166846,
-				"end": 166894,
+				"start": 166232,
+				"end": 166280,
 				"current": "\t\"selectList\": \"リストを選ぶ\",\n\t\"notifications\": \"通知\"\n",
 				"baseline": "\t\"selectList\": \"リストを選ぶ\"\n"
 			},
 			{
-				"start": 176360,
-				"end": 176419,
+				"start": 175746,
+				"end": 175805,
 				"current": "\t\"selectList\": \"Fren tabdart\",\n\t\"notifications\": \"Ilɣuyen\"\n",
 				"baseline": "\t\"selectList\": \"Fren tabdart\"\n"
 			},
 			{
-				"start": 185895,
-				"end": 185959,
+				"start": 185281,
+				"end": 185345,
 				"current": "\t\"selectList\": \"Select a list\",\n\t\"notifications\": \"ಅಧಿಸೂಚನೆಗಳು\"\n",
 				"baseline": "\t\"selectList\": \"Select a list\"\n"
 			},
 			{
-				"start": 192948,
-				"end": 192996,
+				"start": 192334,
+				"end": 192382,
 				"current": "\t\"selectList\": \"리스트 선택\",\n\t\"notifications\": \"알림\"\n",
 				"baseline": "\t\"selectList\": \"리스트 선택\"\n"
 			},
 			{
-				"start": 202710,
-				"end": 202774,
+				"start": 202096,
+				"end": 202160,
 				"current": "\t\"selectList\": \"Kies een lijst.\",\n\t\"notifications\": \"Meldingen\"\n",
 				"baseline": "\t\"selectList\": \"Kies een lijst.\"\n"
 			},
 			{
-				"start": 212250,
-				"end": 212310,
+				"start": 211636,
+				"end": 211696,
 				"current": "\t\"selectList\": \"Velg en liste\",\n\t\"notifications\": \"Varsler\"\n",
 				"baseline": "\t\"selectList\": \"Velg en liste\"\n"
 			},
 			{
-				"start": 222006,
-				"end": 222072,
+				"start": 221392,
+				"end": 221458,
 				"current": "\t\"selectList\": \"Wybierz listę\",\n\t\"notifications\": \"Powiadomienia\"\n",
 				"baseline": "\t\"selectList\": \"Wybierz listę\"\n"
 			},
 			{
-				"start": 232290,
-				"end": 232361,
+				"start": 231676,
+				"end": 231747,
 				"current": "\t\"selectList\": \"Selecione uma lista\",\n\t\"notifications\": \"Notificações\"\n",
 				"baseline": "\t\"selectList\": \"Selecione uma lista\"\n"
 			},
 			{
-				"start": 242381,
-				"end": 242447,
+				"start": 241767,
+				"end": 241833,
 				"current": "\t\"selectList\": \"Выберите список\",\n\t\"notifications\": \"Уведомления\"\n",
 				"baseline": "\t\"selectList\": \"Выберите список\"\n"
 			},
 			{
-				"start": 251992,
-				"end": 252055,
+				"start": 251378,
+				"end": 251441,
 				"current": "\t\"selectList\": \"Vyberte zoznam\",\n\t\"notifications\": \"Oznámenia\"\n",
 				"baseline": "\t\"selectList\": \"Vyberte zoznam\"\n"
 			},
 			{
-				"start": 261228,
-				"end": 261290,
+				"start": 260614,
+				"end": 260676,
 				"current": "\t\"selectList\": \"เลือกรายชื่อ\",\n\t\"notifications\": \"เเจ้งเตือน\"\n",
 				"baseline": "\t\"selectList\": \"เลือกรายชื่อ\"\n"
 			},
 			{
-				"start": 271421,
-				"end": 271485,
+				"start": 270807,
+				"end": 270871,
 				"current": "\t\"selectList\": \"Bir liste seç\",\n\t\"notifications\": \"Bildirimler\"\n",
 				"baseline": "\t\"selectList\": \"Bir liste seç\"\n"
 			},
 			{
-				"start": 280953,
-				"end": 281019,
+				"start": 280339,
+				"end": 280405,
 				"current": "\t\"selectList\": \"Select a list\",\n\t\"notifications\": \"Notifications\"\n",
 				"baseline": "\t\"selectList\": \"Select a list\"\n"
 			},
 			{
-				"start": 291085,
-				"end": 291150,
+				"start": 290471,
+				"end": 290536,
 				"current": "\t\"selectList\": \"Виберіть список\",\n\t\"notifications\": \"Сповіщення\"\n",
 				"baseline": "\t\"selectList\": \"Виберіть список\"\n"
 			},
 			{
-				"start": 300820,
-				"end": 300883,
+				"start": 300206,
+				"end": 300269,
 				"current": "\t\"selectList\": \"Chọn danh sách\",\n\t\"notifications\": \"Thông báo\"\n",
 				"baseline": "\t\"selectList\": \"Chọn danh sách\"\n"
 			},
 			{
-				"start": 306899,
-				"end": 306945,
+				"start": 306285,
+				"end": 306331,
 				"current": "\t\"selectList\": \"选择列表\",\n\t\"notifications\": \"通知\"\n",
 				"baseline": "\t\"selectList\": \"选择列表\"\n"
 			},
 			{
-				"start": 313044,
-				"end": 313090,
+				"start": 312430,
+				"end": 312476,
 				"current": "\t\"selectList\": \"選擇清單\",\n\t\"notifications\": \"通知\"\n",
 				"baseline": "\t\"selectList\": \"選擇清單\"\n"
 			}
@@ -17156,18 +17133,23 @@ export function restoreGlobalCatalogPilotSource(file: string, source: string): s
 	return source;
 }
 
+export function restoreGlobalCatalogPilotSourceAfterAltReminder(file: string, source: string): string {
+	return restoreGlobalCatalogPilotSource(file, restoreAltReminderPreferencesBaseline(file, source));
+}
+
 /** Verify live owner and global scopes before replaying the existing raw-owner oracle. */
 export function restoreGlobalCatalogPilotDictionary(file: string, language: string, dictionary: RuntimeLocaleDictionary, global: RuntimeLocaleDictionary): RuntimeLocaleDictionary {
 	const owner = globalCatalogPilotOwners.find(owner => owner.file === file);
 	if (!owner) return dictionary;
-	const source = readFileSync(resolve(root, file), 'utf8');
+	const liveSource = readFileSync(resolve(root, file), 'utf8');
+	const source = restoreAltReminderPreferencesBaseline(file, liveSource);
 	const baseline = restoreGlobalCatalogPilotSource(file, source);
 	const collect = (text: string): Record<string, string> => {
 		const block = parse(text).descriptor.customBlocks.find(block => block.type === 'locale' && block.attrs.locale === language);
 		if (!block) throw new Error(`Missing global catalog pilot language: ${file}:${language}`);
 		return JSON.parse(block.content) as Record<string, string>;
 	};
-	if (JSON.stringify(Object.fromEntries(Object.entries(dictionary))) !== JSON.stringify(collect(source))) throw new Error(`Global catalog pilot loader differs: ${file}:${language}`);
+	if (JSON.stringify(Object.fromEntries(Object.entries(dictionary))) !== JSON.stringify(collect(liveSource))) throw new Error(`Global catalog pilot loader differs: ${file}:${language}`);
 	for (const key of owner.keys) {
 		if (JSON.stringify(globalValue(global, key)) !== JSON.stringify(globalValue(locales[language], key))) throw new Error(`Global catalog pilot shared label differs: ${language}:${key}`);
 	}
