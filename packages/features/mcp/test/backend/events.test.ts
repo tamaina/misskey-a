@@ -18,6 +18,10 @@ import { streamEventCatalog } from '../../backend/stream-catalog.js';
 import { modernRequest } from '../../backend/modern-request.js';
 import { UserWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/UserWebhookDeliverProcessorService.js';
 import { MiWebhook } from '@features/integrations/backend/models/Webhook.js';
+import * as Reversi from 'misskey-reversi';
+import { MiReversiGame } from '@features/games/reversi/backend/models/ReversiGame.js';
+import { projectReversiTurn } from '@features/games/reversi/backend/turn-webhook.js';
+import type { ModuleRef } from '@nestjs/core';
 import { MiMahjongRoom } from '@features/games/mahjong/backend/models/MahjongRoom.js';
 import { gameTurnEvent } from '@features/games/index/shared/turn-webhook.schema.js';
 import type { RoomState } from '@features/games/mahjong/backend/room.js';
@@ -489,7 +493,7 @@ it('lists and accepts game.turn only through an owner grant with no room or reci
 		expect(v.safeParse(subscribeInput, { ...game, arguments: args }).success).toBe(false);
 	}
 	const listed = (await service.invoke('events/list', {}, context()) as { events: { name: string }[] }).events.find(event => event.name === gameTurnEvent);
-	expect(listed).toMatchObject({ delivery: ['webhook'], payloadSchema: { required: ['game', 'roomId', 'phaseId', 'revision'], additionalProperties: false } });
+	expect(listed).toMatchObject({ delivery: ['webhook'], payloadSchema: { oneOf: [{ required: ['game', 'roomId', 'phaseId', 'revision'], additionalProperties: false }, { required: ['game', 'gameId', 'revision'], additionalProperties: false }] } });
 	const { id } = await subscribe(game);
 	expect(rows.get(id)).toMatchObject({ name: gameTurnEvent, userId: 'account', mcpTokenId: 'grant', mode: 'mcp', on: [] });
 });
@@ -570,4 +574,68 @@ it('signs only the committed turn reference and suppresses inactive subscription
 	});
 	expect(await worker.process(job())).toBe('Suppressed');
 	expect(opened).toBe(false);
+});
+
+it('reauthorizes the current Reversi playing participant and never sends proof, board, opponent or secret', async () => {
+	const moduleRef = mockDeep<ModuleRef>();
+	const redis = mockDeep<Redis.Redis>();
+	moduleRef.get.mockReturnValue(redis);
+	service = new McpEventsService(deps.webhooks, deps.tokens, deps.apps, deps.users, deps.notes, deps.http, deps.roles, deps.noteEntity, deps.antennas, deps.antennaAccess, moduleRef);
+	permission = ['access:mcp', 'read:account'];
+	const { id } = await subscribe({ ...input, name: gameTurnEvent });
+	const sub = rows.get(id)!;
+	const state: MiReversiGame = {
+		id: 'game1', user1Id: 'account', user2Id: 'PRIVATE_OPPONENT', black: 1, isStarted: true, isEnded: false,
+		map: Reversi.maps.eighteight.data, logs: [], isLlotheo: false, canPutEverywhere: false, loopedBoard: false,
+		startedAt: null, endedAt: null, user1: null, user2: null, user1Ready: true, user2Ready: true,
+		winnerId: null, surrenderedUserId: null, timeoutUserId: null, timeLimitForEachTurn: 60,
+		bw: '1', noIrregularRules: false, form1: null, form2: null, crc32: null,
+	};
+	const turn = projectReversiTurn(state, Reversi.Serializer.restoreGame(state))!;
+	const game = mockDeep<Repository<MiReversiGame>>();
+	const query = mockDeep<ReturnType<Repository<MiReversiGame>['createQueryBuilder']>>();
+	game.createQueryBuilder.mockReturnValue(query);
+	query.select.mockReturnValue(query);
+	query.where.mockReturnValue(query);
+	query.andWhere.mockReturnValue(query);
+	query.getOne.mockResolvedValue(state);
+	deps.webhooks.manager.getRepository.mockImplementation(target => {
+		expect(target).toBe(MiReversiGame);
+		return game as never;
+	});
+	redis.mget.mockResolvedValue([JSON.stringify(state), '', null]);
+	const logger = mockDeep<QueueLoggerService>();
+	logger.logger.createSubLogger.mockReturnValue({ debug: vi.fn() } as never);
+	const worker = new UserWebhookDeliverProcessorService({ url: 'https://misskey.example' } as Config, deps.webhooks, deps.http, service, logger);
+	const data = { mode: 'mcp', type: gameTurnEvent, webhookId: id, userId: 'account', generation: sub.mcpGeneration!, noteId: '',
+		gameTurn: turn.reference, gameTurnStateKey: turn.stateKey, createdAt: 123, eventId: 'reversi-turn' } as const;
+	const job = (override = {}) => ({ data: { ...data, ...override } }) as Bull.Job<UserWebhookDeliverJobData>;
+	deps.http.sendMcpWebhook.mockClear();
+	deps.http.sendMcpWebhook.mockImplementation(async (_url, body, headers, _signal, beforeSend) => {
+		await beforeSend?.();
+		expect(headers['webhook-id']).toBe('reversi-turn');
+		expect(headers).not.toHaveProperty('X-Misskey-Hook-Secret');
+		expect(JSON.parse(body)).toEqual({ eventId: 'reversi-turn', name: gameTurnEvent, timestamp: '1970-01-01T00:00:00.123Z', data: { game: 'reversi', gameId: 'game1', revision: 1 }, cursor: null });
+		return { ok: true, status: 200, text: '' };
+	});
+	expect(await worker.process(job())).toBe('Success');
+	expect(query.where).toHaveBeenCalledWith('game.id = :id AND (game."user1Id" = :userId OR game."user2Id" = :userId)', { id: 'game1', userId: 'account' });
+	expect(query.andWhere).toHaveBeenCalledWith('game."isStarted" AND NOT game."isEnded"');
+	expect(await worker.process(job({ userId: 'spectator' }))).toBe('Suppressed');
+	expect(await worker.process(job({ gameTurnStateKey: undefined }))).toBe('Suppressed');
+	expect(await worker.process(job({ gameTurnStateKey: 'a'.repeat(64) }))).toBe('Suppressed');
+	sub.secret = '';
+	expect(await worker.process(job())).toBe('Suppressed');
+	sub.secret = secret;
+	const next = { ...state, logs: Reversi.Serializer.serializeLogs([{ time: 1, player: true, operation: 'put', pos: 19 }]) };
+	redis.mget.mockResolvedValue([JSON.stringify(next), '', '']);
+	expect(await worker.process(job())).toBe('Suppressed');
+	redis.mget.mockResolvedValue([JSON.stringify(state), null, null]);
+	expect(await worker.process(job())).toBe('Suppressed');
+	redis.mget.mockResolvedValue([null, '', null]);
+	expect(await worker.process(job())).toBe('Suppressed');
+	redis.mget.mockResolvedValue([JSON.stringify(state), '', null]);
+	query.getOne.mockResolvedValue(null);
+	expect(await worker.process(job())).toBe('Suppressed');
+	expect(deps.http.sendMcpWebhook).toHaveBeenCalledTimes(1);
 });

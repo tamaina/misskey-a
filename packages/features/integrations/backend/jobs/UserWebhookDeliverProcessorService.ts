@@ -41,7 +41,7 @@ export class UserWebhookDeliverProcessorService {
 		const gameTurn = data.type === gameTurnEvent ? parseGameTurnReference(data.gameTurn) : undefined;
 		if (gameTurn === null) return 'Suppressed';
 		const authorize = () => data.type === gameTurnEvent
-			? this.mcpEvents.authorizeDelivery(data.webhookId, data.userId, data.generation, data.noteId, data.type, data.antennaId, data.data, gameTurn)
+			? this.mcpEvents.authorizeDelivery(data.webhookId, data.userId, data.generation, data.noteId, data.type, data.antennaId, data.data, gameTurn, data.gameTurnStateKey)
 			: this.mcpEvents.authorizeDelivery(data.webhookId, data.userId, data.generation, data.noteId, data.type, data.antennaId, data.data);
 		const webhook = await authorize();
 		if (!webhook) return 'Suppressed';

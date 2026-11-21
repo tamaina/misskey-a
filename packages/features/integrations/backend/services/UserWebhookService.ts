@@ -110,9 +110,9 @@ export class UserWebhookService implements OnApplicationShutdown {
 	}
 
 	/** MCP-only: no legacy URL registration or cache entry gains access to private game events. */
-	public async enqueueGameTurn(userId: string, turn: GameTurnReference, createdAt: number) {
+	public async enqueueGameTurn(userId: string, turn: GameTurnReference, createdAt: number, stateKey?: string) {
 		const webhooks = await this.webhooksRepository.findBy({ userId, mode: 'mcp', active: true, name: gameTurnEvent });
-		return Promise.all(webhooks.map(webhook => this.queueService.gameTurnWebhookDeliver(webhook, turn, createdAt)));
+		return Promise.all(webhooks.map(webhook => this.queueService.gameTurnWebhookDeliver(webhook, turn, createdAt, stateKey)));
 	}
 
 	@bindThis

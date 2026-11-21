@@ -85,9 +85,8 @@ who can discard, play a legal action, or respond to a legal reaction. It does
 not signal pass-only seats or result confirmations. The signed body contains
 the standard MCP envelope (`eventId`, `name`, timestamp, `data`, null cursor).
 Consumers dispatch on the common `data.game` discriminator. Mahjong's data is
-exactly `{game: "mahjong", roomId, phaseId, revision}`; this is the only
-advertised game until other games supply their own authoritative producer and
-delivery checks. Fetch the current room with
+exactly `{game: "mahjong", roomId, phaseId, revision}`; see the
+[Reversi variant](../reversi/README.md) for the other supported game. Fetch the current room with
 the usual authenticated `mahjong/show` if needed (the native Mahjong API
 currently requires `write:account`; the event grant alone cannot play).
 Hidden tiles, opponents, options and even the receiver's hand are not in the event.

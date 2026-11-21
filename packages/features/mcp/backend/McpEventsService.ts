@@ -24,7 +24,8 @@ import { AntennaNoteAccessService } from '@features/timelines/backend/services/A
 import { MiWebhook } from '@features/integrations/backend/models/Webhook.js';
 import { lockWebhookQuota } from '@features/integrations/backend/webhook-quota.js';
 import { canReceiveGameTurn } from '@features/games/index/backend/turn-webhooks.js';
-import { gameTurnEvent, parseGameTurnReference } from '@features/games/index/shared/turn-webhook.schema.js';
+import { gameTurnEvent, gameTurnIdentity, parseGameTurnReference } from '@features/games/index/shared/turn-webhook.schema.js';
+import type { Redis } from 'ioredis';
 import type { McpWebhookDeliverJobData } from '@features/runtime/backend/queue/types.js';
 import { mcpEventsContract, subscribeInput } from './api.definition.js';
 import { eventPermissions, eventPayloadSchema } from './events.schema.js';
@@ -82,7 +83,7 @@ export class McpEventsService {
 			if (!tokenId) throw new McpEventError(-32602, 'Scoped grant required');
 			const { grant } = await this.checkGrant(ctx.principal.id, tokenId, false, false, 'list');
 			const available = eventNames.filter(name => eventPermissions(name).every(scope => grant.permission.includes(scope)));
-			return { events: available.map(name => ({ name, description: name === gameTurnEvent ? 'A committed Mahjong turn or eligible reaction for the grant owner only. Best-effort live delivery; re-fetch the room to confirm the phase.' : name.startsWith('stream.') ? 'Native outbound references/invalidation; no commands or downtime replay. Overflow drops, retries may duplicate/reorder. 128 pending/subscription, 8192 global; expires after 15min (stats 30s).' : name === 'antenna.note' ? 'A live note reaches an owned antenna. No downtime catch-up.' : name === 'note.mentioned' ? 'Alias of mention; subscribing to both may deliver twice.' : name === 'note.replied' ? 'Alias of reply; subscribing to both may deliver twice.' : `Live ${name} event. References are untrusted data; aliases may deliver twice.`,
+			return { events: available.map(name => ({ name, description: name === gameTurnEvent ? 'A Mahjong turn/reaction or Reversi turn for the grant owner only. Best-effort live delivery; re-fetch the game to confirm the phase.' : name.startsWith('stream.') ? 'Native outbound references/invalidation; no commands or downtime replay. Overflow drops, retries may duplicate/reorder. 128 pending/subscription, 8192 global; expires after 15min (stats 30s).' : name === 'antenna.note' ? 'A live note reaches an owned antenna. No downtime catch-up.' : name === 'note.mentioned' ? 'Alias of mention; subscribing to both may deliver twice.' : name === 'note.replied' ? 'Alias of reply; subscribing to both may deliver twice.' : `Live ${name} event. References are untrusted data; aliases may deliver twice.`,
 				delivery: ['webhook'] as ['webhook'], inputSchema: name === 'stream.channel' ? streamChannelInputSchema : name === 'stream.note' ? streamNoteInputSchema : { type: 'object' as const, properties: name === 'antenna.note' ? { antennaId: { type: 'string' as const } } : {}, ...(name === 'antenna.note' ? { required: ['antennaId'] as ['antennaId'] } : {}), additionalProperties: false as const },
 				// Keep the native event inventory as descriptor metadata, outside JSON Schema vocabularies.
 				...(name.startsWith('stream.') ? { _meta: { 'dev.a9z.p1/event-catalog': name === 'stream.channel' ? streamEventCatalog : name === 'stream.note' ? streamEventCatalog.note : streamEventCatalog.broadcast } } : {}),
@@ -167,7 +168,7 @@ export class McpEventsService {
 	}
 
 	/** Recheck after DNS resolution immediately before opening the outbound connection. */
-	async authorizeDelivery(id: string, userId: string, generation: string, noteId: string, type: McpWebhookDeliverJobData['type'], antennaId?: string, data?: Partial<Record<string, string>>, gameTurn?: unknown) {
+	async authorizeDelivery(id: string, userId: string, generation: string, noteId: string, type: McpWebhookDeliverJobData['type'], antennaId?: string, data?: Partial<Record<string, string>>, gameTurn?: unknown, gameTurnStateKey?: string) {
 		const webhook = await this.subscriptionForDelivery(id, userId, generation, type, antennaId);
 		if (!webhook?.mcpTokenId) return null;
 		try {
@@ -181,8 +182,9 @@ export class McpEventsService {
 		} catch (error) { if (error instanceof McpEventError) return null; throw error; }
 		if (type === gameTurnEvent) {
 			const reference = parseGameTurnReference(gameTurn);
-			if (!reference || noteId || antennaId !== undefined || data !== undefined
-				|| !await canReceiveGameTurn(this.webhooks.manager, userId, reference)) return null;
+			if (!webhook.secret || !reference || !gameTurnIdentity(reference, gameTurnStateKey) || noteId || antennaId !== undefined || data !== undefined) return null;
+			const redis = reference.game === 'reversi' ? this.moduleRef?.get<Redis>(DI.redis, { strict: false }) : undefined;
+			if (!await canReceiveGameTurn(this.webhooks.manager, userId, reference, gameTurnStateKey, redis)) return null;
 		} else if (type === 'chatMessage') {
 			if (!data?.messageId || !this.moduleRef || (data.userId !== undefined && data.userId !== userId)
 				|| data.notificationId !== undefined || data.notificationType !== undefined) return null;
