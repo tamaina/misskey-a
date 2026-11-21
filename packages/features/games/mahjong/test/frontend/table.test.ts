@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { fireEvent, render } from '@testing-library/vue';
+import { fireEvent, render, within } from '@testing-library/vue';
 import { expect, test } from 'vitest';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import Table from '../../frontend/components/Table.vue';
@@ -55,6 +55,43 @@ test.each([
 		await fireEvent.click(wrapper.getByRole('button', { name: `${label}（手出し） s1` }));
 		await fireEvent.click(wrapper.getByRole('button', { name: `${label}（ツモ切り） s1` }));
 		expect(wrapper.emitted().action).toEqual([[`${kind}:s1`], [`${kind}:s1_`]]);
+	} finally {
+		wrapper.unmount();
+	}
+});
+
+test.each([
+	['hule', 'win', [8000, -8000, 0, 0]],
+	['pingju', 'draw', [1500, -1500, 1500, -1500]],
+] as const)('shows each seat’s %s delta without changing its score before the next phase', async (kind, result, deltas) => {
+	const intl = createInternationalization({ initialLocale: 'ja-JP' });
+	await intl.ready;
+	const rotated = [2, 0, 3, 1].map((index, seat) => ({
+		...view.snapshot!.seats[index],
+		score: [33000, 17000, 27000, 23000][seat],
+	}));
+	const formatter = new Intl.NumberFormat(undefined, { signDisplay: 'exceptZero' });
+	const resultView: MahjongView = {
+		...view,
+		snapshot: { ...view.snapshot!, seats: rotated },
+		phase: { ...view.phase!, kind, actions: [{ id: 'continue:', kind: 'continue', tiles: '' }] },
+		outcome: { kind: result, winner: result === 'win' ? 2 : null, name: '', points: result === 'win' ? 8000 : 0, yaku: [], deltas: [...deltas] },
+	};
+	const wrapper = render(Table, { global: { plugins: [intl] }, props: { view: resultView, userId: 'alice', names: {}, busy: false, seconds: 10 } });
+	try {
+		const assertResult = () => {
+			for (const [index, seat] of rotated.entries()) {
+				const queries = within(wrapper.getByText(new RegExp(seat.userId + '$')).closest('section')!);
+				expect(queries.getByText(seat.score.toLocaleString())).toBeTruthy();
+				expect(queries.getByText('点数増減')).toBeTruthy();
+				expect(queries.getByText(formatter.format(deltas[index]))).toBeTruthy();
+			}
+		};
+		assertResult();
+		await wrapper.rerender({ view: { ...resultView, phase: { ...resultView.phase!, submitted: true, actions: [] } } });
+		assertResult();
+		await wrapper.rerender({ view: { ...resultView, phase: view.phase, outcome: null } });
+		expect(wrapper.queryAllByText('点数増減')).toHaveLength(0);
 	} finally {
 		wrapper.unmount();
 	}
