@@ -171,7 +171,7 @@ Deck-specific study keeps its existing eligibility rules.
 ## Collection size and old backups
 
 Local and Drive inspection and queued source imports accept a framed binary
-archive up to 1 GiB, with 64 MiB total JSON, 8 MiB per JSON frame, 8 MiB of non-history JSON, 20,000 frames excluding review history, one global
+archive up to 1 GiB, with 8 MiB per JSON frame, 8 MiB of non-history JSON, 20,000 frames excluding review history, one global
 settings record, 100 decks and up to 10,000 records in each remaining material store.
 Framing and the checksum also count toward the archive ceiling. Drive role,
 instance, storage and downloader limits can be lower. The default role permits 30 MiB per file. Synchronous restore
@@ -215,8 +215,9 @@ at 100 ms intervals and excludes the client, PostgreSQL and Redis.
 ### Long review histories
 
 The queued importer and the local/Drive scanners accept combined JSON over
-8 MiB when the excess comes from review history. The pilot bounds total JSON
-at 64 MiB to bound import validation, transaction size and the duplicate-ID index. The existing
+8 MiB when the excess comes from review history. Files over 64 MiB index review IDs by hash prefix and frame offset; a hash
+match rereads the original ID for exact comparison. The 1 GiB archive limit
+bounds the total work. The existing
 8 MiB non-history budget bounds the library response. Counters include the
 actual UTF-8 frame wrapper. Restore rereads at most 100 consecutive frames
 fitting in a 256 KiB window, or one larger frame, from the same private

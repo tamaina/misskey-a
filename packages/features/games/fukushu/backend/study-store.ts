@@ -96,8 +96,6 @@ export class FukushuStudyStore {
 			v.parse(reviewLogRecordSchema, record);
 			v.parse(storedFsrsCardSchema, before);
 			const byteSize = [record, before, scheduled.card, request].reduce((sum, value) => sum + Buffer.byteLength(JSON.stringify(value), 'utf8'), 0);
-			const [{ count, bytes }] = await manager.query('SELECT COUNT(*)::text AS count, COALESCE(SUM("byteSize"), 0)::text AS bytes FROM "fukushu_review_log" WHERE "ownerId" = $1', [ownerId]) as { count: string; bytes: string }[];
-			if (Number(count) >= 10_000 || Number(bytes) + byteSize > 32 * 1024 * 1024) throw new StudyError('STUDY_LIMIT');
 			await this.captureVersion(manager, ownerId, question, now);
 			const stateRevision = (saved?.revision ?? 0) + 1;
 			if (saved) await states.update({ ownerId, questionId: question.id }, { data: nextState, revision: stateRevision });

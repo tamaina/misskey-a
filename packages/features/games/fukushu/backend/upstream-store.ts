@@ -6,7 +6,7 @@ import { createHash } from 'node:crypto';
 import { isDeepStrictEqual } from 'node:util';
 import { In, QueryFailedError } from 'typeorm';
 import * as v from 'valibot';
-import { scanSourceArchive, MAX_SOURCE_ARCHIVE_BYTES, MAX_SOURCE_JSON_BYTES } from '../shared/source-scan.js';
+import { scanSourceArchive, MAX_SOURCE_ARCHIVE_BYTES } from '../shared/source-scan.js';
 import { checkMaterialCount, checkUpstreamRelations, emptyUpstreamRecords, UPSTREAM_MAGIC } from '../shared/upstream-reader.js';
 import { learningSettingsSchema, upstreamStoreSchemas } from '../shared/upstream-records.schema.js';
 import { studyRequestIdSchema } from '../shared/study.schema.js';
@@ -27,7 +27,6 @@ import type { LearningSettings } from '../shared/upstream-records.schema.js';
 import type { DataSource, EntityManager } from 'typeorm';
 import type { UpstreamFrame } from '../shared/upstream-reader.js';
 import type { SourceHistoryPage } from './upstream.contract.js';
-import type { SourceFrameOffset } from '../shared/source-scan.js';
 import type { DriveSnapshot, WithSource } from './backup-drive.js';
 import type { CompatibilityReviewInput } from './pilot/upstream-session.js';
 
@@ -36,6 +35,31 @@ const SOURCE_CHUNK_BYTES = 256 * 1024;
 const hash = (value: Uint8Array | string) => createHash('sha256').update(value).digest('hex');
 const key = (value: unknown) => hash(JSON.stringify(value));
 export type PersistedUpstreamReview = Omit<CompatibilityReviewInput, 'reviewedAt'>;
+
+/** Reread a verified immutable snapshot. Keep only one batch of offsets/data. */
+async function* restoreBatches(file: Blob) {
+	const end = file.size - 64;
+	let offset = UPSTREAM_MAGIC.length;
+	while (offset < end) {
+		// Include the first prefix in the window, even if its JSON exceeds one window.
+		const start = offset;
+		const window = Buffer.from(await file.slice(start, Math.min(end, start + SOURCE_CHUNK_BYTES)).arrayBuffer());
+		const batch: (UpstreamFrame & { blobOffset: number; blobSize?: number })[] = [];
+		while (batch.length < 100 && offset + 4 <= start + window.length) {
+			const length = window.readUInt32LE(offset - start);
+			const jsonStart = offset + 4;
+			const jsonEnd = jsonStart + length;
+			if (batch.length && jsonEnd > start + window.length) break;
+			const json = jsonEnd <= start + window.length
+				? window.toString('utf8', jsonStart - start, jsonEnd - start)
+				: await file.slice(jsonStart, jsonEnd).text();
+			const frame: UpstreamFrame & { blobSize?: number } = JSON.parse(json);
+			batch.push({ ...frame, blobOffset: jsonEnd });
+			offset = jsonEnd + (frame.blobSize ?? 0);
+		}
+		yield batch;
+	}
+}
 
 export class FukushuUpstreamStore {
 	constructor(private readonly db: DataSource, private readonly reader: { withSource: WithSource }, private readonly clock: () => Date = () => new Date()) {}
@@ -94,13 +118,12 @@ export class FukushuUpstreamStore {
 		return this.reader.withSource(ownerId, fileId, async snapshot => {
 			if (!accepted && snapshot.blob.size > MAX_BACKUP_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
 			if (accepted && (snapshot.blob.size !== accepted.size || snapshot.md5 !== accepted.md5)) throw new BackupError('BACKUP_FAILED');
-			const frames: SourceFrameOffset[] = [];
-			await scanSourceArchive(snapshot.blob, undefined, frame => frames.push(frame));
-			return this.commitRestore(ownerId, fileId, id, request, snapshot, frames);
+			await scanSourceArchive(snapshot.blob);
+			return this.commitRestore(ownerId, fileId, id, request, snapshot);
 		}, accepted ? MAX_SOURCE_ARCHIVE_BYTES : MAX_BACKUP_BYTES);
 	}
 
-	private async commitRestore(ownerId: string, fileId: string, id: string, request: string, snapshot: DriveSnapshot, frames: SourceFrameOffset[]) {
+	private async commitRestore(ownerId: string, fileId: string, id: string, request: string, snapshot: DriveSnapshot) {
 		try {
 			return await this.db.transaction(async manager => {
 				await this.lock(manager, ownerId);
@@ -115,18 +138,8 @@ export class FukushuUpstreamStore {
 				// The owner/store/key primary key rejects any source collision in the same transaction.
 				// Keep the validated metadata bounded, reread each binary from the immutable snapshot.
 				// A batch never accumulates binary buffers, even for many small media.
-				for (let index = 0; index < frames.length;) {
-					const first = frames[index];
-					let end = index + 1;
-					while (end < frames.length && end - index < 100 && frames[end].start + frames[end].length - first.start <= SOURCE_CHUNK_BYTES) end++;
-					const offsets = frames.slice(index, end);
-					const last = frames[end - 1];
-					const bytes = Buffer.from(await snapshot.blob.slice(first.start, last.start + last.length).arrayBuffer());
-					const batch = offsets.map(frame => {
-						const offset = frame.start - first.start;
-						const { store, value }: UpstreamFrame = JSON.parse(bytes.toString('utf8', offset, offset + frame.length));
-						return { store, value, blobSize: frame.blobSize, blobOffset: frame.start + frame.length };
-					});
+				let position = 0;
+				for await (const batch of restoreBatches(snapshot.blob)) {
 					// Native PostgreSQL text IDs cannot contain NUL or unpaired surrogates.
 					// Preserve these in the source JSON; they have no possible native collision.
 					for (const [table, store] of [['fukushu_deck', 'decks'], ['fukushu_question', 'questions'], ['fukushu_review_log', 'reviewLogs']]) {
@@ -145,7 +158,7 @@ export class FukushuUpstreamStore {
 							store: frame.store,
 							key: key(frame.value.id ?? frame.value.questionId),
 							data: JSON.stringify(frame.value),
-							position: index + i,
+							position: position + i,
 							revision: 0,
 							sourceHash: snapshot.sha256,
 							chunkedSize: frame.blobSize !== undefined && frame.blobSize > MAX_BACKUP_BYTES ? frame.blobSize : null,
@@ -165,7 +178,7 @@ export class FukushuUpstreamStore {
 							}
 						}
 					}
-					index = end;
+					position += batch.length;
 				}
 				// The source can place logs before their deck. Set counts after all frames exist.
 				if (deckCounts.size) await manager.query(`UPDATE fukushu_upstream_record d SET "indexedReviews" = n.total
@@ -174,7 +187,7 @@ export class FukushuUpstreamStore {
 				[ownerId, [...deckCounts.keys()], [...deckCounts.values()]]);
 				await this.refreshUsage(manager, ownerId);
 				await manager.delete(MiFukushuLearningSettings, { ownerId });
-				const result = { restored: true as const, sha256: snapshot.sha256, records: frames.length };
+				const result = { restored: true as const, sha256: snapshot.sha256, records: position };
 				await manager.getRepository(MiFukushuOperationReceipt).insert({ ownerId, id, request, result: JSON.stringify(result) });
 				return result;
 			});
@@ -201,7 +214,7 @@ export class FukushuUpstreamStore {
 			ON CONFLICT ("ownerId") DO UPDATE SET count = EXCLUDED.count, last = EXCLUDED.last,
 				logs = EXCLUDED.logs, bytes = EXCLUDED.bytes, binaries = EXCLUDED.binaries, "materialBytes" = EXCLUDED."materialBytes"
 			RETURNING count, bytes, binaries, "materialBytes"`, [ownerId]);
-		if (usage.materialBytes > MAX_BACKUP_BYTES || usage.bytes > MAX_SOURCE_JSON_BYTES || usage.bytes + usage.binaries + usage.count * 4 + UPSTREAM_MAGIC.length + 64 > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
+		if (usage.materialBytes > MAX_BACKUP_BYTES || usage.bytes + usage.binaries + usage.count * 4 + UPSTREAM_MAGIC.length + 64 > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
 	}
 
 	private materialRecords(frames: Iterable<UpstreamFrame>) {
@@ -320,7 +333,7 @@ export class FukushuUpstreamStore {
 			const count = budget.count + appended;
 			const jsonBytes = budget.bytes + delta;
 			const materialBytes = budget.materialBytes + delta;
-			if (materialBytes > MAX_BACKUP_BYTES || jsonBytes > MAX_SOURCE_JSON_BYTES ||
+			if (materialBytes > MAX_BACKUP_BYTES ||
 				UPSTREAM_MAGIC.length + 64 + count * 4 + budget.binaries + jsonBytes > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
 			if (expected !== undefined) {
 				let position = budget.last;
@@ -544,7 +557,7 @@ export class FukushuUpstreamStore {
 			const materialBytes = budget.materialBytes + stateDelta;
 			const jsonBytes = budget.bytes + stateDelta + logBytes;
 			const fileBytes = UPSTREAM_MAGIC.length + 64 + (budget.count + 1) * 4 + Number(budget.binaries) + jsonBytes;
-			if (logBytes > MAX_BACKUP_BYTES || materialBytes > MAX_BACKUP_BYTES || jsonBytes > MAX_SOURCE_JSON_BYTES || fileBytes > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
+			if (logBytes > MAX_BACKUP_BYTES || materialBytes > MAX_BACKUP_BYTES || fileBytes > MAX_SOURCE_ARCHIVE_BYTES) throw new BackupError('BACKUP_TOO_LARGE');
 			await usage.update({ ownerId }, { count: budget.count + 1, last: budget.last + 1, logs: budget.logs + 1, bytes: jsonBytes, materialBytes });
 			await records.update({ ownerId, store: state.store, key: cardKey }, { data, revision: result.revision });
 			const lookup = this.historyFields(result.record);

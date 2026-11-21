@@ -51,11 +51,8 @@ export class FukushuBackupRestorer {
 				const versionRows = payload.versions.map(row => ({ ...row, ownerId, recordedAt: new Date(row.recordedAt), byteSize: jsonBytes(row.data) }));
 				const reviewRows = payload.reviews.map(row => ({ ...row, ownerId, deckId: id, reviewedAt: new Date(row.reviewedAt), byteSize: [row.data, row.before, row.after, row.request].reduce((sum, value) => sum + jsonBytes(value), 0) }));
 				const [{ bytes: versionBytes }] = await manager.query('SELECT COALESCE(SUM("byteSize"), 0)::text AS bytes FROM fukushu_question_version WHERE "ownerId" = $1', [ownerId]) as { bytes: string }[];
-				const [{ count: reviewCount, bytes: reviewBytes }] = await manager.query('SELECT COUNT(*)::text AS count, COALESCE(SUM("byteSize"), 0)::text AS bytes FROM fukushu_review_log WHERE "ownerId" = $1', [ownerId]) as { count: string; bytes: string }[];
 				if (await decks.countBy({ ownerId }) >= 100 || payload.questions.some(q => q.currentVersion > 64)
-					|| Number(versionBytes) + versionRows.reduce((sum, row) => sum + row.byteSize, 0) > 32 * 1024 * 1024
-					|| Number(reviewCount) + reviewRows.length > 10_000
-					|| Number(reviewBytes) + reviewRows.reduce((sum, row) => sum + row.byteSize, 0) > 32 * 1024 * 1024) throw new BackupError('BACKUP_LIMIT');
+					|| Number(versionBytes) + versionRows.reduce((sum, row) => sum + row.byteSize, 0) > 32 * 1024 * 1024) throw new BackupError('BACKUP_LIMIT');
 				await decks.insert({ ownerId, id, data: payload.material.deck, revision: payload.deckState.revision, archivedAt: payload.deckState.archivedAt ? new Date(payload.deckState.archivedAt) : null });
 				const metadata = new Map(payload.questions.map(row => [row.questionId, row]));
 				const questionRows = payload.material.questions.map(data => {

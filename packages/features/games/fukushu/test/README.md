@@ -158,3 +158,12 @@ harness with `FUKUSHU_LONG_HISTORY=verify`, `FUKUSHU_PERSISTED_EXPORT` and
 `FUKUSHU_PERSISTED_STATE` pointing to those two test artifacts. It checks the
 restored state, continues learning and compares all 10,001 existing logs
 after one more upstream export/restore.
+
+For the former 64 MiB aggregate JSON boundary, use
+`FUKUSHU_LONG_HISTORY=generate-large` in a separate, empty output directory.
+Run the PostgreSQL suite with `FUKUSHU_LONG_ARCHIVE_DIR` set to that directory
+to import via a synthetic Drive snapshot, review, retry, and re-export. Feed
+`continued.fukushu` and `continued-state.json` from this run to the same
+`verify` scenario. This exercises the large-file store independently of the
+instance's Drive upload limits. Set `FUKUSHU_NATIVE_LONG_HISTORY=1` for the
+separate 20-deck, 10,020-answer native v1 backup round trip.

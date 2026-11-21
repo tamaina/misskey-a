@@ -4,15 +4,15 @@
  */
 import { sha256 } from '@noble/hashes/sha2.js';
 import { bytesToHex } from '@noble/hashes/utils.js';
+import { ReviewIdIndex } from './review-id-index.js';
 import { MAX_BACKUP_BYTES } from './backup.schema.js';
 import { checkMaterialCount, checkUpstreamRelations, decodeUpstreamRecord, emptyUpstreamRecords, summarizeUpstreamRecords, UPSTREAM_MAGIC, UpstreamBackupError } from './upstream-reader.js';
 import type { UpstreamInspection } from './upstream-backup.schema.js';
 
 // The browser and the server use the same archive and metadata limits.
-// Only JSON counts toward the retained metadata budget. APKG/media stay opaque.
 export const MAX_SOURCE_ARCHIVE_BYTES = 1024 ** 3;
-// The pilot bounds the ID/reference index and scan work; history bodies are released per frame.
-export const MAX_SOURCE_JSON_BYTES = 64 * 1024 ** 2;
+// Small files can retain the IDs directly. Larger files use offsets into the same immutable Blob.
+const inlineIndexBytes = 64 * 1024 ** 2;
 const chunkBytes = 256 * 1024;
 
 class FileCursor {
@@ -49,10 +49,7 @@ class FileCursor {
 	}
 }
 
-export type SourceFrameOffset = { start: number; length: number; blobSize?: number };
-
-/** Frame offsets are provisional until the trailer, media digests and references pass. */
-export async function scanSourceArchive(file: Blob, signal?: AbortSignal, onFrame?: (frame: SourceFrameOffset) => void) {
+export async function scanSourceArchive(file: Blob, signal?: AbortSignal) {
 	if (file.size > MAX_SOURCE_ARCHIVE_BYTES) throw new UpstreamBackupError('BACKUP_TOO_LARGE');
 	const cursor = new FileCursor(file, signal);
 	const end = file.size - 64;
@@ -63,7 +60,8 @@ export async function scanSourceArchive(file: Blob, signal?: AbortSignal, onFram
 	const records = emptyUpstreamRecords();
 	const seen = new Set<string>();
 	const media = new Set<string>();
-	let metadataBytes = 0;
+	const reviewIds = file.size > inlineIndexBytes ? new ReviewIdIndex(file) : undefined;
+	let referenceChars = 0;
 	let materialBytes = 0;
 	let materialCount = 0;
 	let logCount = 0;
@@ -76,17 +74,21 @@ export async function scanSourceArchive(file: Blob, signal?: AbortSignal, onFram
 		digest.update(prefix);
 		const length = new DataView(prefix.buffer).getUint32(0, true);
 		if (!length || length > end - cursor.position) throw new UpstreamBackupError('INVALID_BACKUP');
-		metadataBytes += length;
-		if (length > MAX_BACKUP_BYTES || metadataBytes > MAX_SOURCE_JSON_BYTES) throw new UpstreamBackupError('UPSTREAM_INSPECTION_LIMIT');
+		if (length > MAX_BACKUP_BYTES) throw new UpstreamBackupError('UPSTREAM_INSPECTION_LIMIT');
 		const json = await cursor.read(length);
 		digest.update(json);
-		const { store, value, blobSize } = decodeUpstreamRecord(json, seen, records);
+		const { store, value, blobSize } = decodeUpstreamRecord(json, seen, records, reviewIds !== undefined);
 		if (store === 'reviewLogs') {
 			const log = records.reviewLogs.pop();
-			if (!log) throw new UpstreamBackupError('INVALID_BACKUP');
+			if (!log || (reviewIds && !await reviewIds.add(log.id, cursor.position - length - 4))) throw new UpstreamBackupError('INVALID_BACKUP');
 			const previous = loggedQuestions.get(log.questionId);
 			if (previous !== undefined && previous !== log.deckId) throw new UpstreamBackupError('INVALID_BACKUP');
-			loggedQuestions.set(log.questionId, log.deckId);
+			if (previous === undefined) {
+				// Valid references must also fit in the material frames, even when logs precede questions.
+				referenceChars += log.questionId.length + log.deckId.length;
+				if (loggedQuestions.size >= 10_000 || referenceChars > MAX_BACKUP_BYTES) throw new UpstreamBackupError('INVALID_BACKUP');
+				loggedQuestions.set(log.questionId, log.deckId);
+			}
 			deckCounts.set(log.deckId, (deckCounts.get(log.deckId) ?? 0) + 1);
 			logCount++;
 			const entry: UpstreamInspection['history'][number] = {
@@ -104,7 +106,6 @@ export async function scanSourceArchive(file: Blob, signal?: AbortSignal, onFram
 			if (materialBytes > MAX_BACKUP_BYTES) throw new UpstreamBackupError('UPSTREAM_INSPECTION_LIMIT');
 			checkMaterialCount(store, records, ++materialCount, 10_000);
 		}
-		onFrame?.({ start: cursor.position - length, length, blobSize });
 		if (blobSize === undefined) {
 			if (store === 'media') throw new UpstreamBackupError('INVALID_BACKUP');
 			continue;

@@ -208,18 +208,20 @@ describe.skipIf(!socket)('private flashcard study PostgreSQL', () => {
 			WHERE l."ownerId" = $1 AND l.id = $2`, [owner, originalId, count]);
 	}
 
-	test('retains idempotent retries at the 10000-row cap and rolls back every new write', async () => {
+	test('saves a new answer beyond 10000 existing reviews and retries it exactly once', async () => {
 		await materials.create('alice', material());
 		const input = request(); const saved = await study.review('alice', input);
 		await copyLogs('alice', input.requestId, 9999);
 		await materials.archive('alice', 'deck-original', 1, true);
 		await materials.create('alice', material('new', 'new'));
-		await expect(study.review('alice', request({ id: 'new', questionId: 'new' }))).rejects.toThrow('STUDY_LIMIT');
+		const next = request({ id: 'new', questionId: 'new' });
+		const written = await study.review('alice', next);
+		expect(await study.review('alice', next)).toEqual(written);
 		expect(await study.review('alice', input)).toEqual(saved);
-		expect(await counts()).toEqual({ logs: 10000, states: 1, versions: 1 });
-		expect((await materials.showCardVersion('alice', 'new', 'new', 1)).recordedAt).toBeNull();
+		expect(await counts()).toEqual({ logs: 10001, states: 2, versions: 2 });
+		expect((await study.history('alice', 'new')).map(row => row.id)).toEqual([next.requestId]);
 	}, 30_000);
-	test('enforces 32 MiB of actual UTF-8 history JSON independently of the row cap', async () => {
+	test('appends across 32 MiB of retained UTF-8 history without losing existing reviews', async () => {
 		const large = material('教'.repeat(256), '問'.repeat(256));
 		await materials.create('alice', large);
 		const input = request({ id: large.deck.id, questionId: large.questions[0].id });
@@ -230,9 +232,9 @@ describe.skipIf(!socket)('private flashcard study PostgreSQL', () => {
 		await copyLogs('alice', input.requestId, count - 1);
 		const other = material('材'.repeat(256), '題'.repeat(256));
 		await materials.create('alice', other);
-		await expect(study.review('alice', request({ id: other.deck.id, questionId: other.questions[0].id }))).rejects.toThrow('STUDY_LIMIT');
-		expect(await counts()).toEqual({ logs: count, states: 1, versions: 1 });
-		expect((await materials.showCardVersion('alice', other.deck.id, other.questions[0].id, 1)).recordedAt).toBeNull();
+		await study.review('alice', request({ id: other.deck.id, questionId: other.questions[0].id }));
+		expect(await counts()).toEqual({ logs: count + 1, states: 2, versions: 2 });
+		expect(Number((await db.query('SELECT SUM("byteSize") AS bytes FROM fukushu_review_log'))[0].bytes)).toBeGreaterThan(32 * 1024 * 1024);
 	}, 30_000);
 	test('baseline version-budget failure leaves no study state or review behind', async () => {
 		await materials.create('alice', material());
