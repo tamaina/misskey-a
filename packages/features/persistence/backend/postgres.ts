@@ -4,6 +4,7 @@
  */
 
 // https://github.com/typeorm/typeorm/issues/2400
+import { MiPeerPaymentIntent, MiPeerPaymentToken } from '@features/billing/backend/models/PeerPayment.js';
 import pg from 'pg';
 import { DataSource, Logger, type QueryRunner } from 'typeorm';
 import { entities as charts } from '@features/statistics/backend/charts/registry.js';
@@ -277,6 +278,8 @@ export const entities = [
 	MiBillingServiceOrder,
 	MiBillingWalletChain,
 	MiBillingWallet,
+	MiPeerPaymentIntent,
+	MiPeerPaymentToken,
 	MiBillingWalletChallenge,
 	MiChatMessage,
 	MiChatRoom,

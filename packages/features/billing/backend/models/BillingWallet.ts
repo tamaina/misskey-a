@@ -17,6 +17,7 @@ const integer = { type: 'bigint' as const, transformer: { to: (value: number | n
 @Check('billing_wallet_createdAt_check', '"createdAt" BETWEEN 0 AND 9007199254740991')
 @Check('billing_wallet_updatedAt_check', '"updatedAt" BETWEEN 0 AND 9007199254740991')
 export class MiBillingWallet {
+	@Column('boolean', { default: false }) public isPublicForPayments: boolean;
 	@PrimaryColumn({ ...id(), primaryKeyConstraintName: 'billing_wallet_pk' })
 	public id: string;
 

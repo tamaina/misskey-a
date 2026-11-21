@@ -4,6 +4,7 @@
  */
 
 import { ServiceBillingApiProvider } from '@features/billing/backend/service.provider.js';
+import { PeerPaymentApiProvider } from '@features/billing/backend/peer.provider.js';
 import { WalletApiProvider } from '@features/billing/backend/wallet.provider.js';
 import { implement } from '@orpc/server';
 import { normalizeError } from '@features/api/backend/transport/orpc-error.js';
@@ -45,6 +46,7 @@ import type { ApiContext } from '@features/api/backend/transport/context.js';
 
 export interface ApiRouterFeatures {
 	serviceBilling: ReturnType<ServiceBillingApiProvider['compose']>;
+	peerPayments: ReturnType<PeerPaymentApiProvider['compose']>;
 	wallets: ReturnType<WalletApiProvider['compose']>;
 	roles: ReturnType<RolesApiProvider['compose']>;
 	moderation: ReturnType<ModerationApiProvider['compose']>;
@@ -99,6 +101,7 @@ export class ApiRouterProvider {
 		if (this.router !== undefined) return this.router;
 		this.router = createApiRouter({
 			serviceBilling: this.moduleRef.get(ServiceBillingApiProvider, { strict: false }).compose(),
+			peerPayments: this.moduleRef.get(PeerPaymentApiProvider, { strict: false }).compose(),
 			wallets: this.moduleRef.get(WalletApiProvider, { strict: false }).compose(),
 			roles: this.moduleRef.get(RolesApiProvider, { strict: false }).compose(),
 			moderation: this.moduleRef.get(ModerationApiProvider, { strict: false }).compose(),

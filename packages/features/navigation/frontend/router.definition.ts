@@ -118,6 +118,10 @@ export const ROUTE_DEF = [{
 		name: 'residence',
 		component: page(() => import('@features/billing/frontend/pages/settings/residence.vue')),
 	}, {
+		path: '/peer-payments',
+		name: 'peerPayments',
+		component: page(() => import('@features/billing/frontend/pages/settings/peer-payments.vue')),
+	}, {
 		path: '/wallets',
 		name: 'wallets',
 		component: page(() => import('@features/billing/frontend/pages/settings/wallets.vue')),
@@ -475,6 +479,10 @@ export const ROUTE_DEF = [{
 		path: '/service-offers',
 		name: 'serviceOffers',
 		component: page(() => import('@features/billing/frontend/pages/admin/service-offers.vue')),
+	}, {
+		path: '/peer-payment-tokens',
+		name: 'peerPaymentTokens',
+		component: page(() => import('@features/billing/frontend/pages/admin/peer-payment-tokens.vue')),
 	}, {
 		path: '/wallet-chains',
 		name: 'walletChains',

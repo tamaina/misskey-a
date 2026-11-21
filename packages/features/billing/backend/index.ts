@@ -58,3 +58,8 @@ export { createResidenceRouter } from './residence.implementation.js';
 export { createResidenceStore, requireDeclaredResidence, readyResidence } from './residence-store.js';
 export { residenceContract } from './residence.contract.js';
 export { declaredResidence, declaredResidenceInput } from './residence.schema.js';
+export { peerPaymentContract } from './peer.contract.js';
+export { PeerPaymentApiProvider } from './peer.provider.js';
+export { createPeerPaymentRouter } from './peer.implementation.js';
+export { createPeerPaymentStore, publicPeerTransfer } from './peer-store.js';
+export { MiPeerPaymentIntent, MiPeerPaymentToken } from './models/PeerPayment.js';
