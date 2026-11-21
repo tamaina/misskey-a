@@ -43,6 +43,8 @@ import { AbuseReportNotificationRecipientEntityService } from '@features/moderat
 import { ModerationLogEntityService } from '@features/moderation/backend/serializers/ModerationLogEntityService.js';
 import { UserSuspendService } from '@features/moderation/backend/services/UserSuspendService.js';
 import { toPackedUserDetailed } from '@features/users/backend/user.schema.js';
+import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
+import { AccountUpdateService } from '@features/users/backend/services/AccountUpdateService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { Injectable } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
@@ -64,6 +66,7 @@ export interface ModerationApiDependencies<Actor extends ApiActor> {
 	roleEntityService: {
 		packMany(roles: MiRole[], actor: Actor): Promise<Outputs['adminShowUser']['roles']>;
 	};
+	notifyProfileImageUnset(user: MiUser): Promise<void>;
 	userEntityService: {
 		packMany(users: MiUser[], actor: Actor, options: {
 			schema: 'UserDetailed';
@@ -143,6 +146,8 @@ export class ModerationApiProvider {
 		const recipientEntityService = moduleRef.get(AbuseReportNotificationRecipientEntityService, { strict: false });
 		const logEntityService = moduleRef.get(ModerationLogEntityService, { strict: false });
 		const userEntityService = moduleRef.get(UserEntityService, { strict: false });
+		const globalEventService = moduleRef.get(GlobalEventService, { strict: false });
+		const accountUpdateService = moduleRef.get(AccountUpdateService, { strict: false });
 		this.router = createModerationRouter<MiLocalUser>({
 			usersRepository: users,
 			userProfilesRepository: moduleRef.get<UserProfilesRepository>(DI.userProfilesRepository, { strict: false }),
@@ -151,6 +156,15 @@ export class ModerationApiProvider {
 			userIpsRepository: moduleRef.get<UserIpsRepository>(DI.userIpsRepository, { strict: false }),
 			moderationLogsRepository: moduleRef.get<ModerationLogsRepository>(DI.moderationLogsRepository, { strict: false }),
 			queryService, idService, roleService: roles, roleEntityService,
+			notifyProfileImageUnset: async (user) => {
+				if (userEntityService.isLocalUser(user)) {
+					globalEventService.publishInternalEvent('localUserUpdated', { id: user.id });
+					globalEventService.publishMainStream(user.id, 'meUpdated', await userEntityService.packSelf(user.id));
+					void accountUpdateService.publishToFollowers(user.id);
+				} else {
+					globalEventService.publishInternalEvent('remoteUserUpdated', { id: user.id });
+				}
+			},
 			userEntityService: { packMany: async (rows, actor, options) => (await userEntityService.packMany(rows, actor, options)).map(toPackedUserDetailed) },
 			abuseReportNotificationRecipientEntityService: { pack: async (row) => toRecipientWire(await recipientEntityService.pack(row)), packMany: async (rows) => (await recipientEntityService.packMany(rows)).map(toRecipientWire) },
 			abuseUserReportEntityService: { packMany: async (rows) => (await reportEntityService.packMany(rows)).map(toReportWire) },

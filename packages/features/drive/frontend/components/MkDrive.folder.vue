@@ -250,7 +250,15 @@ function move() {
 	});
 }
 
-function deleteFolder() {
+async function deleteFolder() {
+	if (prefer.s.uploadFolder === props.folder.id) {
+		const { canceled } = await os.confirm({
+			type: 'warning',
+			text: $locale.value.sfc.uploadFolderDeletionConfirm,
+		});
+		if (canceled) return;
+	}
+
 	misskeyApi('drive/folders/delete', {
 		folderId: props.folder.id,
 	}).then(() => {
@@ -556,6 +564,7 @@ function onContextmenu(ev: PointerEvent) {
 
 <locale locale="ja-JP" lang="json">
 {
+	"uploadFolderDeletionConfirm": "このフォルダは既定アップロード先に指定されています。削除すると、既定アップロード先は解除され、ファイルはルートにアップロードされます。",
 	"unableToProcess": "操作を完了できません",
 	"circularReferenceFolder": "移動先のフォルダーは、移動するフォルダーのサブフォルダーです。",
 	"renameFolder": "フォルダー名を変更",
