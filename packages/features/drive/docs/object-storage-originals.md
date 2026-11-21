@@ -59,7 +59,9 @@ type S3LocationEvidence = {
 - GET は認可済み key への `GetObject`、HEAD は `HeadObject` を使う。HEAD のために GET 本体を読み捨てない。S3 から返った長さを使い、DB size や上流 `Content-Disposition` を信用して転記しない。
 - `Content-Type: application/octet-stream`、既存 filename encoder を使った attachment、`Cache-Control: private, no-store`、`Vary: Authorization`、`nosniff` を維持する。公開 URL / `/files` / `/proxy` は変更しない。この入口は既存公開 URL を非公開化するものではない。
 - AWS SDK の streaming body を Fastify に渡し、buffer 化・一時ファイルへの全量コピーをしない。リクエスト中断、応答ソケット close、上流エラーで AbortController と Readable を確実に破棄する。イベント listener を完了時にも除去する。共有 agent 自体を request ごとに破棄しない。
-- missing key は 404。資格情報や backend の接続エラーは非公開の診断とし、利用者には資格情報・bucket・endpoint・上流 XML を返さない。送信開始前の失敗は汎用 5xx、開始後の失敗はレスポンスを終了し成功完了と扱わない。公開用 fallback / cache の error handler は流用しない。
+- 原本取得は認可済みの保存先と key に限定し、この入口のために `s3:ListBucket` を要求・追加しない。欠落の確認目的でも一覧は取得しない。Amazon S3 の汎用バケットでは、一覧権限がないと、存在しない key に対する GET / HEAD も権限拒否と同じ 403 になる。HEAD にはエラー本文もない。[AWS GetObject](https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetObject.html)、[AWS HeadObject](https://docs.aws.amazon.com/AmazonS3/latest/API/API_HeadObject.html)。
+- object の欠落を識別できる応答だけを 404 にする（例: `GetObject` の `NoSuchKey`）。上流の 404 を一律に key の欠落と見なさない。送信開始前の上流 403 は、欠落か拒否かを推測せず、どちらも同じ汎用 502・no-store とする。内部診断も「欠落と拒否を区別できない」状態を記録し、資格情報の不備と断定しない。区別を必須にする場合は、根拠と最小権限を別途決め、対象 backend ごとに検証する。
+- それ以外の送信開始前の backend エラーは汎用 5xx。利用者には資格情報・bucket・endpoint・上流 XML を返さない。開始後の失敗はレスポンスを終了し、成功完了と扱わない。公開用 fallback / cache の error handler は流用しない。
 - Range は次段階。初期 GET は従来どおり完全な 200 応答。タイムアウトの上限、client の再利用・廃棄の責任を明示して、遅い object storage が無期限に資源を占有しないようにする。
 
 ## 実装後に必要な検証
@@ -67,15 +69,17 @@ type S3LocationEvidence = {
 | ケース | 必須の観測 |
 | --- | --- |
 | 未認証 / Cookie のみ / query token / scope 不足 / 他人の fileId | #314 と同じ応答、S3 呼び出しゼロ |
-| 記録済み到達先・通常 GET | 同じ key の原本のみ、添付・no-store、streaming、公開 URL の変更なし |
+| 記録済み到達先・通常 GET | 一覧権限なしで同じ key の原本のみ取得。添付・no-store、streaming、公開 URL の変更なし |
 | bucket / endpoint / TLS / region の変更、CDN URL 据置 | 旧 fileId が新しい到達先を読まない |
 | prefix / CDN のみ変更、同じ保存先の credential rotation | 保存時の key を使う。対応する identity 方針どおりに扱う |
 | upload 中の meta 更新 | upload 先と記録された identity が一致する |
 | 未記録 legacy object | 推測して読まず 404、既存 URL は変更なし |
-| HEAD / missing key | HEAD body は空、正しい Content-Length、GetObject を呼ばない。missing は GET/HEAD とも 404 |
+| HEAD / 存在する key | 一覧権限なしで成功する。body は空、正しい Content-Length、GetObject と一覧取得を呼ばない |
+| GET / HEAD で識別できる key の欠落 | 利用する backend の応答から key の欠落だと確認できるときだけ 404。bucket の欠落や意味が不明な上流 404 は同じ扱いにしない |
+| 一覧権限なしで、存在しない key と読取拒否された既存 key の両方が上流 403 | GET / HEAD とも、両ケースで同じ汎用 502・no-store。HEAD の body は空。追加の一覧取得、権限昇格、代替の保存先への再試行を行わない |
 | GetObject 前の切断 / 上流 headers 前の切断 | SDK の abort signal 発火、stream を残さない |
 | 途中まで送った後の切断 / 上流 Readable エラー | 実際に listen した HTTP client で確認。接続・listener・body が解放され、汎用 JSON や XML を途中へ追記しない |
-| SDK エラー / timeout / AccessDenied | 秘密情報を含めない汎用 5xx、no-store、内部ログの限定 |
+| その他の SDK エラー / timeout | 秘密情報を含めない汎用 5xx、no-store、内部ログの限定 |
 | migration /保存復元 | nullable legacy、up/down、pack への非露出、同じ identity/key の round trip |
 
 現在はこれらの object storage 回帰テストを実装・実行していない。S3 相当 backend と実ソケットのテスト、型・lint・CI が通るまで接続完了としない。Node の mock だけでは実 HTTP の切断時の資源解放や SDK transport 互換性を保証できない。
