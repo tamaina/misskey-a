@@ -26702,6 +26702,9 @@ export default {
 						"INTERNAL_ERROR": {
 							"status": 500
 						},
+						"NO_SUCH_FOLDER": {
+							"status": 400
+						},
 						"FILE_REQUIRED": {
 							"status": 400
 						},

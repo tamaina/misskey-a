@@ -99,7 +99,7 @@ export default defineConfig((args) => {
 				postgres: '../features/persistence/backend/postgres.ts',
 				'gen-spec': '../features/api/backend/transport/openapi/gen-spec.ts',
 				'features/api/pilot': '../features/api/backend/pilot.ts',
-				...Object.fromEntries([...globSync('../features/*/{backend,shared}/index.ts')].map(file => [
+				...Object.fromEntries([...globSync(['../features/*/{backend,shared}/index.ts', '../features/games/*/{backend,shared}/index.ts'])].map(file => [
 					file.replace('../', '').replace('/index.ts', ''), file,
 				])),
 			},
@@ -128,7 +128,7 @@ export default defineConfig((args) => {
 				format: 'esm',
 			},
 			watch: {
-				include: ['src/**/*.{ts,mts,js,mjs,cjs,tsx,json}', '../features/*/{backend,contract,shared}/**/*.{ts,mts,js,mjs,cjs,tsx,json}'],
+				include: ['src/**/*.{ts,mts,js,mjs,cjs,tsx,json}', '../features/*/{backend,contract,shared}/**/*.{ts,mts,js,mjs,cjs,tsx,json}', '../features/games/*/{backend,contract,shared}/**/*.{ts,mts,js,mjs,cjs,tsx,json}'],
 				clearScreen: false,
 			},
 			experimental: { nativeMagicString: true },

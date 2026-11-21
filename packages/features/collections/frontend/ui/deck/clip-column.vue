@@ -229,7 +229,7 @@ const menu: MenuItem[] = [
 
 <locale lang="json" locale="de-DE">
 {
-	"selectClip": "クリップを選択"
+	"selectClip": "Clip auswählen"
 }
 </locale>
 

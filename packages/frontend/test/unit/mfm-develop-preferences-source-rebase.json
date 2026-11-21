@@ -1,0 +1,44 @@
+{
+  "file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
+  "currentSha256": "e295b1adcf5ad43316b392b92ddf5599edc62a42a48ebb932be7b11a5887f77e",
+  "developSha256": "e2a3288bd0f6107765accbdf5001e3e5c9b32990a989732425bf266f7339e18c",
+  "mfmHeadSha256": "e6681a373094f3ef8c01d95920f6e1a2a624716d486da65a907d530dbdee388e",
+  "edits": [
+    {
+      "start": 36221,
+      "end": 36620,
+      "current": "\t\t\t\t\t\t\t<SearchMarker :keywords=\"['url', 'preview', 'expand', 'player', 'embed']\">\n\t\t\t\t\t\t\t\t<MkPreferenceContainer k=\"expandUrlPreviewAutomatically\">\n\t\t\t\t\t\t\t\t\t<MkSwitch v-model=\"expandUrlPreviewAutomatically\">\n\t\t\t\t\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.expandUrlPreviewAutomatically }}</SearchLabel></template>\n\t\t\t\t\t\t\t\t\t</MkSwitch>\n\t\t\t\t\t\t\t\t</MkPreferenceContainer>\n\t\t\t\t\t\t\t</SearchMarker>\n\n",
+      "baseline": ""
+    },
+    {
+      "start": 46285,
+      "end": 46370,
+      "current": "const expandUrlPreviewAutomatically = prefer.model('expandUrlPreviewAutomatically');\n",
+      "baseline": ""
+    },
+    {
+      "start": 72095,
+      "end": 72346,
+      "current": "\t\"notifications\": \"Notificacions\",\n\t\"autoplayEmbededPlayerOfUrlPreview\": \"Reprodueix automàticament el reproductor incrustat per a les previsualitzacions d'URL\",\n\t\"expandUrlPreviewAutomatically\": \"Expandir automàticament les previsualitzacions d'URL\"\n",
+      "baseline": "\t\"notifications\": \"Notificacions\"\n"
+    },
+    {
+      "start": 153071,
+      "end": 153277,
+      "current": "\t\"notifications\": \"Notifiche\",\n\t\"autoplayEmbededPlayerOfUrlPreview\": \"Riproduci automaticamente le anteprime URL multimediali\",\n\t\"expandUrlPreviewAutomatically\": \"Espansione automatica delle anteprime URL\"\n",
+      "baseline": "\t\"notifications\": \"Notifiche\"\n"
+    },
+    {
+      "start": 153328,
+      "end": 153379,
+      "current": "\t\"expandUrlPreviewAutomatically\": \"URLプレビューを自動展開\",\n",
+      "baseline": ""
+    },
+    {
+      "start": 193566,
+      "end": 193706,
+      "current": "\t\"notifications\": \"알림\",\n\t\"autoplayEmbededPlayerOfUrlPreview\": \"URL 미리보기의 임베드 플레이어 자동 재생\",\n\t\"expandUrlPreviewAutomatically\": \"URL 미리보기 자동확장\"\n",
+      "baseline": "\t\"notifications\": \"알림\"\n"
+    }
+  ]
+}

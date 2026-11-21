@@ -2,13 +2,15 @@
  * SPDX-FileCopyrightText: misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
-import { restoreNyaizeMfmBaseline } from './nyaize-preferences-source-rebase.js';
-import { restoreMfmSearchBaseline } from './mfm-search-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { restoreFormulaBaseline } from './formula-source-rebase.js';
 import { parse } from 'vue/compiler-sfc';
+import crowdin18171 from './upstream-sync-crowdin-18171-delta.json';
+import { restoreNyaizeMfmBaseline } from './nyaize-preferences-source-rebase.js';
+import { restoreMfmSearchBaseline } from './mfm-search-source-rebase.js';
+import { restoreFormulaBaseline } from './formula-source-rebase.js';
+import { restoreMergedMfmPreferencesDevelopBaseline } from './mfm-integration-source-rebase.js';
 import type { LocaleBundle, RuntimeLocaleDictionary } from 'vite-vue-internationalization/runtime';
 
 export interface SourceRebase {
@@ -30,19 +32,36 @@ const rebases = sourceRebases;
 if (new Set(rebases.map(entry => entry.file)).size !== rebases.length) throw new Error('Duplicate upstream source rebase');
 
 const sha256 = (source: string): string => createHash('sha256').update(source).digest('hex');
+function restoreMfmSourceForUpstream(file: string, source: string): string {
+	// Preferences are restored before the Crowdin/global catalog layers instead.
+	if (file === 'packages/features/preferences/frontend/pages/settings/preferences.vue') return source;
+	source = restoreNyaizeMfmBaseline(file, source);
+	if (file === 'packages/features/integrations/frontend/components/MkGoogle.vue') source = restoreMfmSearchBaseline(file, source);
+	return restoreFormulaBaseline(file, source);
+}
+
 /** Restore only pinned source adaptations before replaying the unchanged historical proofs. */
 export function restoreUpstreamDevelopBaseline(file: string, source: string): string {
 	const rebase = rebases.find(entry => entry.file === file);
 	if (!rebase || sha256(source) === rebase.baselineSha256 || sha256(source) === rebase.historicalSha256) return source;
-	source = restoreNyaizeMfmBaseline(file, source);
-	if (file === 'packages/features/integrations/frontend/components/MkGoogle.vue') source = restoreMfmSearchBaseline(file, source);
-	source = restoreFormulaBaseline(file, source);
-	if (sha256(source) !== rebase.currentSha256) throw new Error(`Source differs from reviewed upstream develop: ${file}`);
+	return restoreSourceRebase(rebase, restoreMfmSourceForUpstream(file, source));
+}
+
+/** #18171 follows the frozen source layers below; undo just those new translations first. */
+export function restoreCrowdin18171Baseline(file: string, source: string): string {
+	return restoreSourceRebase(crowdin18171.find(entry => entry.file === file), restoreMergedMfmPreferencesDevelopBaseline(file, source));
+}
+
+function restoreSourceRebase(rebase: SourceRebase | undefined, source: string): string {
+	if (!rebase) return source;
+	const hash = sha256(source);
+	if (hash === rebase.baselineSha256 || hash === rebase.historicalSha256) return source;
+	if (hash !== rebase.currentSha256) throw new Error(`Source differs from reviewed upstream develop: ${rebase.file}`);
 	for (const edit of [...rebase.edits].reverse()) {
-		if (source.slice(edit.start, edit.end) !== edit.current) throw new Error(`Upstream develop boundary differs: ${file}`);
+		if (source.slice(edit.start, edit.end) !== edit.current) throw new Error(`Upstream develop boundary differs: ${rebase.file}`);
 		source = source.slice(0, edit.start) + edit.baseline + source.slice(edit.end);
 	}
-	if (sha256(source) !== rebase.baselineSha256) throw new Error(`Upstream develop baseline differs: ${file}`);
+	if (sha256(source) !== rebase.baselineSha256) throw new Error(`Upstream develop baseline differs: ${rebase.file}`);
 	return source;
 }
 
@@ -55,14 +74,13 @@ export function restoreUpstreamLocaleBundle(language: string, bundle: LocaleBund
 	for (const rebase of rebases.filter(entry => !entry.sourceOnly && entry.file.endsWith('.vue'))) {
 		const moduleId = rebase.file.replace('packages/', '/');
 		if (!Object.hasOwn(modules, moduleId)) continue;
-		let source = readFileSync(resolve(import.meta.dirname, '../../../..', rebase.file), 'utf8');
-		if (rebase.file === 'packages/features/integrations/frontend/components/MkGoogle.vue') source = restoreMfmSearchBaseline(rebase.file, source);
-		source = restoreFormulaBaseline(rebase.file, source);
-		if (sha256(source) !== rebase.currentSha256) throw new Error(`Locale source differs from reviewed upstream develop: ${rebase.file}`);
+		const source = readFileSync(resolve(import.meta.dirname, '../../../..', rebase.file), 'utf8');
+		const prior = restoreMfmSourceForUpstream(rebase.file, restoreCrowdin18171Baseline(rebase.file, source));
+		if (sha256(prior) !== rebase.currentSha256) throw new Error(`Locale source differs from reviewed upstream develop: ${rebase.file}`);
 		let dictionaries = localeCache.get(rebase.file);
 		if (!dictionaries) {
 			const collect = (text: string): Map<string, RuntimeLocaleDictionary> => new Map(parse(text).descriptor.customBlocks.filter(block => block.type === 'locale').map(block => [String(block.attrs.locale), JSON.parse(block.content) as RuntimeLocaleDictionary]));
-			dictionaries = { current: collect(source), baseline: collect(restoreUpstreamDevelopBaseline(rebase.file, source)) };
+			dictionaries = { current: collect(source), baseline: collect(restoreUpstreamDevelopBaseline(rebase.file, prior)) };
 			localeCache.set(rebase.file, dictionaries);
 		}
 		// VVI loaders fill keys missing from a language with the primary (ja-JP) messages, in the primary key order.

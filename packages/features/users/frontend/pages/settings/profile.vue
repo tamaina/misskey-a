@@ -939,7 +939,9 @@ definePage(() => ({
 	"flagAsCatDescription": "Miaoo mia miao mi miao?",
 	"flagAsBot": "Io sono un robot",
 	"flagAsBotDescription": "Attiva questo campo se il profilo esegue principalmente operazioni automatiche. L'attivazione segnala agli altri sviluppatori come comportarsi per evitare catene d’interazione infinite con altri bot. I sistemi interni di Misskey si adegueranno al fine di trattare questo profilo come bot.",
-	"qr": "QR Code"
+	"qr": "QR Code",
+	"cannotSelectSensitiveMedia": "Impossibile selezionare il media esplicito",
+	"cannotSelectSensitiveMediaDescription": "Se si ottiene questo errore senza aver contrassegnato il contenuto come sensibile, il file potrebbe essere stato automaticamente classificato come tale.\nConsiderando il regolamento del server, valutare se rimuovere l'attributo \"contenuto esplicito\" e riprovare."
 }
 </locale>
 

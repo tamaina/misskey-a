@@ -289,7 +289,7 @@ definePage(() => ({
 
 <locale locale="zh-CN" lang="json">
 {
-	"customCssWarn": "这些设置必须有相关的基础知识，不当的配置可能导致客户端无法正常使用。",
+	"customCssWarn": "进行这些设置必须具备相关的基础知识，不当的配置可能导致客户端无法正常使用。",
 	"customCssIsDisabledBecauseSafeMode": "因启用了安全模式，无法应用自定义 CSS。",
 	"reloadToApplySetting": "页面刷新后设置才会生效。是否现在刷新页面？",
 	"customCss": "自定义 CSS"

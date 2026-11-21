@@ -28,7 +28,7 @@ test('relationships HTTP explicitly selects outer and nested following fields wi
 		isBlocking: false, isBlocked: false, isMuted: false, isRenoteMuted: false,
 	};
 	const stored = { ...expected, accessKey: 'outer-secret', requestHeaders: { secret: 'outer' },
-		following: { ...following, followee: null, follower: null, accessKey: 'nested-secret', requestHeaders: { secret: 'nested' } },
+		following: { ...following, followee: null, follower: null, requestId: 'https://example.test/internal-follow', accessKey: 'nested-secret', requestHeaders: { secret: 'nested' } },
 	};
 	service.getRelation.mockResolvedValue(stored);
 	const schema = relationshipsContract['users/relation']['~orpc'].outputSchema;

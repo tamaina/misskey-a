@@ -10,12 +10,13 @@ import { relationshipsContract } from '../../relationships.contract.js';
 import type { RelationshipsDependencies } from '../../../api.implementation.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
 import { relationshipsErrors } from '../../relationships.errors.js';
-export function createUsersListsDeleteProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'userListsRepository'>) {
+export function createUsersListsDeleteProcedure<Actor extends MiLocalUser>(deps: Pick<RelationshipsDependencies, 'userListsRepository' | 'userListService'>) {
 	return createApiProcedure<Actor>()(relationshipsContract["users/lists/delete"]).use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const actor = context.principal;
 			const list = await deps.userListsRepository.findOneBy({ id: input.listId, userId: actor.id });
 			if (list == null) throw apiError(relationshipsErrors['users/lists/delete'].noSuchList);
 			await deps.userListsRepository.delete(list.id);
+			deps.userListService.notifyListDeleted(list.id);
 		});
 }
