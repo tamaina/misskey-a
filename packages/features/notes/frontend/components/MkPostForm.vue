@@ -153,6 +153,7 @@ import { globalEvents } from '@features/runtime/frontend/events.js';
 import { checkDragDataType, getDragData } from '@features/ui/frontend/drag-and-drop.js';
 import { useUploader } from '@features/drive/frontend/composables/use-uploader.js';
 import { startTour } from '@features/navigation/frontend/utility/tour.js';
+import { confirmImageAltText, createPostPreparationGuard } from '@features/notes/frontend/utility/post-image-alt-reminder.js';
 import { closeTip } from '@features/web/frontend/tips.js';
 import type { UploaderItem } from '@features/drive/frontend/composables/use-uploader.js';
 import type { PollEditorModelValue } from '@features/notes/frontend/components/MkPollEditor.vue';
@@ -198,6 +199,7 @@ const footerEl = useTemplateRef('footerEl');
 const submitButtonEl = useTemplateRef('submitButtonEl');
 
 const posting = ref(false);
+const { preparing: preparingPost, run: preparePost } = createPostPreparationGuard();
 const posted = ref(false);
 const text = ref(props.initialText ?? '');
 const files = ref(props.initialFiles ?? []);
@@ -315,7 +317,7 @@ const cwTextLength = computed((): number => {
 const maxCwTextLength = 100;
 
 const canPost = computed((): boolean => {
-	return !props.mock && !posting.value && !posted.value && !uploader.uploading.value && (uploader.items.value.length === 0 || uploader.readyForUpload.value) &&
+	return !props.mock && !preparingPost.value && !posting.value && !posted.value && !uploader.uploading.value && (uploader.items.value.length === 0 || uploader.readyForUpload.value) &&
 		(
 			1 <= textLength.value ||
 			1 <= files.value.length ||
@@ -958,7 +960,32 @@ async function uploadFiles() {
 	}
 }
 
+async function confirmMissingImageAltText(): Promise<boolean> {
+	return await confirmImageAltText(prefer.s.warnMissingImageAltText, files.value, async () => {
+		const { canceled, result } = await os.actions({
+			type: 'warning',
+			text: $locale.value.sfc.missingImageAltTextReminder,
+			actions: [{
+				value: 'edit',
+				text: $locale.value.sfc.returnToAltTextEditing,
+				primary: true,
+			}, {
+				value: 'continue',
+				text: $locale.value.sfc.continueWithoutImageAltText,
+			}],
+		});
+
+		return !canceled && result === 'continue';
+	});
+}
+
 async function post(ev?: PointerEvent) {
+	if (!canPost.value) return;
+
+	await preparePost(() => postInternal(ev));
+}
+
+async function postInternal(ev?: PointerEvent) {
 	if (ev != null) {
 		const el = (ev.currentTarget ?? ev.target) as HTMLElement | null;
 
@@ -981,6 +1008,8 @@ async function post(ev?: PointerEvent) {
 				return;
 			}
 		}
+
+		if (!await confirmMissingImageAltText()) return;
 
 		await postAsScheduled();
 		clear();
@@ -1024,6 +1053,8 @@ async function post(ev?: PointerEvent) {
 			return;
 		}
 	}
+
+	if (!await confirmMissingImageAltText()) return;
 
 	let postData = {
 		text: text.value === '' ? null : text.value,
@@ -2266,6 +2297,9 @@ html[data-color-scheme=light] .preview {
 	"schedulePost": "Schedule note",
 	"quoteQuestion": "Append as quote?",
 	"attachAsFileQuestion": "The text in clipboard is long. Would you want to attach it as text file?",
+	"missingImageAltTextReminder": "Some images are missing alt text.",
+	"returnToAltTextEditing": "Return to editing",
+	"continueWithoutImageAltText": "Continue without alt text",
 	"thisPostMayBeAnnoying": "This note may annoy others.",
 	"thisPostMayBeAnnoyingHome": "Post to home timeline",
 	"thisPostMayBeAnnoyingCancel": "Cancel",
@@ -2591,6 +2625,9 @@ html[data-color-scheme=light] .preview {
 	"schedulePost": "投稿を予約",
 	"quoteQuestion": "引用として添付しますか？",
 	"attachAsFileQuestion": "クリップボードのテキストが長いです。テキストファイルとして添付しますか？",
+	"missingImageAltTextReminder": "代替テキストが入力されていない画像があります。",
+	"returnToAltTextEditing": "編集に戻る",
+	"continueWithoutImageAltText": "説明なしで続ける",
 	"thisPostMayBeAnnoying": "この投稿は迷惑になる可能性があります。",
 	"thisPostMayBeAnnoyingHome": "ホームに投稿",
 	"thisPostMayBeAnnoyingCancel": "やめる",

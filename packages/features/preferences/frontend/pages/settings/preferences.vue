@@ -344,6 +344,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</MkPreferenceContainer>
 							</SearchMarker>
 
+							<SearchMarker :keywords="['alt text', 'accessibility', 'image', 'caption', 'attachment', 'warning']">
+								<MkPreferenceContainer k="warnMissingImageAltText">
+									<MkSwitch v-model="warnMissingImageAltText">
+										<template #label><SearchLabel>{{ $locale.sfc.warnMissingImageAltText }}</SearchLabel></template>
+									</MkSwitch>
+								</MkPreferenceContainer>
+							</SearchMarker>
+
 							<SearchMarker :keywords="['remember', 'keep', 'note', 'visibility']">
 								<MkPreferenceContainer k="rememberNoteVisibility">
 									<MkSwitch v-model="rememberNoteVisibility">
@@ -923,6 +931,7 @@ const overridedDeviceKind = prefer.model('overridedDeviceKind');
 const pollingInterval = prefer.model('pollingInterval');
 const showTitlebar = prefer.model('showTitlebar');
 const keepCw = prefer.model('keepCw');
+const warnMissingImageAltText = prefer.model('warnMissingImageAltText');
 const serverDisconnectedBehavior = prefer.model('serverDisconnectedBehavior');
 const hemisphere = prefer.model('hemisphere');
 const showNoteActionsOnlyHover = prefer.model('showNoteActionsOnlyHover');
@@ -2009,6 +2018,7 @@ definePage(() => ({
 	"displayOfSensitiveMedia": "Display of sensitive media",
 	"postForm": "Posting form",
 	"keepCw": "Keep content warnings",
+	"warnMissingImageAltText": "Confirm before posting images without alt text",
 	"rememberNoteVisibility": "Remember note visibility settings",
 	"enableQuickAddMfmFunction": "Show advanced MFM picker",
 	"defaultNoteVisibility": "Default visibility",
@@ -2801,6 +2811,7 @@ definePage(() => ({
 	"displayOfSensitiveMedia": "センシティブなメディアの表示",
 	"postForm": "投稿フォーム",
 	"keepCw": "CWを維持する",
+	"warnMissingImageAltText": "画像に代替テキストがないとき、投稿前に確認する",
 	"rememberNoteVisibility": "公開範囲を記憶する",
 	"enableQuickAddMfmFunction": "高度なMFMのピッカーを表示する",
 	"defaultNoteVisibility": "デフォルトの公開範囲",
