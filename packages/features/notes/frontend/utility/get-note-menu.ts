@@ -211,12 +211,14 @@ export function getNoteMenu(props: {
 	}
 
 	function delEdit(): void {
+		if (!$i?.policies.canNote) return;
+
 		os.confirm({
 			type: 'warning',
 			text: FeatureLocaleMessages.$locale.deleteAndEditConfirm,
 		}).then(({ canceled }) => {
 			if (canceled) return;
-			if ($i == null) return;
+			if (!$i?.policies.canNote) return;
 
 			misskeyApi('notes/delete', {
 				noteId: appearNote.id,
@@ -516,7 +518,7 @@ export function getNoteMenu(props: {
 
 		if (appearNote.userId === $i.id || $i.isModerator || $i.isAdmin) {
 			menuItems.push({ type: 'divider' });
-			if (appearNote.userId === $i.id) {
+			if (appearNote.userId === $i.id && $i.policies.canNote) {
 				menuItems.push({
 					icon: 'ti ti-edit',
 					text: FeatureLocaleMessages.$locale.deleteAndEdit,

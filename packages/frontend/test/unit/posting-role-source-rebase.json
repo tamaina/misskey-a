@@ -363,42 +363,54 @@
 	},
 	{
 		"file": "packages/features/notes/frontend/utility/get-note-menu.ts",
-		"currentSha256": "ca092a6002535b555f2974c98850a36dea405185d5867516689b90624c11a479",
+		"currentSha256": "29edabfd90b7a3893841f300fcba7997f16bc4a58a61444f042435336dd41fec",
 		"baselineSha256": "9083977d659098ba8ddaa99d76de6696a2be62629f108c53e2442be2d6dd994e",
 		"edits": [
 			{
-				"start": 18858,
-				"end": 18965,
+				"start": 6851,
+				"end": 7106,
+				"current": "\tfunction delEdit(): void {\n\t\tif (!$i?.policies.canNote) return;\n\n\t\tos.confirm({\n\t\t\ttype: 'warning',\n\t\t\ttext: FeatureLocaleMessages.$locale.deleteAndEditConfirm,\n\t\t}).then(({ canceled }) => {\n\t\t\tif (canceled) return;\n\t\t\tif (!$i?.policies.canNote) return;\n",
+				"baseline": "\tfunction delEdit(): void {\n\t\tos.confirm({\n\t\t\ttype: 'warning',\n\t\t\ttext: FeatureLocaleMessages.$locale.deleteAndEditConfirm,\n\t\t}).then(({ canceled }) => {\n\t\t\tif (canceled) return;\n\t\t\tif ($i == null) return;\n"
+			},
+			{
+				"start": 16091,
+				"end": 16198,
+				"current": "\t\t\tif (appearNote.userId === $i.id && $i.policies.canNote) {\n\t\t\t\tmenuItems.push({\n\t\t\t\t\ticon: 'ti ti-edit',\n",
+				"baseline": "\t\t\tif (appearNote.userId === $i.id) {\n\t\t\t\tmenuItems.push({\n\t\t\t\t\ticon: 'ti ti-edit',\n"
+			},
+			{
+				"start": 18930,
+				"end": 19037,
 				"current": "\tif (!$i?.policies.canNote || $i?.policies.renotePolicy === 'disallow') {\n\t\treturn {\n\t\t\tmenu: [],\n\t\t};\n\t}\n\n",
 				"baseline": ""
 			},
 			{
-				"start": 19200,
-				"end": 19228,
+				"start": 19272,
+				"end": 19300,
 				"current": "\t\tchannelRenoteItems.push({\n",
 				"baseline": "\t\tchannelRenoteItems.push(...[{\n"
 			},
 			{
-				"start": 19938,
-				"end": 20261,
+				"start": 20010,
+				"end": 20333,
 				"current": "\t\t});\n\n\t\tif ($i?.policies.renotePolicy === 'allow') {\n\t\t\tchannelRenoteItems.push({\n\t\t\t\ttext: FeatureLocaleMessages.$locale.inChannelQuote,\n\t\t\t\ticon: 'ti ti-quote',\n\t\t\t\taction: () => {\n\t\t\t\t\tif (!props.mock) {\n\t\t\t\t\t\tos.post({\n\t\t\t\t\t\t\trenote: appearNote,\n\t\t\t\t\t\t\tchannel: appearNote.channel!,\n\t\t\t\t\t\t});\n\t\t\t\t\t}\n\t\t\t\t},\n\t\t\t});\n\t\t}\n",
 				"baseline": "\t\t}, {\n\t\t\ttext: FeatureLocaleMessages.$locale.inChannelQuote,\n\t\t\ticon: 'ti ti-quote',\n\t\t\taction: () => {\n\t\t\t\tif (!props.mock) {\n\t\t\t\t\tos.post({\n\t\t\t\t\t\trenote: appearNote,\n\t\t\t\t\t\tchannel: appearNote.channel,\n\t\t\t\t\t});\n\t\t\t\t}\n\t\t\t},\n\t\t}]);\n"
 			},
 			{
-				"start": 20337,
-				"end": 20364,
+				"start": 20409,
+				"end": 20436,
 				"current": "\t\tnormalRenoteItems.push({\n",
 				"baseline": "\t\tnormalRenoteItems.push(...[{\n"
 			},
 			{
-				"start": 20902,
-				"end": 21148,
+				"start": 20974,
+				"end": 21220,
 				"current": "\t\t\t\tconst configuredLocalOnly = prefer.s.rememberNoteVisibility ? store.s.localOnly : prefer.s.defaultNoteLocalOnly;\n\t\t\t\t// 連合が許可されていないなら、設定に関わらずローカルのみにする\n\t\t\t\tconst localOnly = $i?.policies.canFederateNote === false ? true : configuredLocalOnly;\n",
 				"baseline": "\t\t\t\tconst localOnly = prefer.s.rememberNoteVisibility ? store.s.localOnly : prefer.s.defaultNoteLocalOnly;\n"
 			},
 			{
-				"start": 21649,
-				"end": 21906,
+				"start": 21721,
+				"end": 21978,
 				"current": "\t\t});\n\n\t\tif (!props.mock && $i?.policies.renotePolicy === 'allow') {\n\t\t\tnormalRenoteItems.push({\n\t\t\t\ttext: FeatureLocaleMessages.$locale.quote,\n\t\t\t\ticon: 'ti ti-quote',\n\t\t\t\taction: () => {\n\t\t\t\t\tos.post({\n\t\t\t\t\t\trenote: appearNote,\n\t\t\t\t\t});\n\t\t\t\t},\n\t\t\t});\n\t\t}\n",
 				"baseline": "\t\t}, ...(props.mock ? [] : [{\n\t\t\ttext: FeatureLocaleMessages.$locale.quote,\n\t\t\ticon: 'ti ti-quote',\n\t\t\taction: () => {\n\t\t\t\tos.post({\n\t\t\t\t\trenote: appearNote,\n\t\t\t\t});\n\t\t\t},\n\t\t}])]);\n"
 			}
