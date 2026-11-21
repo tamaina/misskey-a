@@ -23,7 +23,7 @@ const packed: Packed<'Channel'> = {
 
 function fixture(userId = 'owner123', moderator = false, eligible = true) {
 	const deps = mockDeep<ChannelsUpdateDependencies & ChannelsCreateDependencies>();
-	const channel = mockDeep<MiChannel>({ ...packed, lastNotedAt: null });
+	const channel = mockDeep<MiChannel>({ ...packed, lastNotedAt: null, federationPublicKey: null });
 	deps.channelsRepository.findOneBy.mockResolvedValue(channel);
 	deps.channelsRepository.findOneByOrFail.mockResolvedValue(channel);
 	deps.channelEntityService.pack.mockResolvedValue(packed);
@@ -56,6 +56,34 @@ test('moderator freezes without changing the owner preference', async () => {
 	expect(f.deps.channelsRepository.update).toHaveBeenCalledWith('channel123', expect.objectContaining({ isFederationFrozen: true }));
 	expect(f.deps.channelsRepository.update.mock.calls[0][1]).not.toHaveProperty('isFederated');
 	expect(f.deps.channelFederationService.deliverUpdate).toHaveBeenCalled();
+});
+
+test.each([{ name: 'renamed' }, { description: null }, { isSensitive: true }])('published Group announces metadata-only edit %j', async changed => {
+	const f = fixture();
+	f.channel.isFederated = true;
+	f.channel.description = 'previous description';
+	const persisted = { ...f.channel, ...changed };
+	f.deps.channelsRepository.findOneByOrFail.mockResolvedValue(persisted);
+	await call(createChannelsUpdateProcedure(f.deps), { channelId: 'channel123', ...changed }, { context: f.context });
+	expect(f.deps.channelsRepository.update).toHaveBeenCalledWith('channel123', expect.objectContaining(changed));
+	expect(f.deps.channelFederationService.deliverUpdate).toHaveBeenCalledWith(persisted);
+});
+
+test('unpublished channels and nullable no-op sensitivity edits do not announce metadata', async () => {
+	const f = fixture();
+	const update = createChannelsUpdateProcedure(f.deps);
+	await call(update, { channelId: 'channel123', name: 'renamed' }, { context: f.context });
+	expect(f.deps.channelFederationService.deliverUpdate).not.toHaveBeenCalled();
+	f.channel.isFederated = true;
+	await call(update, { channelId: 'channel123', isSensitive: null }, { context: f.context });
+	expect(f.deps.channelFederationService.deliverUpdate).not.toHaveBeenCalled();
+});
+
+test('a previously published Group announces metadata even after federation OFF', async () => {
+	const f = fixture();
+	f.channel.federationPublicKey = 'synthetic-public-key';
+	await call(createChannelsUpdateProcedure(f.deps), { channelId: 'channel123', isSensitive: true }, { context: f.context });
+	expect(f.deps.channelFederationService.deliverUpdate).toHaveBeenCalledOnce();
 });
 
 test('moderator cannot overwrite owner preference', async () => {

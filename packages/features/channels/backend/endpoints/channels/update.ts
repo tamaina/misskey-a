@@ -82,7 +82,11 @@ export function createChannelsUpdateProcedure<Actor extends MiLocalUser>(deps: C
 				...(typeof ps.isSensitive === 'boolean' ? { isSensitive: ps.isSensitive } : {}),
 				...(isFederated ? { allowRenoteToExternal: true } : typeof ps.allowRenoteToExternal === 'boolean' ? { allowRenoteToExternal: ps.allowRenoteToExternal } : {}),
 			});
-			if (ps.isFederated !== undefined || ps.isFederationFrozen !== undefined || ps.isArchived !== undefined) {
+			const presentationChanged = (ps.name !== undefined && ps.name !== channel.name) ||
+				(ps.description !== undefined && ps.description !== channel.description) ||
+				(typeof ps.isSensitive === 'boolean' && ps.isSensitive !== channel.isSensitive);
+			if (ps.isFederated !== undefined || ps.isFederationFrozen !== undefined || ps.isArchived !== undefined ||
+				(presentationChanged && (channel.isFederated || channel.federationPublicKey))) {
 				await deps.channelFederationService.deliverUpdate(await deps.channelsRepository.findOneByOrFail({ id: channel.id }));
 			}
 			return toPackedChannel(await deps.channelEntityService.pack(channel.id, me));

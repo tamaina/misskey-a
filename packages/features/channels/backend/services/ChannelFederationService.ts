@@ -377,20 +377,30 @@ export class ChannelFederationService implements OnModuleInit, OnApplicationShut
 	}
 
 	private async remoteChannel(actor: MiRemoteUser, group: IObject): Promise<MiChannel> {
+		// An older Group may omit presentation fields. Do not clear known values unless
+		// the canonical actor actually supplies a valid replacement (including null summary).
+		const name = typeof group.name === 'string' && group.name.length > 0 ? group.name.slice(0, 128) : undefined;
+		const summary = group._misskey_summary;
+		const description = typeof summary === 'string' ? summary.slice(0, 2048) : summary === null ? null : undefined;
+		const isSensitive = typeof group.sensitive === 'boolean' ? group.sensitive : undefined;
+		const isFederationFrozen = group._misskey_channelFrozen === true;
 		let channel = await this.channels.findOneBy({ uri: actor.uri });
 		if (!channel) {
 			await this.channels.createQueryBuilder().insert().values({
 				id: this.idService.gen(), uri: actor.uri, host: actor.host,
-				name: (group.name ?? actor.username).slice(0, 128), description: group._misskey_summary?.slice(0, 2048) ?? null,
-				isFederated: true, isFederationFrozen: group._misskey_channelFrozen === true, isSensitive: group.sensitive === true, allowRenoteToExternal: true, userId: null,
+				name: name ?? actor.username.slice(0, 128), description: description ?? null,
+				isFederated: true, isFederationFrozen, isSensitive: isSensitive ?? false, allowRenoteToExternal: true, userId: null,
 			}).orIgnore().execute();
 			channel = await this.channels.findOneByOrFail({ uri: actor.uri });
 		}
-		const isFederationFrozen = group._misskey_channelFrozen === true;
-		if (channel.isFederationFrozen !== isFederationFrozen) {
-			await this.channels.update(channel.id, { isFederationFrozen });
-			channel = { ...channel, isFederationFrozen };
-		}
-		return channel;
+		const changes = {
+			...(name !== undefined && name !== channel.name ? { name } : {}),
+			...(description !== undefined && description !== channel.description ? { description } : {}),
+			...(isSensitive !== undefined && isSensitive !== channel.isSensitive ? { isSensitive } : {}),
+			...(isFederationFrozen !== channel.isFederationFrozen ? { isFederationFrozen } : {}),
+		};
+		if (Object.keys(changes).length === 0) return channel;
+		await this.channels.update(channel.id, changes);
+		return { ...channel, ...changes };
 	}
 }

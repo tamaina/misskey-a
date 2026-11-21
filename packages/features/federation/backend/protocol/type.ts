@@ -12,7 +12,7 @@ export interface IObject {
 	id?: string;
 	name?: string | null;
 	summary?: string;
-	_misskey_summary?: string;
+	_misskey_summary?: string | null;
 	_misskey_followedMessage?: string | null;
 	_misskey_requireSigninToViewContents?: boolean;
 	_misskey_makeNotesFollowersOnlyBefore?: number | null;

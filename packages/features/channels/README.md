@@ -20,7 +20,12 @@ key, Follow/Accept/Undo handling, and a small outbox. The key stays in the datab
 delivery jobs contain only the channel ID. OFF and archive stop queued publications;
 author deletion of an already published note continues to propagate. A Group-signed
 Update advertises `_misskey_channelFrozen` in the Misskey namespace when effective
-federation changes. Receivers discard incoming new contributions while frozen, but
+federation changes, and refreshes the published name, description and channel
+sensitivity when those fields change. Receivers read the canonical Group rather
+than using presentation values embedded in a delayed Update. Omitted presentation fields
+leave existing values intact; a null summary clears the description. This
+channel flag does not change the sensitivity of individual media files.
+Receivers discard incoming new contributions while frozen, but
 still process author Deletes and Unfollows. Source-approved historical public objects
 remain retrievable; freezing is not a retroactive privacy change.
 
