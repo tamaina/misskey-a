@@ -16,18 +16,18 @@ function hook(hook: unknown, ...args: unknown[]): unknown {
 }
 
 describe('VVI SFC subrequest guard', () => {
-	test('scans sibling feature views before a locale module is first loaded', () => {
+	test.each(['navigation', 'games/index'])('scans %s feature views before a locale module is first loaded', owner => {
 		const root = mkdtempSync(join(tmpdir(), 'misskey-a-vvi-feature-'));
 		try {
 			mkdirSync(join(root, 'frontend'), { recursive: true });
-			mkdirSync(join(root, 'features/navigation/frontend'), { recursive: true });
+			mkdirSync(join(root, `features/${owner}/frontend`), { recursive: true });
 			const sfc = '<template><p>{{ $locale.sfc.title }}</p></template><locale locale="ja-JP" lang="json">{"title":"Fixture"}</locale>';
-			writeFileSync(join(root, 'features/navigation/frontend/Page.vue'), sfc);
+			writeFileSync(join(root, `features/${owner}/frontend/Page.vue`), sfc);
 			const plugin = pluginVvi();
 			hook(plugin.configResolved, { root: join(root, 'frontend'), command: 'serve', base: '/', build: { ssr: false } });
 			hook(plugin.buildStart);
 			const locale = hook(plugin.load, '\0virtual:vite-vue-internationalization/locale/ja-JP');
-			expect(locale).toContain('/features/navigation/frontend/Page.vue');
+			expect(locale).toContain(`/features/${owner}/frontend/Page.vue`);
 		} finally {
 			rmSync(root, { recursive: true, force: true });
 		}
@@ -70,12 +70,21 @@ describe('main/embed locale scan isolation', () => {
 			mkdirSync(join(root, 'features/demo/frontend/embed'), { recursive: true });
 			writeFileSync(join(root, 'features/demo/frontend/Main.vue'), '<locale locale="ja-JP" lang="json">{"main":"Main only"}</locale>');
 			writeFileSync(join(root, 'features/demo/frontend/embed/Embed.vue'), '<locale locale="ja-JP" lang="json">{"embed":"Embed only"}</locale>');
+			mkdirSync(join(root, 'features/games/index/frontend/embed'), { recursive: true });
+			writeFileSync(join(root, 'features/games/index/frontend/Main.vue'), '<locale locale="ja-JP" lang="json">{"nested":"Nested main"}</locale>');
+			writeFileSync(join(root, 'features/games/index/frontend/embed/Embed.vue'), '<locale locale="ja-JP" lang="json">{"private":"Nested embed"}</locale>');
+			mkdirSync(join(root, 'features/games/test/frontend'), { recursive: true });
+			writeFileSync(join(root, 'features/games/test/frontend/Fixture.vue'), '<locale locale="ja-JP" lang="json">{"test":"Test fixture only"}</locale>');
 			const plugin = pluginVvi({ embed });
 			hook(plugin.configResolved, { root: join(root, host), command: 'build', base: '/', build: { ssr: false } });
 			hook(plugin.buildStart);
 			const primary = hook(plugin.load, '\0virtual:vite-vue-internationalization/locale/ja-JP');
 			expect(primary).toContain(embed ? 'Embed only' : 'Main only');
 			expect(primary).not.toContain(embed ? 'Main only' : 'Embed only');
+			expect(primary).not.toContain('Nested embed');
+			expect(primary).not.toContain('Test fixture only');
+			if (embed) expect(primary).not.toContain('Nested main');
+			else expect(primary).toContain('Nested main');
 			if (embed) {
 				expect(languages).toHaveLength(28);
 				for (const language of languages) {
