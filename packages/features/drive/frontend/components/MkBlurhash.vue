@@ -97,7 +97,7 @@ watch([() => props.width, () => props.height, canvas], () => {
 
 // Changing canvas dimensions clears its pixels; draw after Vue updates the DOM.
 watch([canvasWidth, canvasHeight, canvas, () => props.blurhash], () => {
-	draw();
+	if (canvas.value != null) draw();
 }, { flush: 'post' });
 
 function drawImage(bitmap: CanvasImageSource) {
@@ -162,12 +162,11 @@ function workerOnMessage(event: MessageEvent) {
 	drawImage(event.data.bitmap as ImageBitmap);
 }
 
+// The post-flush watcher already draws once when the canvas mounts.
 canvasPromise.then(work => {
 	if (work instanceof WorkerMultiDispatch) {
 		work.addListener(workerOnMessage);
 	}
-
-	draw();
 });
 
 onMounted(() => {

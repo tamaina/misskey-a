@@ -57,7 +57,22 @@ try {
 			external.push(route.request().url()); return route.abort();
 		});
 		try {
-			await page.addInitScript(() => Object.defineProperty(navigator, 'hardwareConcurrency', { value: 2 }));
+			await page.addInitScript(() => {
+				Object.defineProperty(navigator, 'hardwareConcurrency', { value: 2 });
+				const workerCounts = globalThis.blurhashWorkerCounts = new Map();
+				const postMessage = Worker.prototype.postMessage;
+				Worker.prototype.postMessage = function (message, ...options) {
+					if (typeof message?.hash === 'string') workerCounts.set(message.hash, (workerCounts.get(message.hash) ?? 0) + 1);
+					return postMessage.call(this, message, ...options);
+				};
+				const drawImage = CanvasRenderingContext2D.prototype.drawImage;
+				CanvasRenderingContext2D.prototype.drawImage = function (...args) {
+					drawImage.apply(this, args);
+					if (this.canvas.parentElement?.id === 'resize-probe') {
+						this.canvas.dataset.fullDraws = String(Number(this.canvas.dataset.fullDraws ?? 0) + 1);
+					}
+				};
+			});
 			await page.goto(`${origin}/${html.fileName}`);
 			await expect(page.getByRole('button', { name: /Show content/ })).toBeVisible();
 			await action(page);
@@ -105,14 +120,22 @@ try {
 		const widths = await page.evaluate(() => ({ width: globalThis.innerWidth, scroll: globalThis.document.documentElement.scrollWidth }));
 		assert.ok(widths.scroll <= widths.width);
 	});
-	await check('resizing full and average-only Blurhash redraws cleared canvas buffers', async page => {
+	await check('one initial full Blurhash decode and repaint of full/average pixels after resize', async page => {
 		for (const id of ['resize-probe', 'average-probe']) await opaque(page.locator(`#${id} canvas`));
-		console.log('Initial full/average Blurhash pixels are opaque.');
+		const full = page.locator('#resize-probe canvas');
+		const completedDraws = () => full.evaluate(canvas => Number(canvas.dataset.fullDraws ?? 0));
+		const workerRequests = () => page.evaluate(() => globalThis.blurhashWorkerCounts.get(globalThis.window.mediaFixture.resizeHash) ?? 0);
+		await expect.poll(completedDraws).toBeGreaterThan(0);
+		const initialRequests = await workerRequests();
+		// If the browser falls back to main-thread decoding, count completed draws.
+		assert.equal(initialRequests || await completedDraws(), 1, 'mount must not start a second full Blurhash decode');
 		await page.evaluate(() => globalThis.window.mediaFixture.resize(200));
 		for (const id of ['resize-probe', 'average-probe']) {
 			await expect(page.locator(`#${id} canvas`)).toHaveAttribute('width', '128');
 			await opaque(page.locator(`#${id} canvas`));
 		}
+		await expect.poll(completedDraws).toBe(2);
+		assert.equal(await workerRequests(), initialRequests === 0 ? 0 : 2);
 		await capture(page, 'media-blurhash-resized');
 	});
 	assert.deepEqual(failures, []);
