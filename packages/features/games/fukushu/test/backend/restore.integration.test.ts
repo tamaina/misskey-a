@@ -161,6 +161,22 @@ describe.skipIf(!socket)('atomic native restore PostgreSQL', () => {
 		expect(await allRows()).toEqual(before);
 	});
 
+	test.each(['decks', 'questions', 'reviewLogs'] as const)('reports imported %s ID collisions in the same namespace as native restore', async store => {
+		const payload = backupFixture();
+		const id = { decks: payload.material.deck.id, questions: payload.questions[0].questionId, reviewLogs: payload.reviews[0].id }[store];
+		const data = JSON.stringify({ id });
+		const key = createHash('sha256').update(JSON.stringify(id)).digest('hex');
+		await db.query('INSERT INTO fukushu_upstream_record ("ownerId", store, key, data, position, "sourceHash") VALUES ($1, $2, $3, $4, 0, $5)',
+			['bob', store, key, data, 'fixture']);
+		expect((await backups.inspect('alice', payload)).conflicts).toEqual({ deck: false, questions: 0, reviews: 0 });
+		expect((await backups.inspect('bob', payload)).conflicts).toEqual({
+			deck: store === 'decks', questions: Number(store === 'questions'), reviews: Number(store === 'reviewLogs'),
+		});
+		const before = await allRows();
+		await expect(restorer.restore('bob', await upload('bob', encodeBackup(payload)))).rejects.toThrow('BACKUP_CONFLICT');
+		expect(await allRows()).toEqual(before);
+	});
+
 	test.each(['foreign', 'deleted', 'changed', 'remote', 'link'] as const)('rejects a %s Drive original after read and before writes', async change => {
 		const id = await upload('bob', encodeBackup(backupFixture()));
 		reader.read.mockImplementationOnce(async () => {

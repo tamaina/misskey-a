@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { In } from 'typeorm';
 import { MAX_BACKUP_BYTES, MAX_BACKUP_VERSIONS } from '../shared/backup.schema.js';
 import { MAX_ANKI_MEDIA_BYTES } from '../shared/anki-media.schema.js';
 import { MiFukushuAnkiMedia } from './models/FukushuAnkiMedia.js';
@@ -15,7 +14,30 @@ import { MiFukushuReviewLog } from './models/FukushuReviewLog.js';
 import { MaterialError } from './store.js';
 import { BackupError, encodeBackup, validateBackup, validateBackupMedia } from './backup-codec.js';
 import type { BackupPayload, BackupInspection } from '../shared/backup.schema.js';
-import type { DataSource } from 'typeorm';
+import type { DataSource, EntityManager } from 'typeorm';
+
+const collisionSources = {
+	decks: { table: 'fukushu_deck', idType: 'text' },
+	questions: { table: 'fukushu_question', idType: 'text' },
+	reviewLogs: { table: 'fukushu_review_log', idType: 'uuid' },
+} as const;
+
+async function countConflicts(manager: EntityManager, ownerId: string, store: keyof typeof collisionSources, ids: string[]): Promise<number> {
+	if (!ids.length) return 0;
+	const { table, idType } = collisionSources[store];
+	// Match fukushu_reject_upstream_collision, including Postgres's canonical
+	// UUID spelling for native review IDs. Count each input ID only once.
+	const [{ count }] = await manager.query(`
+		SELECT COUNT(*)::int AS count FROM (
+			SELECT id FROM ${table} WHERE "ownerId" = $1 AND id = ANY($2::${idType}[])
+			UNION
+			SELECT candidate.id FROM unnest($2::${idType}[]) AS candidate(id)
+			JOIN fukushu_upstream_record AS source ON source."ownerId" = $1 AND source.store = $3
+				AND source.key = encode(sha256(convert_to(to_jsonb(candidate.id::text)::text, 'UTF8')), 'hex')
+		) AS conflicts
+	`, [ownerId, ids, store]) as { count: number }[];
+	return count;
+}
 
 export class FukushuBackupStore {
 	constructor(private readonly db: DataSource, private readonly clock: () => Date = () => new Date()) {}
@@ -88,9 +110,9 @@ export class FukushuBackupStore {
 				archived: payload.deckState.archivedAt !== null, questions: payload.questions.length,
 				versions: payload.versions.length, studyStates: payload.states.length, reviews: payload.reviews.length,
 				conflicts: {
-					deck: await manager.getRepository(MiFukushuDeck).existsBy({ ownerId, id: deckId }),
-					questions: await manager.getRepository(MiFukushuQuestion).countBy({ ownerId, id: In(payload.questions.map(q => q.questionId)) }),
-					reviews: payload.reviews.length ? await manager.getRepository(MiFukushuReviewLog).countBy({ ownerId, id: In(payload.reviews.map(r => r.id)) }) : 0,
+					deck: (await countConflicts(manager, ownerId, 'decks', [deckId])) > 0,
+					questions: await countConflicts(manager, ownerId, 'questions', payload.questions.map(q => q.questionId)),
+					reviews: await countConflicts(manager, ownerId, 'reviewLogs', payload.reviews.map(r => r.id)),
 				},
 			};
 		});
