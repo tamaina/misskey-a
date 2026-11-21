@@ -69,6 +69,8 @@ export default class Connection {
 	private output: NativeStreamOutput | undefined;
 	private outputChannels: ReadonlySet<string> = new Set();
 	private listeningBroadcast = false;
+	private listeningInternal = false;
+	private channelFollowRevision = 0;
 	public get isNativeOutput() { return !!this.output; }
 	private disposed = false;
 	private cancelTokenExpiry: (() => void) | undefined;
@@ -148,6 +150,7 @@ export default class Connection {
 	@bindThis
 	public async fetch(fresh = false) {
 		if (this.user == null) return;
+		const channelFollowRevision = this.channelFollowRevision;
 		const [
 			userProfile,
 			following,
@@ -167,7 +170,7 @@ export default class Connection {
 		]);
 		this.userProfile = userProfile;
 		this.following = following;
-		this.followingChannels = followingChannels;
+		if (channelFollowRevision === this.channelFollowRevision) this.followingChannels = followingChannels;
 		this.mutingChannels = mutingChannels;
 		this.userIdsWhoMeMuting = userIdsWhoMeMuting;
 		this.userIdsWhoBlockingMe = userIdsWhoBlockingMe;
@@ -202,6 +205,10 @@ export default class Connection {
 			: this.messageQueue(() => this.onWsConnectionMessage(data)));
 
 		this.subscriber.on('broadcast', this.onBroadcastMessage);
+		if (this.user) {
+			this.subscriber.on('internal', this.onInternalMessage);
+			this.listeningInternal = true;
+		}
 		this.listeningBroadcast = true;
 		await this.checkBrowserSession();
 	}
@@ -215,6 +222,10 @@ export default class Connection {
 		if (this.token) this.cancelTokenExpiry = scheduleTokenExpiry(this.token, () => this.closeRevokedSession('Access token expired'));
 		if (this.disposed) return;
 		this.outputChannels = new Set(routes.channels);
+		if (this.user) {
+			this.subscriber.on('internal', this.onInternalMessage);
+			this.listeningInternal = true;
+		}
 		if (routes.broadcast) {
 			this.subscriber.on('broadcast', this.onBroadcastMessage);
 			this.listeningBroadcast = true;
@@ -315,6 +326,16 @@ export default class Connection {
 			case 'disconnect': this.onChannelDisconnectRequested(body); break;
 			case 'channel': this.onChannelMessageRequested(body); break;
 			case 'ch': this.onChannelMessageRequested(body); break; // alias
+		}
+	}
+
+	@bindThis
+	private onInternalMessage(data: GlobalEvents['internal']['payload']) {
+		if (this.disposed || this.user == null) return;
+		if ((data.type === 'followChannel' || data.type === 'unfollowChannel') && data.body.userId === this.user.id) {
+			this.channelFollowRevision++;
+			if (data.type === 'followChannel') this.followingChannels.add(data.body.channelId);
+			else this.followingChannels.delete(data.body.channelId);
 		}
 	}
 
@@ -647,6 +668,8 @@ export default class Connection {
 		this.listeningSessionRevocation = false;
 		if (this.listeningBroadcast) this.subscriber.off('broadcast', this.onBroadcastMessage);
 		this.listeningBroadcast = false;
+		if (this.listeningInternal) this.subscriber.off('internal', this.onInternalMessage);
+		this.listeningInternal = false;
 		if (this.fetchIntervalId) clearInterval(this.fetchIntervalId);
 		this.fetchIntervalId = null;
 

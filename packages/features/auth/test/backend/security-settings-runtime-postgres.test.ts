@@ -82,8 +82,9 @@ describe.skipIf(!socket || !redisSocket)('security settings through real HTTP, P
 		db = new DataSource({ type: 'postgres', host: socket, port: 55439, username: userInfo().username, database: 'auth_policy_synthetic', entities, migrations: [resolve(process.cwd(), 'packages/backend/migration/*.js')], migrationsTransactionMode: 'all', extra: { max: 4, statement_timeout: 5000 } });
 		await db.initialize();
 		const applied = await db.runMigrations();
-		expect(applied.map(migration => migration.name).sort()).toEqual(db.migrations.map(migration => migration.name ?? migration.constructor.name).sort());
+		expect(applied.map(migration => migration.name)).toEqual(db.migrations.map(migration => migration.name ?? migration.constructor.name).sort((a, b) => Number(a.slice(-13)) - Number(b.slice(-13))));
 		expect(await db.showMigrations()).toBe(false);
+		expect(applied.map(migration => migration.name)).toEqual(expect.arrayContaining(['PasskeyMfaPolicy1791969900000', 'SudoPolicy1792300000001', 'AccessTokenExpiry1792300000004', 'SessionUserIp1794700800000']));
 		expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
 		redis = new Redis({ path: redisSocket });
 		sessions = new BrowserSessionService(db.getRepository(MiBrowserSession) as ConstructorParameters<typeof BrowserSessionService>[0], { gen: () => `securitysession${++nextSession}` });

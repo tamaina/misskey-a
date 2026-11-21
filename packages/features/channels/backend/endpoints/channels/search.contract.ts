@@ -24,6 +24,7 @@ export const channelsSearchContract = oc.$meta({
 	.errors({ ...commonErrors })
 	.input(objectInput({
 		"query": v.string(),
+		origin: v.exactOptional(v.picklist(['local', 'remote'])),
 		"type": v.optional(v.picklist(["nameAndDescription", "nameOnly"]), "nameAndDescription"),
 		"sinceId": v.exactOptional(misskeyId),
 		"untilId": v.exactOptional(misskeyId),

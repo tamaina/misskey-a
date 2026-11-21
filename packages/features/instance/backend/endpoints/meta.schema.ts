@@ -22,6 +22,7 @@ export const rolePoliciesSchema = v.strictObject({
 	'canUseTranslator': v.boolean(),
 	'canHideAds': v.boolean(),
 	'canCreateChannel': v.boolean(),
+	'canFederateChannel': v.boolean(),
 	'driveCapacityMb': v.pipe(v.pipe(v.number(), v.finite()), v.integer()),
 	'maxFileSizeMb': v.pipe(v.pipe(v.number(), v.finite()), v.integer()),
 	'uploadableFileTypes': v.array(v.string()),

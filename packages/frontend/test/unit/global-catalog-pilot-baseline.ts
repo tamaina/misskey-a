@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parse } from 'vue/compiler-sfc';
+import { restoreChannelFederationSourceBaseline } from './channel-federation-source-rebase.js';
 import { locales } from 'i18n';
 import escapes from './shared-global-locale-escapes.json';
 import { restoreCrowdin18171Baseline } from './upstream-develop-source-rebase.js';
@@ -17026,6 +17027,11 @@ export function restoreGlobalCatalogPilotSource(file: string, source: string): s
 	source = restoreCrowdin18171Baseline(file, source);
 	const owner = globalCatalogPilotOwners.find(owner => owner.file === file);
 	if (!owner || sha256(source) === owner.baselineSha256) return source;
+	if (sha256(source) !== owner.currentSha256) {
+		// Reverse separately pinned channel federation deltas before the original
+		// shared-label proof; both complete historical hashes stay unchanged.
+		try { source = restoreChannelFederationSourceBaseline(file, source); } catch { throw new Error(`Global catalog pilot source differs: ${file}`); }
+	}
 	if (sha256(source) !== owner.currentSha256) throw new Error(`Global catalog pilot source differs: ${file}`);
 	// Reverse exact reviewed upstream follow-up edits made after the pilot before replaying it.
 	if ('edits' in owner) {

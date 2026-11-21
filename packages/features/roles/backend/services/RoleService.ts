@@ -16,6 +16,7 @@ import type {
 	UsersRepository,
 } from '@features/persistence/backend/repositories/models.js';
 import { MemoryKVCache, MemorySingleCache } from '@features/runtime/backend/cache/cache.js';
+import type { ChannelFederationService } from '@features/channels/backend/services/ChannelFederationService.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
@@ -63,6 +64,7 @@ export type RolePolicies = {
 	canUseTranslator: boolean;
 	canHideAds: boolean;
 	canCreateChannel: boolean;
+	canFederateChannel: boolean;
 	driveCapacityMb: number;
 	maxFileSizeMb: number;
 	alwaysMarkNsfw: boolean;
@@ -105,6 +107,7 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	canUseTranslator: true,
 	canHideAds: false,
 	canCreateChannel: true,
+	canFederateChannel: false,
 	driveCapacityMb: 100,
 	maxFileSizeMb: 30,
 	alwaysMarkNsfw: false,
@@ -433,6 +436,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 			canUseTranslator: calc('canUseTranslator', vs => vs.some(v => v === true)),
 			canHideAds: calc('canHideAds', vs => vs.some(v => v === true)),
 			canCreateChannel: calc('canCreateChannel', vs => vs.some(v => v === true)),
+			canFederateChannel: calc('canFederateChannel', vs => vs.some(v => v === true)),
 			driveCapacityMb: calc('driveCapacityMb', vs => Math.max(...vs)),
 			maxFileSizeMb: calc('maxFileSizeMb', vs => Math.min(serverMaxFileSizeMb, Math.max(...vs))),
 			alwaysMarkNsfw: calc('alwaysMarkNsfw', vs => vs.some(v => v === true)),
@@ -586,6 +590,8 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 					roleId: roleId,
 					userId: userId,
 				});
+				// Record the expired eligibility before a replacement grant can make it eligible again.
+				await this.reconcileChannelFederationEligibility(userId);
 			} else {
 				throw new RoleService.AlreadyAssignedError();
 			}
@@ -603,6 +609,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		});
 
 		this.globalEventService.publishInternalEvent('userRoleAssigned', created);
+		await this.reconcileChannelFederationEligibility(userId);
 
 		const user = await this.usersRepository.findOneByOrFail({ id: userId });
 
@@ -636,6 +643,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				roleId: roleId,
 				userId: userId,
 			});
+			await this.reconcileChannelFederationEligibility(userId);
 			throw new RoleService.NotAssignedError();
 		}
 
@@ -646,6 +654,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		});
 
 		this.globalEventService.publishInternalEvent('userRoleUnassigned', existing);
+		await this.reconcileChannelFederationEligibility(userId);
 
 		if (moderator) {
 			const [user, role] = await Promise.all([
@@ -701,6 +710,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 		});
 
 		this.globalEventService.publishInternalEvent('roleCreated', created);
+		await this.reconcileChannelFederationEligibility();
 
 		if (moderator) {
 			this.moderationLogService.log(moderator, 'createRole', {
@@ -722,6 +732,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 
 		const updated = await this.rolesRepository.findOneByOrFail({ id: role.id });
 		this.globalEventService.publishInternalEvent('roleUpdated', updated);
+		await this.reconcileChannelFederationEligibility();
 
 		if (moderator) {
 			this.moderationLogService.log(moderator, 'updateRole', {
@@ -736,6 +747,7 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 	public async delete(role: MiRole, moderator?: MiUser): Promise<void> {
 		await this.rolesRepository.delete({ id: role.id });
 		this.globalEventService.publishInternalEvent('roleDeleted', role);
+		await this.reconcileChannelFederationEligibility();
 
 		if (moderator) {
 			this.moderationLogService.log(moderator, 'deleteRole', {
@@ -743,6 +755,19 @@ export class RoleService implements OnApplicationShutdown, OnModuleInit {
 				role: role,
 			});
 		}
+	}
+
+	private async reconcileChannelFederationEligibility(userId?: MiUser['id']): Promise<void> {
+		this.rolesCache.delete();
+		if (userId) this.roleAssignmentByUserIdCache.delete(userId);
+		await this.moduleRef.get<ChannelFederationService>('ChannelFederationService', { strict: false }).reconcileEligibility(userId);
+	}
+
+	@bindThis
+	public async onDefaultPoliciesUpdated(policies: MiMeta['policies']): Promise<void> {
+		// The database write has completed, but the Redis metaUpdated event may not have arrived yet.
+		this.meta.policies = policies;
+		await this.reconcileChannelFederationEligibility();
 	}
 
 	@bindThis

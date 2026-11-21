@@ -4,12 +4,15 @@
  */
 
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 import { In } from 'typeorm';
 import * as Redis from 'ioredis';
 import { DI } from '@/di-symbols.js';
 import type { PollsRepository, EmojisRepository, MiMeta } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import type { MiRemoteUser } from '@features/users/backend/models/User.js';
+import type { ChannelFederationService } from '@features/channels/backend/services/ChannelFederationService.js';
+import type { MiChannel } from '@features/channels/backend/models/Channel.js';
 import type { MiNote } from '@features/notes/backend/models/Note.js';
 import { acquireApObjectLock } from '@features/runtime/backend/cache/distributed-lock.js';
 import { toArray, toSingle, unique } from '@features/runtime/backend/data/array.js';
@@ -24,6 +27,7 @@ import { StatusError } from '@features/runtime/backend/http/status-error.js';
 import { UtilityService } from './UtilityService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { checkHttps } from '../utility/check-https.js';
+import { CHANNEL_FEDERATION_FROZEN } from '@features/channels/backend/utility/federation-policy.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { getOneApId, getApId, getOneApHrefNullable, validPost, isEmoji, getApType } from '../protocol/type.js';
 import { ApLoggerService } from './ApLoggerService.js';
@@ -77,6 +81,7 @@ export class ApNoteService {
 		private noteEntityService: NoteEntityService,
 		private apDbResolverService: ApDbResolverService,
 		private apLoggerService: ApLoggerService,
+		private moduleRef: ModuleRef,
 	) {
 		this.logger = this.apLoggerService.logger;
 	}
@@ -128,7 +133,7 @@ export class ApNoteService {
 	 * Noteを作成します。
 	 */
 	@bindThis
-	public async createNote(value: string | IObject, actor?: MiRemoteUser, resolver?: Resolver, silent = false): Promise<MiNote | null> {
+	public async createNote(value: string | IObject, actor?: MiRemoteUser, resolver?: Resolver, silent = false, approvedChannel?: MiChannel): Promise<MiNote | null> {
 		// eslint-disable-next-line no-param-reassign
 		if (resolver == null) resolver = await this.apResolverService.createResolver();
 
@@ -145,7 +150,7 @@ export class ApNoteService {
 			throw err;
 		}
 
-		const note = object as IPost;
+		let note = object as IPost;
 
 		this.logger.debug(`Note fetched: ${JSON.stringify(note, null, 2)}`);
 
@@ -161,6 +166,20 @@ export class ApNoteService {
 
 		if (url && !checkHttps(url)) {
 			throw new Error('unexpected schema of note url: ' + url);
+		}
+
+		let approvedHistoricalReference = false;
+		if (!approvedChannel && note.audience != null) {
+			const membership = await this.moduleRef.get<ChannelFederationService>('ChannelFederationService', { strict: false }).resolveNoteMembership(note);
+			if (membership.kind === 'rejected') return null;
+			if (membership.kind === 'approved') {
+				note = membership.note;
+				// eslint-disable-next-line no-param-reassign
+				approvedChannel = membership.channel;
+				approvedHistoricalReference = true;
+				// eslint-disable-next-line no-param-reassign
+				actor ??= membership.author;
+			}
 		}
 
 		this.logger.info(`Creating the Note: ${note.id}`);
@@ -277,6 +296,8 @@ export class ApNoteService {
 					if (res.userHost === null && res.localOnly) return { status: 'permerror' };
 					return { status: 'ok', res };
 				} catch (e) {
+					// Preserve terminal channel rejection through nested quote resolution.
+					if (e instanceof IdentifiableError && e.id === CHANNEL_FEDERATION_FROZEN) throw e;
 					return {
 						status: (e instanceof StatusError && !e.isRetryable) ? 'permerror' : 'temperror',
 					};
@@ -333,6 +354,8 @@ export class ApNoteService {
 				cw,
 				text,
 				localOnly: false,
+				channel: approvedChannel,
+				approvedHistoricalChannelReference: approvedHistoricalReference,
 				visibility,
 				visibleUsers,
 				apMentions,

@@ -7,7 +7,7 @@ import bcrypt from 'bcryptjs';
 import { readFileSync } from 'node:fs';
 import { dirname, isAbsolute, join, resolve } from 'node:path';
 import { userInfo } from 'node:os';
-import { DataSource, MigrationExecutor } from 'typeorm';
+import { DataSource } from 'typeorm';
 import { afterAll, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { entities } from '@features/persistence/backend/postgres.js';
@@ -34,6 +34,7 @@ const owner = 'syntheticcompletion';
 const identity = { userId: owner, browserSession: { id: 'synthetic-session', userId: owner } };
 describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 	let db: DataSource;
+	let appliedMigrationNames: string[];
 	let sudo: SudoService;
 	const events = mockDeep<Parameters<typeof recoverPassword>[0]['globalEventService']>();
 	const profile = () => db.getRepository(MiUserProfile).findOneByOrFail({ userId: owner });
@@ -42,9 +43,10 @@ describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 		db = new DataSource({ type: 'postgres', host: socket, port: 55439, username: userInfo().username, database: 'auth_policy_synthetic', entities, migrations: [resolve(process.cwd(), 'packages/backend/migration/*.js')], migrationsTransactionMode: 'all', extra: { max: 4, statement_timeout: 5000 } });
 		await db.initialize();
 		const applied = await db.runMigrations();
-		expect(applied.map(migration => migration.name).sort()).toEqual(db.migrations.map(migration => migration.name ?? migration.constructor.name).sort());
-		expect(applied.map(migration => migration.name)).toContain('SessionUserIp1794700800000');
+		expect(applied.map(migration => migration.name)).toEqual(db.migrations.map(migration => migration.name ?? migration.constructor.name).sort((a, b) => Number(a.slice(-13)) - Number(b.slice(-13))));
 		expect(await db.showMigrations()).toBe(false);
+		appliedMigrationNames = applied.map(migration => migration.name);
+		expect(appliedMigrationNames).toEqual(expect.arrayContaining(['PasskeyMfaPolicy1791969900000', 'SessionUserIp1794700800000']));
 		const schema = await db.driver.createSchemaBuilder().log();
 		expect(schema.upQueries.map(query => query.query)).toEqual([]);
 		console.log('Production migrations / zero pending DDL:', applied.length);
@@ -148,19 +150,18 @@ describe.skipIf(!socket)('security completion real PostgreSQL', () => {
 		});
 		expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
 	});
-	test('policy and session-history migrations plus later dependencies down/up leave no pending DDL', async () => {
-		const chain = (await new MigrationExecutor(db).getExecutedMigrations()).sort((a, b) => a.timestamp - b.timestamp);
-		const firstPolicy = chain.findIndex(migration => migration.name === new SudoPolicy1792300000001().name);
-		expect(firstPolicy).toBeGreaterThanOrEqual(0);
-		const roundTripNames = chain.slice(firstPolicy).map(migration => migration.name);
-		expect(roundTripNames).toEqual(expect.arrayContaining([
+	test('the latest policy and session-history migrations down/up against production metadata leave no pending DDL', async () => {
+		const policyStart = appliedMigrationNames.indexOf('SudoPolicy1792300000001');
+		expect(policyStart).toBeGreaterThanOrEqual(0);
+		// Include interleaved and later production migrations while reverting every policy dependency in order.
+		const suffix = appliedMigrationNames.slice(policyStart);
+		expect(suffix).toEqual(expect.arrayContaining([
 			'SudoPolicy1792300000001', 'PasswordLoginPolicy1792300000002', 'DeletionIntent1792300000003',
 			'AccessTokenExpiry1792300000004', 'BrowserSessionHistory1794614400000', 'SessionUserIp1794700800000',
 		]));
-		// Undo any newer dependents first, then all policies under test.
-		for (let index = 0; index < roundTripNames.length; index++) await db.undoLastMigration();
+		for (let index = 0; index < suffix.length; index++) await db.undoLastMigration();
 		const applied = await db.runMigrations();
-		expect(applied.map(migration => migration.name)).toEqual(roundTripNames);
+		expect(applied.map(migration => migration.name)).toEqual(suffix);
 		expect(await db.showMigrations()).toBe(false);
 		expect((await db.driver.createSchemaBuilder().log()).upQueries.map(query => query.query)).toEqual([]);
 	});

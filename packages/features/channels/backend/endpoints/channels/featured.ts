@@ -23,7 +23,11 @@ export function createChannelsFeaturedProcedure<Actor extends MiLocalUser>(deps:
 			const query = deps.channelsRepository.createQueryBuilder('channel')
 				.where('channel.lastNotedAt IS NOT NULL')
 				.andWhere('channel.isArchived = FALSE')
-				.orderBy('channel.lastNotedAt', 'DESC');
+				.orderBy('channel.lastNotedAt', 'DESC')
+				.addOrderBy('channel.id', 'DESC');
+
+			if (input.origin === 'local') query.andWhere('channel.host IS NULL');
+			else if (input.origin === 'remote') query.andWhere('channel.host IS NOT NULL');
 
 			const channels = await query.limit(10).getMany();
 			return (await Promise.all(channels.map(x => deps.channelEntityService.pack(x, me)))).map(toPackedChannel);

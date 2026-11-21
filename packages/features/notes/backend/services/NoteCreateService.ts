@@ -22,6 +22,8 @@ import type { MiUser, MiLocalUser, MiRemoteUser } from '@features/users/backend/
 import type { IPoll } from '../models/Poll.js';
 import { MiPoll } from '../models/Poll.js';
 import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
+import { assertFederatedChannelNote, CHANNEL_FEDERATION_FROZEN, CHANNEL_FEDERATION_REQUIRES_PUBLIC } from '@features/channels/backend/utility/federation-policy.js';
+import { ChannelFederationService } from '@features/channels/backend/services/ChannelFederationService.js';
 import type { MiChannel } from '@features/channels/backend/models/Channel.js';
 import { normalizeTag } from '@features/discovery/backend/utility/normalize-tag.js';
 import { RelayService } from '@features/federation/backend/services/RelayService.js';
@@ -184,6 +186,8 @@ type Option = {
 	visibility?: string;
 	visibleUsers?: MinimumUser[] | null;
 	channel?: MiChannel | null;
+	/** Internal only: a canonical Group approval was fetched for an existing public Note. */
+	approvedHistoricalChannelReference?: boolean;
 	apMentions?: MinimumUser[] | null;
 	apMentionRawCount?: number | null;
 	apHashtags?: string[] | null;
@@ -232,6 +236,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 		@Inject(DI.channelsRepository)
 		private channelsRepository: ChannelsRepository,
+
+		private channelFederationService: ChannelFederationService,
 
 		@Inject(DI.noteThreadMutingsRepository)
 		private noteThreadMutingsRepository: NoteThreadMutingsRepository,
@@ -367,7 +373,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 				if (renoteChannel == null) {
 					// リノートしたいノートが書き込まれているチャンネルが無い
 					throw new IdentifiableError('b060f9a6-8909-4080-9e0b-94d9fa6f6a77', 'No such channel');
-				} else if (!renoteChannel.allowRenoteToExternal) {
+				} else if (!renoteChannel.isFederated && !renoteChannel.allowRenoteToExternal) {
 					// リノート作成のリクエストだが、対象チャンネルがリノート禁止だった場合
 					throw new IdentifiableError('7e435f4a-780d-4cfc-a15a-42519bd6fb67', 'Channel does not allow renote to external');
 				}
@@ -423,6 +429,10 @@ export class NoteCreateService implements OnApplicationShutdown {
 			}
 		}
 
+		if (channel?.host != null) {
+			throw new IdentifiableError(CHANNEL_FEDERATION_REQUIRES_PUBLIC, 'Remote channel posting is not available in this pilot.');
+		}
+
 		return this.create(user, {
 			createdAt: data.createdAt,
 			files: files,
@@ -450,6 +460,9 @@ export class NoteCreateService implements OnApplicationShutdown {
 		isBot: MiUser['isBot'];
 		isCat: MiUser['isCat'];
 	}, data: Option, silent = false): Promise<MiNote> {
+		if (data.channel?.isFederated && data.reply && data.reply.channelId !== data.channel.id) {
+			throw new IdentifiableError(CHANNEL_FEDERATION_REQUIRES_PUBLIC, 'Reply must stay in the federated channel.');
+		}
 		// チャンネル外にリプライしたら対象のスコープに合わせる
 		// (クライアントサイドでやっても良い処理だと思うけどとりあえずサーバーサイドで)
 		if (data.reply && data.channel && data.reply.channelId !== data.channel.id) {
@@ -466,19 +479,40 @@ export class NoteCreateService implements OnApplicationShutdown {
 			data.channel = await this.channelsRepository.findOneBy({ id: data.reply.channelId });
 		}
 
+		if (user.host == null && data.channel?.host != null) {
+			throw new IdentifiableError(CHANNEL_FEDERATION_REQUIRES_PUBLIC, 'Remote channel posting is not available in this pilot.');
+		}
+		if (data.channel) data.channel = await this.channelFederationService.refreshEligibility(data.channel);
+		if (user.host != null && data.channel?.isFederationFrozen && !data.approvedHistoricalChannelReference) {
+			throw new IdentifiableError(CHANNEL_FEDERATION_FROZEN, 'Frozen channels discard incoming contributions.');
+		}
+		if (data.channel?.isFederated && !data.channel.isFederationFrozen && isCreationRenote(data) && !isCreationQuote(data)) {
+			throw new IdentifiableError(CHANNEL_FEDERATION_REQUIRES_PUBLIC, 'Pure Renotes in federated channels are not available in this pilot.');
+		}
+
+		// Historical membership permits acquisition during a freeze, not a bypass of
+		// local public-post policies or restrictions on referenced notes.
+		const requiresPublicChannelNote = data.channel?.isFederated
+			&& (!data.channel.isFederationFrozen || (user.host != null && data.approvedHistoricalChannelReference));
+
 		if (data.createdAt == null) data.createdAt = new Date();
 		if (data.visibility == null) data.visibility = 'public';
 		if (data.localOnly == null) data.localOnly = false;
+		if (requiresPublicChannelNote) assertFederatedChannelNote(data, true);
 		if (data.channel != null) data.visibility = 'public';
 		if (data.channel != null) data.visibleUsers = [];
-		if (data.channel != null) data.localOnly = true;
+		if (data.channel != null && !requiresPublicChannelNote && !(user.host != null && data.approvedHistoricalChannelReference)) {
+			data.localOnly = true;
+		}
 
-		if (data.visibility === 'public' && data.channel == null) {
-			const sensitiveWords = this.meta.sensitiveWords;
-			const sensitiveWordsTarget = data.cw ?? data.text ?? '';
-			if (sensitiveWords.length > 0 && this.utilityService.isKeyWordIncluded([sensitiveWordsTarget, ...extractUrlsForKeyWordCheck(sensitiveWordsTarget)].join('\n'), sensitiveWords)) {
-				data.visibility = 'home';
-			} else if ((await this.roleService.getUserPolicies(user.id)).canPublicNote === false) {
+		if (data.visibility === 'public' && (data.channel == null || requiresPublicChannelNote)) {
+			// Decide public eligibility once for both ordinary and channel notes.
+			const publicAllowed = !this.checkSensitiveWordsContain(data)
+				&& (await this.roleService.getUserPolicies(user.id)).canPublicNote !== false;
+			if (requiresPublicChannelNote) {
+				// Channels cannot silently change their public-only scope.
+				assertFederatedChannelNote(data, publicAllowed);
+			} else if (!publicAllowed) {
 				data.visibility = 'home';
 			}
 		}
@@ -574,6 +608,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 				data.localOnly = true;
 			}
 		}
+
+		if (requiresPublicChannelNote) assertFederatedChannelNote(data, true);
 
 		if (data.text) {
 			if (data.text.length > DB_MAX_NOTE_TEXT_LENGTH) {
@@ -888,7 +924,9 @@ export class NoteCreateService implements OnApplicationShutdown {
 			nm.notify();
 
 			//#region AP deliver
-			if (!data.localOnly && this.userEntityService.isLocalUser(user)) {
+			if (!data.localOnly && data.channel && this.userEntityService.isLocalUser(user)) {
+				trackPromise(this.channelFederationService.deliverNote(note));
+			} else if (!data.localOnly && this.userEntityService.isLocalUser(user)) {
 				(async () => {
 					const noteActivity = await this.renderNoteOrRenoteActivity(data, note);
 					const dm = this.apDeliverManagerService.createDeliverManager(user, noteActivity);
@@ -1077,7 +1115,12 @@ export class NoteCreateService implements OnApplicationShutdown {
 				select: { followerId: true },
 			});
 
+			const localFollowerIds = new Set((await this.usersRepository.find({
+				where: { id: In(channelFollowings.map(f => f.followerId)), host: IsNull() },
+				select: { id: true },
+			})).map(u => u.id));
 			for (const channelFollowing of channelFollowings) {
+				if (!localFollowerIds.has(channelFollowing.followerId)) continue;
 				this.fanoutTimelineService.push(`homeTimeline:${channelFollowing.followerId}`, note.id, this.meta.perUserHomeTimelineCacheMax, r);
 				if (note.fileIds.length > 0) {
 					this.fanoutTimelineService.push(`homeTimelineWithFiles:${channelFollowing.followerId}`, note.id, this.meta.perUserHomeTimelineCacheMax / 2, r);
@@ -1231,6 +1274,15 @@ export class NoteCreateService implements OnApplicationShutdown {
 				isFollowerHibernated: true,
 			});
 		}
+	}
+
+	private checkSensitiveWordsContain(data: Pick<Option, 'cw' | 'text'>): boolean {
+		// A CW intentionally hides the body from the public sensitive-word check.
+		// Share this predicate: ordinary posts become home-only, channels reject.
+		const target = data.cw ?? data.text ?? '';
+		return this.meta.sensitiveWords.length > 0 && this.utilityService.isKeyWordIncluded(
+			[target, ...extractUrlsForKeyWordCheck(target)].join('\n'), this.meta.sensitiveWords,
+		);
 	}
 
 	public checkProhibitedWordsContain(content: Parameters<UtilityService['concatNoteContentsForKeyWordCheck']>[0], prohibitedWords?: string[]) {

@@ -43,6 +43,7 @@ describe('RoleService', () => {
 	let meta: Mocked<MiMeta>;
 	let notificationService: Mocked<NotificationService>;
 	let clock: lolex.Clock;
+	const reconcileEligibility = vi.fn(async (_userId?: string) => {});
 
 	async function createUser(data: Partial<MiUser> = {}) {
 		const un = secureRndstr(16);
@@ -101,6 +102,7 @@ describe('RoleService', () => {
 	}
 
 	beforeEach(async () => {
+		reconcileEligibility.mockClear();
 		clock = lolex.install({
 			// https://github.com/sinonjs/sinon/issues/2620
 			toFake: Object.keys(lolex.timers).filter((key) => !['nextTick', 'queueMicrotask'].includes(key)) as lolex.FakeMethod[],
@@ -114,6 +116,7 @@ describe('RoleService', () => {
 			],
 			providers: [
 				RoleService,
+				{ provide: 'ChannelFederationService', useValue: { reconcileEligibility } },
 				CacheService,
 				IdService,
 				GlobalEventService,
@@ -365,6 +368,23 @@ describe('RoleService', () => {
 			// roleWithoutPolicy は default 値 (5) を使い、roleWithPolicy の 10 と比較して大きい方が採用される
 			expect(result.pinLimit).toBe(10);
 		});
+	});
+
+	test('channel federation eligibility defaults off and policy loss is reconciled without waiting for pubsub', async () => {
+		const user = await createUser();
+		expect((await roleService.getUserPolicies(user.id)).canFederateChannel).toBe(false);
+		const role = await createRole({ policies: { canFederateChannel: { useDefault: false, priority: 0, value: true } } });
+		await roleService.assign(user.id, role.id);
+		expect(reconcileEligibility).toHaveBeenLastCalledWith(user.id);
+		expect((await roleService.getUserPolicies(user.id)).canFederateChannel).toBe(true);
+		await roleService.unassign(user.id, role.id);
+		expect(reconcileEligibility).toHaveBeenLastCalledWith(user.id);
+		expect((await roleService.getUserPolicies(user.id)).canFederateChannel).toBe(false);
+		await roleService.onDefaultPoliciesUpdated({ canFederateChannel: true });
+		expect((await roleService.getUserPolicies(user.id)).canFederateChannel).toBe(true);
+		expect(reconcileEligibility).toHaveBeenLastCalledWith(undefined);
+		await roleService.onDefaultPoliciesUpdated({ canFederateChannel: false });
+		expect((await roleService.getUserPolicies(user.id)).canFederateChannel).toBe(false);
 	});
 
 	describe('getUserBadgeRoles', () => {
