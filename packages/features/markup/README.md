@@ -36,7 +36,7 @@ Known differences from the interactive application:
 - Sparkle uses deterministic CSS stars rather than measured/random DOM particles.
 - Mentions are static links without fetched avatars or profile menus.
 - Unicode emoji use the recipient's emoji font rather than a fetched image set.
-- Times are absolute and locale/timezone explicit (UTC by default), never a live clock.
+- Times are absolute and locale/timezone explicit (UTC by default), never a live clock. The legacy `kab-KAB` locale uses `kab`; malformed locale/timezone options show an ISO timestamp.
 - Clickable MFM keeps readable content but has no event action in SSR HTML.
 - Code is escaped monospace unless a trusted highlighter is supplied.
 - Browser rendering preserves transforms/animations; mail clients may strip these,
