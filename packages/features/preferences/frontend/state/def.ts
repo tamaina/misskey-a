@@ -176,6 +176,9 @@ export const PREF_DEF = definePreferences({
 	keepCw: {
 		default: true,
 	},
+	warnMissingImageAltText: {
+		default: false,
+	},
 	rememberNoteVisibility: {
 		default: false,
 	},

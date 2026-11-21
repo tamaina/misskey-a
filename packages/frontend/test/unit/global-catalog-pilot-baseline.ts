@@ -7,6 +7,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parse } from 'vue/compiler-sfc';
+import { restoreAltReminderPreferencesBaseline } from './post-alt-reminder-preferences-source-rebase.js';
 import { locales } from 'i18n';
 import escapes from './shared-global-locale-escapes.json';
 import { restoreCrowdin18171Baseline } from './upstream-develop-source-rebase.js';
@@ -9597,7 +9598,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/notes/frontend/components/MkPostForm.vue",
-		"currentSha256": "934a67f3125f5bf6e031aca8c96fc8e2c127e385bc3dac6ced9c5aa326c80f0b",
+		"currentSha256": "8438d4dfb4b907b6fce7ca3ecf7c0d211e219f089c957199dc5de13a376206ce",
 		"baselineSha256": "3091bfb061e2e184481826df10ee9e70be8db06a7342dcdf6bb0d771bb171123",
 		"keys": [
 			"cancel",
@@ -9697,21 +9698,87 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 8483,
-				"end": 8483,
+				"start": 5654,
+				"end": 5735,
+				"current": "<XPostFormAttaches v-model=\"files\" v-model:savingAltText=\"savingAltText\" @detach=",
+				"baseline": "<XPostFormAttaches v-model=\"files\" @detach="
+			},
+			{
+				"start": 8521,
+				"end": 8521,
 				"current": "",
 				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
 			},
 			{
-				"start": 8949,
-				"end": 8949,
+				"start": 8987,
+				"end": 8987,
 				"current": "",
 				"baseline": "';\nimport type { ShallowRef } from 'vue';\nimport type { PostFormProps } from '../types/post-form.js';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { PollEditorModelValue } from '@features/notes/frontend/components/MkPollEditor.vue';\nimport type { UploaderItem } from '@features/drive/frontend/composables/use-uploader.js"
 			},
 			{
-				"start": 11458,
-				"end": 11916,
+				"start": 11439,
+				"end": 11566,
+				"current": "import { confirmImageAltText, createPostPreparationGuard } from '@features/notes/frontend/utility/post-image-alt-reminder.js';\n",
+				"baseline": ""
+			},
+			{
+				"start": 11623,
+				"end": 12081,
 				"current": ";\nimport type { UploaderItem } from '@features/drive/frontend/composables/use-uploader.js';\nimport type { PollEditorModelValue } from '@features/notes/frontend/components/MkPollEditor.vue';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { PostFormProps } from '../types/post-form.js';\nimport type { ShallowRef } from 'vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"baseline": ""
+			},
+			{
+				"start": 13039,
+				"end": 13124,
+				"current": "const { preparing: preparingPost, run: preparePost } = createPostPreparationGuard();\n",
+				"baseline": ""
+			},
+			{
+				"start": 13194,
+				"end": 13273,
+				"current": "const files = ref(props.initialFiles ?? []);\nconst savingAltText = ref(false);\n",
+				"baseline": "const files = ref(props.initialFiles ?? []);\n"
+			},
+			{
+				"start": 17256,
+				"end": 17463,
+				"current": "\treturn !props.mock && !preparingPost.value && !posting.value && !posted.value && !savingAltText.value && !uploader.uploading.value && (uploader.items.value.length === 0 || uploader.readyForUpload.value) &&\n",
+				"baseline": "\treturn !props.mock && !posting.value && !posted.value && !uploader.uploading.value && (uploader.items.value.length === 0 || uploader.readyForUpload.value) &&\n"
+			},
+			{
+				"start": 35185,
+				"end": 35853,
+				"current": "async function confirmMissingImageAltText(): Promise<boolean> {\n\t// A caption save may have started while note preparation was awaiting an upload.\n\tif (savingAltText.value) return false;\n\treturn await confirmImageAltText(prefer.s.warnMissingImageAltText, files.value, async () => {\n\t\tconst { canceled, result } = await os.actions({\n\t\t\ttype: 'warning',\n\t\t\ttext: $locale.value.sfc.missingImageAltTextReminder,\n\t\t\tactions: [{\n\t\t\t\tvalue: 'edit',\n\t\t\t\ttext: $locale.value.sfc.returnToAltTextEditing,\n\t\t\t\tprimary: true,\n\t\t\t}, {\n\t\t\t\tvalue: 'continue',\n\t\t\t\ttext: $locale.value.sfc.continueWithoutImageAltText,\n\t\t\t}],\n\t\t});\n\n\t\treturn !canceled && result === 'continue';\n\t});\n}\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 35894,
+				"end": 36020,
+				"current": "\tif (!canPost.value) return;\n\n\tawait preparePost(() => postInternal(ev));\n}\n\nasync function postInternal(ev?: PointerEvent) {\n",
+				"baseline": ""
+			},
+			{
+				"start": 36609,
+				"end": 36661,
+				"current": "\t\tif (!await confirmMissingImageAltText()) return;\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 37777,
+				"end": 37828,
+				"current": "\tif (!await confirmMissingImageAltText()) return;\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 78609,
+				"end": 78787,
+				"current": "\t\"missingImageAltTextReminder\": \"Some images are missing alt text.\",\n\t\"returnToAltTextEditing\": \"Return to editing\",\n\t\"continueWithoutImageAltText\": \"Continue without alt text\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 97082,
+				"end": 97221,
+				"current": "\t\"missingImageAltTextReminder\": \"代替テキストが入力されていない画像があります。\",\n\t\"returnToAltTextEditing\": \"編集に戻る\",\n\t\"continueWithoutImageAltText\": \"説明なしで続ける\",\n",
 				"baseline": ""
 			}
 		],
@@ -9732,7 +9799,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/notes/frontend/components/MkPostFormAttaches.vue",
-		"currentSha256": "a081496e01815789f9af4f1a48c8bc05e1fd766d0d8437bb7fcbdcb3d199c399",
+		"currentSha256": "6d0d7dca017a69cf5a0dc7591fefda1a6caf314b913b39e9100c849fa90dc465",
 		"baselineSha256": "fc921da54d2363be68f4de16fd2f4773d03210f4c7e24ec0fb9033b5a0da3983",
 		"keys": [
 			"preview",
@@ -9824,6 +9891,24 @@ export const globalCatalogPilotOwners = [
 				"end": 2346,
 				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
+			},
+			{
+				"start": 2810,
+				"end": 2963,
+				"current": "const savingAltText = defineModel<boolean>('savingAltText', { default: false });\nconst pendingAltTextSaves = new Set<string>();\nlet menuShowing = false;\n",
+				"baseline": "let menuShowing = false;\n"
+			},
+			{
+				"start": 4244,
+				"end": 4359,
+				"current": "async function describe(file: Misskey.entities.DriveFile) {\n\tif (mock || pendingAltTextSaves.has(file.id)) return;\n",
+				"baseline": "async function describe(file: Misskey.entities.DriveFile) {\n\tif (mock) return;\n"
+			},
+			{
+				"start": 4583,
+				"end": 5134,
+				"current": "\t\tdone: async caption => {\n\t\t\tconst comment = caption.length === 0 ? null : caption;\n\t\t\tif (comment === file.comment || pendingAltTextSaves.has(file.id)) return;\n\t\t\tpendingAltTextSaves.add(file.id);\n\t\t\tsavingAltText.value = true;\n\t\t\ttry {\n\t\t\t\tawait os.apiWithDialog('drive/files/update', { fileId: file.id, comment });\n\t\t\t\tfile.comment = comment;\n\t\t\t} catch {\n\t\t\t\t// apiWithDialog reports the error; keep the last saved caption.\n\t\t\t} finally {\n\t\t\t\tpendingAltTextSaves.delete(file.id);\n\t\t\t\tsavingAltText.value = pendingAltTextSaves.size > 0;\n\t\t\t}\n\t\t},\n",
+				"baseline": "\t\tdone: caption => {\n\t\t\tlet comment = caption.length === 0 ? null : caption;\n\t\t\tmisskeyApi('drive/files/update', {\n\t\t\t\tfileId: file.id,\n\t\t\t\tcomment: comment,\n\t\t\t}).then(() => {\n\t\t\t\tfile.comment = comment;\n\t\t\t});\n\t\t},\n"
 			}
 		]
 	},
@@ -17056,18 +17141,23 @@ export function restoreGlobalCatalogPilotSource(file: string, source: string): s
 	return source;
 }
 
+export function restoreGlobalCatalogPilotSourceAfterAltReminder(file: string, source: string): string {
+	return restoreGlobalCatalogPilotSource(file, restoreAltReminderPreferencesBaseline(file, source));
+}
+
 /** Verify live owner and global scopes before replaying the existing raw-owner oracle. */
 export function restoreGlobalCatalogPilotDictionary(file: string, language: string, dictionary: RuntimeLocaleDictionary, global: RuntimeLocaleDictionary): RuntimeLocaleDictionary {
 	const owner = globalCatalogPilotOwners.find(owner => owner.file === file);
 	if (!owner) return dictionary;
-	const source = readFileSync(resolve(root, file), 'utf8');
+	const liveSource = readFileSync(resolve(root, file), 'utf8');
+	const source = restoreAltReminderPreferencesBaseline(file, liveSource);
 	const baseline = restoreGlobalCatalogPilotSource(file, source);
 	const collect = (text: string): Record<string, string> => {
 		const block = parse(text).descriptor.customBlocks.find(block => block.type === 'locale' && block.attrs.locale === language);
 		if (!block) throw new Error(`Missing global catalog pilot language: ${file}:${language}`);
 		return JSON.parse(block.content) as Record<string, string>;
 	};
-	if (JSON.stringify(Object.fromEntries(Object.entries(dictionary))) !== JSON.stringify(collect(source))) throw new Error(`Global catalog pilot loader differs: ${file}:${language}`);
+	if (JSON.stringify(Object.fromEntries(Object.entries(dictionary))) !== JSON.stringify(collect(liveSource))) throw new Error(`Global catalog pilot loader differs: ${file}:${language}`);
 	for (const key of owner.keys) {
 		if (JSON.stringify(globalValue(global, key)) !== JSON.stringify(globalValue(locales[language], key))) throw new Error(`Global catalog pilot shared label differs: ${language}:${key}`);
 	}

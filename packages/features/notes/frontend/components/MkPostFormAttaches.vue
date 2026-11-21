@@ -73,6 +73,8 @@ const emit = defineEmits<{
 	(ev: 'changeName', file: Misskey.entities.DriveFile, newName: string): void;
 }>();
 
+const savingAltText = defineModel<boolean>('savingAltText', { default: false });
+const pendingAltTextSaves = new Set<string>();
 let menuShowing = false;
 
 function detachMedia(id: string) {
@@ -136,20 +138,26 @@ async function rename(file: Misskey.entities.DriveFile) {
 }
 
 async function describe(file: Misskey.entities.DriveFile) {
-	if (mock) return;
+	if (mock || pendingAltTextSaves.has(file.id)) return;
 
 	const { dispose } = await os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkFileCaptionEditWindow.vue').then(x => x.default), {
 		default: file.comment !== null ? file.comment : '',
 		file: file,
 	}, {
-		done: caption => {
-			let comment = caption.length === 0 ? null : caption;
-			misskeyApi('drive/files/update', {
-				fileId: file.id,
-				comment: comment,
-			}).then(() => {
+		done: async caption => {
+			const comment = caption.length === 0 ? null : caption;
+			if (comment === file.comment || pendingAltTextSaves.has(file.id)) return;
+			pendingAltTextSaves.add(file.id);
+			savingAltText.value = true;
+			try {
+				await os.apiWithDialog('drive/files/update', { fileId: file.id, comment });
 				file.comment = comment;
-			});
+			} catch {
+				// apiWithDialog reports the error; keep the last saved caption.
+			} finally {
+				pendingAltTextSaves.delete(file.id);
+				savingAltText.value = pendingAltTextSaves.size > 0;
+			}
 		},
 		closed: () => dispose(),
 	});
