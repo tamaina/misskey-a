@@ -122,7 +122,7 @@ export class MailStore {
 			await manager.query('SELECT pg_advisory_xact_lock(hashtextextended($1, 0))', [`mail:${deliveryId}:${address}`]);
 			const [raw] = await manager.query('SELECT * FROM "mail_raw" WHERE "id"=$1 FOR UPDATE', [rawId]) as (StoredMail | undefined)[];
 			if (!raw || raw.state !== 'ready') throw new MailStoreError('RAW_UNAVAILABLE');
-			const [previous]: MailReceipt[] = await manager.query('SELECT "id","recipient","sha256","envelopeFrom" FROM "mail_delivery" WHERE "deliveryId"=$1 AND "recipient"=$2', [deliveryId, address]);
+			const [previous]: (MailReceipt | undefined)[] = await manager.query('SELECT "id","recipient","sha256","envelopeFrom" FROM "mail_delivery" WHERE "deliveryId"=$1 AND "recipient"=$2', [deliveryId, address]);
 			if (previous) {
 				if (receiptStatus(previous, raw.sha256, envelopeFrom) === 'conflict') throw new MailStoreError('RETRY_CONFLICT');
 				return { id: previous.id, duplicate: true };
