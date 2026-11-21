@@ -17,9 +17,9 @@ export function assertTestDatabaseName(database: unknown, context: string) {
 	}
 }
 
-export function assertTestDatabaseOptions(options: DataSource['options']) {
+export function assertTestDatabaseOptions(options: DataSource['options'], context = 'resetDb') {
 	if (process.env.NODE_ENV !== 'test') throw new Error('NODE_ENV is not a test');
-	assertTestDatabaseName(options.database, 'resetDb');
+	assertTestDatabaseName(options.database, context);
 	// These alternative connection settings can override options.database in
 	// TypeORM/pg. Test fixtures use one explicit PostgreSQL database; fail closed
 	// for overrides rather than approve a name that is not the selected target.
@@ -27,7 +27,7 @@ export function assertTestDatabaseOptions(options: DataSource['options']) {
 		|| options.url !== undefined
 		|| options.replication !== undefined
 		|| (options.extra != null && ['database', 'connectionString'].some(key => Object.hasOwn(options.extra, key)))) {
-		throw new Error('resetDb: refusing to reset/sync an ambiguous database target. Use an explicit PostgreSQL database without URL, replication, or extra database/connectionString overrides.');
+		throw new Error(`${context}: refusing to reset/sync an ambiguous database target. Use an explicit PostgreSQL database without URL, replication, or extra database/connectionString overrides.`);
 	}
 }
 
