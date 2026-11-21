@@ -36,8 +36,10 @@ New author Notes and author Deletes are wrapped in Group Announce activities.
 The receiver uses the authenticated outer Group, resolves the Group actor and
 compares the embedded Create with the author's canonical activity URL. A claimed
 `audience` alone does not grant membership. Author Deletes require the known
-channel/author relationship and a 404/410 from the author's note URL. Only authors
-on the Group's own server are supported initially. Remote submissions and channel
+channel/author relationship and a 404/410 from the author's note URL. For a
+direct Group Announce, a Note that still resolves is kept. Configured bounded
+inbox retries can recheck it after a cached pre-deletion response expires. Only
+authors on the Group's own server are supported initially. Remote submissions and channel
 owner deletion of somebody else's note are not added.
 
 The prototype marker `_misskey_channel: true` identifies this implementation's

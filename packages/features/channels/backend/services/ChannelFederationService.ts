@@ -291,12 +291,14 @@ export class ChannelFederationService implements OnModuleInit, OnApplicationShut
 				if (author.uri !== authorUri) return 'skip: Group delete author mismatch';
 				try {
 					await resolver.resolve(noteUri);
-					return 'skip: author has not deleted the note';
 				} catch (error) {
 					if (!(error instanceof StatusError) || ![404, 410].includes(error.statusCode)) throw error;
+					await this.moduleRef.get<NoteDeleteService>('NoteDeleteService', { strict: false }).delete(author, note);
+					return 'ok: Group note deleted';
 				}
-				await this.moduleRef.get<NoteDeleteService>('NoteDeleteService', { strict: false }).delete(author, note);
-				return 'ok: Group note deleted';
+				// A successful fetch may still be a cached pre-delete representation.
+				// Keep the note and let the inbox's bounded job retries recheck the origin.
+				throw new Error('Group deletion verification pending: author Note still resolves');
 			}
 			if (group._misskey_channelFrozen === true) return 'skip: Group frozen';
 			const object = await this.verifyCreate(actor.uri, inner as ICreate, resolver);
