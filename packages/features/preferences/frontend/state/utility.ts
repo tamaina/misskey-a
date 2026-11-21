@@ -5,6 +5,9 @@
 
 import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, watch } from 'vue';
+import { langs } from '@features/boot/frontend/shared/config.js';
+import { readDeviceAppearance, restoreDeviceAppearance } from '@features/preferences/frontend/state/device-appearance-backup.js';
+import type { DeviceAppearanceBackup } from '@features/preferences/frontend/state/device-appearance-backup.js';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import FeatureLocaleMessages from '@features/preferences/frontend/ts-messages.vue';
 import { miLocalStorage } from '@features/preferences/frontend/local-storage.js';
@@ -116,8 +119,16 @@ async function renameProfile() {
 	prefer.renameProfile(name);
 }
 
+type PreferencesBackup = PreferencesProfile & { deviceAppearance?: unknown };
+
+function applyPreferencesBackup(backup: PreferencesBackup) {
+	const { deviceAppearance, ...profile } = backup;
+	miLocalStorage.setItem('preferences', JSON.stringify(profile));
+	restoreDeviceAppearance(miLocalStorage, deviceAppearance, langs.map(([id]) => id));
+}
+
 function exportCurrentProfile() {
-	const p = prefer.profile;
+	const p = { ...prefer.profile, deviceAppearance: readDeviceAppearance(miLocalStorage) };
 	const txtBlob = new Blob([JSON.stringify(p)], { type: 'text/plain' });
 	const dummya = window.document.createElement('a');
 	dummya.href = URL.createObjectURL(txtBlob);
@@ -134,9 +145,9 @@ function importProfile() {
 
 		const file = input.files[0];
 		const txt = await file.text();
-		const profile = JSON.parse(txt) as PreferencesProfile;
+		const backup = JSON.parse(txt) as PreferencesBackup;
 
-		miLocalStorage.setItem('preferences', JSON.stringify(profile));
+		applyPreferencesBackup(backup);
 		miLocalStorage.setItem('hidePreferencesRestoreSuggestion', 'true');
 		shouldSuggestRestoreBackup.value = false;
 		unisonReload();
@@ -145,7 +156,7 @@ function importProfile() {
 	input.click();
 }
 
-export async function cloudBackup() {
+export async function cloudBackup(deviceAppearance: DeviceAppearanceBackup = readDeviceAppearance(miLocalStorage)) {
 	if ($i == null) return;
 	if (!canAutoBackup()) {
 		throw new Error('cannot auto backup for this profile');
@@ -154,7 +165,7 @@ export async function cloudBackup() {
 	await misskeyApi('i/registry/set', {
 		scope: ['client', 'preferences', 'backups'],
 		key: prefer.profile.name,
-		value: prefer.profile,
+		value: { ...prefer.profile, deviceAppearance },
 	});
 }
 
@@ -208,7 +219,7 @@ export async function restoreFromCloudBackup() {
 
 	if (_DEV_) console.log(profile);
 
-	miLocalStorage.setItem('preferences', JSON.stringify(profile));
+	applyPreferencesBackup(profile as PreferencesBackup);
 	miLocalStorage.setItem('hidePreferencesRestoreSuggestion', 'true');
 	store.set('enablePreferencesAutoCloudBackup', true);
 	shouldSuggestRestoreBackup.value = false;
