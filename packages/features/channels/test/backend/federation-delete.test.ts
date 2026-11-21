@@ -63,7 +63,8 @@ test.each([404, 410])('Group Delete retains a resolvable Note and retries until 
 		type: 'Announce', id: `${groupUri}/activities/note123/delete`, actor: groupUri, audience: groupUri,
 		to: [publicAudience], object: deletion,
 	};
-	expect(await service.receiveAnnounce(group, { ...announcement, object: { ...deletion, actor: `${origin}/users/other` } })).toBe('skip: Group delete author mismatch');
+	const wrongAuthor: IDelete = { ...deletion, actor: `${origin}/users/other` };
+	expect(await service.receiveAnnounce(group, { ...announcement, object: wrongAuthor })).toBe('skip: Group delete author mismatch');
 	expect(resolver.resolve).not.toHaveBeenCalledWith(noteUri);
 
 	await expect(service.receiveAnnounce(group, announcement)).rejects.toMatchObject({ message: 'Group deletion verification pending: author Note still resolves' });

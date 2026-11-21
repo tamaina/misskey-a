@@ -227,7 +227,7 @@ test('native Accept consumption and channel cancellation are serialized before c
 	let nativeFollowing = false;
 	let releaseRead!: () => void;
 	const requests = {
-		findOneBy: vi.fn(async () => { await new Promise<void>(resolve => { releaseRead = resolve; }); return { withReplies: false }; }),
+		findOneBy: vi.fn(async () => { await new Promise<void>(resolve => { releaseRead = resolve; }); return { id: 'follow-request', requestId: null, withReplies: false }; }),
 		existsBy: vi.fn(async () => pending),
 	};
 	const unfollow = vi.fn(async () => { nativeFollowing = false; });
@@ -235,7 +235,12 @@ test('native Accept consumption and channel cancellation are serialized before c
 		moduleRef: { get: () => f.service },
 		followRequestsRepository: requests,
 		insertFollowingDoc: vi.fn(async () => { nativeFollowing = true; pending = false; }),
-		userEntityService: { isRemoteUser: () => false, packSelf: async () => ({}) },
+		userEntityService: {
+			isLocalUser: (user: { host: string | null }) => user.host === null,
+			isRemoteUser: (user: { host: string | null }) => user.host !== null,
+			packSelf: async () => ({}),
+		},
+		apRendererService: { getLocalFollowRequestActivityId: () => 'https://local.test/follows/follow-request' },
 		globalEventService: { publishMainStream: vi.fn() }, unfollowUnlocked: unfollow,
 	}, UserFollowingService.prototype) as UserFollowingService;
 	const local = mockDeep<MiLocalUser>({ id: 'local123', host: null });
