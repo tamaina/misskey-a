@@ -40,10 +40,30 @@ export function createMailIngress(settings: UserMailSettings, store: MailStore) 
 				try { envelope = JSON.parse(Buffer.from(metadata, 'base64url').toString('utf8')); } catch { throw new MailIngressError('UNAUTHENTICATED'); }
 				if (!envelope || typeof envelope !== 'object') throw new MailIngressError('UNAUTHENTICATED');
 				const raw = await readBoundedMailData(request.iterator({ destroyOnReturn: false }), settings.maxBytes);
-				authenticateMailDelivery(raw, envelope, signature, settings.ingress.secret);
-				const staged = await store.stage(raw);
+				const sha256 = authenticateMailDelivery(raw, envelope, signature, settings.ingress.secret);
+				const findReceipts = (recipients: string[]) => store.findReceipts(envelope.deliveryId, recipients, sha256, envelope.mailFrom);
+				const receipts = await findReceipts(envelope.recipients);
+				const pending = envelope.recipients.filter(recipient => !receipts.has(recipient));
+				let staged: Awaited<ReturnType<MailStore['stage']>> | null = null;
+				if (pending.length) {
+					try {
+						staged = await store.stage(raw);
+					} catch (error) {
+						// A concurrent delivery may have committed while this request was staging.
+						// Never discard known receipts if storage or this second lookup fails.
+						try {
+							for (const [recipient, status] of await findReceipts(pending)) receipts.set(recipient, status);
+						} catch { /* Unknown recipients can retry. */ }
+						if (receipts.size === 0) throw error;
+					}
+				}
 				const results = [];
 				for (const recipient of envelope.recipients) {
+					const receipt = receipts.get(recipient);
+					if (receipt !== undefined || staged === null) {
+						results.push({ recipient, code: receipt === 'accepted' ? 250 : receipt === 'conflict' ? 550 : 451 });
+						continue;
+					}
 					try {
 						await store.accept(staged.id, envelope.deliveryId, recipient, envelope.mailFrom);
 						results.push({ recipient, code: 250 });

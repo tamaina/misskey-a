@@ -24,7 +24,7 @@
 - `authenticateMailDelivery()` は raw の SHA-256、MTA が生成した deliveryId、timestamp、MAIL FROM、順序を含む RCPT TO 配列を HMAC で束ねる。署名は DATA のヘッダーではなく、認証済み MTA との side channel から渡す。
 - 共有秘密は少なくとも 32 bytes。現在の時刻許容幅は 300 秒。ネットワーク隔離と TLS/接続先認証も必要で、HMAC だけで公開 endpoint の負荷制限を代替しない。
 - MTA は配送単位の deliveryId を耐久保存し、同じ配送の再試行には同じ ID を使う。timestamp/署名は再試行時に更新する。ID、raw、envelope の対応を変更しない。
-- DB は `(deliveryId, recipient)` を一意に管理し、再利用時の所有者・raw hash・envelope sender の不一致を拒否する。**外部 Message-ID 単独で重複排除しない。** 受理済み宛先を他宛先の一時失敗で取り消さない。
+- DB は `(deliveryId, recipient)` を一意に管理し、再利用時は raw hash と envelope sender が一致する受理記録だけを再応答する。受理済みの再送には新規 upload・spool の空き・現在の受信有効化を要求しない。**外部 Message-ID 単独で重複排除しない。** 他宛先の一時失敗で受理済みの応答を取り消さない。
 - `stage()` が raw を保存し、`accept()` が受信記録・必要な quota/parse outbox・転送タスクを transaction で確定してから、その宛先に成功を返す。保存・DB 確定前の 250 応答は禁止。確定前の障害は MTA が再送できる一時失敗にする。
 - DATA は申告 SIZE ではなく実 byte 数で制限する。現在の既定 raw 上限は 25 MiB。MTA adapter 側でも接続数、宛先数、流量、読み取り期限を制限する。
 
@@ -53,7 +53,7 @@ S3 互換サービスも同じ確認ができるものを使い、チェック�
 
 所有者 quota とは別に、stage() は raw/spool 全体の予約を DB の advisory lock で直列化する。
 既定上限は 1 GiB。staging・ready・deleting を含む全 raw 行の size を数え、upload 前に予約する。
-受理失敗・重複再送の staging object も回収完了まで計上する。upload 用 byte はコピーしてから hash を確定し、upload と ready 化の間は raw 行を lock する。
+受理失敗や、受理確定と競合した再送で生じた staging object も回収完了まで計上する。upload 用 byte はコピーしてから hash を確定し、upload と ready 化の間は raw 行を lock する。
 この上限は DB に追跡された raw の予算であり、bucket の過去 version、バックアップ、DB 等を含む総ディスク容量ではない。
 ingress の流量・同時受理制限と worker の同時実行制限、spool 不足時の一時失敗を実装している。プロセスを跨ぐ MTA 側の総量制限、容量監視・警報は運用側で用意する。
 

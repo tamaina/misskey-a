@@ -13,8 +13,14 @@ export interface PrivateMailStorage {
 	delete(key: string): Promise<void>;
 }
 export type StoredMail = { id: string; objectKey: string; sha256: string; size: number; state: string };
+type MailReceipt = { id: string; recipient: string; sha256: string; envelopeFrom: string };
+type ReceiptStatus = 'accepted' | 'conflict';
 export class MailStoreError extends Error {
 	constructor(public readonly code: 'RECIPIENT_UNAVAILABLE' | 'QUOTA_EXCEEDED' | 'RETRY_CONFLICT' | 'NOT_FOUND' | 'RAW_UNAVAILABLE') { super(code); }
+}
+
+function receiptStatus(receipt: MailReceipt, sha256: string, envelopeFrom: string): ReceiptStatus {
+	return receipt.sha256 === sha256 && receipt.envelopeFrom === envelopeFrom ? 'accepted' : 'conflict';
 }
 
 /**
@@ -41,14 +47,26 @@ export class MailStore {
 			ON CONFLICT ("userId") DO UPDATE SET "enabled" = EXCLUDED."enabled"`, [userId, enabled]);
 	}
 
-	async resolveRecipient(address: string): Promise<{ userId: string; recipient: string; suffix: string | null }> {
+	private parseMailboxRecipient(address: string) {
 		const parsed = parseEnvelopeRecipient(address, this.domain);
 		// Operational aliases and bounce/SRS domains stay at the MTA, not user inboxes.
 		if (['postmaster', 'abuse', 'mailer_daemon', 'bounce', 'bounces'].includes(parsed.username)) throw new MailStoreError('RECIPIENT_UNAVAILABLE');
+		return parsed;
+	}
+
+	async resolveRecipient(address: string): Promise<{ userId: string; recipient: string; suffix: string | null }> {
+		const parsed = this.parseMailboxRecipient(address);
 		const rows = await this.db.query(`SELECT u."id" FROM "user" u JOIN "mail_account" m ON m."userId" = u."id"
 			WHERE u."usernameLower" = $1 AND u."host" IS NULL AND NOT u."isSuspended" AND NOT u."isDeleted" AND m."enabled"`, [parsed.username]);
 		if (rows.length !== 1) throw new MailStoreError('RECIPIENT_UNAVAILABLE');
 		return { userId: rows[0].id, recipient: parsed.address, suffix: parsed.suffix };
+	}
+
+	/** For authenticated retries: a committed receipt survives storage pressure and mailbox changes. */
+	async findReceipts(deliveryId: string, recipients: readonly string[], sha256: string, envelopeFrom: string): Promise<Map<string, ReceiptStatus>> {
+		const rows: MailReceipt[] = await this.db.query(`SELECT "id","recipient","sha256","envelopeFrom" FROM "mail_delivery"
+			WHERE "deliveryId"=$1 AND "recipient"=ANY($2::varchar[])`, [deliveryId, recipients]);
+		return new Map(rows.map(row => [row.recipient, receiptStatus(row, sha256, envelopeFrom)]));
 	}
 
 	/** Staging row makes failed uploads/crashes discoverable without bucket listing. */
@@ -99,36 +117,36 @@ export class MailStore {
 	/** Per-recipient LMTP acceptance. Partial failures never undo other recipients. */
 	async accept(rawId: string, deliveryId: string, address: string, envelopeFrom: string): Promise<{ id: string; duplicate: boolean }> {
 		if (!/^[A-Za-z0-9_-]{16,128}$/.test(deliveryId) || envelopeFrom.length > 254 || /[\r\n\0]/.test(envelopeFrom)) throw new Error('Invalid MTA envelope');
-		const recipient = await this.resolveRecipient(address);
 		return this.db.transaction(async manager => {
 			// Order: retry identity -> raw -> account/user. All paths use this order.
-			await manager.query('SELECT pg_advisory_xact_lock(hashtextextended($1, 0))', [`mail:${deliveryId}:${recipient.recipient}`]);
+			await manager.query('SELECT pg_advisory_xact_lock(hashtextextended($1, 0))', [`mail:${deliveryId}:${address}`]);
 			const [raw] = await manager.query('SELECT * FROM "mail_raw" WHERE "id"=$1 FOR UPDATE', [rawId]) as (StoredMail | undefined)[];
 			if (!raw || raw.state !== 'ready') throw new MailStoreError('RAW_UNAVAILABLE');
-			const [previous] = await manager.query('SELECT * FROM "mail_delivery" WHERE "deliveryId"=$1 AND "recipient"=$2', [deliveryId, recipient.recipient]);
+			const [previous]: MailReceipt[] = await manager.query('SELECT "id","recipient","sha256","envelopeFrom" FROM "mail_delivery" WHERE "deliveryId"=$1 AND "recipient"=$2', [deliveryId, address]);
 			if (previous) {
-				if (previous.userId !== recipient.userId || previous.sha256 !== raw.sha256 || previous.envelopeFrom !== envelopeFrom) throw new MailStoreError('RETRY_CONFLICT');
+				if (receiptStatus(previous, raw.sha256, envelopeFrom) === 'conflict') throw new MailStoreError('RETRY_CONFLICT');
 				return { id: previous.id, duplicate: true };
 			}
-			const [account] = await manager.query(`SELECT m."usedBytes" FROM "mail_account" m JOIN "user" u ON u."id"=m."userId"
-				WHERE m."userId"=$1 AND u."usernameLower"=$2 AND m."enabled" AND u."host" IS NULL AND NOT u."isDeleted" AND NOT u."isSuspended" FOR UPDATE OF m, u`, [recipient.userId, parseEnvelopeRecipient(address, this.domain).username]);
-			if (!account) throw new MailStoreError('RECIPIENT_UNAVAILABLE');
-			const [forwarding] = this.forwardingEnabled ? await manager.query('SELECT * FROM "mail_forwarding" WHERE "userId"=$1 AND "enabled" AND "verifiedAt" IS NOT NULL AND "address" IS NOT NULL FOR SHARE', [recipient.userId]) : [];
+			const accounts: { userId: string; usedBytes: string }[] = await manager.query(`SELECT m."userId",m."usedBytes" FROM "mail_account" m JOIN "user" u ON u."id"=m."userId"
+				WHERE u."usernameLower"=$1 AND m."enabled" AND u."host" IS NULL AND NOT u."isDeleted" AND NOT u."isSuspended" FOR UPDATE OF m, u`, [this.parseMailboxRecipient(address).username]);
+			if (accounts.length !== 1) throw new MailStoreError('RECIPIENT_UNAVAILABLE');
+			const account = accounts[0];
+			const [forwarding] = this.forwardingEnabled ? await manager.query('SELECT * FROM "mail_forwarding" WHERE "userId"=$1 AND "enabled" AND "verifiedAt" IS NOT NULL AND "address" IS NOT NULL FOR SHARE', [account.userId]) : [];
 			const quotaExceeded = BigInt(account.usedBytes) + BigInt(raw.size) > this.quotaBytes;
 			const localStored = (!forwarding || forwarding.keepLocalCopy) && !quotaExceeded;
 			if (!localStored && !forwarding) throw new MailStoreError('QUOTA_EXCEEDED');
 			const localError = localStored ? null : (quotaExceeded && (!forwarding || forwarding.keepLocalCopy) ? 'quota' : 'disabled');
 			const id = randomUUID();
 			await manager.query(`INSERT INTO "mail_delivery" ("id","deliveryId","recipient","envelopeFrom","userId","rawId","sha256","size","createdAt","parseState","localStored","localError")
-				VALUES ($1,$2,$3,$4,$5,$6,$7,$8,now(),$9,$10,$11)`, [id, deliveryId, recipient.recipient, envelopeFrom, recipient.userId, localStored ? rawId : null, raw.sha256, raw.size, localStored ? 'pending' : 'parsed', localStored, localError]);
+				VALUES ($1,$2,$3,$4,$5,$6,$7,$8,now(),$9,$10,$11)`, [id, deliveryId, address, envelopeFrom, account.userId, localStored ? rawId : null, raw.sha256, raw.size, localStored ? 'pending' : 'parsed', localStored, localError]);
 			if (localStored) {
-				await manager.query('UPDATE "mail_account" SET "usedBytes"="usedBytes"+$2 WHERE "userId"=$1', [recipient.userId, raw.size]);
+				await manager.query('UPDATE "mail_account" SET "usedBytes"="usedBytes"+$2 WHERE "userId"=$1', [account.userId, raw.size]);
 				await manager.query(`INSERT INTO "mail_outbox" ("id","deliveryId","kind","createdAt") VALUES ($1,$2,'parse',now())`, [randomUUID(), id]);
 			}
 			if (forwarding) {
 				await manager.query(`INSERT INTO "mail_submission" ("id","userId","idempotencyKey","contentHash","rawId","kind","deliveryId","forwardingRevision","envelopeFrom","recipients","metadata","state","createdAt","expiresAt","nextAttemptAt","size")
 					VALUES ($1,$2,$3,$4,$5,'forward',$6,$7,$8,$9,$10,'queued',now(),now()+interval '1 day',now(),$11)`,
-				[randomUUID(), recipient.userId, `forward:${id}:${forwarding.revision}`, raw.sha256, rawId, id, forwarding.revision, envelopeFrom, JSON.stringify([forwarding.address]), JSON.stringify({ subject: '', to: [forwarding.address], cc: [], bcc: [] }), raw.size]);
+				[randomUUID(), account.userId, `forward:${id}:${forwarding.revision}`, raw.sha256, rawId, id, forwarding.revision, envelopeFrom, JSON.stringify([forwarding.address]), JSON.stringify({ subject: '', to: [forwarding.address], cc: [], bcc: [] }), raw.size]);
 			}
 			return { id, duplicate: false };
 		});

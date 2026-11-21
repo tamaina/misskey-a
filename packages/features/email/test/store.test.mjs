@@ -155,6 +155,22 @@ test('mail persistence against PostgreSQL SQL semantics', { skip: !connectionStr
 			assert.equal((await query('SELECT "parsed" FROM "mail_delivery" WHERE "id"=$1', [accepted.id]))[0].parsed, null);
 		});
 
+		await t.test('a committed retry is not gated by mailbox opt-in or remaining spool', async () => {
+			await reset();
+			const address = 'alice@mail.example';
+			const store = new MailStore(db, storage, 'mail.example', BigInt(raw.length * 2), raw.length, BigInt(raw.length));
+			const first = await store.stage(raw);
+			const accepted = await store.accept(first.id, deliveryId, address, sender);
+			await store.setEnabled('alice', false);
+			await assert.rejects(store.stage(raw), /QUOTA_EXCEEDED/);
+			assert.deepEqual(await store.findReceipts(deliveryId, [address, 'bob@mail.example'], first.sha256, sender), new Map([[address, 'accepted']]));
+			assert.deepEqual(await store.findReceipts(deliveryId, [address], first.sha256, 'other@example.net'), new Map([[address, 'conflict']]));
+			assert.deepEqual(await store.accept(first.id, deliveryId, address, sender), { id: accepted.id, duplicate: true });
+			await assert.rejects(store.accept(first.id, `${deliveryId}_fresh`, address, sender), /RECIPIENT_UNAVAILABLE/);
+			assert.equal(objects.size, 1);
+			assert.equal(await usage('alice'), BigInt(raw.length));
+		});
+
 		await t.test('quota rejection rolls back only that recipient and preserves others', async () => {
 			await reset();
 			const staged = await store.stage(raw);

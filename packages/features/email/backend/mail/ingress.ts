@@ -46,15 +46,20 @@ export type MailDeliveryEnvelope = {
 
 /** Versioned wire contract; recipient order is significant (LMTP response order). */
 export function mailDeliverySigningPayload(raw: Uint8Array, envelope: MailDeliveryEnvelope): string {
-	return JSON.stringify(['misskey-mail-v1', envelope.deliveryId, envelope.timestamp, envelope.mailFrom, envelope.recipients, createHash('sha256').update(raw).digest('hex')]);
+	return signingPayload(createHash('sha256').update(raw).digest('hex'), envelope);
+}
+
+function signingPayload(sha256: string, envelope: MailDeliveryEnvelope): string {
+	return JSON.stringify(['misskey-mail-v1', envelope.deliveryId, envelope.timestamp, envelope.mailFrom, envelope.recipients, sha256]);
 }
 
 /**
  * Verify side-channel metadata supplied by the MTA, not fields extracted from DATA.
  * Network isolation/TLS is still required. The caller must enforce durable uniqueness
  * on (deliveryId, recipient) and reject reuse with different content/envelope.
+ * Returns the authenticated raw digest for checking existing receipts.
  */
-export function authenticateMailDelivery(raw: Uint8Array, envelope: MailDeliveryEnvelope, signature: string, secret: string, nowSeconds = Math.floor(Date.now() / 1000)): void {
+export function authenticateMailDelivery(raw: Uint8Array, envelope: MailDeliveryEnvelope, signature: string, secret: string, nowSeconds = Math.floor(Date.now() / 1000)): string {
 	if (Buffer.byteLength(secret) < 32) throw new Error('Mail ingress secret must contain at least 32 bytes');
 	if (!/^[A-Za-z0-9_-]{16,128}$/.test(envelope.deliveryId) || !Number.isSafeInteger(envelope.timestamp) || Math.abs(nowSeconds - envelope.timestamp) > 300 ||
 		!Array.isArray(envelope.recipients) || envelope.recipients.length < 1 || envelope.recipients.length > 100 ||
@@ -62,6 +67,8 @@ export function authenticateMailDelivery(raw: Uint8Array, envelope: MailDelivery
 		typeof envelope.mailFrom !== 'string' || envelope.mailFrom.length > 254 || /[\r\n\0]/.test(envelope.mailFrom) || !/^[a-f0-9]{64}$/.test(signature)) {
 		throw new MailIngressError('UNAUTHENTICATED');
 	}
-	const expected = createHmac('sha256', secret).update(mailDeliverySigningPayload(raw, envelope)).digest();
+	const sha256 = createHash('sha256').update(raw).digest('hex');
+	const expected = createHmac('sha256', secret).update(signingPayload(sha256, envelope)).digest();
 	if (!timingSafeEqual(expected, Buffer.from(signature, 'hex'))) throw new MailIngressError('UNAUTHENTICATED');
+	return sha256;
 }
