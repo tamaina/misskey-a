@@ -3336,6 +3336,2251 @@ export default {
 			}
 		}
 	},
+	"fukushu": {
+		"reminderShow": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"secure": true,
+					"requestName": "fukushu/reminder/show"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/reminder/show",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"reminderUpdate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"INVALID_REMINDER_SCHEDULE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"secure": true,
+					"requestName": "fukushu/reminder/update"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/reminder/update",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"studySettings": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/study/settings"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/study/settings",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"updateStudySettings": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/study/update-settings"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/study/update-settings",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"studyToday": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/study/today"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/study/today",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"studyQueue": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/study/queue"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/study/queue",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"studyReview": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/study/review"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/study/review",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"studyHistory": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/study/history"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/study/history",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"upstreamInspect": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"BACKUP_LIMIT": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"UPSTREAM_BACKUP_UNSUPPORTED": {
+						"status": 400
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "fukushu/backup/inspect-upstream",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/backup/inspect-upstream",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"backupRestore": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"BACKUP_LIMIT": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"UPSTREAM_BACKUP_UNSUPPORTED": {
+						"status": 400
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "fukushu/backup/restore",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/backup/restore",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"backupExport": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"BACKUP_LIMIT": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"UPSTREAM_BACKUP_UNSUPPORTED": {
+						"status": 400
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "fukushu/backup/export",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 86400000,
+						"max": 5
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/backup/export",
+					"successStatus": 204,
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"backupInspect": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"BACKUP_LIMIT": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"UPSTREAM_BACKUP_UNSUPPORTED": {
+						"status": 400
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "fukushu/backup/inspect",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/backup/inspect",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"upstreamRestoreJob": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 30
+					},
+					"requestName": "fukushu/upstream/restore-job"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/upstream/restore-job",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"upstreamMedia": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"requestName": "fukushu/upstream/media",
+					"limit": {
+						"duration": 60000,
+						"max": 120
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/upstream/media",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"upstreamCreateGift": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"requestName": "fukushu/upstream/create-gift"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/upstream/create-gift",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"upstreamUpdateGift": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"requestName": "fukushu/upstream/update-gift"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/upstream/update-gift",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"upstreamRestore": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"requestName": "fukushu/upstream/restore"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/upstream/restore",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"upstreamShow": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"requestName": "fukushu/upstream/show",
+					"limit": {
+						"duration": 60000,
+						"max": 30
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/upstream/show",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"upstreamReview": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"requestName": "fukushu/upstream/review",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/upstream/review",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"upstreamExport": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 86400000,
+						"max": 5
+					},
+					"requestName": "fukushu/upstream/export"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/upstream/export",
+					"tags": [
+						"fukushu"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"list": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/materials/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/list",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"import": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"requestName": "fukushu/materials/import"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/import",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"create": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"requestName": "fukushu/materials/create"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/create",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"show": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/materials/show"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/show",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"ankiMedia": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"secure": true,
+					"requestName": "fukushu/materials/anki-media"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/anki-media",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"update": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"requestName": "fukushu/materials/update"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/update",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"updateCardExplanation": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"requestName": "fukushu/materials/update-card-explanation"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/update-card-explanation",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"listCardVersions": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/materials/card-versions"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/card-versions",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"showCardVersion": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/materials/card-version"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/card-version",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"archive": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"requestName": "fukushu/materials/archive"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/archive",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		}
+	},
 	"games": {
 		"bubbleGameRanking": {
 			"~orpc": {
@@ -8263,6 +10508,1934 @@ export default {
 		}
 	},
 	"auth": {
+		"i/sudo/start": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 10,
+						"key": "sudo"
+					},
+					"requestName": "i/sudo/start"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/sudo/start",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/sudo/complete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 10,
+						"key": "sudo"
+					},
+					"requestName": "i/sudo/complete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/sudo/complete",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/sudo/status": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"requestName": "i/sudo/status"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/sudo/status",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/sudo/exit": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"requestName": "i/sudo/exit"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/sudo/exit",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/account/delete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/account/delete",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/account/delete",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/passwordless/start": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/passwordless/start",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/passwordless/start",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/passwordless/complete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/passwordless/complete",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/passwordless/complete",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/password-login/disable/start": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/password-login/disable/start",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/password-login/disable/start",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/password-login/disable/complete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/password-login/disable/complete",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/password-login/disable/complete",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/password": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/password",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/password",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/email": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/email",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/email",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/regenerate-token": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/regenerate-token",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/regenerate-token",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/state": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/state",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/state",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/keys/list": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/keys/list",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/keys/list",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/register/start": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/register/start",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/register/start",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/register/complete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/register/complete",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/register/complete",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/mfa/start": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/mfa/start",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/mfa/start",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/mfa/complete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/mfa/complete",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/mfa/complete",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/mfa/enable": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/mfa/enable",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/mfa/enable",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/mfa/disable": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/mfa/disable",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/mfa/disable",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/remove": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/remove",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/remove",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/rename": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/rename",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/rename",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/passkey/passwordless": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/passkey/passwordless",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/passkey/passwordless",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/totp/start": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/totp/start",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/totp/start",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/totp/complete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/totp/complete",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/totp/complete",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/totp/remove": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/totp/remove",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/totp/remove",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/security/recovery-codes": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"SUDO_REQUIRED": {
+						"status": 403
+					},
+					"REAUTHENTICATION_FAILED": {
+						"status": 403
+					},
+					"INCORRECT_PASSWORD": {
+						"status": 400
+					},
+					"UNAVAILABLE": {
+						"status": 400
+					},
+					"EMAIL_REQUIRED": {
+						"status": 400
+					},
+					"CONFIRMATION_FAILED": {
+						"status": 403
+					},
+					"LAST_AUTHENTICATION_FACTOR": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "i/security/recovery-codes",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 20,
+						"key": "security-settings"
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/security/recovery-codes",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
 		"admin/accounts/create": {
 			"~orpc": {
 				"errorMap": {
@@ -9883,52 +14056,6 @@ export default {
 				}
 			}
 		},
-		"i/change-password": {
-			"~orpc": {
-				"errorMap": {
-					"ACCESS_DENIED": {
-						"status": 400
-					},
-					"ROLE_PERMISSION_DENIED": {
-						"status": 403
-					},
-					"AUTHENTICATION_FAILED": {
-						"status": 401
-					},
-					"CREDENTIAL_REQUIRED": {
-						"status": 401
-					},
-					"YOUR_ACCOUNT_SUSPENDED": {
-						"status": 403
-					},
-					"YOUR_ACCOUNT_MOVED": {
-						"status": 403
-					},
-					"PERMISSION_DENIED": {
-						"status": 403
-					},
-					"RATE_LIMIT_EXCEEDED": {
-						"status": 429
-					},
-					"INVALID_PARAM": {
-						"status": 400
-					},
-					"INTERNAL_ERROR": {
-						"status": 500
-					}
-				},
-				"meta": {
-					"requestName": "i/change-password",
-					"requireCredential": true,
-					"secure": true
-				},
-				"route": {
-					"method": "POST",
-					"path": "/i/change-password",
-					"tags": []
-				}
-			}
-		},
 		"i/regenerate-token": {
 			"~orpc": {
 				"errorMap": {
@@ -9972,6 +14099,118 @@ export default {
 					"method": "POST",
 					"path": "/i/regenerate-token",
 					"tags": []
+				}
+			}
+		},
+		"i/regenerate-token/passkey/start": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"FRESH_REAUTHENTICATION_FAILED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 10,
+						"key": "fresh-token-regeneration"
+					},
+					"requestName": "i/regenerate-token/passkey/start"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/regenerate-token/passkey/start",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/regenerate-token/passkey/complete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"FRESH_REAUTHENTICATION_FAILED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 10,
+						"key": "fresh-token-regeneration"
+					},
+					"requestName": "i/regenerate-token/passkey/complete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/regenerate-token/passkey/complete",
+					"tags": [
+						"account"
+					]
 				}
 			}
 		},
@@ -10108,6 +14347,54 @@ export default {
 				"route": {
 					"method": "POST",
 					"path": "/i/sessions",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/session-ips": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requestName": "i/session-ips",
+					"requireCredential": true,
+					"secure": true
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/session-ips",
 					"tags": [
 						"account"
 					]
@@ -10269,6 +14556,118 @@ export default {
 					"method": "POST",
 					"path": "/i/update-email",
 					"tags": []
+				}
+			}
+		},
+		"i/update-email/passkey/start": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"FRESH_REAUTHENTICATION_FAILED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 10,
+						"key": "fresh-email-change"
+					},
+					"requestName": "i/update-email/passkey/start"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/update-email/passkey/start",
+					"tags": [
+						"account"
+					]
+				}
+			}
+		},
+		"i/update-email/passkey/complete": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"FRESH_REAUTHENTICATION_FAILED": {
+						"status": 403
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 3600000,
+						"max": 3,
+						"key": "i/update-email"
+					},
+					"requestName": "i/update-email/passkey/complete"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/i/update-email/passkey/complete",
+					"tags": [
+						"account"
+					]
 				}
 			}
 		},

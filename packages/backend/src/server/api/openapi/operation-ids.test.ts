@@ -50,7 +50,106 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	expect(spec.paths?.['/i/sessions']?.post?.operationId).toBe('post___i___sessions');
 	expect(spec.paths?.['/i/sessions/revoke']?.post?.operationId).toBe('post___i___sessions___revoke');
 	expect(spec.paths?.['/i/signout']?.post?.operationId).toBe('post___i___signout');
-	expect(identifiers).toHaveLength(477);
+	expect(spec.paths?.['/i/regenerate-token/passkey/start']?.post?.operationId).toBe('post___i___regenerate-token___passkey___start');
+	expect(spec.paths?.['/i/regenerate-token/passkey/complete']?.post?.operationId).toBe('post___i___regenerate-token___passkey___complete');
+	expect(spec.paths?.['/i/update-email/passkey/start']?.post?.operationId).toBe('post___i___update-email___passkey___start');
+	expect(spec.paths?.['/i/update-email/passkey/complete']?.post?.operationId).toBe('post___i___update-email___passkey___complete');
+	// SSO is deferred; none of its fifteen routes may appear in the public contract.
+	for (const path of [
+		'/oidc/providers',
+		'/oidc/start',
+		'/oidc/callback',
+		'/oidc/status',
+		'/oidc/cancel',
+		'/oidc/login',
+		'/oidc/onboarding',
+		'/oidc/onboarding/verify',
+		'/i/oidc/links',
+		'/i/oidc/link/start',
+		'/i/oidc/link/complete',
+		'/i/oidc/unlink',
+		'/admin/oidc/providers',
+		'/admin/oidc/create',
+		'/admin/oidc/update',
+	]) {
+		expect(spec.paths).not.toHaveProperty(path);
+	}
+	const addedSecurityPaths = [
+		'/i/security/account/delete',
+		'/i/security/passkey/passwordless/start',
+		'/i/security/passkey/passwordless/complete',
+		'/i/security/password-login/disable/start',
+		'/i/security/password-login/disable/complete',
+		'/i/security/password',
+		'/i/security/email',
+		'/i/security/regenerate-token',
+		'/i/security/state',
+		'/i/security/keys/list',
+		'/i/security/passkey/register/start',
+		'/i/security/passkey/register/complete',
+		'/i/security/passkey/mfa/start',
+		'/i/security/passkey/mfa/complete',
+		'/i/security/passkey/mfa/enable',
+		'/i/security/passkey/mfa/disable',
+		'/i/security/passkey/remove',
+		'/i/security/passkey/rename',
+		'/i/security/passkey/passwordless',
+		'/i/security/totp/start',
+		'/i/security/totp/complete',
+		'/i/security/totp/remove',
+		'/i/security/recovery-codes',
+		'/i/sudo/start',
+		'/i/sudo/complete',
+		'/i/sudo/status',
+		'/i/sudo/exit',
+	];
+	const addedSecurityIds = new Set(addedSecurityPaths.map(path => `post___${path.slice(1).replaceAll('/', '___')}`));
+	expect(addedSecurityIds.size).toBe(27);
+	for (const path of addedSecurityPaths) {
+		expect(spec.paths?.[path]?.post?.operationId).toBe(`post___${path.slice(1).replaceAll('/', '___')}`);
+	}
+	const addedFukushuOperations = new Map([
+		['/fukushu/reminder/show', 'post___fukushu___reminder___show'],
+		['/fukushu/reminder/update', 'post___fukushu___reminder___update'],
+		['/fukushu/upstream/media', 'post___fukushu___upstream___media'],
+		['/fukushu/upstream/create-gift', 'post___fukushu___upstream___create-gift'],
+		['/fukushu/upstream/update-gift', 'post___fukushu___upstream___update-gift'],
+		['/fukushu/upstream/restore-job', 'post___fukushu___upstream___restore-job'],
+		['/fukushu/upstream/restore', 'post___fukushu___upstream___restore'],
+		['/fukushu/upstream/show', 'post___fukushu___upstream___show'],
+		['/fukushu/upstream/review', 'post___fukushu___upstream___review'],
+		['/fukushu/upstream/export', 'post___fukushu___upstream___export'],
+		['/fukushu/backup/inspect-upstream', 'post___fukushu___backup___inspect-upstream'],
+		['/fukushu/backup/restore', 'post___fukushu___backup___restore'],
+		['/fukushu/backup/export', 'post___fukushu___backup___export'],
+		['/fukushu/backup/inspect', 'post___fukushu___backup___inspect'],
+		['/fukushu/materials/create', 'post___fukushu___materials___create'],
+		['/fukushu/materials/show', 'post___fukushu___materials___show'],
+		['/fukushu/materials/anki-media', 'post___fukushu___materials___anki-media'],
+		['/fukushu/materials/list', 'post___fukushu___materials___list'],
+		['/fukushu/materials/import', 'post___fukushu___materials___import'],
+		['/fukushu/materials/update', 'post___fukushu___materials___update'],
+		['/fukushu/materials/archive', 'post___fukushu___materials___archive'],
+		['/fukushu/materials/update-card-explanation', 'post___fukushu___materials___update-card-explanation'],
+		['/fukushu/materials/card-versions', 'post___fukushu___materials___card-versions'],
+		['/fukushu/materials/card-version', 'post___fukushu___materials___card-version'],
+		['/fukushu/study/settings', 'post___fukushu___study___settings'],
+		['/fukushu/study/update-settings', 'post___fukushu___study___update-settings'],
+		['/fukushu/study/today', 'post___fukushu___study___today'],
+		['/fukushu/study/queue', 'post___fukushu___study___queue'],
+		['/fukushu/study/review', 'post___fukushu___study___review'],
+		['/fukushu/study/history', 'post___fukushu___study___history'],
+	]);
+	const addedFukushuIds = new Set(addedFukushuOperations.values());
+	expect(addedFukushuIds.size).toBe(30);
+	for (const [path, operationId] of addedFukushuOperations) {
+		expect(spec.paths?.[path]?.post?.operationId).toBe(operationId);
+		expect(spec.paths?.[path]?.get).toBeUndefined();
+	}
+	// Exclude the fifteen deferred SSO routes from the preceding API count.
+	// The explicitly verified Fukushu IDs do not change the historical baseline.
+	expect(identifiers.filter(id => !addedSecurityIds.has(id!) && !addedFukushuIds.has(id!))).toHaveLength(481);
+	expect(identifiers).toHaveLength(481 + 27 + addedFukushuIds.size);
 	expect(new Set(identifiers).size).toBe(identifiers.length);
 });
 

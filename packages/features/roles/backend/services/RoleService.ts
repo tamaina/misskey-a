@@ -6,6 +6,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import * as Redis from 'ioredis';
 import { In } from 'typeorm';
+import { ANKI_PACKAGE_MIME } from '@features/drive/backend/file-types.js';
 import { ModuleRef } from '@nestjs/core';
 import type {
 	MiMeta,
@@ -128,6 +129,8 @@ export const DEFAULT_POLICIES: RolePolicies = {
 	uploadableFileTypes: [
 		'text/*',
 		'application/json',
+		'application/x-fukushu-backup',
+		ANKI_PACKAGE_MIME,
 		'image/*',
 		'video/*',
 		'audio/*',

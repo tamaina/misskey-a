@@ -5,6 +5,7 @@
 
 import * as fs from 'node:fs';
 import rename from 'rename';
+import { getDriveFileDisposition } from '@features/drive/backend/file-types.js';
 import type { Config } from '@/config.js';
 import type { IImageStreamable } from '@features/drive/backend/services/ImageProcessingService.js';
 import { contentDisposition } from '@features/drive/backend/utility/content-disposition.js';
@@ -88,7 +89,7 @@ export class FileServerDriveHandler {
 				reply.header('Cache-Control', 'max-age=31536000, immutable');
 				reply.header('Content-Disposition',
 					contentDisposition(
-						'inline',
+						getDriveFileDisposition(image.type),
 						correctFilename(file.filename, image.ext),
 					),
 				);

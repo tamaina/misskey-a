@@ -70,6 +70,9 @@ const REPEATABLE_SYSTEM_JOB_DEF = [{
 	name: 'clean',
 	pattern: '0 0 * * *',
 }, {
+	name: 'fukushuReminder',
+	pattern: '* * * * *',
+}, {
 	name: 'checkExpiredMutings',
 	pattern: '*/5 * * * *',
 }, {
@@ -328,6 +331,15 @@ export class QueueService {
 				age: 3600 * 24 * 7, // keep up to 7 days
 				count: 100,
 			},
+		});
+	}
+
+	@bindThis
+	public createExportFukushuJob(user: ThinUser, deckId: string, upstream = false) {
+		return this.dbQueue.add('exportFukushu', { user: { id: user.id }, deckId, ...(upstream ? { upstream: true } : {}) }, {
+			attempts: 1,
+			removeOnComplete: { age: 3600 * 24 * 7, count: 30 },
+			removeOnFail: { age: 3600 * 24 * 7, count: 100 },
 		});
 	}
 
@@ -599,11 +611,13 @@ export class QueueService {
 	}
 
 	@bindThis
-	public createDeleteAccountJob(user: ThinUser, opts: { soft?: boolean; } = {}) {
+	public createDeleteAccountJob(user: ThinUser, opts: { soft?: boolean; requiresCommittedDeletion?: true; deletionIntentId?: string; } = {}) {
 		return this.dbQueue.add('deleteAccount', {
 			user: { id: user.id },
 			soft: opts.soft,
+			...(opts.requiresCommittedDeletion ? { requiresCommittedDeletion: true as const, deletionIntentId: opts.deletionIntentId } : {}),
 		}, {
+			...(opts.requiresCommittedDeletion ? { attempts: 5, backoff: { type: 'exponential', delay: 1000 } } : {}),
 			removeOnComplete: {
 				age: 3600 * 24 * 7, // keep up to 7 days
 				count: 30,

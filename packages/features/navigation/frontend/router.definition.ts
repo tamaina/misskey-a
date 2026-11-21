@@ -576,6 +576,10 @@ export const ROUTE_DEF = [{
 	component: page(() => import('@features/games/frontend/pages/clicker.vue')),
 	loginRequired: true,
 }, {
+	path: '/fukushu',
+	component: page(() => import('@features/games/fukushu/frontend/pages/index.vue')),
+	loginRequired: true,
+}, {
 	path: '/games',
 	component: page(() => import('@features/games/frontend/pages/games.vue')),
 	loginRequired: false,

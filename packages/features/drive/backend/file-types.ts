@@ -3,6 +3,12 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+// Recognized Anki uploads are downloadable attachments, never browser-safe media.
+export const ANKI_PACKAGE_MIME = 'application/x-anki-package';
+export function getDriveFileDisposition(mime: string): 'attachment' | 'inline' {
+	return mime === ANKI_PACKAGE_MIME ? 'attachment' : 'inline';
+}
+
 export const FILE_TYPE_IMAGE = [
 	'image/png',
 	'image/gif',

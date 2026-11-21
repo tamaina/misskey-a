@@ -22,6 +22,7 @@ type PushNotificationsTypes = {
 		antenna: { id: string, name: string };
 		note: Packed<'Note'>;
 	};
+	fukushuReminder: { occurrence: number; expiresAt: number };
 	'readAllNotifications': undefined;
 	newChatMessage: Packed<'ChatMessage'>;
 };
@@ -99,7 +100,9 @@ export class PushNotificationService implements OnApplicationShutdown {
 			this.meta.swPublicKey,
 			this.meta.swPrivateKey);
 
-		const subscriptions = await this.subscriptionsCache.fetch(userId);
+		const reminder = type === 'fukushuReminder' ? body as PushNotificationsTypes['fukushuReminder'] : undefined;
+		const subscriptions = reminder ? await this.swSubscriptionsRepository.findBy({ userId }) : await this.subscriptionsCache.fetch(userId);
+		let retry = false;
 
 		for (const subscription of subscriptions) {
 			if ([
@@ -116,30 +119,37 @@ export class PushNotificationService implements OnApplicationShutdown {
 				},
 			};
 
-			push.sendNotification(pushSubscription, JSON.stringify({
+			const ttl = reminder ? Math.floor((reminder.expiresAt - Date.now()) / 1000) : undefined;
+			if (ttl !== undefined && ttl <= 0) break;
+			const delivery = push.sendNotification(pushSubscription, JSON.stringify({
 				type,
 				body: (type === 'notification' || type === 'unreadAntennaNote') ? truncateBody(type, body) : body,
 				userId,
 				dateTime: Date.now(),
 			}), {
+				...(reminder ? { TTL: ttl, timeout: 5000 } : {}),
 				agent: this.httpRequestService.getAgentForHttps(new URL(subscription.endpoint)),
-			}).catch((err: any) => {
+			}).catch(async (err: any) => {
 				//swLogger.info(err.statusCode);
 				//swLogger.info(err.headers);
 				//swLogger.info(err.body);
 
 				if (err.statusCode === 410 || err.statusCode === 404) {
-					this.swSubscriptionsRepository.delete({
+					await this.swSubscriptionsRepository.delete({
 						userId: userId,
 						endpoint: subscription.endpoint,
 						auth: subscription.auth,
 						publickey: subscription.publickey,
-					}).then(() => {
-						this.refreshCache(userId);
 					});
+					this.refreshCache(userId);
+				} else if (reminder) {
+					retry = true;
 				}
 			});
+			if (reminder) await delivery;
+			else void delivery.catch(() => {});
 		}
+		if (retry) throw new Error('Fukushu reminder delivery incomplete');
 	}
 
 	@bindThis

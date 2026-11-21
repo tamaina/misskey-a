@@ -1,0 +1,3 @@
+`generated-anki-25.09.apkg` is a synthetic Anki 25.09 export with two populated decks, templates, media, and reviews, not a personal collection.
+
+Source: [tamaina/anki-reader at 142ce051, tests/fixtures/official-21b.apkg](https://github.com/tamaina/anki-reader/blob/142ce0512bdcf4fe5aad677615e3518ee3c68631/tests/fixtures/official-21b.apkg), generated with [the official Python exporter](https://github.com/tamaina/anki-reader/blob/142ce0512bdcf4fe5aad677615e3518ee3c68631/tests/generate-apkg-fixtures.py). SHA-256: `a97e9c2e4e737a2a2a295aef66259d9a9cdcf466047f07b7302017e75fcca81a`. Source project MIT (2026 Fukushu contributors); see [license](../../../../FUKUSHU-LICENSE.txt).

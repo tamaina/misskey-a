@@ -130,7 +130,7 @@ export const packedNotificationSchema = v.variant('type', [v.strictObject({
 	'type': v.picklist(['exportCompleted']),
 	// packedCommon emits this enumerable key as undefined; JSON must omit it.
 	'userId': v.optional(v.never()),
-	'exportedEntity': v.picklist(['antenna', 'blocking', 'clip', 'customEmoji', 'favorite', 'following', 'muting', 'note', 'userList']),
+	'exportedEntity': v.picklist(['antenna', 'blocking', 'clip', 'customEmoji', 'favorite', 'following', 'fukushu', 'muting', 'note', 'userList']),
 	'fileId': v.pipe(v.string(), v.metadata({ 'format': 'id' })),
 }), v.strictObject({
 	'id': v.pipe(v.string(), v.metadata({ 'format': 'id' })),

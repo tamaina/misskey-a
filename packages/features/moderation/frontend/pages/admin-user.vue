@@ -118,8 +118,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkInfo v-if="!iAmAdmin" warn>{{ $locale.sfc.requireAdminForView }}</MkInfo>
 						<MkInfo v-else>The date is the IP address was first acknowledged.</MkInfo>
 						<template v-if="iAmAdmin && ips">
-							<div v-for="record in ips" :key="record.ip" class="_monospace" :class="$style.ip" style="margin: 1em 0;">
-								<span class="date">{{ record.createdAt }}</span>
+							<div v-for="record in ips" :key="record.id" class="_monospace" :class="$style.ip" style="margin: 1em 0;">
+								<span class="date">{{ $locale.sfc.ipFirstSeen }} {{ record.createdAt }}</span>
+								<span class="date">{{ $locale.sfc.ipLastSeen }} {{ record.lastSeenAt }}</span>
 								<span class="ip">{{ record.ip }}</span>
 							</div>
 						</template>
@@ -673,6 +674,8 @@ definePage(() => ({
 <style lang="scss" module>
 .ip {
 	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5em;
 	word-break: break-all;
 
 	> :global(.date) {
@@ -1117,6 +1120,8 @@ definePage(() => ({
 
 <locale lang="json" locale="ja-JP">
 {
+	"ipFirstSeen": "初回確認:",
+	"ipLastSeen": "最終確認:",
 	"remoteSuspended": "リモートで凍結済み",
 	"isSystemAccount": "システムにより自動で作成・管理されているアカウントです。",
 	"instanceInfo": "サーバー情報",

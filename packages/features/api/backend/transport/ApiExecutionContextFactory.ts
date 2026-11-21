@@ -75,8 +75,8 @@ export class ApiExecutionContextFactory {
 			services: {
 				authenticate: async token => {
 					try {
-						const principal = await this.authenticate.authenticate(token);
-						if (principal[0]) this.ipLogging.log(request.ip, principal[0].id);
+						const principal = await this.authenticate.authenticate(token, { ip: request.ip, userAgent: typeof request.headers['user-agent'] === 'string' ? request.headers['user-agent'] : null });
+						if (principal[0]) void this.ipLogging.log(request.ip, principal[0].id, principal[2]?.id ?? null);
 						return principal;
 					} catch (error) {
 						if (!(error instanceof AuthenticationError)) throw error;

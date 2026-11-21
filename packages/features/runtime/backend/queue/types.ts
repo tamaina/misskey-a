@@ -50,6 +50,8 @@ export type DbJobMap = {
 	exportCustomEmojis: DbJobDataWithUser;
 	exportAntennas: DBExportAntennasData;
 	exportNotes: DbJobDataWithUser;
+	exportFukushu: DbExportFukushuData;
+	importFukushu: DbImportFukushuData;
 	exportFavorites: DbJobDataWithUser;
 	exportFollowing: DbExportFollowingData;
 	exportMuting: DbJobDataWithUser;
@@ -65,6 +67,9 @@ export type DbJobMap = {
 	importCustomEmojis: DbUserImportJobData;
 	deleteAccount: DbUserDeleteJobData;
 };
+
+export type DbImportFukushuData = { format?: 'anki-apkg'; ownerId: string; fileId: string; requestId: string; size: number; md5: string };
+export type DbExportFukushuData = { user: ThinUser; deckId: string; upstream?: boolean };
 
 export type DbJobDataWithUser = {
 	user: ThinUser;
@@ -83,6 +88,9 @@ export type DBExportAntennasData = {
 export type DbUserDeleteJobData = {
 	user: ThinUser;
 	soft?: boolean;
+	/** The worker must serialize on the user and observe committed isDeleted before any effect. */
+	requiresCommittedDeletion?: true;
+	deletionIntentId?: string;
 };
 
 export type DbUserImportJobData = {

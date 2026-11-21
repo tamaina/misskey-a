@@ -1669,6 +1669,7 @@ declare namespace entities {
         SignupResponse,
         SignupPendingRequest,
         SignupPendingResponse,
+        SigninProgressChallenge,
         SigninFlowRequest,
         SigninFlowResponse,
         SigninWithPasskeyRequest,
@@ -1782,6 +1783,63 @@ declare namespace entities {
         FlashSearchResponse,
         UsersFlashsRequest,
         UsersFlashsResponse,
+        FukushuReminderShowRequest,
+        FukushuReminderShowResponse,
+        FukushuReminderUpdateRequest,
+        FukushuStudySettingsRequest,
+        FukushuStudySettingsResponse,
+        FukushuStudyUpdateSettingsRequest,
+        FukushuStudyUpdateSettingsResponse,
+        FukushuStudyTodayRequest,
+        FukushuStudyTodayResponse,
+        FukushuStudyQueueRequest,
+        FukushuStudyQueueResponse,
+        FukushuStudyReviewRequest,
+        FukushuStudyReviewResponse,
+        FukushuStudyHistoryRequest,
+        FukushuStudyHistoryResponse,
+        FukushuBackupInspectUpstreamRequest,
+        FukushuBackupInspectUpstreamResponse,
+        FukushuBackupRestoreRequest,
+        FukushuBackupRestoreResponse,
+        FukushuBackupExportRequest,
+        FukushuBackupInspectRequest,
+        FukushuBackupInspectResponse,
+        FukushuUpstreamRestoreJobRequest,
+        FukushuUpstreamRestoreJobResponse,
+        FukushuUpstreamMediaRequest,
+        FukushuUpstreamMediaResponse,
+        FukushuUpstreamCreateGiftRequest,
+        FukushuUpstreamCreateGiftResponse,
+        FukushuUpstreamUpdateGiftRequest,
+        FukushuUpstreamUpdateGiftResponse,
+        FukushuUpstreamRestoreRequest,
+        FukushuUpstreamRestoreResponse,
+        FukushuUpstreamShowRequest,
+        FukushuUpstreamShowResponse,
+        FukushuUpstreamReviewRequest,
+        FukushuUpstreamReviewResponse,
+        FukushuUpstreamExportRequest,
+        FukushuMaterialsListRequest,
+        FukushuMaterialsListResponse,
+        FukushuMaterialsImportRequest,
+        FukushuMaterialsImportResponse,
+        FukushuMaterialsCreateRequest,
+        FukushuMaterialsCreateResponse,
+        FukushuMaterialsShowRequest,
+        FukushuMaterialsShowResponse,
+        FukushuMaterialsAnkiMediaRequest,
+        FukushuMaterialsAnkiMediaResponse,
+        FukushuMaterialsUpdateRequest,
+        FukushuMaterialsUpdateResponse,
+        FukushuMaterialsUpdateCardExplanationRequest,
+        FukushuMaterialsUpdateCardExplanationResponse,
+        FukushuMaterialsCardVersionsRequest,
+        FukushuMaterialsCardVersionsResponse,
+        FukushuMaterialsCardVersionRequest,
+        FukushuMaterialsCardVersionResponse,
+        FukushuMaterialsArchiveRequest,
+        FukushuMaterialsArchiveResponse,
         BubbleGameRankingRequest,
         BubbleGameRankingResponse,
         BubbleGameRegisterRequest,
@@ -1930,6 +1988,47 @@ declare namespace entities {
         IImportFollowingRequest,
         IImportMutingRequest,
         IImportUserListsRequest,
+        ISudoStartRequest,
+        ISudoStartResponse,
+        ISudoCompleteRequest,
+        ISudoCompleteResponse,
+        ISudoStatusRequest,
+        ISudoStatusResponse,
+        ISudoExitRequest,
+        ISecurityAccountDeleteRequest,
+        ISecurityPasskeyPasswordlessStartRequest,
+        ISecurityPasskeyPasswordlessStartResponse,
+        ISecurityPasskeyPasswordlessCompleteRequest,
+        ISecurityPasswordLoginDisableStartRequest,
+        ISecurityPasswordLoginDisableStartResponse,
+        ISecurityPasswordLoginDisableCompleteRequest,
+        ISecurityPasswordRequest,
+        ISecurityEmailRequest,
+        ISecurityRegenerateTokenRequest,
+        ISecurityStateRequest,
+        ISecurityStateResponse,
+        ISecurityKeysListRequest,
+        ISecurityKeysListResponse,
+        ISecurityPasskeyRegisterStartRequest,
+        ISecurityPasskeyRegisterStartResponse,
+        ISecurityPasskeyRegisterCompleteRequest,
+        ISecurityPasskeyRegisterCompleteResponse,
+        ISecurityPasskeyMfaStartRequest,
+        ISecurityPasskeyMfaStartResponse,
+        ISecurityPasskeyMfaCompleteRequest,
+        ISecurityPasskeyMfaEnableRequest,
+        ISecurityPasskeyMfaEnableResponse,
+        ISecurityPasskeyMfaDisableRequest,
+        ISecurityPasskeyRemoveRequest,
+        ISecurityPasskeyRenameRequest,
+        ISecurityPasskeyPasswordlessRequest,
+        ISecurityTotpStartRequest,
+        ISecurityTotpStartResponse,
+        ISecurityTotpCompleteRequest,
+        ISecurityTotpCompleteResponse,
+        ISecurityTotpRemoveRequest,
+        ISecurityRecoveryCodesRequest,
+        ISecurityRecoveryCodesResponse,
         AdminAccountsCreateRequest,
         AdminAccountsCreateResponse,
         AdminCaptchaCurrentRequest,
@@ -1972,17 +2071,24 @@ declare namespace entities {
         IAppsResponse,
         IAuthorizedAppsRequest,
         IAuthorizedAppsResponse,
-        IChangePasswordRequest,
         IRegenerateTokenRequest,
+        IRegenerateTokenPasskeyStartRequest,
+        IRegenerateTokenPasskeyStartResponse,
+        IRegenerateTokenPasskeyCompleteRequest,
         IRevokeTokenRequest,
         ISigninHistoryRequest,
         ISigninHistoryResponse,
         ISessionsRequest,
         ISessionsResponse,
+        ISessionIpsRequest,
+        ISessionIpsResponse,
         ISessionsRevokeRequest,
         ISignoutRequest,
         IUpdateEmailRequest,
         IUpdateEmailResponse,
+        IUpdateEmailPasskeyStartRequest,
+        IUpdateEmailPasskeyStartResponse,
+        IUpdateEmailPasskeyCompleteRequest,
         InviteCreateRequest,
         InviteCreateResponse,
         InviteDeleteRequest,
@@ -3717,6 +3823,177 @@ type FollowingUpdateResponse = ContractResponse<'following/update'>;
 export const followingVisibilities: readonly ["public", "followers", "private"];
 
 // @public (undocumented)
+type FukushuBackupExportRequest = ContractRequest<'fukushu/backup/export'>;
+
+// @public (undocumented)
+type FukushuBackupInspectRequest = ContractRequest<'fukushu/backup/inspect'>;
+
+// @public (undocumented)
+type FukushuBackupInspectResponse = ContractResponse<'fukushu/backup/inspect'>;
+
+// @public (undocumented)
+type FukushuBackupInspectUpstreamRequest = ContractRequest<'fukushu/backup/inspect-upstream'>;
+
+// @public (undocumented)
+type FukushuBackupInspectUpstreamResponse = ContractResponse<'fukushu/backup/inspect-upstream'>;
+
+// @public (undocumented)
+type FukushuBackupRestoreRequest = ContractRequest<'fukushu/backup/restore'>;
+
+// @public (undocumented)
+type FukushuBackupRestoreResponse = ContractResponse<'fukushu/backup/restore'>;
+
+// @public (undocumented)
+type FukushuMaterialsAnkiMediaRequest = ContractRequest<'fukushu/materials/anki-media'>;
+
+// @public (undocumented)
+type FukushuMaterialsAnkiMediaResponse = ContractResponse<'fukushu/materials/anki-media'>;
+
+// @public (undocumented)
+type FukushuMaterialsArchiveRequest = ContractRequest<'fukushu/materials/archive'>;
+
+// @public (undocumented)
+type FukushuMaterialsArchiveResponse = ContractResponse<'fukushu/materials/archive'>;
+
+// @public (undocumented)
+type FukushuMaterialsCardVersionRequest = ContractRequest<'fukushu/materials/card-version'>;
+
+// @public (undocumented)
+type FukushuMaterialsCardVersionResponse = ContractResponse<'fukushu/materials/card-version'>;
+
+// @public (undocumented)
+type FukushuMaterialsCardVersionsRequest = ContractRequest<'fukushu/materials/card-versions'>;
+
+// @public (undocumented)
+type FukushuMaterialsCardVersionsResponse = ContractResponse<'fukushu/materials/card-versions'>;
+
+// @public (undocumented)
+type FukushuMaterialsCreateRequest = ContractRequest<'fukushu/materials/create'>;
+
+// @public (undocumented)
+type FukushuMaterialsCreateResponse = ContractResponse<'fukushu/materials/create'>;
+
+// @public (undocumented)
+type FukushuMaterialsImportRequest = ContractRequest<'fukushu/materials/import'>;
+
+// @public (undocumented)
+type FukushuMaterialsImportResponse = ContractResponse<'fukushu/materials/import'>;
+
+// @public (undocumented)
+type FukushuMaterialsListRequest = ContractRequest<'fukushu/materials/list'>;
+
+// @public (undocumented)
+type FukushuMaterialsListResponse = ContractResponse<'fukushu/materials/list'>;
+
+// @public (undocumented)
+type FukushuMaterialsShowRequest = ContractRequest<'fukushu/materials/show'>;
+
+// @public (undocumented)
+type FukushuMaterialsShowResponse = ContractResponse<'fukushu/materials/show'>;
+
+// @public (undocumented)
+type FukushuMaterialsUpdateCardExplanationRequest = ContractRequest<'fukushu/materials/update-card-explanation'>;
+
+// @public (undocumented)
+type FukushuMaterialsUpdateCardExplanationResponse = ContractResponse<'fukushu/materials/update-card-explanation'>;
+
+// @public (undocumented)
+type FukushuMaterialsUpdateRequest = ContractRequest<'fukushu/materials/update'>;
+
+// @public (undocumented)
+type FukushuMaterialsUpdateResponse = ContractResponse<'fukushu/materials/update'>;
+
+// @public (undocumented)
+type FukushuReminderShowRequest = ContractRequest<'fukushu/reminder/show'>;
+
+// @public (undocumented)
+type FukushuReminderShowResponse = ContractResponse<'fukushu/reminder/show'>;
+
+// @public (undocumented)
+type FukushuReminderUpdateRequest = ContractRequest<'fukushu/reminder/update'>;
+
+// @public (undocumented)
+type FukushuStudyHistoryRequest = ContractRequest<'fukushu/study/history'>;
+
+// @public (undocumented)
+type FukushuStudyHistoryResponse = ContractResponse<'fukushu/study/history'>;
+
+// @public (undocumented)
+type FukushuStudyQueueRequest = ContractRequest<'fukushu/study/queue'>;
+
+// @public (undocumented)
+type FukushuStudyQueueResponse = ContractResponse<'fukushu/study/queue'>;
+
+// @public (undocumented)
+type FukushuStudyReviewRequest = ContractRequest<'fukushu/study/review'>;
+
+// @public (undocumented)
+type FukushuStudyReviewResponse = ContractResponse<'fukushu/study/review'>;
+
+// @public (undocumented)
+type FukushuStudySettingsRequest = ContractRequest<'fukushu/study/settings'>;
+
+// @public (undocumented)
+type FukushuStudySettingsResponse = ContractResponse<'fukushu/study/settings'>;
+
+// @public (undocumented)
+type FukushuStudyTodayRequest = ContractRequest<'fukushu/study/today'>;
+
+// @public (undocumented)
+type FukushuStudyTodayResponse = ContractResponse<'fukushu/study/today'>;
+
+// @public (undocumented)
+type FukushuStudyUpdateSettingsRequest = ContractRequest<'fukushu/study/update-settings'>;
+
+// @public (undocumented)
+type FukushuStudyUpdateSettingsResponse = ContractResponse<'fukushu/study/update-settings'>;
+
+// @public (undocumented)
+type FukushuUpstreamCreateGiftRequest = ContractRequest<'fukushu/upstream/create-gift'>;
+
+// @public (undocumented)
+type FukushuUpstreamCreateGiftResponse = ContractResponse<'fukushu/upstream/create-gift'>;
+
+// @public (undocumented)
+type FukushuUpstreamExportRequest = ContractRequest<'fukushu/upstream/export'>;
+
+// @public (undocumented)
+type FukushuUpstreamMediaRequest = ContractRequest<'fukushu/upstream/media'>;
+
+// @public (undocumented)
+type FukushuUpstreamMediaResponse = ContractResponse<'fukushu/upstream/media'>;
+
+// @public (undocumented)
+type FukushuUpstreamRestoreJobRequest = ContractRequest<'fukushu/upstream/restore-job'>;
+
+// @public (undocumented)
+type FukushuUpstreamRestoreJobResponse = ContractResponse<'fukushu/upstream/restore-job'>;
+
+// @public (undocumented)
+type FukushuUpstreamRestoreRequest = ContractRequest<'fukushu/upstream/restore'>;
+
+// @public (undocumented)
+type FukushuUpstreamRestoreResponse = ContractResponse<'fukushu/upstream/restore'>;
+
+// @public (undocumented)
+type FukushuUpstreamReviewRequest = ContractRequest<'fukushu/upstream/review'>;
+
+// @public (undocumented)
+type FukushuUpstreamReviewResponse = ContractResponse<'fukushu/upstream/review'>;
+
+// @public (undocumented)
+type FukushuUpstreamShowRequest = ContractRequest<'fukushu/upstream/show'>;
+
+// @public (undocumented)
+type FukushuUpstreamShowResponse = ContractResponse<'fukushu/upstream/show'>;
+
+// @public (undocumented)
+type FukushuUpstreamUpdateGiftRequest = ContractRequest<'fukushu/upstream/update-gift'>;
+
+// @public (undocumented)
+type FukushuUpstreamUpdateGiftResponse = ContractResponse<'fukushu/upstream/update-gift'>;
+
+// @public (undocumented)
 type GalleryFeaturedRequest = ContractRequest<'gallery/featured'>;
 
 // @public (undocumented)
@@ -3911,9 +4188,6 @@ type IAuthorizedAppsRequest = ContractRequest<'i/authorized-apps'>;
 type IAuthorizedAppsResponse = ContractResponse<'i/authorized-apps'>;
 
 // @public (undocumented)
-type IChangePasswordRequest = ContractRequest<'i/change-password'>;
-
-// @public (undocumented)
 export interface IChannelConnection<Channel extends AnyOf<Channels> = AnyOf<Channels>> extends EventEmitter<Channel['events']> {
     // (undocumented)
     channel: string;
@@ -4061,6 +4335,15 @@ type IPinResponse = ContractResponse<'i/pin'>;
 type IReadAnnouncementRequest = ContractRequest<'i/read-announcement'>;
 
 // @public (undocumented)
+type IRegenerateTokenPasskeyCompleteRequest = ContractRequest<'i/regenerate-token/passkey/complete'>;
+
+// @public (undocumented)
+type IRegenerateTokenPasskeyStartRequest = ContractRequest<'i/regenerate-token/passkey/start'>;
+
+// @public (undocumented)
+type IRegenerateTokenPasskeyStartResponse = ContractResponse<'i/regenerate-token/passkey/start'>;
+
+// @public (undocumented)
 type IRegenerateTokenRequest = ContractRequest<'i/regenerate-token'>;
 
 // @public (undocumented)
@@ -4118,6 +4401,114 @@ type IRevokeTokenRequest = ContractRequest<'i/revoke-token'>;
 function isAPIError(reason: Record<PropertyKey, unknown>): reason is APIError;
 
 // @public (undocumented)
+type ISecurityAccountDeleteRequest = ContractRequest<'i/security/account/delete'>;
+
+// @public (undocumented)
+type ISecurityEmailRequest = ContractRequest<'i/security/email'>;
+
+// @public (undocumented)
+type ISecurityKeysListRequest = ContractRequest<'i/security/keys/list'>;
+
+// @public (undocumented)
+type ISecurityKeysListResponse = ContractResponse<'i/security/keys/list'>;
+
+// @public (undocumented)
+type ISecurityPasskeyMfaCompleteRequest = ContractRequest<'i/security/passkey/mfa/complete'>;
+
+// @public (undocumented)
+type ISecurityPasskeyMfaDisableRequest = ContractRequest<'i/security/passkey/mfa/disable'>;
+
+// @public (undocumented)
+type ISecurityPasskeyMfaEnableRequest = ContractRequest<'i/security/passkey/mfa/enable'>;
+
+// @public (undocumented)
+type ISecurityPasskeyMfaEnableResponse = ContractResponse<'i/security/passkey/mfa/enable'>;
+
+// @public (undocumented)
+type ISecurityPasskeyMfaStartRequest = ContractRequest<'i/security/passkey/mfa/start'>;
+
+// @public (undocumented)
+type ISecurityPasskeyMfaStartResponse = ContractResponse<'i/security/passkey/mfa/start'>;
+
+// @public (undocumented)
+type ISecurityPasskeyPasswordlessCompleteRequest = ContractRequest<'i/security/passkey/passwordless/complete'>;
+
+// @public (undocumented)
+type ISecurityPasskeyPasswordlessRequest = ContractRequest<'i/security/passkey/passwordless'>;
+
+// @public (undocumented)
+type ISecurityPasskeyPasswordlessStartRequest = ContractRequest<'i/security/passkey/passwordless/start'>;
+
+// @public (undocumented)
+type ISecurityPasskeyPasswordlessStartResponse = ContractResponse<'i/security/passkey/passwordless/start'>;
+
+// @public (undocumented)
+type ISecurityPasskeyRegisterCompleteRequest = ContractRequest<'i/security/passkey/register/complete'>;
+
+// @public (undocumented)
+type ISecurityPasskeyRegisterCompleteResponse = ContractResponse<'i/security/passkey/register/complete'>;
+
+// @public (undocumented)
+type ISecurityPasskeyRegisterStartRequest = ContractRequest<'i/security/passkey/register/start'>;
+
+// @public (undocumented)
+type ISecurityPasskeyRegisterStartResponse = ContractResponse<'i/security/passkey/register/start'>;
+
+// @public (undocumented)
+type ISecurityPasskeyRemoveRequest = ContractRequest<'i/security/passkey/remove'>;
+
+// @public (undocumented)
+type ISecurityPasskeyRenameRequest = ContractRequest<'i/security/passkey/rename'>;
+
+// @public (undocumented)
+type ISecurityPasswordLoginDisableCompleteRequest = ContractRequest<'i/security/password-login/disable/complete'>;
+
+// @public (undocumented)
+type ISecurityPasswordLoginDisableStartRequest = ContractRequest<'i/security/password-login/disable/start'>;
+
+// @public (undocumented)
+type ISecurityPasswordLoginDisableStartResponse = ContractResponse<'i/security/password-login/disable/start'>;
+
+// @public (undocumented)
+type ISecurityPasswordRequest = ContractRequest<'i/security/password'>;
+
+// @public (undocumented)
+type ISecurityRecoveryCodesRequest = ContractRequest<'i/security/recovery-codes'>;
+
+// @public (undocumented)
+type ISecurityRecoveryCodesResponse = ContractResponse<'i/security/recovery-codes'>;
+
+// @public (undocumented)
+type ISecurityRegenerateTokenRequest = ContractRequest<'i/security/regenerate-token'>;
+
+// @public (undocumented)
+type ISecurityStateRequest = ContractRequest<'i/security/state'>;
+
+// @public (undocumented)
+type ISecurityStateResponse = ContractResponse<'i/security/state'>;
+
+// @public (undocumented)
+type ISecurityTotpCompleteRequest = ContractRequest<'i/security/totp/complete'>;
+
+// @public (undocumented)
+type ISecurityTotpCompleteResponse = ContractResponse<'i/security/totp/complete'>;
+
+// @public (undocumented)
+type ISecurityTotpRemoveRequest = ContractRequest<'i/security/totp/remove'>;
+
+// @public (undocumented)
+type ISecurityTotpStartRequest = ContractRequest<'i/security/totp/start'>;
+
+// @public (undocumented)
+type ISecurityTotpStartResponse = ContractResponse<'i/security/totp/start'>;
+
+// @public (undocumented)
+type ISessionIpsRequest = ContractRequest<'i/session-ips'>;
+
+// @public (undocumented)
+type ISessionIpsResponse = ContractResponse<'i/session-ips'>;
+
+// @public (undocumented)
 type ISessionsRequest = ContractRequest<'i/sessions'>;
 
 // @public (undocumented)
@@ -4150,6 +4541,10 @@ export interface IStream extends EventEmitter<StreamEvents> {
     heartbeat(): void;
     // (undocumented)
     ping(): void;
+    // (undocumented)
+    reconnect(user: {
+        token: string;
+    } | null): void;
     // Warning: (ae-forgotten-export) The symbol "SharedConnection" needs to be exported by the entry point index.d.ts
     //
     // (undocumented)
@@ -4173,10 +4568,40 @@ export interface IStream extends EventEmitter<StreamEvents> {
 }
 
 // @public (undocumented)
+type ISudoCompleteRequest = ContractRequest<'i/sudo/complete'>;
+
+// @public (undocumented)
+type ISudoCompleteResponse = ContractResponse<'i/sudo/complete'>;
+
+// @public (undocumented)
+type ISudoExitRequest = ContractRequest<'i/sudo/exit'>;
+
+// @public (undocumented)
+type ISudoStartRequest = ContractRequest<'i/sudo/start'>;
+
+// @public (undocumented)
+type ISudoStartResponse = ContractResponse<'i/sudo/start'>;
+
+// @public (undocumented)
+type ISudoStatusRequest = ContractRequest<'i/sudo/status'>;
+
+// @public (undocumented)
+type ISudoStatusResponse = ContractResponse<'i/sudo/status'>;
+
+// @public (undocumented)
 type IUnpinRequest = ContractRequest<'i/unpin'>;
 
 // @public (undocumented)
 type IUnpinResponse = ContractResponse<'i/unpin'>;
+
+// @public (undocumented)
+type IUpdateEmailPasskeyCompleteRequest = ContractRequest<'i/update-email/passkey/complete'>;
+
+// @public (undocumented)
+type IUpdateEmailPasskeyStartRequest = ContractRequest<'i/update-email/passkey/start'>;
+
+// @public (undocumented)
+type IUpdateEmailPasskeyStartResponse = ContractResponse<'i/update-email/passkey/start'>;
 
 // @public (undocumented)
 type IUpdateEmailRequest = ContractRequest<'i/update-email'>;
@@ -7934,6 +8359,8 @@ type Signin = ContractModel<'Signin'>;
 
 // @public (undocumented)
 type SigninFlowRequest = {
+    progressMode?: 'v1';
+    authenticationProgress?: SigninProgressChallenge;
     username: string;
     password?: string;
     token?: string;
@@ -7956,12 +8383,22 @@ type SigninFlowResponse = {
 } | {
     finished: false;
     next: 'totp';
-    availableFactors?: ('totp' | 'passkey')[];
+    authenticationProgress?: SigninProgressChallenge;
+    availableFactors?: ('totp' | 'passkey' | 'recovery')[];
 } | {
     finished: false;
     next: 'passkey';
+    authenticationProgress?: SigninProgressChallenge;
     authRequest: PublicKeyCredentialRequestOptionsJSON_2;
-    availableFactors?: ('totp' | 'passkey')[];
+    availableFactors?: ('totp' | 'passkey' | 'recovery')[];
+};
+
+// @public (undocumented)
+type SigninProgressChallenge = {
+    ticket: string;
+    browserSecret: string;
+    nonce: string;
+    version: number;
 };
 
 // @public (undocumented)
@@ -7981,6 +8418,10 @@ type SigninWithPasskeyResponse = {
     signinResponse: SigninFlowResponse & {
         finished: true;
     };
+    passwordFlowRequired?: never;
+} | {
+    passwordFlowRequired: true;
+    signinResponse?: never;
 };
 
 // @public (undocumented)
@@ -8035,6 +8476,10 @@ export class Stream extends EventEmitter<StreamEvents> implements IStream {
     heartbeat(): void;
     // (undocumented)
     ping(): void;
+    // (undocumented)
+    reconnect(user: {
+        token: string;
+    } | null): void;
     // (undocumented)
     removeSharedConnection(connection: SharedConnection): void;
     // (undocumented)
@@ -8306,7 +8751,7 @@ type VerifyEmailRequest = ContractRequest<'verify-email'>;
 
 // Warnings were encountered during analysis:
 //
-// src/streaming.ts:57:3 - (ae-forgotten-export) The symbol "ReconnectingWebSocket" needs to be exported by the entry point index.d.ts
+// src/streaming.ts:63:3 - (ae-forgotten-export) The symbol "ReconnectingWebSocket" needs to be exported by the entry point index.d.ts
 // src/streaming.types.ts:236:4 - (ae-forgotten-export) The symbol "ReversiUpdateKey" needs to be exported by the entry point index.d.ts
 // src/streaming.types.ts:251:4 - (ae-forgotten-export) The symbol "ReversiUpdateSettings" needs to be exported by the entry point index.d.ts
 

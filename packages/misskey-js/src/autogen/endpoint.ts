@@ -103,6 +103,63 @@ import type {
 	FlashSearchResponse,
 	UsersFlashsRequest,
 	UsersFlashsResponse,
+	FukushuReminderShowRequest,
+	FukushuReminderShowResponse,
+	FukushuReminderUpdateRequest,
+	FukushuStudySettingsRequest,
+	FukushuStudySettingsResponse,
+	FukushuStudyUpdateSettingsRequest,
+	FukushuStudyUpdateSettingsResponse,
+	FukushuStudyTodayRequest,
+	FukushuStudyTodayResponse,
+	FukushuStudyQueueRequest,
+	FukushuStudyQueueResponse,
+	FukushuStudyReviewRequest,
+	FukushuStudyReviewResponse,
+	FukushuStudyHistoryRequest,
+	FukushuStudyHistoryResponse,
+	FukushuBackupInspectUpstreamRequest,
+	FukushuBackupInspectUpstreamResponse,
+	FukushuBackupRestoreRequest,
+	FukushuBackupRestoreResponse,
+	FukushuBackupExportRequest,
+	FukushuBackupInspectRequest,
+	FukushuBackupInspectResponse,
+	FukushuUpstreamRestoreJobRequest,
+	FukushuUpstreamRestoreJobResponse,
+	FukushuUpstreamMediaRequest,
+	FukushuUpstreamMediaResponse,
+	FukushuUpstreamCreateGiftRequest,
+	FukushuUpstreamCreateGiftResponse,
+	FukushuUpstreamUpdateGiftRequest,
+	FukushuUpstreamUpdateGiftResponse,
+	FukushuUpstreamRestoreRequest,
+	FukushuUpstreamRestoreResponse,
+	FukushuUpstreamShowRequest,
+	FukushuUpstreamShowResponse,
+	FukushuUpstreamReviewRequest,
+	FukushuUpstreamReviewResponse,
+	FukushuUpstreamExportRequest,
+	FukushuMaterialsListRequest,
+	FukushuMaterialsListResponse,
+	FukushuMaterialsImportRequest,
+	FukushuMaterialsImportResponse,
+	FukushuMaterialsCreateRequest,
+	FukushuMaterialsCreateResponse,
+	FukushuMaterialsShowRequest,
+	FukushuMaterialsShowResponse,
+	FukushuMaterialsAnkiMediaRequest,
+	FukushuMaterialsAnkiMediaResponse,
+	FukushuMaterialsUpdateRequest,
+	FukushuMaterialsUpdateResponse,
+	FukushuMaterialsUpdateCardExplanationRequest,
+	FukushuMaterialsUpdateCardExplanationResponse,
+	FukushuMaterialsCardVersionsRequest,
+	FukushuMaterialsCardVersionsResponse,
+	FukushuMaterialsCardVersionRequest,
+	FukushuMaterialsCardVersionResponse,
+	FukushuMaterialsArchiveRequest,
+	FukushuMaterialsArchiveResponse,
 	BubbleGameRankingRequest,
 	BubbleGameRankingResponse,
 	BubbleGameRegisterRequest,
@@ -251,6 +308,47 @@ import type {
 	IImportFollowingRequest,
 	IImportMutingRequest,
 	IImportUserListsRequest,
+	ISudoStartRequest,
+	ISudoStartResponse,
+	ISudoCompleteRequest,
+	ISudoCompleteResponse,
+	ISudoStatusRequest,
+	ISudoStatusResponse,
+	ISudoExitRequest,
+	ISecurityAccountDeleteRequest,
+	ISecurityPasskeyPasswordlessStartRequest,
+	ISecurityPasskeyPasswordlessStartResponse,
+	ISecurityPasskeyPasswordlessCompleteRequest,
+	ISecurityPasswordLoginDisableStartRequest,
+	ISecurityPasswordLoginDisableStartResponse,
+	ISecurityPasswordLoginDisableCompleteRequest,
+	ISecurityPasswordRequest,
+	ISecurityEmailRequest,
+	ISecurityRegenerateTokenRequest,
+	ISecurityStateRequest,
+	ISecurityStateResponse,
+	ISecurityKeysListRequest,
+	ISecurityKeysListResponse,
+	ISecurityPasskeyRegisterStartRequest,
+	ISecurityPasskeyRegisterStartResponse,
+	ISecurityPasskeyRegisterCompleteRequest,
+	ISecurityPasskeyRegisterCompleteResponse,
+	ISecurityPasskeyMfaStartRequest,
+	ISecurityPasskeyMfaStartResponse,
+	ISecurityPasskeyMfaCompleteRequest,
+	ISecurityPasskeyMfaEnableRequest,
+	ISecurityPasskeyMfaEnableResponse,
+	ISecurityPasskeyMfaDisableRequest,
+	ISecurityPasskeyRemoveRequest,
+	ISecurityPasskeyRenameRequest,
+	ISecurityPasskeyPasswordlessRequest,
+	ISecurityTotpStartRequest,
+	ISecurityTotpStartResponse,
+	ISecurityTotpCompleteRequest,
+	ISecurityTotpCompleteResponse,
+	ISecurityTotpRemoveRequest,
+	ISecurityRecoveryCodesRequest,
+	ISecurityRecoveryCodesResponse,
 	AdminAccountsCreateRequest,
 	AdminAccountsCreateResponse,
 	AdminCaptchaCurrentRequest,
@@ -294,17 +392,24 @@ import type {
 	IAppsResponse,
 	IAuthorizedAppsRequest,
 	IAuthorizedAppsResponse,
-	IChangePasswordRequest,
 	IRegenerateTokenRequest,
+	IRegenerateTokenPasskeyStartRequest,
+	IRegenerateTokenPasskeyStartResponse,
+	IRegenerateTokenPasskeyCompleteRequest,
 	IRevokeTokenRequest,
 	ISigninHistoryRequest,
 	ISigninHistoryResponse,
 	ISessionsRequest,
 	ISessionsResponse,
+	ISessionIpsRequest,
+	ISessionIpsResponse,
 	ISessionsRevokeRequest,
 	ISignoutRequest,
 	IUpdateEmailRequest,
 	IUpdateEmailResponse,
+	IUpdateEmailPasskeyStartRequest,
+	IUpdateEmailPasskeyStartResponse,
+	IUpdateEmailPasskeyCompleteRequest,
 	InviteCreateRequest,
 	InviteCreateResponse,
 	InviteDeleteRequest,
@@ -814,6 +919,36 @@ export type Endpoints = {
 	'flash/update': { req: FlashUpdateRequest; res: EmptyResponse };
 	'flash/search': { req: FlashSearchRequest; res: FlashSearchResponse };
 	'users/flashs': { req: UsersFlashsRequest; res: UsersFlashsResponse };
+	'fukushu/reminder/show': { req: FukushuReminderShowRequest; res: FukushuReminderShowResponse };
+	'fukushu/reminder/update': { req: FukushuReminderUpdateRequest; res: EmptyResponse };
+	'fukushu/study/settings': { req: FukushuStudySettingsRequest; res: FukushuStudySettingsResponse };
+	'fukushu/study/update-settings': { req: FukushuStudyUpdateSettingsRequest; res: FukushuStudyUpdateSettingsResponse };
+	'fukushu/study/today': { req: FukushuStudyTodayRequest; res: FukushuStudyTodayResponse };
+	'fukushu/study/queue': { req: FukushuStudyQueueRequest; res: FukushuStudyQueueResponse };
+	'fukushu/study/review': { req: FukushuStudyReviewRequest; res: FukushuStudyReviewResponse };
+	'fukushu/study/history': { req: FukushuStudyHistoryRequest; res: FukushuStudyHistoryResponse };
+	'fukushu/backup/inspect-upstream': { req: FukushuBackupInspectUpstreamRequest; res: FukushuBackupInspectUpstreamResponse };
+	'fukushu/backup/restore': { req: FukushuBackupRestoreRequest; res: FukushuBackupRestoreResponse };
+	'fukushu/backup/export': { req: FukushuBackupExportRequest; res: EmptyResponse };
+	'fukushu/backup/inspect': { req: FukushuBackupInspectRequest; res: FukushuBackupInspectResponse };
+	'fukushu/upstream/restore-job': { req: FukushuUpstreamRestoreJobRequest; res: FukushuUpstreamRestoreJobResponse };
+	'fukushu/upstream/media': { req: FukushuUpstreamMediaRequest; res: FukushuUpstreamMediaResponse };
+	'fukushu/upstream/create-gift': { req: FukushuUpstreamCreateGiftRequest; res: FukushuUpstreamCreateGiftResponse };
+	'fukushu/upstream/update-gift': { req: FukushuUpstreamUpdateGiftRequest; res: FukushuUpstreamUpdateGiftResponse };
+	'fukushu/upstream/restore': { req: FukushuUpstreamRestoreRequest; res: FukushuUpstreamRestoreResponse };
+	'fukushu/upstream/show': { req: FukushuUpstreamShowRequest; res: FukushuUpstreamShowResponse };
+	'fukushu/upstream/review': { req: FukushuUpstreamReviewRequest; res: FukushuUpstreamReviewResponse };
+	'fukushu/upstream/export': { req: FukushuUpstreamExportRequest; res: EmptyResponse };
+	'fukushu/materials/list': { req: FukushuMaterialsListRequest; res: FukushuMaterialsListResponse };
+	'fukushu/materials/import': { req: FukushuMaterialsImportRequest; res: FukushuMaterialsImportResponse };
+	'fukushu/materials/create': { req: FukushuMaterialsCreateRequest; res: FukushuMaterialsCreateResponse };
+	'fukushu/materials/show': { req: FukushuMaterialsShowRequest; res: FukushuMaterialsShowResponse };
+	'fukushu/materials/anki-media': { req: FukushuMaterialsAnkiMediaRequest; res: FukushuMaterialsAnkiMediaResponse };
+	'fukushu/materials/update': { req: FukushuMaterialsUpdateRequest; res: FukushuMaterialsUpdateResponse };
+	'fukushu/materials/update-card-explanation': { req: FukushuMaterialsUpdateCardExplanationRequest; res: FukushuMaterialsUpdateCardExplanationResponse };
+	'fukushu/materials/card-versions': { req: FukushuMaterialsCardVersionsRequest; res: FukushuMaterialsCardVersionsResponse };
+	'fukushu/materials/card-version': { req: FukushuMaterialsCardVersionRequest; res: FukushuMaterialsCardVersionResponse };
+	'fukushu/materials/archive': { req: FukushuMaterialsArchiveRequest; res: FukushuMaterialsArchiveResponse };
 	'bubble-game/ranking': { req: BubbleGameRankingRequest; res: BubbleGameRankingResponse };
 	'bubble-game/register': { req: BubbleGameRegisterRequest; res: EmptyResponse };
 	'reversi/cancel-match': { req: ReversiCancelMatchRequest; res: EmptyResponse };
@@ -909,6 +1044,33 @@ export type Endpoints = {
 	'i/import-following': { req: IImportFollowingRequest; res: EmptyResponse };
 	'i/import-muting': { req: IImportMutingRequest; res: EmptyResponse };
 	'i/import-user-lists': { req: IImportUserListsRequest; res: EmptyResponse };
+	'i/sudo/start': { req: ISudoStartRequest; res: ISudoStartResponse };
+	'i/sudo/complete': { req: ISudoCompleteRequest; res: ISudoCompleteResponse };
+	'i/sudo/status': { req: ISudoStatusRequest; res: ISudoStatusResponse };
+	'i/sudo/exit': { req: ISudoExitRequest; res: EmptyResponse };
+	'i/security/account/delete': { req: ISecurityAccountDeleteRequest; res: EmptyResponse };
+	'i/security/passkey/passwordless/start': { req: ISecurityPasskeyPasswordlessStartRequest; res: ISecurityPasskeyPasswordlessStartResponse };
+	'i/security/passkey/passwordless/complete': { req: ISecurityPasskeyPasswordlessCompleteRequest; res: EmptyResponse };
+	'i/security/password-login/disable/start': { req: ISecurityPasswordLoginDisableStartRequest; res: ISecurityPasswordLoginDisableStartResponse };
+	'i/security/password-login/disable/complete': { req: ISecurityPasswordLoginDisableCompleteRequest; res: EmptyResponse };
+	'i/security/password': { req: ISecurityPasswordRequest; res: EmptyResponse };
+	'i/security/email': { req: ISecurityEmailRequest; res: EmptyResponse };
+	'i/security/regenerate-token': { req: ISecurityRegenerateTokenRequest; res: EmptyResponse };
+	'i/security/state': { req: ISecurityStateRequest; res: ISecurityStateResponse };
+	'i/security/keys/list': { req: ISecurityKeysListRequest; res: ISecurityKeysListResponse };
+	'i/security/passkey/register/start': { req: ISecurityPasskeyRegisterStartRequest; res: ISecurityPasskeyRegisterStartResponse };
+	'i/security/passkey/register/complete': { req: ISecurityPasskeyRegisterCompleteRequest; res: ISecurityPasskeyRegisterCompleteResponse };
+	'i/security/passkey/mfa/start': { req: ISecurityPasskeyMfaStartRequest; res: ISecurityPasskeyMfaStartResponse };
+	'i/security/passkey/mfa/complete': { req: ISecurityPasskeyMfaCompleteRequest; res: EmptyResponse };
+	'i/security/passkey/mfa/enable': { req: ISecurityPasskeyMfaEnableRequest; res: ISecurityPasskeyMfaEnableResponse };
+	'i/security/passkey/mfa/disable': { req: ISecurityPasskeyMfaDisableRequest; res: EmptyResponse };
+	'i/security/passkey/remove': { req: ISecurityPasskeyRemoveRequest; res: EmptyResponse };
+	'i/security/passkey/rename': { req: ISecurityPasskeyRenameRequest; res: EmptyResponse };
+	'i/security/passkey/passwordless': { req: ISecurityPasskeyPasswordlessRequest; res: EmptyResponse };
+	'i/security/totp/start': { req: ISecurityTotpStartRequest; res: ISecurityTotpStartResponse };
+	'i/security/totp/complete': { req: ISecurityTotpCompleteRequest; res: ISecurityTotpCompleteResponse };
+	'i/security/totp/remove': { req: ISecurityTotpRemoveRequest; res: EmptyResponse };
+	'i/security/recovery-codes': { req: ISecurityRecoveryCodesRequest; res: ISecurityRecoveryCodesResponse };
 	'admin/accounts/create': { req: AdminAccountsCreateRequest; res: AdminAccountsCreateResponse };
 	'admin/captcha/current': { req: AdminCaptchaCurrentRequest; res: AdminCaptchaCurrentResponse };
 	'admin/captcha/save': { req: AdminCaptchaSaveRequest; res: EmptyResponse };
@@ -933,14 +1095,18 @@ export type Endpoints = {
 	'i/2fa/update-key': { req: I2faUpdateKeyRequest; res: I2faUpdateKeyResponse };
 	'i/apps': { req: IAppsRequest; res: IAppsResponse };
 	'i/authorized-apps': { req: IAuthorizedAppsRequest; res: IAuthorizedAppsResponse };
-	'i/change-password': { req: IChangePasswordRequest; res: EmptyResponse };
 	'i/regenerate-token': { req: IRegenerateTokenRequest; res: EmptyResponse };
+	'i/regenerate-token/passkey/start': { req: IRegenerateTokenPasskeyStartRequest; res: IRegenerateTokenPasskeyStartResponse };
+	'i/regenerate-token/passkey/complete': { req: IRegenerateTokenPasskeyCompleteRequest; res: EmptyResponse };
 	'i/revoke-token': { req: IRevokeTokenRequest; res: EmptyResponse };
 	'i/signin-history': { req: ISigninHistoryRequest; res: ISigninHistoryResponse };
 	'i/sessions': { req: ISessionsRequest; res: ISessionsResponse };
+	'i/session-ips': { req: ISessionIpsRequest; res: ISessionIpsResponse };
 	'i/sessions/revoke': { req: ISessionsRevokeRequest; res: EmptyResponse };
 	'i/signout': { req: ISignoutRequest; res: EmptyResponse };
 	'i/update-email': { req: IUpdateEmailRequest; res: IUpdateEmailResponse };
+	'i/update-email/passkey/start': { req: IUpdateEmailPasskeyStartRequest; res: IUpdateEmailPasskeyStartResponse };
+	'i/update-email/passkey/complete': { req: IUpdateEmailPasskeyCompleteRequest; res: EmptyResponse };
 	'invite/create': { req: InviteCreateRequest; res: InviteCreateResponse };
 	'invite/delete': { req: InviteDeleteRequest; res: EmptyResponse };
 	'invite/limit': { req: InviteLimitRequest; res: InviteLimitResponse };

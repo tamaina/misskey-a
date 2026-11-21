@@ -40,6 +40,10 @@ export async function createNotification<K extends keyof PushNotificationDataMap
 }
 
 async function composeNotification(data: PushNotificationDataMap[keyof PushNotificationDataMap]): Promise<[string, NotificationOptions] | null> {
+	if (data.type === 'fukushuReminder') {
+		const body = (await swLang.lang).startsWith('ja') ? '復習するカードがあります。' : 'You have cards to review.';
+		return ['Fukushu', { body, tag: `fukushu:${data.userId}:${data.body.occurrence}`, badge: iconUrl('bell'), data }];
+	}
 	const i18n = await (swLang.i18n ?? swLang.fetchLocale());
 	switch (data.type) {
 		/*
@@ -224,6 +228,7 @@ async function composeNotification(data: PushNotificationDataMap[keyof PushNotif
 						customEmoji: i18n.ts.customEmojis,
 						favorite: i18n.ts.favorites,
 						following: i18n.ts.following,
+						fukushu: 'Fukushu',
 						muting: i18n.ts.mutedUsers,
 						note: i18n.ts.notes,
 						userList: i18n.ts.lists,

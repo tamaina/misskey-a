@@ -15,7 +15,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label><SearchLabel>{{ $locale.sfc.password }}</SearchLabel></template>
 
 				<SearchMarker>
-					<MkButton primary @click="change()">
+					<MkButton primary :disabled="changingPassword" @click="change()">
 						<SearchLabel>{{ $locale.sfc.changePassword }}</SearchLabel>
 					</MkButton>
 				</SearchMarker>
@@ -23,31 +23,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</SearchMarker>
 
 		<X2fa/>
-
 		<SearchMarker :keywords="['signin', 'login', 'history', 'log']">
-			<FormSection>
-				<template #label><SearchLabel>{{ $locale.sfc.signinHistory }}</SearchLabel></template>
-				<MkPagination :paginator="paginator" withControl :forceDisableInfiniteScroll="true">
-					<template #default="{items}">
-						<div>
-							<div v-for="item in items" :key="item.id" v-panel class="timnmucd">
-								<header>
-									<i v-if="item.success" class="ti ti-check icon succ"></i>
-									<i v-else class="ti ti-circle-x icon fail"></i>
-									<code class="ip _monospace">{{ item.ip }}</code>
-									<MkTime :time="item.createdAt" class="time"/>
-								</header>
-							</div>
-						</div>
-					</template>
-				</MkPagination>
-			</FormSection>
+			<MkBrowserSessions/>
 		</SearchMarker>
 
 		<SearchMarker :keywords="['regenerate', 'refresh', 'reset', 'token']">
 			<FormSection>
 				<FormSlot>
-					<MkButton danger @click="regenerateToken"><i class="ti ti-refresh"></i> <SearchLabel>{{ $locale.sfc.regenerateLoginToken }}</SearchLabel></MkButton>
+					<MkButton danger :disabled="changingPassword" @click="regenerateToken()"><i class="ti ti-refresh"></i> <SearchLabel>{{ $locale.sfc.regenerateLoginToken }}</SearchLabel></MkButton>
 					<template #caption>{{ $locale.sfc.regenerateLoginTokenDescription }}</template>
 				</FormSlot>
 			</FormSection>
@@ -57,76 +40,68 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, markRaw } from 'vue';
-import X2fa from '@features/auth/frontend/pages/settings/2fa.vue';
+import { computed, onActivated, onDeactivated, onUnmounted, ref, watch } from 'vue';
+import MkBrowserSessions from '@features/auth/frontend/components/MkBrowserSessions.vue';
+import X2fa from './2fa.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import FormSlot from '@features/ui/frontend/components/form/slot.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import * as os from '@features/ui/frontend/os.js';
-import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import MkFeatureBanner from '@features/web/frontend/components/MkFeatureBanner.vue';
-import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import { signout } from '@features/auth/frontend/signout.js';
+import { ownedConfirm, ownedInputText } from '@features/auth/frontend/utility/owned-dialog.js';
+import { ensureSudo } from '@features/auth/frontend/utility/ensure-sudo.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
+import { isSameLiveCredential } from '@features/auth/frontend/utility/live-account.js';
 
-const paginator = markRaw(new Paginator('i/signin-history', {
-	limit: 5,
-}));
+const ownerId = ensureSignin().id;
+const ownerToken = ensureSignin().token;
+const sameActor = () => isSameLiveCredential(ownerId, ownerToken, ensureSignin().id, ensureSignin().token);
+const changingPassword = ref(false);
+let disposed = false;
+let ceremonyGeneration = 0;
+let sudoAbort: AbortController | null = null;
+const invalidateCeremony = () => { disposed = true; ceremonyGeneration++; sudoAbort?.abort(); sudoAbort = null; };
+onDeactivated(invalidateCeremony);
+onUnmounted(invalidateCeremony);
+onActivated(() => { disposed = false; });
+watch(() => [ensureSignin().id, ensureSignin().token], () => { if (!sameActor()) invalidateCeremony(); }, { flush: 'sync' });
 
 async function change() {
-	const { canceled, result: currentPassword } = await os.inputText({
-		title: $locale.value.sfc.password,
-		type: 'password',
-		autocomplete: 'current-password',
-		minLength: 1,
-	});
-	if (canceled || currentPassword == null || currentPassword === '') return;
+	if (changingPassword.value || disposed) return;
+	changingPassword.value = true;
+	const generation = ++ceremonyGeneration;
+	sudoAbort = new AbortController();
+	try { await collectAndChangePassword(() => !disposed && generation === ceremonyGeneration && sameActor()); } finally { changingPassword.value = false; }
+}
 
-	const { canceled: canceled2, result: newPassword } = await os.inputText({
-		title: $locale.value.sfc.newPassword,
-		type: 'password',
-		autocomplete: 'new-password',
-	});
-	if (canceled2 || newPassword == null) return;
-
-	const { canceled: canceled3, result: newPassword2 } = await os.inputText({
-		title: $locale.value.sfc.newPasswordRetype,
-		type: 'password',
-		autocomplete: 'new-password',
-	});
-	if (canceled3 || newPassword2 == null) return;
-
-	if (newPassword !== newPassword2) {
-		os.alert({
-			type: 'error',
-			text: $locale.value.sfc.retypedNotMatch,
-		});
-		return;
-	}
-
-	let token: string | null = null;
-	if (ensureSignin().twoFactorEnabled) {
-		const auth = await os.authenticateDialog({ currentPassword });
-		if (auth.canceled) return;
-		token = auth.result.token;
-	}
-
-	os.apiWithDialog('i/change-password', {
-		currentPassword,
-		token,
-		newPassword,
-	});
+async function collectAndChangePassword(isCurrent: () => boolean) {
+	const confirmation = await ownedConfirm({ type: 'question', title: $locale.value.sfc.changePassword, text: $locale.value.sfc.confirmPasswordChange }, sudoAbort?.signal);
+	if (!isCurrent() || confirmation.canceled) return;
+	if (!await ensureSudo(isCurrent, sudoAbort?.signal) || !isCurrent()) return;
+	const password = await ownedInputText({ title: $locale.value.sfc.newPassword, type: 'password', autocomplete: 'new-password', minLength: 1 }, sudoAbort?.signal);
+	if (!isCurrent() || password.canceled || !password.result) return;
+	const repeated = await ownedInputText({ title: $locale.value.sfc.newPasswordRetype, type: 'password', autocomplete: 'new-password', minLength: 1 }, sudoAbort?.signal);
+	if (!isCurrent() || repeated.canceled || !repeated.result) return;
+	if (password.result !== repeated.result) { await os.alert({ type: 'error', text: $locale.value.sfc.retypedNotMatch }); return; }
+	await os.apiWithDialog('i/security/password', { newPassword: password.result });
+	if (isCurrent()) await signout('credentials-changed');
 }
 
 async function regenerateToken() {
-	const auth = await os.authenticateDialog();
-	if (auth.canceled) return;
-
-	misskeyApi('i/regenerate-token', {
-		password: auth.result.password,
-		token: auth.result.token,
-	});
+	if (changingPassword.value || disposed) return;
+	changingPassword.value = true;
+	const generation = ++ceremonyGeneration;
+	sudoAbort = new AbortController();
+	const isCurrent = () => !disposed && generation === ceremonyGeneration && sameActor();
+	try {
+		const confirmation = await ownedConfirm({ type: 'warning', text: $locale.value.sfc.regenerateLoginTokenDescription }, sudoAbort?.signal);
+		if (!isCurrent() || confirmation.canceled) return;
+		if (!await ensureSudo(isCurrent, sudoAbort?.signal) || !isCurrent()) return;
+		await os.apiWithDialog('i/security/regenerate-token', {});
+		if (isCurrent()) await signout('credentials-changed');
+	} finally { changingPassword.value = false; }
 }
 
 const headerActions = computed(() => []);
@@ -138,58 +113,6 @@ definePage(() => ({
 	icon: 'ti ti-lock',
 }));
 </script>
-
-<style lang="scss" scoped>
-.timnmucd {
-	padding: 12px;
-
-	&:first-child {
-		border-top-left-radius: 6px;
-		border-top-right-radius: 6px;
-	}
-
-	&:last-child {
-		border-bottom-left-radius: 6px;
-		border-bottom-right-radius: 6px;
-	}
-
-	&:not(:last-child) {
-		border-bottom: solid 0.5px var(--MI_THEME-divider);
-	}
-
-	> header {
-		display: flex;
-		align-items: center;
-
-		> .icon {
-			width: 1em;
-			margin-right: 0.75em;
-
-			&.succ {
-				color: var(--MI_THEME-success);
-			}
-
-			&.fail {
-				color: var(--MI_THEME-error);
-			}
-		}
-
-		> .ip {
-			flex: 1;
-			min-width: 0;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			margin-right: 12px;
-		}
-
-		> .time {
-			margin-left: auto;
-			opacity: 0.7;
-		}
-	}
-}
-</style>
 
 <locale locale="ar-SA" lang="json">
 {
@@ -275,6 +198,8 @@ definePage(() => ({
 	"securityBanner": "You can configure settings related to account security, such as password, login methods, authentication apps, and Passkeys.",
 	"password": "Password",
 	"changePassword": "Change password",
+	"confirmPasswordChange": "Do you want to change your password?",
+	"passwordChangeRequiresSignin": "To change your password, please sign in again in the browser.",
 	"signinHistory": "Login history",
 	"regenerateLoginToken": "Regenerate login token",
 	"regenerateLoginTokenDescription": "Regenerates the token used internally during login. Normally this action is not necessary. If regenerated, all devices will be logged out."
@@ -350,7 +275,10 @@ definePage(() => ({
 	"securityBanner": "パスワード、ログイン方法、認証アプリ、パスキーなどアカウントのセキュリティに関する設定を行えます。",
 	"password": "パスワード",
 	"changePassword": "パスワードを変更",
-	"signinHistory": "ログイン履歴",
+	"confirmPasswordChange": "パスワードを変更しますか。",
+	"passwordChangeRequiresSignin": "パスワードを変更するには、ブラウザで再度ログインしてください。",
+	"signinHistory": "セッションに紐付いていない過去のログイン履歴",
+	"regenerateLoginTokenWithPasskey": "パスキーでログイントークンを再生成",
 	"regenerateLoginToken": "ログイントークンを再生成",
 	"regenerateLoginTokenDescription": "ログインに使用される内部トークンを再生成します。通常この操作を行う必要はありません。再生成すると、全てのデバイスでログアウトされます。"
 }

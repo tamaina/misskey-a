@@ -5,6 +5,7 @@
 
 import * as fs from 'node:fs';
 import * as stream from 'node:stream/promises';
+import { Transform } from 'node:stream';
 import { Inject, Injectable } from '@nestjs/common';
 import chalk from 'chalk';
 import got, * as Got from 'got';
@@ -34,14 +35,15 @@ export class DownloadService {
 	}
 
 	@bindThis
-	public async downloadUrl(url: string, path: string): Promise<{
+	public async downloadUrl(url: string, path: string, options: { maxSize?: number } = {}): Promise<{
 		filename: string;
 	}> {
 		this.logger.info(`Downloading ${chalk.cyan(url)} to ${chalk.cyanBright(path)} ...`);
 
 		const timeout = 30 * 1000;
 		const operationTimeout = 60 * 1000;
-		const maxSize = this.config.maxFileSize;
+		if (options.maxSize !== undefined && (!Number.isSafeInteger(options.maxSize) || options.maxSize < 0)) throw new RangeError('Invalid download size limit');
+		const maxSize = Math.min(this.config.maxFileSize, options.maxSize ?? this.config.maxFileSize);
 
 		const urlObj = new URL(url);
 		let filename = urlObj.pathname.split('/').pop() ?? 'untitled';
@@ -111,7 +113,17 @@ export class DownloadService {
 		});
 
 		try {
-			await stream.pipeline(req, fs.createWriteStream(path));
+			// Progress events and Content-Length are advisory; enforce the bound on
+			// actual (decompressed) bytes before writing them, including chunked bodies.
+			let received = 0;
+			const bound = new Transform({
+				transform(chunk: Buffer, _encoding, callback) {
+					received += chunk.length;
+					if (received > maxSize) callback(new Error('Download size limit exceeded'));
+					else callback(null, chunk);
+				},
+			});
+			await stream.pipeline(req, bound, fs.createWriteStream(path));
 		} catch (e) {
 			if (e instanceof Got.HTTPError) {
 				throw new StatusError(`${e.response.statusCode} ${e.response.statusMessage}`, e.response.statusCode, e.response.statusMessage);

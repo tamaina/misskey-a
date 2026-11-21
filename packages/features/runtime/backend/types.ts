@@ -21,7 +21,7 @@ export const followersVisibilities = ['public', 'followers', 'private'] as const
  *
  * （主にエクスポート完了通知で使用するものであり、既存のDBの名称等と必ずしも一致しない）
  */
-export const userExportableEntities = ['antenna', 'blocking', 'clip', 'customEmoji', 'favorite', 'following', 'muting', 'note', 'userList'] as const;
+export const userExportableEntities = ['antenna', 'blocking', 'clip', 'customEmoji', 'favorite', 'following', 'fukushu', 'muting', 'note', 'userList'] as const;
 
 /**
  * ユーザーがインポートできるものの種類

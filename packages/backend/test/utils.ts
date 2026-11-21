@@ -12,7 +12,7 @@ import WebSocket, { ClientOptions } from 'ws';
 import fetch, { Blob, FormData } from 'node-fetch';
 import type { RequestInit, Headers, Response } from 'node-fetch';
 import * as htmlParser from 'node-html-parser';
-import { DataSource } from 'typeorm';
+import { DataSource, IsNull } from 'typeorm';
 import Fastify from 'fastify';
 import { entities } from '@features/persistence/backend/postgres.js';
 import { loadConfig } from '@/config.js';
@@ -174,6 +174,37 @@ export const signup = async (params?: Partial<misskey.Endpoints['signup']['req']
 	return res.body;
 };
 
+/** Explicitly test the legacy MFA writer without promoting a browser session. */
+export const legacySignup = async (params?: Partial<misskey.Endpoints['signup']['req']>): Promise<misskey.entities.SignupResponse> => {
+	if (process.env.NODE_ENV !== 'test' || process.env.CI !== 'true'
+		|| (process.env.MISSKEY_CONFIG_YML !== undefined && process.env.MISSKEY_CONFIG_YML !== 'test.yml')
+		|| config.url !== 'http://misskey.local' || config.port !== 61812
+		|| config.db.host !== '127.0.0.1' || config.db.port !== 54312 || config.db.db !== 'test-misskey'
+		|| config.dbReplications || (config.dbSlaves?.length ?? 0) !== 0
+		|| ('url' in config.db && config.db.url) || ('replication' in config.db && config.db.replication)
+		|| Object.keys(config.db.extra ?? {}).length !== 0 || params?.host != null) {
+		throw new Error('Legacy credential fixtures require the isolated CI test configuration');
+	}
+	const user = await signup(params);
+	const db = await initTestDb(true);
+	try {
+		const local = await db.getRepository(MiUser).findOne({ where: { id: user.id, host: IsNull() }, select: { id: true, host: true, token: true } });
+		if (local?.id !== user.id || local.host !== null || !local.token || !/^[a-zA-Z0-9]{16}$/.test(local.token)) throw new Error('Missing synthetic local legacy credential');
+		return { ...user, token: local.token };
+	} finally { await db.destroy(); }
+};
+
+export const confirmSessionSudo = async (user: UserToken, password = 'test'): Promise<void> => {
+	const response = await api('i/sudo/start', { password }, user);
+	assert.strictEqual(response.status, 200, inspect(response.body));
+	assert.strictEqual(response.body.status, 'elevated');
+};
+
+export const deleteOwnAccount = async (user: UserToken, password = 'test'): Promise<void> => {
+	await confirmSessionSudo(user, password);
+	await successfulApiCall({ endpoint: 'i/security/account/delete', parameters: { acknowledged: true }, user });
+};
+
 export const post = async (user: UserToken, params: misskey.Endpoints['notes/create']['req']): Promise<misskey.entities.Note> => {
 	const q = params;
 
@@ -184,11 +215,13 @@ export const post = async (user: UserToken, params: misskey.Endpoints['notes/cre
 };
 
 export const createAppToken = async (user: UserToken, permissions: (typeof misskey.permissions)[number][]) => {
+	await confirmSessionSudo(user);
 	const res = await api('miauth/gen-token', {
 		session: randomUUID(),
 		permission: permissions,
 	}, user);
 
+	assert.strictEqual(res.status, 200, inspect(res.body));
 	return (res.body as misskey.entities.MiauthGenTokenResponse).token;
 };
 

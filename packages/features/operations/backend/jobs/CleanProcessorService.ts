@@ -44,7 +44,7 @@ export class CleanProcessorService {
 		this.logger.info('Cleaning...');
 
 		this.userIpsRepository.delete({
-			createdAt: LessThan(new Date(Date.now() - (1000 * 60 * 60 * 24 * 90))),
+			lastSeenAt: LessThan(new Date(Date.now() - (1000 * 60 * 60 * 24 * 90))),
 		});
 
 		// 使われてないアンテナを停止
