@@ -715,7 +715,7 @@
 		"/users/get-frequently-replied-users": "49f5d736be904f83ae1cf94d9c6aad2f75a72451d7a4dd6ea9ac7d4613ce80de",
 		"/users/recommendation": "0ed137bf6983df5a4862428f57eeee380a8a3b746d36eab392b7fd209bbc9e56",
 		"/users/search": "0ab4040f6369fdee3ef073dee5cfc5d47ac2ea8aaf586e3f95afe6b6378a6d0e",
-		"/users/search-by-username-and-host": "7d21d969bda5a3c3f43f3138158a4c053bc3a2f8ef25ea8e57e9676ebdecd284",
+		"/users/search-by-username-and-host": "d6ee63281816890c895c1d9c4e3bc662f486e6864c9577cc237f31834b04d67d",
 		"/admin/announcements/create": "40dd9b6f4cbfa0ca847ae718f6f06479d7453dc6ba9b42995dab8644788cc0c3",
 		"/admin/announcements/delete": "43af647a5b9da76a0f73331830abc272c98ee2b232d0675b2f6d7fb22c3bb1b5",
 		"/admin/announcements/list": "14d830f3f5644d7e16547226307fead4cfb6d19a5f1da444075c33e06ce1a305",
