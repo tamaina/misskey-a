@@ -7,7 +7,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as Bull from 'bullmq';
 import { McpEventsService } from '@features/mcp/backend/McpEventsService.js';
 import { signedHeaders } from '@features/mcp/backend/events-protocol.js';
-import { gameTurnEvent, parseGameTurnReference } from '@features/games/mahjong/shared/turn-webhook.schema.js';
+import { gameTurnEvent, parseGameTurnReference } from '@features/games/index/shared/turn-webhook.schema.js';
 import type { McpWebhookDeliverJobData } from '@features/runtime/backend/queue/types.js';
 import { DI } from '@/di-symbols.js';
 import type { WebhooksRepository } from '@features/persistence/backend/repositories/models.js';

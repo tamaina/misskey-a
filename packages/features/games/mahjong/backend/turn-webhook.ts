@@ -6,7 +6,7 @@
 import { MiMahjongRoom } from './models/MahjongRoom.js';
 import type { EntityManager } from 'typeorm';
 import type { RoomState } from './room.js';
-import type { GameTurnReference } from '../shared/turn-webhook.schema.js';
+import type { MahjongTurnReference } from '../../index/shared/turn-webhook.schema.js';
 
 export function actionableTurnUsers(room: RoomState, now: number): string[] {
 	const phase = room.phase;
@@ -15,7 +15,7 @@ export function actionableTurnUsers(room: RoomState, now: number): string[] {
 		&& phase.menus[seat].some(action => action.kind !== 'pass' && action.kind !== 'continue'));
 }
 
-export async function canReceiveGameTurn(manager: EntityManager, userId: string, turn: GameTurnReference): Promise<boolean> {
+export async function canReceiveMahjongTurn(manager: EntityManager, userId: string, turn: MahjongTurnReference): Promise<boolean> {
 	// Selection and membership are checked against the current committed room, not the queued job.
 	const room = await manager.getRepository(MiMahjongRoom).createQueryBuilder('room').select(['room.state'])
 		.where('room.id = :id AND :userId = ANY(room."userIds")', { id: turn.roomId, userId }).getOne();

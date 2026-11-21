@@ -146,7 +146,7 @@ export type LegacyUserWebhookDeliverJobData<T extends WebhookEventTypes = Webhoo
 /** MCP jobs contain references only; current destination and keys are read at delivery time. */
 export type McpWebhookDeliverJobData = {
 	mode: 'mcp'; type: WebhookEventTypes | 'antenna' | 'game.turn'; data?: Record<string, string>; antennaId?: string; webhookId: string; userId: string;
-	gameTurn?: import('@features/games/mahjong/shared/turn-webhook.schema.js').GameTurnReference;
+	gameTurn?: import('@features/games/index/shared/turn-webhook.schema.js').GameTurnReference;
 	generation: string; noteId: string; createdAt: number; eventId: string;
 };
 export type UserWebhookDeliverJobData<T extends WebhookEventTypes = WebhookEventTypes> = LegacyUserWebhookDeliverJobData<T> | McpWebhookDeliverJobData;

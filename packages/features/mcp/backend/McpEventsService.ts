@@ -23,8 +23,8 @@ import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntit
 import { AntennaNoteAccessService } from '@features/timelines/backend/services/AntennaNoteAccessService.js';
 import { MiWebhook } from '@features/integrations/backend/models/Webhook.js';
 import { lockWebhookQuota } from '@features/integrations/backend/webhook-quota.js';
-import { canReceiveGameTurn } from '@features/games/mahjong/backend/turn-webhook.js';
-import { gameTurnEvent, parseGameTurnReference } from '@features/games/mahjong/shared/turn-webhook.schema.js';
+import { canReceiveGameTurn } from '@features/games/index/backend/turn-webhooks.js';
+import { gameTurnEvent, parseGameTurnReference } from '@features/games/index/shared/turn-webhook.schema.js';
 import type { McpWebhookDeliverJobData } from '@features/runtime/backend/queue/types.js';
 import { mcpEventsContract, subscribeInput } from './api.definition.js';
 import { eventPermissions, eventPayloadSchema } from './events.schema.js';

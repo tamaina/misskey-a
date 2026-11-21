@@ -13,8 +13,8 @@ import { bindThis } from '@features/runtime/backend/decorators.js';
 import { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { Packed } from '@features/index/backend/packed.schema.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
-import { gameTurnEvent } from '@features/games/mahjong/shared/turn-webhook.schema.js';
-import type { GameTurnReference } from '@features/games/mahjong/shared/turn-webhook.schema.js';
+import { gameTurnEvent } from '@features/games/index/shared/turn-webhook.schema.js';
+import type { GameTurnReference } from '@features/games/index/shared/turn-webhook.schema.js';
 
 export type NotificationWebhookOccurrence = Pick<Packed<'Notification'>, 'id' | 'createdAt' | 'type'>;
 

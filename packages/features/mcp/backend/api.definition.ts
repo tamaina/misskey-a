@@ -9,7 +9,7 @@ import type { Meta } from '@orpc/contract';
 import type { ApiProcedureMetadata } from '../../api/backend/transport/policy.types.js';
 import { webhookEventTypes } from '../../integrations/backend/webhook-events.schema.js';
 import { eventNames } from './events.schema.js';
-import { gameTurnEvent } from '@features/games/mahjong/shared/turn-webhook.schema.js';
+import { gameTurnEvent } from '@features/games/index/shared/turn-webhook.schema.js';
 import { streamChannelArguments, streamNoteArguments } from './stream.schema.js';
 
 const url = v.pipe(v.string(), v.minLength(1), v.maxLength(1024));

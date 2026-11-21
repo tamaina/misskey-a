@@ -83,14 +83,17 @@ Use the existing HTTPS challenge, expiry, unsubscribe and signed delivery.
 The event is an **actionable phase hint**, received only by the participant
 who can discard, play a legal action, or respond to a legal reaction. It does
 not signal pass-only seats or result confirmations. The signed body contains
-the standard MCP envelope (`eventId`, `name`, timestamp, `data`, null cursor);
-`data` is exactly `{roomId, phaseId, revision}`. Fetch the current room with
+the standard MCP envelope (`eventId`, `name`, timestamp, `data`, null cursor).
+Consumers dispatch on the common `data.game` discriminator. Mahjong's data is
+exactly `{game: "mahjong", roomId, phaseId, revision}`; this is the only
+advertised game until other games supply their own authoritative producer and
+delivery checks. Fetch the current room with
 the usual authenticated `mahjong/show` if needed (the native Mahjong API
 currently requires `write:account`; the event grant alone cannot play).
 Hidden tiles, opponents, options and even the receiver's hand are not in the event.
 
 Only a new phase from a committed transaction can enqueue. Stable event IDs
-are per subscription generation and room/phase; consumers should deduplicate
+are per subscription generation, game kind and room/phase; consumers should deduplicate
 retries. Delivery also rechecks the active grant, membership, phase validity
 and whether the recipient still has an outstanding action. Enqueue is
 best-effort after commit, not a persistent outbox: downtime, transient queue

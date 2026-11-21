@@ -127,7 +127,7 @@ it('selects only the recipient’s MCP game.turn hooks and queues a stable refer
 	const row = { ...mcp, name: 'game.turn', on: [] };
 	webhooks.findBy.mockResolvedValue([row]);
 	const service = new UserWebhookService(redis, webhooks, queue);
-	const turn = { roomId: '50000000-0000-4000-8000-000000000001', phaseId: '50000000-0000-4000-8000-000000000002', revision: 5 };
+	const turn = { game: 'mahjong' as const, roomId: '50000000-0000-4000-8000-000000000001', phaseId: '50000000-0000-4000-8000-000000000002', revision: 5 };
 	await service.enqueueGameTurn('account', turn, 123);
 	expect(webhooks.findBy).toHaveBeenCalledWith({ userId: 'account', mode: 'mcp', active: true, name: 'game.turn' });
 	expect(queue.gameTurnWebhookDeliver).toHaveBeenCalledExactlyOnceWith(row, turn, 123);

@@ -11,8 +11,8 @@ import { entities } from '@features/persistence/backend/postgres.js';
 import { testContext } from '@features/auth/test/backend/native-context.js';
 import { Mahjong1794828000000 } from '../../../../../backend/migration/1794828000000-mahjong.js';
 import { MahjongStore } from '../../backend/store.js';
-import { canReceiveGameTurn } from '../../backend/turn-webhook.js';
-import type { GameTurnReference } from '../../shared/turn-webhook.schema.js';
+import { canReceiveMahjongTurn } from '../../backend/turn-webhook.js';
+import type { MahjongTurnReference } from '../../../index/shared/turn-webhook.schema.js';
 import { MiMahjongRoom } from '../../backend/models/MahjongRoom.js';
 import { createMahjongProcedures } from '../../backend/endpoints/mahjong.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
@@ -74,8 +74,8 @@ describe.skipIf(!socket)('isolated PostgreSQL mahjong transport and concurrency'
 	});
 	test('publishes new actionable phase references once and only after commit', async () => {
 		const repo = db.getRepository(MiMahjongRoom);
-		const delivered: { userId: string; turn: GameTurnReference; visibleRevision: number }[] = [];
-		const publish = vi.fn(async (userId: string, turn: GameTurnReference) => {
+		const delivered: { userId: string; turn: MahjongTurnReference; visibleRevision: number }[] = [];
+		const publish = vi.fn(async (userId: string, turn: MahjongTurnReference) => {
 			const committed = await repo.findOneByOrFail({ id: turn.roomId });
 			delivered.push({ userId, turn, visibleRevision: committed.state.revision });
 		});
@@ -89,24 +89,24 @@ describe.skipIf(!socket)('isolated PostgreSQL mahjong transport and concurrency'
 		const first = delivered[0];
 		const saved = await repo.findOneByOrFail({ id: initial.id });
 		const actor = saved.state.users[saved.state.phase!.menus.findIndex(menu => menu.some(action => action.kind === 'discard'))];
-		expect(first).toEqual({ userId: actor, turn: { roomId: initial.id, phaseId: saved.state.phase!.id, revision: saved.state.revision }, visibleRevision: saved.state.revision });
-		expect(await canReceiveGameTurn(db.manager, actor, first.turn)).toBe(true);
-		for (const user of [...users, 'outsider'].filter(user => user !== actor)) expect(await canReceiveGameTurn(db.manager, user, first.turn)).toBe(false);
+		expect(first).toEqual({ userId: actor, turn: { game: 'mahjong', roomId: initial.id, phaseId: saved.state.phase!.id, revision: saved.state.revision }, visibleRevision: saved.state.revision });
+		expect(await canReceiveMahjongTurn(db.manager, actor, first.turn)).toBe(true);
+		for (const user of [...users, 'outsider'].filter(user => user !== actor)) expect(await canReceiveMahjongTurn(db.manager, user, first.turn)).toBe(false);
 		await Promise.all(users.map(user => worker.access(user, initial.id, 'show')));
 		expect(publish).toHaveBeenCalledTimes(1);
 		const stalePhase = saved.state.phase!;
 		const player = saved.state.users.indexOf(actor);
 		const input = { phaseId: stalePhase.id, actionId: stalePhase.menus[player].find(action => action.kind === 'discard')!.id, requestId: crypto.randomUUID() };
 		await Promise.all([worker.access(actor, initial.id, 'submit', input), secondWorker.access(actor, initial.id, 'submit', input)]);
-		expect(await canReceiveGameTurn(db.manager, actor, first.turn)).toBe(false);
+		expect(await canReceiveMahjongTurn(db.manager, actor, first.turn)).toBe(false);
 		const after = await repo.findOneByOrFail({ id: initial.id });
 		const phase = after.state.phase!;
 		const eligible = after.state.users.filter((_, seat) => phase.selected[seat] === null && phase.menus[seat].some(action => !['continue', 'pass'].includes(action.kind)));
 		await expect.poll(() => delivered.length).toBe(eligible.length + 1);
 		expect(delivered.slice(1).map(entry => entry.userId).sort()).toEqual([...eligible].sort());
-		for (const item of delivered.slice(1)) expect(item.turn).toEqual({ roomId: initial.id, phaseId: phase.id, revision: after.state.revision });
+		for (const item of delivered.slice(1)) expect(item.turn).toEqual({ game: 'mahjong', roomId: initial.id, phaseId: phase.id, revision: after.state.revision });
 		await worker.access(actor, initial.id, 'cancel');
-		for (const user of eligible) expect(await canReceiveGameTurn(db.manager, user, delivered[1].turn)).toBe(false);
+		for (const user of eligible) expect(await canReceiveMahjongTurn(db.manager, user, delivered[1].turn)).toBe(false);
 		expect(publish).toHaveBeenCalledTimes(eligible.length + 1);
 	});
 	test('timeout commits even when a late client action is rejected', async () => {

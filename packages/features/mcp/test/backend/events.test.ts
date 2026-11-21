@@ -19,7 +19,7 @@ import { modernRequest } from '../../backend/modern-request.js';
 import { UserWebhookDeliverProcessorService } from '@features/integrations/backend/jobs/UserWebhookDeliverProcessorService.js';
 import { MiWebhook } from '@features/integrations/backend/models/Webhook.js';
 import { MiMahjongRoom } from '@features/games/mahjong/backend/models/MahjongRoom.js';
-import { gameTurnEvent } from '@features/games/mahjong/shared/turn-webhook.schema.js';
+import { gameTurnEvent } from '@features/games/index/shared/turn-webhook.schema.js';
 import type { RoomState } from '@features/games/mahjong/backend/room.js';
 import type { Repository } from 'typeorm';
 import { UserWebhookService, type UserWebhookPayload } from '@features/integrations/backend/services/UserWebhookService.js';
@@ -489,7 +489,7 @@ it('lists and accepts game.turn only through an owner grant with no room or reci
 		expect(v.safeParse(subscribeInput, { ...game, arguments: args }).success).toBe(false);
 	}
 	const listed = (await service.invoke('events/list', {}, context()) as { events: { name: string }[] }).events.find(event => event.name === gameTurnEvent);
-	expect(listed).toMatchObject({ delivery: ['webhook'], payloadSchema: { required: ['roomId', 'phaseId', 'revision'], additionalProperties: false } });
+	expect(listed).toMatchObject({ delivery: ['webhook'], payloadSchema: { required: ['game', 'roomId', 'phaseId', 'revision'], additionalProperties: false } });
 	const { id } = await subscribe(game);
 	expect(rows.get(id)).toMatchObject({ name: gameTurnEvent, userId: 'account', mcpTokenId: 'grant', mode: 'mcp', on: [] });
 });
@@ -498,7 +498,7 @@ it('signs only the committed turn reference and suppresses inactive subscription
 	permission = ['access:mcp', 'read:account'];
 	const { id } = await subscribe({ ...input, name: gameTurnEvent });
 	const sub = rows.get(id)!;
-	const gameTurn = { roomId: '50000000-0000-4000-8000-000000000001', phaseId: '50000000-0000-4000-8000-000000000002', revision: 7 };
+	const gameTurn = { game: 'mahjong' as const, roomId: '50000000-0000-4000-8000-000000000001', phaseId: '50000000-0000-4000-8000-000000000002', revision: 7 };
 	const userId = 'account';
 	const phase: NonNullable<RoomState['phase']> = {
 		id: gameTurn.phaseId, kind: 'dapai', deadline: Date.now() + 10000,
@@ -536,6 +536,9 @@ it('signs only the committed turn reference and suppresses inactive subscription
 	expect(query.getOne).toHaveBeenCalledTimes(2); // including re-check immediately before send
 	expect(await worker.process(job({ userId: 'outsider' }))).toBe('Suppressed');
 	expect(await worker.process(job({ gameTurn: { ...gameTurn, tiles: ['private'] } }))).toBe('Suppressed');
+	expect(await worker.process(job({ gameTurn: { ...gameTurn, game: 'reversi', gameId: 'othergame' } }))).toBe('Suppressed');
+	const { game: _game, ...withoutGame } = gameTurn;
+	expect(await worker.process(job({ gameTurn: withoutGame }))).toBe('Suppressed');
 	expect(await worker.process(job({ generation: 'old-generation' }))).toBe('Suppressed');
 	expect(await worker.process(job({ gameTurn: { ...gameTurn, revision: gameTurn.revision + 1 } }))).toBe('Suppressed');
 	phase.selected[0] = {};

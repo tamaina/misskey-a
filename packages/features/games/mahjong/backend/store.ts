@@ -10,12 +10,12 @@ import { MiBlocking } from '@features/relationships/backend/models/Blocking.js';
 import { MiMahjongRoom } from './models/MahjongRoom.js';
 import { cancelRoom, createRoom, expireRoom, projectRoom, readyRoom, RoomError, submitRoom } from './room.js';
 import { actionableTurnUsers } from './turn-webhook.js';
-import type { GameTurnReference } from '../shared/turn-webhook.schema.js';
+import type { MahjongTurnReference } from '../../index/shared/turn-webhook.schema.js';
 import type { DataSource } from 'typeorm';
 import type { Four } from './reply-gate.js';
 
 export class MahjongStore {
-	constructor(private readonly db: DataSource, private readonly publishTurn?: (userId: string, turn: GameTurnReference, createdAt: number) => Promise<unknown>) {}
+	constructor(private readonly db: DataSource, private readonly publishTurn?: (userId: string, turn: MahjongTurnReference, createdAt: number) => Promise<unknown>) {}
 
 	async create(user: string, invitees: string[]) {
 		if (invitees.length !== 3) throw new RoomError('INVALID_ACTION');
@@ -74,7 +74,7 @@ export class MahjongStore {
 			if (row.state.revision !== before) await repo.update(row.id, { state: row.state, status: row.state.status, updatedAt: new Date(now) });
 			const phaseId = row.state.phase?.id;
 			const turn = this.publishTurn && phaseId && phaseId !== previousPhase
-				? { reference: { roomId: row.id, phaseId, revision: row.state.revision }, users: actionableTurnUsers(row.state, now), createdAt: now }
+				? { reference: { game: 'mahjong' as const, roomId: row.id, phaseId, revision: row.state.revision }, users: actionableTurnUsers(row.state, now), createdAt: now }
 				: null;
 			return { view: projectRoom(row.id, row.state, user, now), rejected, turn };
 		}).then(({ view, rejected, turn }) => {
