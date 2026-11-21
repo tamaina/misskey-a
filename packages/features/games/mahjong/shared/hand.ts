@@ -13,3 +13,36 @@ export function handTiles(hand: string): string[] {
 	}
 	return result;
 }
+
+type MeldKind = 'chi' | 'pon' | 'openKan' | 'addedKan' | 'closedKan';
+const sourceOffsets = { '+': 1, '=': 2, '-': 3 } as const;
+
+/** Decode a core meld's marker relative to the caller, not the current viewer. */
+export function describeMeld(compact: string): {
+	kind: MeldKind;
+	tiles: string[];
+	sourceOffset: number | null;
+	calledTileIndex: number | null;
+} | null {
+	const match = /^([mpsz])(\d{1,4})(?:([+=-])(\d{0,2}))?$/.exec(compact);
+	if (!match) return null;
+	const [, suit, before, direction, after = ''] = match;
+	const digits = before + after;
+	if (suit === 'z' && /[089]/.test(digits)) return null;
+	const sameFace = new Set(digits.replaceAll('0', '5')).size === 1;
+	const sourceOffset = direction ? sourceOffsets[direction as keyof typeof sourceOffsets] : null;
+	let kind: MeldKind;
+	if (digits.length === 4 && sameFace) {
+		kind = sourceOffset === null ? 'closedKan' : after.length === 1 ? 'addedKan' : 'openKan';
+	} else if (digits.length === 3 && sourceOffset !== null) {
+		kind = sameFace ? 'pon' : 'chi';
+	} else {
+		return null;
+	}
+	return {
+		kind,
+		tiles: Array.from(digits, digit => suit + digit),
+		sourceOffset,
+		calledTileIndex: direction ? before.length - 1 : null,
+	};
+}

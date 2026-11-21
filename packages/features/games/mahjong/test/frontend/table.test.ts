@@ -97,6 +97,35 @@ test.each([
 	}
 });
 
+test('distinguishes calls and concealed kan in a resumed table using the core seat order', async () => {
+	const intl = createInternationalization({ initialLocale: 'ja-JP' });
+	await intl.ready;
+	const resumed: MahjongView = {
+		...view,
+		snapshot: {
+			...view.snapshot!,
+			seats: [2, 0, 1, 3].map(index => {
+				const seat = view.snapshot!.seats[index];
+				return {
+					...seat,
+					melds: index === 0 ? ['p40-6', 's505=', 'z5555+', 'm444-4'] : index === 1 ? ['z6666'] : [],
+				};
+			}),
+		},
+	};
+	const wrapper = render(Table, { global: { plugins: [intl] }, props: { view: resumed, userId: 'alice', names: { carol: '@carol' }, busy: false, seconds: 30 } });
+	try {
+		const chi = within(wrapper.getByRole('group', { name: 'チー · 鳴き元: 東 @carol' }));
+		expect(chi.getAllByRole('img', { name: /^p[046]$/ }).map(tile => tile.getAttribute('aria-label'))).toEqual(['p4', 'p0', 'p6']);
+		expect(wrapper.getByText('ポン · 鳴き元: 北 dave')).toBeTruthy();
+		expect(wrapper.getByRole('group', { name: '大明槓 · 鳴き元: 西 bob' })).toBeTruthy();
+		expect(wrapper.getByRole('group', { name: '加槓 · 鳴き元: 東 @carol' })).toBeTruthy();
+		expect(wrapper.getByRole('group', { name: '暗槓' })).toBeTruthy();
+	} finally {
+		wrapper.unmount();
+	}
+});
+
 test('shows the ordered final scores only for a completed match', async () => {
 	const intl = createInternationalization({ initialLocale: 'ja-JP' });
 	await intl.ready;

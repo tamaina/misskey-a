@@ -12,20 +12,25 @@ Seat/felt presentation adapted from upstream PR #13112; see ../../README.md.
 		</ol>
 	</section>
 	<div v-else-if="view.snapshot" :class="$style.summary">
-		<strong>{{ ['東', '南', '西', '北'][view.snapshot.roundWind] }} {{ view.snapshot.handNumber + 1 }}{{ $locale.sfc.hand }} · {{ view.snapshot.honba }}{{ $locale.sfc.honba }}</strong>
+		<strong>{{ winds[view.snapshot.roundWind] }} {{ view.snapshot.handNumber + 1 }}{{ $locale.sfc.hand }} · {{ view.snapshot.honba }}{{ $locale.sfc.honba }}</strong>
 		<span>{{ $locale.sfc.remaining }} {{ view.snapshot.remainingTiles }} · {{ $locale.sfc.riichiSticks }} {{ view.snapshot.riichiSticks }}</span>
 		<div>{{ $locale.sfc.dora }} <Tile v-for="(tile, i) in view.snapshot.doraIndicators" :key="i" :tile="tile"/></div>
 	</div>
 	<div :class="$style.seats">
 		<section v-for="entry in seats" :key="entry.seat.userId" :class="[$style.seat, { [$style.turn]: entry.index === view.snapshot?.turnSeat, [$style.mine]: entry.seat.userId === userId }]">
-			<header><strong>{{ ['東', '南', '西', '北'][entry.index] }} · {{ names[entry.seat.userId] ?? entry.seat.userId }}</strong><b>{{ entry.seat.score.toLocaleString() }}</b></header>
+			<header><strong>{{ winds[entry.index] }} · {{ names[entry.seat.userId] ?? entry.seat.userId }}</strong><b>{{ entry.seat.score.toLocaleString() }}</b></header>
 			<div v-if="entry.delta !== undefined" :class="$style.delta">
 				{{ $locale.sfc.scoreChange }} <strong>{{ deltaFormatter.format(entry.delta) }}</strong>
 			</div>
 			<div :class="$style.tiles" :aria-label="$locale.sfc.handTiles">
 				<Tile v-for="(tile, i) in entry.seat.concealedHand ? handTiles(entry.seat.concealedHand) : Array(entry.seat.concealedCount).fill('_')" :key="i" :tile="tile"/>
 			</div>
-			<div v-for="(meld, i) in entry.seat.melds" :key="`meld-${i}`" :class="$style.meld"><Tile v-for="(tile, j) in handTiles(meld)" :key="j" :tile="tile"/></div>
+			<div v-for="(meld, i) in entry.melds" :key="`meld-${i}`" :class="$style.meld" role="group" :aria-label="meld.label">
+				<div :class="$style.meldTiles">
+					<Tile v-for="(tile, j) in meld.tiles" :key="j" :tile="tile" :class="{ [$style.meldCalledTile]: meld.calledTileIndex === j }"/>
+				</div>
+				<small v-if="meld.label" :class="$style.meldLabel" aria-hidden="true">{{ meld.label }}</small>
+			</div>
 			<div :class="$style.river" :aria-label="$locale.sfc.discards">
 				<span v-for="(tile, i) in entry.seat.discards" :key="i" :class="{ [$style.riichi]: tile.includes('*'), [$style.called]: /[+=-]/.test(tile) }"><Tile :tile="tile.slice(0, 2)"/></span>
 			</div>
@@ -49,7 +54,7 @@ Seat/felt presentation adapted from upstream PR #13112; see ../../README.md.
 </template>
 <script setup lang="ts">
 import { computed } from 'vue';
-import { handTiles } from '../../shared/hand.js';
+import { describeMeld, handTiles } from '../../shared/hand.js';
 import Tile from './Tile.vue';
 import type { MahjongView } from '../../shared/view.schema.js';
 const props = defineProps<{ view: MahjongView; userId: string; names: Record<string, string>; busy: boolean; seconds: number }>();
@@ -64,17 +69,30 @@ function hasSameTileAlternative(action: Action): boolean {
 	return props.view.phase?.actions.some(other => other.kind === action.kind && other.tiles === alternate) ?? false;
 }
 
+const winds = ['東', '南', '西', '北'] as const;
 const deltaFormatter = new Intl.NumberFormat(undefined, { signDisplay: 'exceptZero' });
 const seats = computed(() => {
 	const { phase, snapshot, outcome } = props.view;
+	if (!snapshot) return [];
 	// Result deltas are in core seat order, before this table moves the viewer's seat last.
 	const deltas = phase?.kind === 'hule' || phase?.kind === 'pingju' ? outcome?.deltas : undefined;
-	return snapshot?.seats.map((seat, index) => ({ seat, index, delta: deltas?.[index] }))
-		.sort((a, b) => Number(a.seat.userId === props.userId) - Number(b.seat.userId === props.userId)) ?? [];
+	return snapshot.seats.map((seat, index) => ({
+		seat, index, delta: deltas?.[index],
+		melds: seat.melds.map(compact => {
+			const meld = describeMeld(compact);
+			if (!meld) return { tiles: handTiles(compact), calledTileIndex: null, label: undefined };
+			const kind = $locale.value.sfc[meld.kind];
+			if (meld.sourceOffset === null) return { ...meld, label: kind };
+			const sourceIndex = (index + meld.sourceOffset) % winds.length;
+			const sourceUserId = snapshot.seats[sourceIndex].userId;
+			const sourceName = props.names[sourceUserId] ?? sourceUserId;
+			return { ...meld, label: `${kind} · ${$locale.value.sfc.meldSource}: ${winds[sourceIndex]} ${sourceName}` };
+		}),
+	})).sort((a, b) => Number(a.seat.userId === props.userId) - Number(b.seat.userId === props.userId));
 });
 </script>
 <locale locale="ja-JP" lang="json">
-{"hand":"局","honba":"本場","remaining":"残り","riichiSticks":"供託","dora":"ドラ表示牌","handTiles":"手牌","discards":"捨て牌","scoreChange":"点数増減","standings":"最終順位","ended":"対局終了 — 牌譜は公開されません","waiting":"他の参加者の操作を待っています","choose":"操作を選んでください","seconds":"秒","discard":"打牌","riichi":"リーチ","handDiscard":"手出し","drawnDiscard":"ツモ切り","chi":"チー","pon":"ポン","kan":"カン","win":"和了","draw":"流局","pass":"見送る","continue":"次へ"}
+{"hand":"局","honba":"本場","remaining":"残り","riichiSticks":"供託","dora":"ドラ表示牌","handTiles":"手牌","discards":"捨て牌","scoreChange":"点数増減","standings":"最終順位","ended":"対局終了 — 牌譜は公開されません","waiting":"他の参加者の操作を待っています","choose":"操作を選んでください","seconds":"秒","discard":"打牌","riichi":"リーチ","handDiscard":"手出し","drawnDiscard":"ツモ切り","chi":"チー","pon":"ポン","kan":"カン","closedKan":"暗槓","openKan":"大明槓","addedKan":"加槓","meldSource":"鳴き元","win":"和了","draw":"流局","pass":"見送る","continue":"次へ"}
 </locale>
 <style module>
 .table { padding: 20px; border-radius: 16px; background: radial-gradient(ellipse at top, #286a61, #143e39); color: #fff; box-shadow: inset 0 0 0 1px #ffffff20; }
@@ -87,7 +105,10 @@ const seats = computed(() => {
 .turn { border-color: #f6d78c; }
 .mine { background: #ffffff12; }
 .tiles { display: flex; flex-wrap: wrap; gap: 1px; }
-.meld { display: inline-flex; margin: 8px 8px 0 0; }
+.meld { display: inline-flex; flex-direction: column; gap: 2px; max-width: 100%; margin: 8px 8px 0 0; vertical-align: top; }
+.meldTiles { display: flex; }
+.meldCalledTile { transform: rotate(90deg) scale(.7); }
+.meldLabel { font-size: .75em; overflow-wrap: anywhere; }
 .river { display: grid; grid-template-columns: repeat(6, 30px); gap: 2px; min-height: 48px; padding-top: 12px; }
 .riichi { rotate: 90deg; }
 .called { opacity: .4; }
