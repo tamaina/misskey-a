@@ -7,6 +7,10 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { parse } from 'vue/compiler-sfc';
 import crowdin18171 from './upstream-sync-crowdin-18171-delta.json';
+import { restoreNyaizeMfmBaseline } from './nyaize-preferences-source-rebase.js';
+import { restoreMfmSearchBaseline } from './mfm-search-source-rebase.js';
+import { restoreFormulaBaseline } from './formula-source-rebase.js';
+import { restoreMergedMfmPreferencesDevelopBaseline } from './mfm-integration-source-rebase.js';
 import type { LocaleBundle, RuntimeLocaleDictionary } from 'vite-vue-internationalization/runtime';
 
 export interface SourceRebase {
@@ -28,14 +32,24 @@ const rebases = sourceRebases;
 if (new Set(rebases.map(entry => entry.file)).size !== rebases.length) throw new Error('Duplicate upstream source rebase');
 
 const sha256 = (source: string): string => createHash('sha256').update(source).digest('hex');
+function restoreMfmSourceForUpstream(file: string, source: string): string {
+	// Preferences are restored before the Crowdin/global catalog layers instead.
+	if (file === 'packages/features/preferences/frontend/pages/settings/preferences.vue') return source;
+	source = restoreNyaizeMfmBaseline(file, source);
+	if (file === 'packages/features/integrations/frontend/components/MkGoogle.vue') source = restoreMfmSearchBaseline(file, source);
+	return restoreFormulaBaseline(file, source);
+}
+
 /** Restore only pinned source adaptations before replaying the unchanged historical proofs. */
 export function restoreUpstreamDevelopBaseline(file: string, source: string): string {
-	return restoreSourceRebase(rebases.find(entry => entry.file === file), source);
+	const rebase = rebases.find(entry => entry.file === file);
+	if (!rebase || sha256(source) === rebase.baselineSha256 || sha256(source) === rebase.historicalSha256) return source;
+	return restoreSourceRebase(rebase, restoreMfmSourceForUpstream(file, source));
 }
 
 /** #18171 follows the frozen source layers below; undo just those new translations first. */
 export function restoreCrowdin18171Baseline(file: string, source: string): string {
-	return restoreSourceRebase(crowdin18171.find(entry => entry.file === file), source);
+	return restoreSourceRebase(crowdin18171.find(entry => entry.file === file), restoreMergedMfmPreferencesDevelopBaseline(file, source));
 }
 
 function restoreSourceRebase(rebase: SourceRebase | undefined, source: string): string {
@@ -61,7 +75,7 @@ export function restoreUpstreamLocaleBundle(language: string, bundle: LocaleBund
 		const moduleId = rebase.file.replace('packages/', '/');
 		if (!Object.hasOwn(modules, moduleId)) continue;
 		const source = readFileSync(resolve(import.meta.dirname, '../../../..', rebase.file), 'utf8');
-		const prior = restoreCrowdin18171Baseline(rebase.file, source);
+		const prior = restoreMfmSourceForUpstream(rebase.file, restoreCrowdin18171Baseline(rebase.file, source));
 		if (sha256(prior) !== rebase.currentSha256) throw new Error(`Locale source differs from reviewed upstream develop: ${rebase.file}`);
 		let dictionaries = localeCache.get(rebase.file);
 		if (!dictionaries) {

@@ -62,6 +62,9 @@ export const preferState: Record<string, unknown> = {
 
 	// なんかtestがうまいこと動かないのでここに書く
 	autoplayEmbededPlayerOfUrlPreview: true,
+	disableNoteNyaize: false,
+	mfmSearchEngine: 'google',
+	mfmSearchEngineCustomUrl: '',
 	dataSaver: {
 		media: false,
 		avatar: false,

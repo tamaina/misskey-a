@@ -30,6 +30,31 @@ function render(text: string, config: Partial<MfmRendererConfig> = {}, props: Pa
 }
 
 describe('shared MFM renderer', () => {
+	test('cat speech can be disabled per render without changing stored text or author', async () => {
+		const author = Object.freeze({ isCat: true }) as MfmBaseProps['author'];
+		const props = Object.freeze({ text: 'なな **なな** `なな`', author, nyaize: 'respect' as const });
+		let disableNyaize = false;
+		const renderer = createMfmRenderer({ components: () => ({ ...components, CodeInline: undefined }), getOptions: () => ({ advancedMfm: true, animatedMfm: false, disableNyaize }) });
+		const html = () => renderToString(createSSRApp({ render: () => renderer(props, { emit: vi.fn() }) }));
+		expect(await html()).toContain('にゃにゃ');
+		expect(await html()).toContain('<code>なな</code>');
+		disableNyaize = true;
+		expect(await html()).not.toContain('にゃ');
+		expect(await html()).toContain('なな');
+		expect(props.text).toBe('なな **なな** `なな`');
+		expect(author?.isCat).toBe(true);
+		disableNyaize = false;
+		expect(await html()).toContain('にゃにゃ');
+	});
+
+	test('embedded/non-DOM defaults and non-cat behavior stay unchanged', async () => {
+		for (const isCat of [false, true]) {
+			const { node } = render('なな', {}, { author: { isCat } as MfmBaseProps['author'], nyaize: 'respect' });
+			const html = await renderToString(createSSRApp({ render: () => node }));
+			expect(html).toContain(isCat ? 'にゃにゃ' : 'なな');
+		}
+	});
+
 	test('renders raw text safely and preserves line breaks', async () => {
 		const { node } = render('<img src=x onerror=alert(1)>\nsecond');
 		const html = await renderToString(createSSRApp({ render: () => node }));

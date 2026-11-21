@@ -4,8 +4,9 @@
  */
 
 import { createMfmRenderer } from '@features/markup/frontend/shared/mfm-renderer.js';
-import type { MfmBaseProps } from '@features/markup/frontend/shared/mfm-renderer.js';
-import type { MkABehavior } from '@features/navigation/frontend/components/global/MkA.vue';
+import MkFormula from '@features/markup/frontend/shared/MkFormula.vue';
+import { isLatexEnabled } from '@features/markup/frontend/shared/formula-safety.js';
+import { instance } from '@features/instance/frontend/instance.js';
 import MkUrl from '@features/markup/frontend/components/global/MkUrl.vue';
 import MkTime from '@features/ui/frontend/components/global/MkTime.vue';
 import MkLink from '@features/navigation/frontend/components/MkLink.vue';
@@ -18,6 +19,8 @@ import MkGoogle from '@features/integrations/frontend/components/MkGoogle.vue';
 import MkSparkle from '@features/ui/frontend/components/MkSparkle.vue';
 import MkA from '@features/navigation/frontend/components/global/MkA.vue';
 import { prefer } from '@features/preferences/frontend/preferences.js';
+import type { MkABehavior } from '@features/navigation/frontend/components/global/MkA.vue';
+import type { MfmBaseProps } from '@features/markup/frontend/shared/mfm-renderer.js';
 
 type MfmProps = MfmBaseProps & {
 	enableEmojiMenu?: boolean;
@@ -28,6 +31,7 @@ type MfmProps = MfmBaseProps & {
 // eslint-disable-next-line import/no-default-export
 export default createMfmRenderer<MfmProps>({
 	components: () => ({
+		Formula: MkFormula,
 		Url: MkUrl,
 		Link: MkLink,
 		Mention: MkMention,
@@ -41,8 +45,10 @@ export default createMfmRenderer<MfmProps>({
 		Sparkle: MkSparkle,
 	}),
 	getOptions: () => ({
+		latexEnabled: isLatexEnabled(instance.clientOptions),
 		advancedMfm: prefer.s.advancedMfm,
 		animatedMfm: prefer.s.animatedMfm,
+		disableNyaize: prefer.r.disableNoteNyaize.value,
 	}),
 	supports: {
 		navigationBehavior: true,

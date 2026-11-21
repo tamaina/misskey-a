@@ -138,6 +138,39 @@ test('migrated settings/admin search labels survive VVI and individual index gen
 	}
 }, 30_000);
 
+test.each([
+	['settings', 'preferences/frontend/pages/settings/preferences.vue', 'nyaize', 'disableNoteNyaize', '/settings/preferences'],
+	['settings', 'preferences/frontend/pages/settings/preferences.vue', 'duckduckgo', 'mfmSearchEngine', '/settings/preferences'],
+	['admin', 'instance/frontend/pages/admin/branding.vue', 'katex', 'mfmFormulaRendering', '/admin/branding'],
+])('includes the %s MFM control from %s (keyword %s)', async (section, page, keyword, key, route) => {
+	const file = resolve('../features', page);
+	const componentLocaleRoot = resolve('..');
+	const sectionOptions = searchIndexes.find(item => item.mainVirtualModule === `search-index:${section}`);
+	if (!sectionOptions) throw new Error('Expected section search options');
+	expect(globSync(sectionOptions.targetFilePaths).map(path => resolve(path))).toContain(file);
+
+	const assigner = new MarkerIdAssigner();
+	const code = assigner.processFile(file, readFileSync(file, 'utf8'))?.code;
+	const markers = collectFileMarkers(file, code, componentLocaleRoot);
+	const label = `\${createComponentLocale('/features/${page}').${key}}`;
+	const marker = markers.find(item => item.label === label);
+	expect(marker).toBeDefined();
+	expect(marker?.keywords).toContain(keyword);
+	expect(code?.toString()).toContain(`data-in-app-search-marker-id="${marker?.id}"`);
+
+	let destination = marker;
+	while (destination != null && destination.path == null) {
+		destination = markers.find(parent => parent.id === destination?.parentId);
+	}
+	expect(destination?.path).toBe(route);
+
+	const load = pluginCreateSearchIndexVirtualModule({ ...sectionOptions, componentLocaleRoot }, assigner).load;
+	if (typeof load !== 'function') throw new Error('Expected a load hook');
+	const generated = await load.call({ addWatchFile: () => {} } as never, `search-index-individual:${file}.ts`);
+	expect(generated).toContain(label);
+	expect(generated).toContain(`"${keyword}"`);
+});
+
 test.each(restoredSearchLabels)('%s restores search labels from the global catalog in every existing SFC language', (page, keys) => {
 	const { descriptor, errors } = parse(readFileSync(resolve('../features', page), 'utf8'));
 	expect(errors).toEqual([]);
