@@ -24,6 +24,7 @@
 		"verbatimModuleSyntax": true,
 		"skipLibCheck": true,
 		"paths": {
+			"@pdfme/*": ["./node_modules/@pdfme/*"],
 			"vue": ["./node_modules/vue"],
 			"@storybook/vue3": ["./node_modules/@storybook/vue3/dist/index.d.ts"],
 			"storybook/actions": ["./node_modules/storybook/dist/actions/index.d.ts"],

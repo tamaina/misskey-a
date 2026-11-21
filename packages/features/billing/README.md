@@ -1,10 +1,10 @@
-# Billing wallet registration
+# Billing wallets and fixed service terms
 
 Small review slice for [Issue #8](https://github.com/tamaina/misskey-a/issues/8).
 Wallet registration is composed into Misskey's native feature provider/API and
 `/settings/wallets` and `/admin/wallet-chains`. The older payment-history and disabled payment-chain prototypes
-remain unregistered; this slice performs no payments, balance/credit accounting,
-pricing, entitlements, settlement or transfers.
+remain unregistered. Wallet registration supplies the account identities used by
+the fixed service terms below.
 
 The host binds the current Misskey principal to a PostgreSQL wallet identity.
 `billing_wallet`, `billing_wallet_challenge` and `billing_wallet_chain` are the new tables. The local,
@@ -74,3 +74,49 @@ RAYON_NUM_THREADS=1 pnpm exec vitest run --config vitest.billing.config.js --max
 Successful registration tests use a synthetic signature verifier. They do not prove
 valid wallet-signature interoperability or any live billing integration. No real
 wallet request, signature, key, RPC endpoint or payment is used in these tests.
+
+## Fixed service terms
+
+The independent server slice is [Draft #81](https://github.com/tamaina/misskey-a/pull/81),
+based on [receipt core #103](https://github.com/tamaina/misskey-a/pull/103).
+`/admin/service-offers` accepts administrator-supplied asset, recipient, price,
+duration and confirmation settings. There are no seeded prices or offers.
+`/settings/subscriptions` prepares an account-owned immutable quote and checks a
+submitted transaction hash; this page does not send transactions.
+
+A confirmed matching transfer atomically stores the paid order and interval.
+Only paid orders reserve a unique chain/transaction claim. An account row lock
+serializes same-service renewals; request keys preserve retry idempotency.
+An optional eligible ordinary manual role takes effect during the paid interval
+through the native role service. Existing manual assignments remain intact;
+paid roles cannot grant staff privileges through conditional roles. Role reads
+query active paid intervals directly. No quota mapping, ranked plan changes,
+automatic renewal, balance ledger, usage settlement, refund or notification is wired.
+
+P2P routes, models and UI belong to [Draft #126](https://github.com/tamaina/misskey-a/pull/126);
+they are absent from this server slice. Accounting claims are scoped to this slice.
+Account deletion removes the participant reference while retaining paid evidence.
+The new local migration has reversible schema tests and is unapplied to production.
+Reverting it removes its records.
+
+Source provenance and behavioral differences are recorded in Issue #8 and the
+PR body. Synthetic tests do not prove live payment interoperability. After building,
+run `node --test --test-concurrency=1 packages/features/billing/test/service-store.test.mjs`
+with the disposable loopback database variable described above.
+
+## Registered account residence
+
+Before registering a wallet or creating a new service order, the account must
+explicitly register its country at `/settings/residence`. In the purchase-policy
+admin page, operators select the countries that also require an administrative
+subdivision. These settings apply independently of purchase IP-region rules and
+whether tax policy is enabled. ISO identifiers are vendored as portable schema
+constants; no runtime dataset dependency is installed.
+
+Declarations are private, self-declared account data, not verified tax location.
+New orders retain their original declaration. Existing request-key recovery,
+transaction hash submission, reconciliation, history and refund obligations stay
+available. The residence migration refuses rollback while declarations or order
+evidence remain. The sibling P2P pilot needs a separate integration of this guard
+at prepare and immediately before browser-wallet sending; this slice does not
+claim that connection.

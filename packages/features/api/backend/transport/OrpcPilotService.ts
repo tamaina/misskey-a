@@ -30,7 +30,7 @@ export class OrpcPilotService {
 			maxFileSize: this.contextFactory.maxFileSize,
 			context: (request, reply, name, upload) => this.contextFactory.create({
 				credential: name === 'clear-browser-cache' ? undefined : bodyCredential(request),
-				ip: request.ip, headers: request.headers, params: request.body, upload,
+				ip: request.ip, transportPeerIp: request.raw.socket.remoteAddress, headers: request.headers, params: request.body, upload,
 				response: { header: (key, value) => { reply.header(key, value); } },
 			}, name),
 			runSpan: (name, run) => this.telemetry.startSpan(name, run),

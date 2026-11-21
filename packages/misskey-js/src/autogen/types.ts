@@ -3,6 +3,138 @@
 
 import type { PackedJsonValue as ContractJsonValue } from '#native-json-value';
 export type paths = {
+    '/account/peer-receipt/get': {
+        post: operations['account___peer-receipt___get'];
+    };
+    '/account/peer-receipt/set': {
+        post: operations['account___peer-receipt___set'];
+    };
+    '/account/residence/get': {
+        post: operations['account___residence___get'];
+    };
+    '/account/residence/set': {
+        post: operations['account___residence___set'];
+    };
+    '/billing/orders/receipt': {
+        post: operations['billing___orders___receipt'];
+    };
+    '/billing/catalog/list': {
+        post: operations['billing___catalog___list'];
+    };
+    '/billing/orders/cancel': {
+        post: operations['billing___orders___cancel'];
+    };
+    '/billing/orders/quote': {
+        post: operations['billing___orders___quote'];
+    };
+    '/admin/billing/offers/list': {
+        post: operations['admin___billing___offers___list'];
+    };
+    '/admin/billing/offers/upsert': {
+        post: operations['admin___billing___offers___upsert'];
+    };
+    '/billing/offers/list': {
+        post: operations['billing___offers___list'];
+    };
+    '/billing/orders/create': {
+        post: operations['billing___orders___create'];
+    };
+    '/billing/orders/check': {
+        post: operations['billing___orders___check'];
+    };
+    '/billing/orders/list': {
+        post: operations['billing___orders___list'];
+    };
+    '/billing/refunds/request': {
+        post: operations['billing___refunds___request'];
+    };
+    '/billing/refunds/list': {
+        post: operations['billing___refunds___list'];
+    };
+    '/billing/refunds/show': {
+        post: operations['billing___refunds___show'];
+    };
+    '/billing/refunds/cancel': {
+        post: operations['billing___refunds___cancel'];
+    };
+    '/billing/refunds/document': {
+        post: operations['billing___refunds___document'];
+    };
+    '/admin/billing/refunds/list': {
+        post: operations['admin___billing___refunds___list'];
+    };
+    '/admin/billing/refunds/show': {
+        post: operations['admin___billing___refunds___show'];
+    };
+    '/admin/billing/refunds/decide': {
+        post: operations['admin___billing___refunds___decide'];
+    };
+    '/admin/billing/refunds/start': {
+        post: operations['admin___billing___refunds___start'];
+    };
+    '/admin/billing/refunds/submit': {
+        post: operations['admin___billing___refunds___submit'];
+    };
+    '/admin/billing/refunds/check': {
+        post: operations['admin___billing___refunds___check'];
+    };
+    '/admin/billing/prices/list': {
+        post: operations['admin___billing___prices___list'];
+    };
+    '/admin/billing/chains/delete': {
+        post: operations['admin___billing___chains___delete'];
+    };
+    '/admin/billing/assets/list': {
+        post: operations['admin___billing___assets___list'];
+    };
+    '/admin/billing/assets/upsert': {
+        post: operations['admin___billing___assets___upsert'];
+    };
+    '/admin/billing/assets/delete': {
+        post: operations['admin___billing___assets___delete'];
+    };
+    '/admin/billing/deployments/list': {
+        post: operations['admin___billing___deployments___list'];
+    };
+    '/admin/billing/deployments/upsert': {
+        post: operations['admin___billing___deployments___upsert'];
+    };
+    '/admin/billing/deployments/delete': {
+        post: operations['admin___billing___deployments___delete'];
+    };
+    '/admin/billing/deployments/resolve': {
+        post: operations['admin___billing___deployments___resolve'];
+    };
+    '/admin/billing/chains/test-rpc': {
+        post: operations['admin___billing___chains___test-rpc'];
+    };
+    '/admin/billing/prices/attach-deployment': {
+        post: operations['admin___billing___prices___attach-deployment'];
+    };
+    '/admin/billing/prices/delete': {
+        post: operations['admin___billing___prices___delete'];
+    };
+    '/admin/billing/policy/get': {
+        post: operations['admin___billing___policy___get'];
+    };
+    '/admin/billing/policy/upsert': {
+        post: operations['admin___billing___policy___upsert'];
+    };
+    '/billing/purchase-requirements': {
+        post: operations['billing___purchase-requirements'];
+    };
+    '/billing/orders/history': {
+        post: operations['billing___orders___history'];
+    };
+    '/admin/billing/orders/list': {
+        post: operations['admin___billing___orders___list'];
+    };
+    '/admin/billing/orders/check': {
+        post: operations['admin___billing___orders___check'];
+    };
+    '/admin/billing/sales/summary': {
+        post: operations['admin___billing___sales___summary'];
+    };
     '/admin/wallets/chains/list': {
         post: operations['admin___wallets___chains___list'];
     };
@@ -38486,6 +38618,13718 @@ export type components = {
 };
 export type $defs = Record<string, never>;
 export interface operations {
+    'account___peer-receipt___get': {
+        requestBody: {
+            content: {
+                'application/json': Record<string, never>;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        revision: number;
+                        acceptForeignPayments: boolean;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    'account___peer-receipt___set': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    revision: number;
+                    acceptForeignPayments: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        revision: number;
+                        acceptForeignPayments: boolean;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    account___residence___get: {
+        requestBody: {
+            content: {
+                'application/json': Record<string, never>;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        residence: {
+                            /** @enum {string} */
+                            country: 'AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW';
+                            subdivision: string | null;
+                            revision: number;
+                            declaredAt: number;
+                            /** @constant */
+                            kind: 'self_declared';
+                        } | null;
+                        requiredSubdivisions: ('AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW')[];
+                        isReady: boolean;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    account___residence___set: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    revision: number;
+                    residence: {
+                        /** @enum {string} */
+                        country: 'AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW';
+                        subdivision: string | null;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        /** @enum {string} */
+                        country: 'AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW';
+                        subdivision: string | null;
+                        revision: number;
+                        declaredAt: number;
+                        /** @constant */
+                        kind: 'self_declared';
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    billing___orders___receipt: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    orderId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        order: {
+                            id: string;
+                            offer: {
+                                id: string;
+                                serviceKey: string;
+                                name: string;
+                                chainId: number;
+                                deploymentId?: string;
+                                currencyCode?: string;
+                                catalogPriceId?: string;
+                                priceStartsAt?: number;
+                                priceExpiresAt?: number | null;
+                                pricingAssetKey?: string;
+                                planGroup?: string;
+                                sortOrder?: number;
+                                roleId?: string | null;
+                                contractAddress: string;
+                                recipientAddress: string;
+                                tokenSymbol: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                duration: number;
+                                /** @enum {string} */
+                                durationUnit: 'days' | 'months' | 'years';
+                                confirmationsRequired: number;
+                                isEnabled: boolean;
+                            };
+                            payerAddress: string;
+                            declaredResidence?: {
+                                /** @enum {string} */
+                                country: 'AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW';
+                                subdivision: string | null;
+                                revision: number;
+                                declaredAt: number;
+                                /** @constant */
+                                kind: 'self_declared';
+                            };
+                            amountBaseUnits: string;
+                            quote: {
+                                quoteCreatedAt: number;
+                                quoteExpiresAt: number;
+                                baseAmountBaseUnits: string;
+                                discountBaseUnits: string;
+                                payableAmountBaseUnits: string;
+                                discountAssignmentIds: string[];
+                                effectiveStartsAt: number;
+                                effectiveExpiresAt: number;
+                                currentPlan: {
+                                    id: string;
+                                    name: string;
+                                    sortOrder: number;
+                                    expiresAt: number;
+                                    priceAmountBaseUnits: string;
+                                    priceDurationDays: number;
+                                    /** @enum {string} */
+                                    priceDurationUnit: 'days' | 'months' | 'years';
+                                } | null;
+                            } | null;
+                            /** @enum {string} */
+                            status: 'pending' | 'paid' | 'expired' | 'failed';
+                            txHash: string | null;
+                            createdAt: number;
+                            expiresAt: number;
+                            paidAt: number | null;
+                            startsAt: number | null;
+                            endsAt: number | null;
+                        };
+                        snapshot: {
+                            /** @constant */
+                            version: 1;
+                            consentedAt: number;
+                            region: {
+                                country: string | null;
+                                isEUCountry: boolean | null;
+                                city: string | null;
+                                continent: string | null;
+                                latitude: string | null;
+                                longitude: string | null;
+                                postalCode: string | null;
+                                metroCode: string | null;
+                                region: string | null;
+                                regionCode: string | null;
+                                timezone: string | null;
+                            };
+                            statement: {
+                                id: string;
+                                country: string;
+                                statement: string;
+                            };
+                            seller: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            };
+                            tax: {
+                                name: string;
+                                rate: string;
+                                currencyCode: string;
+                                includedBaseUnits: string;
+                                excludedBaseUnits: string;
+                                taxBaseUnits: string;
+                            };
+                        } | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_TRANSACTION_INVALID';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    billing___catalog___list: {
+        requestBody: {
+            content: {
+                'application/json': Record<string, never> & unknown;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        offer: {
+                            id: string;
+                            serviceKey: string;
+                            name: string;
+                            chainId: number;
+                            deploymentId?: string;
+                            currencyCode?: string;
+                            catalogPriceId?: string;
+                            priceStartsAt?: number;
+                            priceExpiresAt?: number | null;
+                            pricingAssetKey?: string;
+                            planGroup?: string;
+                            sortOrder?: number;
+                            roleId?: string | null;
+                            contractAddress: string;
+                            recipientAddress: string;
+                            tokenSymbol: string;
+                            decimals: number;
+                            amountBaseUnits: string;
+                            duration: number;
+                            /** @enum {string} */
+                            durationUnit: 'days' | 'months' | 'years';
+                            confirmationsRequired: number;
+                            isEnabled: boolean;
+                        };
+                        priceHistory: {
+                            id: string;
+                            priceId: string;
+                            assetId: string;
+                            planId: string;
+                            amountBaseUnits: string;
+                            durationDays: number;
+                            /** @enum {string} */
+                            durationUnit: 'days' | 'months' | 'years';
+                            isEnabled: boolean;
+                            startsAt: number;
+                            expiresAt: number | null;
+                        }[];
+                        priceDisplayWindow: {
+                            previousPeriod: {
+                                id: string;
+                                priceId: string;
+                                assetId: string;
+                                planId: string;
+                                amountBaseUnits: string;
+                                durationDays: number;
+                                /** @enum {string} */
+                                durationUnit: 'days' | 'months' | 'years';
+                                isEnabled: boolean;
+                                startsAt: number;
+                                expiresAt: number | null;
+                            } | null;
+                            currentPeriod: {
+                                id: string;
+                                priceId: string;
+                                assetId: string;
+                                planId: string;
+                                amountBaseUnits: string;
+                                durationDays: number;
+                                /** @enum {string} */
+                                durationUnit: 'days' | 'months' | 'years';
+                                isEnabled: boolean;
+                                startsAt: number;
+                                expiresAt: number | null;
+                            } | null;
+                            nextPeriod: {
+                                id: string;
+                                priceId: string;
+                                assetId: string;
+                                planId: string;
+                                amountBaseUnits: string;
+                                durationDays: number;
+                                /** @enum {string} */
+                                durationUnit: 'days' | 'months' | 'years';
+                                isEnabled: boolean;
+                                startsAt: number;
+                                expiresAt: number | null;
+                            } | null;
+                        };
+                        dealDisplay: {
+                            canShowDeal: boolean;
+                            referenceAmountBaseUnits: string | null;
+                            /** @enum {string} */
+                            reason: 'eligible' | 'no_reference_price' | 'reference_not_higher' | 'sold_less_than_half_recent_period' | 'sold_less_than_two_weeks' | 'reference_too_old';
+                            checkedFrom: number;
+                            checkedTo: number;
+                            referenceSoldMs: number;
+                            totalSoldMs: number;
+                            referenceLastSoldAt: number | null;
+                        };
+                    }[];
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_TRANSACTION_INVALID';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    billing___orders___cancel: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    orderId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        /** @constant */
+                        ok: true;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_TRANSACTION_INVALID';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    billing___orders___quote: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    offerId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        revision: number;
+                        quote: {
+                            quoteCreatedAt: number;
+                            quoteExpiresAt: number;
+                            baseAmountBaseUnits: string;
+                            discountBaseUnits: string;
+                            payableAmountBaseUnits: string;
+                            discountAssignmentIds: string[];
+                            effectiveStartsAt: number;
+                            effectiveExpiresAt: number;
+                            currentPlan: {
+                                id: string;
+                                name: string;
+                                sortOrder: number;
+                                expiresAt: number;
+                                priceAmountBaseUnits: string;
+                                priceDurationDays: number;
+                                /** @enum {string} */
+                                priceDurationUnit: 'days' | 'months' | 'years';
+                            } | null;
+                        };
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_TRANSACTION_INVALID';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___offers___list: {
+        requestBody: {
+            content: {
+                'application/json': Record<string, never> & unknown;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        serviceKey: string;
+                        name: string;
+                        chainId: number;
+                        deploymentId?: string;
+                        currencyCode?: string;
+                        catalogPriceId?: string;
+                        priceStartsAt?: number;
+                        priceExpiresAt?: number | null;
+                        pricingAssetKey?: string;
+                        planGroup?: string;
+                        sortOrder?: number;
+                        roleId?: string | null;
+                        contractAddress: string;
+                        recipientAddress: string;
+                        tokenSymbol: string;
+                        decimals: number;
+                        amountBaseUnits: string;
+                        duration: number;
+                        /** @enum {string} */
+                        durationUnit: 'days' | 'months' | 'years';
+                        confirmationsRequired: number;
+                        isEnabled: boolean;
+                    }[];
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_TRANSACTION_INVALID';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___offers___upsert: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    id: string;
+                    serviceKey: string;
+                    name: string;
+                    chainId: number;
+                    deploymentId?: string;
+                    currencyCode?: string;
+                    catalogPriceId?: string;
+                    priceStartsAt?: number;
+                    priceExpiresAt?: number | null;
+                    pricingAssetKey?: string;
+                    planGroup?: string;
+                    sortOrder?: number;
+                    roleId?: string | null;
+                    contractAddress: string;
+                    recipientAddress: string;
+                    tokenSymbol: string;
+                    decimals: number;
+                    amountBaseUnits: string;
+                    duration: number;
+                    /** @enum {string} */
+                    durationUnit: 'days' | 'months' | 'years';
+                    confirmationsRequired: number;
+                    isEnabled: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        serviceKey: string;
+                        name: string;
+                        chainId: number;
+                        deploymentId?: string;
+                        currencyCode?: string;
+                        catalogPriceId?: string;
+                        priceStartsAt?: number;
+                        priceExpiresAt?: number | null;
+                        pricingAssetKey?: string;
+                        planGroup?: string;
+                        sortOrder?: number;
+                        roleId?: string | null;
+                        contractAddress: string;
+                        recipientAddress: string;
+                        tokenSymbol: string;
+                        decimals: number;
+                        amountBaseUnits: string;
+                        duration: number;
+                        /** @enum {string} */
+                        durationUnit: 'days' | 'months' | 'years';
+                        confirmationsRequired: number;
+                        isEnabled: boolean;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_TRANSACTION_INVALID';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    billing___offers___list: {
+        requestBody: {
+            content: {
+                'application/json': Record<string, never> & unknown;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        serviceKey: string;
+                        name: string;
+                        chainId: number;
+                        deploymentId?: string;
+                        currencyCode?: string;
+                        catalogPriceId?: string;
+                        priceStartsAt?: number;
+                        priceExpiresAt?: number | null;
+                        pricingAssetKey?: string;
+                        planGroup?: string;
+                        sortOrder?: number;
+                        roleId?: string | null;
+                        contractAddress: string;
+                        recipientAddress: string;
+                        tokenSymbol: string;
+                        decimals: number;
+                        amountBaseUnits: string;
+                        duration: number;
+                        /** @enum {string} */
+                        durationUnit: 'days' | 'months' | 'years';
+                        confirmationsRequired: number;
+                        isEnabled: boolean;
+                    }[];
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_TRANSACTION_INVALID';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    billing___orders___create: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    offerId: string;
+                    walletId: string;
+                    requestKey: string;
+                    quotedOffer: {
+                        id: string;
+                        serviceKey: string;
+                        name: string;
+                        chainId: number;
+                        deploymentId?: string;
+                        currencyCode?: string;
+                        catalogPriceId?: string;
+                        priceStartsAt?: number;
+                        priceExpiresAt?: number | null;
+                        pricingAssetKey?: string;
+                        planGroup?: string;
+                        sortOrder?: number;
+                        roleId?: string | null;
+                        contractAddress: string;
+                        recipientAddress: string;
+                        tokenSymbol: string;
+                        decimals: number;
+                        amountBaseUnits: string;
+                        duration: number;
+                        /** @enum {string} */
+                        durationUnit: 'days' | 'months' | 'years';
+                        confirmationsRequired: number;
+                        isEnabled: boolean;
+                    };
+                    quotedQuote?: {
+                        revision: number;
+                        quote: {
+                            quoteCreatedAt: number;
+                            quoteExpiresAt: number;
+                            baseAmountBaseUnits: string;
+                            discountBaseUnits: string;
+                            payableAmountBaseUnits: string;
+                            discountAssignmentIds: string[];
+                            effectiveStartsAt: number;
+                            effectiveExpiresAt: number;
+                            currentPlan: {
+                                id: string;
+                                name: string;
+                                sortOrder: number;
+                                expiresAt: number;
+                                priceAmountBaseUnits: string;
+                                priceDurationDays: number;
+                                /** @enum {string} */
+                                priceDurationUnit: 'days' | 'months' | 'years';
+                            } | null;
+                        };
+                    };
+                    residencyConsent?: {
+                        statementId: string;
+                        /** @constant */
+                        agreed: true;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        offer: {
+                            id: string;
+                            serviceKey: string;
+                            name: string;
+                            chainId: number;
+                            deploymentId?: string;
+                            currencyCode?: string;
+                            catalogPriceId?: string;
+                            priceStartsAt?: number;
+                            priceExpiresAt?: number | null;
+                            pricingAssetKey?: string;
+                            planGroup?: string;
+                            sortOrder?: number;
+                            roleId?: string | null;
+                            contractAddress: string;
+                            recipientAddress: string;
+                            tokenSymbol: string;
+                            decimals: number;
+                            amountBaseUnits: string;
+                            duration: number;
+                            /** @enum {string} */
+                            durationUnit: 'days' | 'months' | 'years';
+                            confirmationsRequired: number;
+                            isEnabled: boolean;
+                        };
+                        payerAddress: string;
+                        declaredResidence?: {
+                            /** @enum {string} */
+                            country: 'AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW';
+                            subdivision: string | null;
+                            revision: number;
+                            declaredAt: number;
+                            /** @constant */
+                            kind: 'self_declared';
+                        };
+                        amountBaseUnits: string;
+                        quote: {
+                            quoteCreatedAt: number;
+                            quoteExpiresAt: number;
+                            baseAmountBaseUnits: string;
+                            discountBaseUnits: string;
+                            payableAmountBaseUnits: string;
+                            discountAssignmentIds: string[];
+                            effectiveStartsAt: number;
+                            effectiveExpiresAt: number;
+                            currentPlan: {
+                                id: string;
+                                name: string;
+                                sortOrder: number;
+                                expiresAt: number;
+                                priceAmountBaseUnits: string;
+                                priceDurationDays: number;
+                                /** @enum {string} */
+                                priceDurationUnit: 'days' | 'months' | 'years';
+                            } | null;
+                        } | null;
+                        /** @enum {string} */
+                        status: 'pending' | 'paid' | 'expired' | 'failed';
+                        txHash: string | null;
+                        createdAt: number;
+                        expiresAt: number;
+                        paidAt: number | null;
+                        startsAt: number | null;
+                        endsAt: number | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_TRANSACTION_INVALID';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    billing___orders___check: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    orderId: string;
+                    txHash?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        offer: {
+                            id: string;
+                            serviceKey: string;
+                            name: string;
+                            chainId: number;
+                            deploymentId?: string;
+                            currencyCode?: string;
+                            catalogPriceId?: string;
+                            priceStartsAt?: number;
+                            priceExpiresAt?: number | null;
+                            pricingAssetKey?: string;
+                            planGroup?: string;
+                            sortOrder?: number;
+                            roleId?: string | null;
+                            contractAddress: string;
+                            recipientAddress: string;
+                            tokenSymbol: string;
+                            decimals: number;
+                            amountBaseUnits: string;
+                            duration: number;
+                            /** @enum {string} */
+                            durationUnit: 'days' | 'months' | 'years';
+                            confirmationsRequired: number;
+                            isEnabled: boolean;
+                        };
+                        payerAddress: string;
+                        declaredResidence?: {
+                            /** @enum {string} */
+                            country: 'AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW';
+                            subdivision: string | null;
+                            revision: number;
+                            declaredAt: number;
+                            /** @constant */
+                            kind: 'self_declared';
+                        };
+                        amountBaseUnits: string;
+                        quote: {
+                            quoteCreatedAt: number;
+                            quoteExpiresAt: number;
+                            baseAmountBaseUnits: string;
+                            discountBaseUnits: string;
+                            payableAmountBaseUnits: string;
+                            discountAssignmentIds: string[];
+                            effectiveStartsAt: number;
+                            effectiveExpiresAt: number;
+                            currentPlan: {
+                                id: string;
+                                name: string;
+                                sortOrder: number;
+                                expiresAt: number;
+                                priceAmountBaseUnits: string;
+                                priceDurationDays: number;
+                                /** @enum {string} */
+                                priceDurationUnit: 'days' | 'months' | 'years';
+                            } | null;
+                        } | null;
+                        /** @enum {string} */
+                        status: 'pending' | 'paid' | 'expired' | 'failed';
+                        txHash: string | null;
+                        createdAt: number;
+                        expiresAt: number;
+                        paidAt: number | null;
+                        startsAt: number | null;
+                        endsAt: number | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_TRANSACTION_INVALID';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    billing___orders___list: {
+        requestBody: {
+            content: {
+                'application/json': Record<string, never> & unknown;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        offer: {
+                            id: string;
+                            serviceKey: string;
+                            name: string;
+                            chainId: number;
+                            deploymentId?: string;
+                            currencyCode?: string;
+                            catalogPriceId?: string;
+                            priceStartsAt?: number;
+                            priceExpiresAt?: number | null;
+                            pricingAssetKey?: string;
+                            planGroup?: string;
+                            sortOrder?: number;
+                            roleId?: string | null;
+                            contractAddress: string;
+                            recipientAddress: string;
+                            tokenSymbol: string;
+                            decimals: number;
+                            amountBaseUnits: string;
+                            duration: number;
+                            /** @enum {string} */
+                            durationUnit: 'days' | 'months' | 'years';
+                            confirmationsRequired: number;
+                            isEnabled: boolean;
+                        };
+                        payerAddress: string;
+                        declaredResidence?: {
+                            /** @enum {string} */
+                            country: 'AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW';
+                            subdivision: string | null;
+                            revision: number;
+                            declaredAt: number;
+                            /** @constant */
+                            kind: 'self_declared';
+                        };
+                        amountBaseUnits: string;
+                        quote: {
+                            quoteCreatedAt: number;
+                            quoteExpiresAt: number;
+                            baseAmountBaseUnits: string;
+                            discountBaseUnits: string;
+                            payableAmountBaseUnits: string;
+                            discountAssignmentIds: string[];
+                            effectiveStartsAt: number;
+                            effectiveExpiresAt: number;
+                            currentPlan: {
+                                id: string;
+                                name: string;
+                                sortOrder: number;
+                                expiresAt: number;
+                                priceAmountBaseUnits: string;
+                                priceDurationDays: number;
+                                /** @enum {string} */
+                                priceDurationUnit: 'days' | 'months' | 'years';
+                            } | null;
+                        } | null;
+                        /** @enum {string} */
+                        status: 'pending' | 'paid' | 'expired' | 'failed';
+                        txHash: string | null;
+                        createdAt: number;
+                        expiresAt: number;
+                        paidAt: number | null;
+                        startsAt: number | null;
+                        endsAt: number | null;
+                    }[];
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_TRANSACTION_INVALID';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    billing___refunds___request: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    requestKey: string;
+                    cutoffAt?: number;
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        version: number;
+                        /** @enum {string} */
+                        status: 'requested' | 'review_required' | 'prepared' | 'processing' | 'rejected' | 'cancelled' | 'completed';
+                        /** @enum {string} */
+                        requestedMode: 'immediate' | 'scheduled';
+                        requestedCutoffAt: number;
+                        effectiveCutoffAt: number | null;
+                        reason: string;
+                        createdAt: number;
+                        quote: {
+                            revision: number;
+                            effectiveCutoffAt: number;
+                            assignments: {
+                                id: string;
+                                orderId: string;
+                                offer: {
+                                    id: string;
+                                    serviceKey: string;
+                                    name: string;
+                                    chainId: number;
+                                    deploymentId?: string;
+                                    currencyCode?: string;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
+                                    pricingAssetKey?: string;
+                                    planGroup?: string;
+                                    sortOrder?: number;
+                                    roleId?: string | null;
+                                    contractAddress: string;
+                                    recipientAddress: string;
+                                    tokenSymbol: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    duration: number;
+                                    /** @enum {string} */
+                                    durationUnit: 'days' | 'months' | 'years';
+                                    confirmationsRequired: number;
+                                    isEnabled: boolean;
+                                };
+                                startsAt: number;
+                                expiresAt: number;
+                                provenanceComplete: boolean;
+                            }[];
+                            groups: {
+                                id: string;
+                                payerAddress: string;
+                                chainId: number;
+                                contractAddress: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                lines: {
+                                    id: string;
+                                    assignmentId: string;
+                                    amountBaseUnits: string;
+                                    sourceOrder: {
+                                        id: string;
+                                        payerAddress: string;
+                                        chainId: number;
+                                        contractAddress: string;
+                                        decimals: number;
+                                    };
+                                }[];
+                                confirmations: number;
+                            }[];
+                            reviewReasons: string[];
+                        } | null;
+                        transfers: {
+                            id: string;
+                            /** @enum {string} */
+                            status: 'prepared' | 'broadcast_pending' | 'submitted';
+                            senderAddress: string | null;
+                            startedAt: number | null;
+                            txHash: string | null;
+                        }[];
+                        events: {
+                            actorId: string;
+                            at: number;
+                            action: string;
+                            reason: string;
+                        }[];
+                        document: {
+                            adjustmentReason?: string;
+                            seller?: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            } | null;
+                            taxAdjustments?: {
+                                lineId: string;
+                                sourceOrderId: string;
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                } | null;
+                            }[];
+                            id: string;
+                            completedAt: number;
+                            requestedCutoffAt: number;
+                            effectiveCutoffAt: number;
+                            groups: {
+                                id: string;
+                                payerAddress: string;
+                                chainId: number;
+                                contractAddress: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                lines: {
+                                    id: string;
+                                    assignmentId: string;
+                                    amountBaseUnits: string;
+                                    sourceOrder: {
+                                        id: string;
+                                        payerAddress: string;
+                                        chainId: number;
+                                        contractAddress: string;
+                                        decimals: number;
+                                    };
+                                }[];
+                                confirmations: number;
+                            }[];
+                            proofs: {
+                                transferId: string;
+                                senderAddress: string;
+                                evidence: {
+                                    chainId: number;
+                                    txHash: string;
+                                    timestamp: number;
+                                    blockHash?: string;
+                                    blockNumber?: string;
+                                    transfers: {
+                                        logIndex: number;
+                                        contractAddress: string;
+                                        fromAddress: string;
+                                        toAddress: string;
+                                        amountBaseUnits: string;
+                                    }[];
+                                };
+                            }[];
+                            originalPurchases: {
+                                id: string;
+                                payerAddress: string;
+                                offer: {
+                                    id: string;
+                                    serviceKey: string;
+                                    name: string;
+                                    chainId: number;
+                                    deploymentId?: string;
+                                    currencyCode?: string;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
+                                    pricingAssetKey?: string;
+                                    planGroup?: string;
+                                    sortOrder?: number;
+                                    roleId?: string | null;
+                                    contractAddress: string;
+                                    recipientAddress: string;
+                                    tokenSymbol: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    duration: number;
+                                    /** @enum {string} */
+                                    durationUnit: 'days' | 'months' | 'years';
+                                    confirmationsRequired: number;
+                                    isEnabled: boolean;
+                                };
+                                cashAmountBaseUnits: string;
+                                receiptSnapshot?: {
+                                    /** @constant */
+                                    version: 1;
+                                    consentedAt: number;
+                                    region: {
+                                        country: string | null;
+                                        isEUCountry: boolean | null;
+                                        city: string | null;
+                                        continent: string | null;
+                                        latitude: string | null;
+                                        longitude: string | null;
+                                        postalCode: string | null;
+                                        metroCode: string | null;
+                                        region: string | null;
+                                        regionCode: string | null;
+                                        timezone: string | null;
+                                    };
+                                    statement: {
+                                        id: string;
+                                        country: string;
+                                        statement: string;
+                                    };
+                                    seller: {
+                                        name: string;
+                                        address: string;
+                                        invoiceRegistrationNumber: string;
+                                    };
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    };
+                                } | null;
+                                txHash: string | null;
+                                paidAt: number | null;
+                            }[];
+                        } | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_REVIEW_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    billing___refunds___list: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    cursor?: string;
+                    /** @default 20 */
+                    limit?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        items: {
+                            id: string;
+                            version: number;
+                            /** @enum {string} */
+                            status: 'requested' | 'review_required' | 'prepared' | 'processing' | 'rejected' | 'cancelled' | 'completed';
+                            /** @enum {string} */
+                            requestedMode: 'immediate' | 'scheduled';
+                            requestedCutoffAt: number;
+                            effectiveCutoffAt: number | null;
+                            reason: string;
+                            createdAt: number;
+                            quote: {
+                                revision: number;
+                                effectiveCutoffAt: number;
+                                assignments: {
+                                    id: string;
+                                    orderId: string;
+                                    offer: {
+                                        id: string;
+                                        serviceKey: string;
+                                        name: string;
+                                        chainId: number;
+                                        deploymentId?: string;
+                                        currencyCode?: string;
+                                        catalogPriceId?: string;
+                                        priceStartsAt?: number;
+                                        priceExpiresAt?: number | null;
+                                        pricingAssetKey?: string;
+                                        planGroup?: string;
+                                        sortOrder?: number;
+                                        roleId?: string | null;
+                                        contractAddress: string;
+                                        recipientAddress: string;
+                                        tokenSymbol: string;
+                                        decimals: number;
+                                        amountBaseUnits: string;
+                                        duration: number;
+                                        /** @enum {string} */
+                                        durationUnit: 'days' | 'months' | 'years';
+                                        confirmationsRequired: number;
+                                        isEnabled: boolean;
+                                    };
+                                    startsAt: number;
+                                    expiresAt: number;
+                                    provenanceComplete: boolean;
+                                }[];
+                                groups: {
+                                    id: string;
+                                    payerAddress: string;
+                                    chainId: number;
+                                    contractAddress: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    lines: {
+                                        id: string;
+                                        assignmentId: string;
+                                        amountBaseUnits: string;
+                                        sourceOrder: {
+                                            id: string;
+                                            payerAddress: string;
+                                            chainId: number;
+                                            contractAddress: string;
+                                            decimals: number;
+                                        };
+                                    }[];
+                                    confirmations: number;
+                                }[];
+                                reviewReasons: string[];
+                            } | null;
+                            transfers: {
+                                id: string;
+                                /** @enum {string} */
+                                status: 'prepared' | 'broadcast_pending' | 'submitted';
+                                senderAddress: string | null;
+                                startedAt: number | null;
+                                txHash: string | null;
+                            }[];
+                            events: {
+                                actorId: string;
+                                at: number;
+                                action: string;
+                                reason: string;
+                            }[];
+                            document: {
+                                adjustmentReason?: string;
+                                seller?: {
+                                    name: string;
+                                    address: string;
+                                    invoiceRegistrationNumber: string;
+                                } | null;
+                                taxAdjustments?: {
+                                    lineId: string;
+                                    sourceOrderId: string;
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    } | null;
+                                }[];
+                                id: string;
+                                completedAt: number;
+                                requestedCutoffAt: number;
+                                effectiveCutoffAt: number;
+                                groups: {
+                                    id: string;
+                                    payerAddress: string;
+                                    chainId: number;
+                                    contractAddress: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    lines: {
+                                        id: string;
+                                        assignmentId: string;
+                                        amountBaseUnits: string;
+                                        sourceOrder: {
+                                            id: string;
+                                            payerAddress: string;
+                                            chainId: number;
+                                            contractAddress: string;
+                                            decimals: number;
+                                        };
+                                    }[];
+                                    confirmations: number;
+                                }[];
+                                proofs: {
+                                    transferId: string;
+                                    senderAddress: string;
+                                    evidence: {
+                                        chainId: number;
+                                        txHash: string;
+                                        timestamp: number;
+                                        blockHash?: string;
+                                        blockNumber?: string;
+                                        transfers: {
+                                            logIndex: number;
+                                            contractAddress: string;
+                                            fromAddress: string;
+                                            toAddress: string;
+                                            amountBaseUnits: string;
+                                        }[];
+                                    };
+                                }[];
+                                originalPurchases: {
+                                    id: string;
+                                    payerAddress: string;
+                                    offer: {
+                                        id: string;
+                                        serviceKey: string;
+                                        name: string;
+                                        chainId: number;
+                                        deploymentId?: string;
+                                        currencyCode?: string;
+                                        catalogPriceId?: string;
+                                        priceStartsAt?: number;
+                                        priceExpiresAt?: number | null;
+                                        pricingAssetKey?: string;
+                                        planGroup?: string;
+                                        sortOrder?: number;
+                                        roleId?: string | null;
+                                        contractAddress: string;
+                                        recipientAddress: string;
+                                        tokenSymbol: string;
+                                        decimals: number;
+                                        amountBaseUnits: string;
+                                        duration: number;
+                                        /** @enum {string} */
+                                        durationUnit: 'days' | 'months' | 'years';
+                                        confirmationsRequired: number;
+                                        isEnabled: boolean;
+                                    };
+                                    cashAmountBaseUnits: string;
+                                    receiptSnapshot?: {
+                                        /** @constant */
+                                        version: 1;
+                                        consentedAt: number;
+                                        region: {
+                                            country: string | null;
+                                            isEUCountry: boolean | null;
+                                            city: string | null;
+                                            continent: string | null;
+                                            latitude: string | null;
+                                            longitude: string | null;
+                                            postalCode: string | null;
+                                            metroCode: string | null;
+                                            region: string | null;
+                                            regionCode: string | null;
+                                            timezone: string | null;
+                                        };
+                                        statement: {
+                                            id: string;
+                                            country: string;
+                                            statement: string;
+                                        };
+                                        seller: {
+                                            name: string;
+                                            address: string;
+                                            invoiceRegistrationNumber: string;
+                                        };
+                                        tax: {
+                                            name: string;
+                                            rate: string;
+                                            currencyCode: string;
+                                            includedBaseUnits: string;
+                                            excludedBaseUnits: string;
+                                            taxBaseUnits: string;
+                                        };
+                                    } | null;
+                                    txHash: string | null;
+                                    paidAt: number | null;
+                                }[];
+                            } | null;
+                        }[];
+                        nextCursor: string | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_REVIEW_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    billing___refunds___show: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    requestId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        version: number;
+                        /** @enum {string} */
+                        status: 'requested' | 'review_required' | 'prepared' | 'processing' | 'rejected' | 'cancelled' | 'completed';
+                        /** @enum {string} */
+                        requestedMode: 'immediate' | 'scheduled';
+                        requestedCutoffAt: number;
+                        effectiveCutoffAt: number | null;
+                        reason: string;
+                        createdAt: number;
+                        quote: {
+                            revision: number;
+                            effectiveCutoffAt: number;
+                            assignments: {
+                                id: string;
+                                orderId: string;
+                                offer: {
+                                    id: string;
+                                    serviceKey: string;
+                                    name: string;
+                                    chainId: number;
+                                    deploymentId?: string;
+                                    currencyCode?: string;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
+                                    pricingAssetKey?: string;
+                                    planGroup?: string;
+                                    sortOrder?: number;
+                                    roleId?: string | null;
+                                    contractAddress: string;
+                                    recipientAddress: string;
+                                    tokenSymbol: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    duration: number;
+                                    /** @enum {string} */
+                                    durationUnit: 'days' | 'months' | 'years';
+                                    confirmationsRequired: number;
+                                    isEnabled: boolean;
+                                };
+                                startsAt: number;
+                                expiresAt: number;
+                                provenanceComplete: boolean;
+                            }[];
+                            groups: {
+                                id: string;
+                                payerAddress: string;
+                                chainId: number;
+                                contractAddress: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                lines: {
+                                    id: string;
+                                    assignmentId: string;
+                                    amountBaseUnits: string;
+                                    sourceOrder: {
+                                        id: string;
+                                        payerAddress: string;
+                                        chainId: number;
+                                        contractAddress: string;
+                                        decimals: number;
+                                    };
+                                }[];
+                                confirmations: number;
+                            }[];
+                            reviewReasons: string[];
+                        } | null;
+                        transfers: {
+                            id: string;
+                            /** @enum {string} */
+                            status: 'prepared' | 'broadcast_pending' | 'submitted';
+                            senderAddress: string | null;
+                            startedAt: number | null;
+                            txHash: string | null;
+                        }[];
+                        events: {
+                            actorId: string;
+                            at: number;
+                            action: string;
+                            reason: string;
+                        }[];
+                        document: {
+                            adjustmentReason?: string;
+                            seller?: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            } | null;
+                            taxAdjustments?: {
+                                lineId: string;
+                                sourceOrderId: string;
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                } | null;
+                            }[];
+                            id: string;
+                            completedAt: number;
+                            requestedCutoffAt: number;
+                            effectiveCutoffAt: number;
+                            groups: {
+                                id: string;
+                                payerAddress: string;
+                                chainId: number;
+                                contractAddress: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                lines: {
+                                    id: string;
+                                    assignmentId: string;
+                                    amountBaseUnits: string;
+                                    sourceOrder: {
+                                        id: string;
+                                        payerAddress: string;
+                                        chainId: number;
+                                        contractAddress: string;
+                                        decimals: number;
+                                    };
+                                }[];
+                                confirmations: number;
+                            }[];
+                            proofs: {
+                                transferId: string;
+                                senderAddress: string;
+                                evidence: {
+                                    chainId: number;
+                                    txHash: string;
+                                    timestamp: number;
+                                    blockHash?: string;
+                                    blockNumber?: string;
+                                    transfers: {
+                                        logIndex: number;
+                                        contractAddress: string;
+                                        fromAddress: string;
+                                        toAddress: string;
+                                        amountBaseUnits: string;
+                                    }[];
+                                };
+                            }[];
+                            originalPurchases: {
+                                id: string;
+                                payerAddress: string;
+                                offer: {
+                                    id: string;
+                                    serviceKey: string;
+                                    name: string;
+                                    chainId: number;
+                                    deploymentId?: string;
+                                    currencyCode?: string;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
+                                    pricingAssetKey?: string;
+                                    planGroup?: string;
+                                    sortOrder?: number;
+                                    roleId?: string | null;
+                                    contractAddress: string;
+                                    recipientAddress: string;
+                                    tokenSymbol: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    duration: number;
+                                    /** @enum {string} */
+                                    durationUnit: 'days' | 'months' | 'years';
+                                    confirmationsRequired: number;
+                                    isEnabled: boolean;
+                                };
+                                cashAmountBaseUnits: string;
+                                receiptSnapshot?: {
+                                    /** @constant */
+                                    version: 1;
+                                    consentedAt: number;
+                                    region: {
+                                        country: string | null;
+                                        isEUCountry: boolean | null;
+                                        city: string | null;
+                                        continent: string | null;
+                                        latitude: string | null;
+                                        longitude: string | null;
+                                        postalCode: string | null;
+                                        metroCode: string | null;
+                                        region: string | null;
+                                        regionCode: string | null;
+                                        timezone: string | null;
+                                    };
+                                    statement: {
+                                        id: string;
+                                        country: string;
+                                        statement: string;
+                                    };
+                                    seller: {
+                                        name: string;
+                                        address: string;
+                                        invoiceRegistrationNumber: string;
+                                    };
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    };
+                                } | null;
+                                txHash: string | null;
+                                paidAt: number | null;
+                            }[];
+                        } | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_REVIEW_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    billing___refunds___cancel: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    requestId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        version: number;
+                        /** @enum {string} */
+                        status: 'requested' | 'review_required' | 'prepared' | 'processing' | 'rejected' | 'cancelled' | 'completed';
+                        /** @enum {string} */
+                        requestedMode: 'immediate' | 'scheduled';
+                        requestedCutoffAt: number;
+                        effectiveCutoffAt: number | null;
+                        reason: string;
+                        createdAt: number;
+                        quote: {
+                            revision: number;
+                            effectiveCutoffAt: number;
+                            assignments: {
+                                id: string;
+                                orderId: string;
+                                offer: {
+                                    id: string;
+                                    serviceKey: string;
+                                    name: string;
+                                    chainId: number;
+                                    deploymentId?: string;
+                                    currencyCode?: string;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
+                                    pricingAssetKey?: string;
+                                    planGroup?: string;
+                                    sortOrder?: number;
+                                    roleId?: string | null;
+                                    contractAddress: string;
+                                    recipientAddress: string;
+                                    tokenSymbol: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    duration: number;
+                                    /** @enum {string} */
+                                    durationUnit: 'days' | 'months' | 'years';
+                                    confirmationsRequired: number;
+                                    isEnabled: boolean;
+                                };
+                                startsAt: number;
+                                expiresAt: number;
+                                provenanceComplete: boolean;
+                            }[];
+                            groups: {
+                                id: string;
+                                payerAddress: string;
+                                chainId: number;
+                                contractAddress: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                lines: {
+                                    id: string;
+                                    assignmentId: string;
+                                    amountBaseUnits: string;
+                                    sourceOrder: {
+                                        id: string;
+                                        payerAddress: string;
+                                        chainId: number;
+                                        contractAddress: string;
+                                        decimals: number;
+                                    };
+                                }[];
+                                confirmations: number;
+                            }[];
+                            reviewReasons: string[];
+                        } | null;
+                        transfers: {
+                            id: string;
+                            /** @enum {string} */
+                            status: 'prepared' | 'broadcast_pending' | 'submitted';
+                            senderAddress: string | null;
+                            startedAt: number | null;
+                            txHash: string | null;
+                        }[];
+                        events: {
+                            actorId: string;
+                            at: number;
+                            action: string;
+                            reason: string;
+                        }[];
+                        document: {
+                            adjustmentReason?: string;
+                            seller?: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            } | null;
+                            taxAdjustments?: {
+                                lineId: string;
+                                sourceOrderId: string;
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                } | null;
+                            }[];
+                            id: string;
+                            completedAt: number;
+                            requestedCutoffAt: number;
+                            effectiveCutoffAt: number;
+                            groups: {
+                                id: string;
+                                payerAddress: string;
+                                chainId: number;
+                                contractAddress: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                lines: {
+                                    id: string;
+                                    assignmentId: string;
+                                    amountBaseUnits: string;
+                                    sourceOrder: {
+                                        id: string;
+                                        payerAddress: string;
+                                        chainId: number;
+                                        contractAddress: string;
+                                        decimals: number;
+                                    };
+                                }[];
+                                confirmations: number;
+                            }[];
+                            proofs: {
+                                transferId: string;
+                                senderAddress: string;
+                                evidence: {
+                                    chainId: number;
+                                    txHash: string;
+                                    timestamp: number;
+                                    blockHash?: string;
+                                    blockNumber?: string;
+                                    transfers: {
+                                        logIndex: number;
+                                        contractAddress: string;
+                                        fromAddress: string;
+                                        toAddress: string;
+                                        amountBaseUnits: string;
+                                    }[];
+                                };
+                            }[];
+                            originalPurchases: {
+                                id: string;
+                                payerAddress: string;
+                                offer: {
+                                    id: string;
+                                    serviceKey: string;
+                                    name: string;
+                                    chainId: number;
+                                    deploymentId?: string;
+                                    currencyCode?: string;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
+                                    pricingAssetKey?: string;
+                                    planGroup?: string;
+                                    sortOrder?: number;
+                                    roleId?: string | null;
+                                    contractAddress: string;
+                                    recipientAddress: string;
+                                    tokenSymbol: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    duration: number;
+                                    /** @enum {string} */
+                                    durationUnit: 'days' | 'months' | 'years';
+                                    confirmationsRequired: number;
+                                    isEnabled: boolean;
+                                };
+                                cashAmountBaseUnits: string;
+                                receiptSnapshot?: {
+                                    /** @constant */
+                                    version: 1;
+                                    consentedAt: number;
+                                    region: {
+                                        country: string | null;
+                                        isEUCountry: boolean | null;
+                                        city: string | null;
+                                        continent: string | null;
+                                        latitude: string | null;
+                                        longitude: string | null;
+                                        postalCode: string | null;
+                                        metroCode: string | null;
+                                        region: string | null;
+                                        regionCode: string | null;
+                                        timezone: string | null;
+                                    };
+                                    statement: {
+                                        id: string;
+                                        country: string;
+                                        statement: string;
+                                    };
+                                    seller: {
+                                        name: string;
+                                        address: string;
+                                        invoiceRegistrationNumber: string;
+                                    };
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    };
+                                } | null;
+                                txHash: string | null;
+                                paidAt: number | null;
+                            }[];
+                        } | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_REVIEW_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    billing___refunds___document: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    requestId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        adjustmentReason?: string;
+                        seller?: {
+                            name: string;
+                            address: string;
+                            invoiceRegistrationNumber: string;
+                        } | null;
+                        taxAdjustments?: {
+                            lineId: string;
+                            sourceOrderId: string;
+                            tax: {
+                                name: string;
+                                rate: string;
+                                currencyCode: string;
+                                includedBaseUnits: string;
+                                excludedBaseUnits: string;
+                                taxBaseUnits: string;
+                            } | null;
+                        }[];
+                        id: string;
+                        completedAt: number;
+                        requestedCutoffAt: number;
+                        effectiveCutoffAt: number;
+                        groups: {
+                            id: string;
+                            payerAddress: string;
+                            chainId: number;
+                            contractAddress: string;
+                            decimals: number;
+                            amountBaseUnits: string;
+                            lines: {
+                                id: string;
+                                assignmentId: string;
+                                amountBaseUnits: string;
+                                sourceOrder: {
+                                    id: string;
+                                    payerAddress: string;
+                                    chainId: number;
+                                    contractAddress: string;
+                                    decimals: number;
+                                };
+                            }[];
+                            confirmations: number;
+                        }[];
+                        proofs: {
+                            transferId: string;
+                            senderAddress: string;
+                            evidence: {
+                                chainId: number;
+                                txHash: string;
+                                timestamp: number;
+                                blockHash?: string;
+                                blockNumber?: string;
+                                transfers: {
+                                    logIndex: number;
+                                    contractAddress: string;
+                                    fromAddress: string;
+                                    toAddress: string;
+                                    amountBaseUnits: string;
+                                }[];
+                            };
+                        }[];
+                        originalPurchases: {
+                            id: string;
+                            payerAddress: string;
+                            offer: {
+                                id: string;
+                                serviceKey: string;
+                                name: string;
+                                chainId: number;
+                                deploymentId?: string;
+                                currencyCode?: string;
+                                catalogPriceId?: string;
+                                priceStartsAt?: number;
+                                priceExpiresAt?: number | null;
+                                pricingAssetKey?: string;
+                                planGroup?: string;
+                                sortOrder?: number;
+                                roleId?: string | null;
+                                contractAddress: string;
+                                recipientAddress: string;
+                                tokenSymbol: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                duration: number;
+                                /** @enum {string} */
+                                durationUnit: 'days' | 'months' | 'years';
+                                confirmationsRequired: number;
+                                isEnabled: boolean;
+                            };
+                            cashAmountBaseUnits: string;
+                            receiptSnapshot?: {
+                                /** @constant */
+                                version: 1;
+                                consentedAt: number;
+                                region: {
+                                    country: string | null;
+                                    isEUCountry: boolean | null;
+                                    city: string | null;
+                                    continent: string | null;
+                                    latitude: string | null;
+                                    longitude: string | null;
+                                    postalCode: string | null;
+                                    metroCode: string | null;
+                                    region: string | null;
+                                    regionCode: string | null;
+                                    timezone: string | null;
+                                };
+                                statement: {
+                                    id: string;
+                                    country: string;
+                                    statement: string;
+                                };
+                                seller: {
+                                    name: string;
+                                    address: string;
+                                    invoiceRegistrationNumber: string;
+                                };
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                };
+                            } | null;
+                            txHash: string | null;
+                            paidAt: number | null;
+                        }[];
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_REVIEW_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___refunds___list: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    cursor?: string;
+                    /** @default 20 */
+                    limit?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        items: {
+                            id: string;
+                            version: number;
+                            /** @enum {string} */
+                            status: 'requested' | 'review_required' | 'prepared' | 'processing' | 'rejected' | 'cancelled' | 'completed';
+                            /** @enum {string} */
+                            requestedMode: 'immediate' | 'scheduled';
+                            requestedCutoffAt: number;
+                            effectiveCutoffAt: number | null;
+                            reason: string;
+                            createdAt: number;
+                            quote: {
+                                revision: number;
+                                effectiveCutoffAt: number;
+                                assignments: {
+                                    id: string;
+                                    orderId: string;
+                                    offer: {
+                                        id: string;
+                                        serviceKey: string;
+                                        name: string;
+                                        chainId: number;
+                                        deploymentId?: string;
+                                        currencyCode?: string;
+                                        catalogPriceId?: string;
+                                        priceStartsAt?: number;
+                                        priceExpiresAt?: number | null;
+                                        pricingAssetKey?: string;
+                                        planGroup?: string;
+                                        sortOrder?: number;
+                                        roleId?: string | null;
+                                        contractAddress: string;
+                                        recipientAddress: string;
+                                        tokenSymbol: string;
+                                        decimals: number;
+                                        amountBaseUnits: string;
+                                        duration: number;
+                                        /** @enum {string} */
+                                        durationUnit: 'days' | 'months' | 'years';
+                                        confirmationsRequired: number;
+                                        isEnabled: boolean;
+                                    };
+                                    startsAt: number;
+                                    expiresAt: number;
+                                    provenanceComplete: boolean;
+                                }[];
+                                groups: {
+                                    id: string;
+                                    payerAddress: string;
+                                    chainId: number;
+                                    contractAddress: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    lines: {
+                                        id: string;
+                                        assignmentId: string;
+                                        amountBaseUnits: string;
+                                        sourceOrder: {
+                                            id: string;
+                                            payerAddress: string;
+                                            chainId: number;
+                                            contractAddress: string;
+                                            decimals: number;
+                                        };
+                                    }[];
+                                    confirmations: number;
+                                }[];
+                                reviewReasons: string[];
+                            } | null;
+                            transfers: {
+                                id: string;
+                                /** @enum {string} */
+                                status: 'prepared' | 'broadcast_pending' | 'submitted';
+                                senderAddress: string | null;
+                                startedAt: number | null;
+                                txHash: string | null;
+                            }[];
+                            events: {
+                                actorId: string;
+                                at: number;
+                                action: string;
+                                reason: string;
+                            }[];
+                            document: {
+                                adjustmentReason?: string;
+                                seller?: {
+                                    name: string;
+                                    address: string;
+                                    invoiceRegistrationNumber: string;
+                                } | null;
+                                taxAdjustments?: {
+                                    lineId: string;
+                                    sourceOrderId: string;
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    } | null;
+                                }[];
+                                id: string;
+                                completedAt: number;
+                                requestedCutoffAt: number;
+                                effectiveCutoffAt: number;
+                                groups: {
+                                    id: string;
+                                    payerAddress: string;
+                                    chainId: number;
+                                    contractAddress: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    lines: {
+                                        id: string;
+                                        assignmentId: string;
+                                        amountBaseUnits: string;
+                                        sourceOrder: {
+                                            id: string;
+                                            payerAddress: string;
+                                            chainId: number;
+                                            contractAddress: string;
+                                            decimals: number;
+                                        };
+                                    }[];
+                                    confirmations: number;
+                                }[];
+                                proofs: {
+                                    transferId: string;
+                                    senderAddress: string;
+                                    evidence: {
+                                        chainId: number;
+                                        txHash: string;
+                                        timestamp: number;
+                                        blockHash?: string;
+                                        blockNumber?: string;
+                                        transfers: {
+                                            logIndex: number;
+                                            contractAddress: string;
+                                            fromAddress: string;
+                                            toAddress: string;
+                                            amountBaseUnits: string;
+                                        }[];
+                                    };
+                                }[];
+                                originalPurchases: {
+                                    id: string;
+                                    payerAddress: string;
+                                    offer: {
+                                        id: string;
+                                        serviceKey: string;
+                                        name: string;
+                                        chainId: number;
+                                        deploymentId?: string;
+                                        currencyCode?: string;
+                                        catalogPriceId?: string;
+                                        priceStartsAt?: number;
+                                        priceExpiresAt?: number | null;
+                                        pricingAssetKey?: string;
+                                        planGroup?: string;
+                                        sortOrder?: number;
+                                        roleId?: string | null;
+                                        contractAddress: string;
+                                        recipientAddress: string;
+                                        tokenSymbol: string;
+                                        decimals: number;
+                                        amountBaseUnits: string;
+                                        duration: number;
+                                        /** @enum {string} */
+                                        durationUnit: 'days' | 'months' | 'years';
+                                        confirmationsRequired: number;
+                                        isEnabled: boolean;
+                                    };
+                                    cashAmountBaseUnits: string;
+                                    receiptSnapshot?: {
+                                        /** @constant */
+                                        version: 1;
+                                        consentedAt: number;
+                                        region: {
+                                            country: string | null;
+                                            isEUCountry: boolean | null;
+                                            city: string | null;
+                                            continent: string | null;
+                                            latitude: string | null;
+                                            longitude: string | null;
+                                            postalCode: string | null;
+                                            metroCode: string | null;
+                                            region: string | null;
+                                            regionCode: string | null;
+                                            timezone: string | null;
+                                        };
+                                        statement: {
+                                            id: string;
+                                            country: string;
+                                            statement: string;
+                                        };
+                                        seller: {
+                                            name: string;
+                                            address: string;
+                                            invoiceRegistrationNumber: string;
+                                        };
+                                        tax: {
+                                            name: string;
+                                            rate: string;
+                                            currencyCode: string;
+                                            includedBaseUnits: string;
+                                            excludedBaseUnits: string;
+                                            taxBaseUnits: string;
+                                        };
+                                    } | null;
+                                    txHash: string | null;
+                                    paidAt: number | null;
+                                }[];
+                            } | null;
+                        }[];
+                        nextCursor: string | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_REVIEW_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___refunds___show: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    requestId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        version: number;
+                        /** @enum {string} */
+                        status: 'requested' | 'review_required' | 'prepared' | 'processing' | 'rejected' | 'cancelled' | 'completed';
+                        /** @enum {string} */
+                        requestedMode: 'immediate' | 'scheduled';
+                        requestedCutoffAt: number;
+                        effectiveCutoffAt: number | null;
+                        reason: string;
+                        createdAt: number;
+                        quote: {
+                            revision: number;
+                            effectiveCutoffAt: number;
+                            assignments: {
+                                id: string;
+                                orderId: string;
+                                offer: {
+                                    id: string;
+                                    serviceKey: string;
+                                    name: string;
+                                    chainId: number;
+                                    deploymentId?: string;
+                                    currencyCode?: string;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
+                                    pricingAssetKey?: string;
+                                    planGroup?: string;
+                                    sortOrder?: number;
+                                    roleId?: string | null;
+                                    contractAddress: string;
+                                    recipientAddress: string;
+                                    tokenSymbol: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    duration: number;
+                                    /** @enum {string} */
+                                    durationUnit: 'days' | 'months' | 'years';
+                                    confirmationsRequired: number;
+                                    isEnabled: boolean;
+                                };
+                                startsAt: number;
+                                expiresAt: number;
+                                provenanceComplete: boolean;
+                            }[];
+                            groups: {
+                                id: string;
+                                payerAddress: string;
+                                chainId: number;
+                                contractAddress: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                lines: {
+                                    id: string;
+                                    assignmentId: string;
+                                    amountBaseUnits: string;
+                                    sourceOrder: {
+                                        id: string;
+                                        payerAddress: string;
+                                        chainId: number;
+                                        contractAddress: string;
+                                        decimals: number;
+                                    };
+                                }[];
+                                confirmations: number;
+                            }[];
+                            reviewReasons: string[];
+                        } | null;
+                        transfers: {
+                            id: string;
+                            /** @enum {string} */
+                            status: 'prepared' | 'broadcast_pending' | 'submitted';
+                            senderAddress: string | null;
+                            startedAt: number | null;
+                            txHash: string | null;
+                        }[];
+                        events: {
+                            actorId: string;
+                            at: number;
+                            action: string;
+                            reason: string;
+                        }[];
+                        document: {
+                            adjustmentReason?: string;
+                            seller?: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            } | null;
+                            taxAdjustments?: {
+                                lineId: string;
+                                sourceOrderId: string;
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                } | null;
+                            }[];
+                            id: string;
+                            completedAt: number;
+                            requestedCutoffAt: number;
+                            effectiveCutoffAt: number;
+                            groups: {
+                                id: string;
+                                payerAddress: string;
+                                chainId: number;
+                                contractAddress: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                lines: {
+                                    id: string;
+                                    assignmentId: string;
+                                    amountBaseUnits: string;
+                                    sourceOrder: {
+                                        id: string;
+                                        payerAddress: string;
+                                        chainId: number;
+                                        contractAddress: string;
+                                        decimals: number;
+                                    };
+                                }[];
+                                confirmations: number;
+                            }[];
+                            proofs: {
+                                transferId: string;
+                                senderAddress: string;
+                                evidence: {
+                                    chainId: number;
+                                    txHash: string;
+                                    timestamp: number;
+                                    blockHash?: string;
+                                    blockNumber?: string;
+                                    transfers: {
+                                        logIndex: number;
+                                        contractAddress: string;
+                                        fromAddress: string;
+                                        toAddress: string;
+                                        amountBaseUnits: string;
+                                    }[];
+                                };
+                            }[];
+                            originalPurchases: {
+                                id: string;
+                                payerAddress: string;
+                                offer: {
+                                    id: string;
+                                    serviceKey: string;
+                                    name: string;
+                                    chainId: number;
+                                    deploymentId?: string;
+                                    currencyCode?: string;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
+                                    pricingAssetKey?: string;
+                                    planGroup?: string;
+                                    sortOrder?: number;
+                                    roleId?: string | null;
+                                    contractAddress: string;
+                                    recipientAddress: string;
+                                    tokenSymbol: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    duration: number;
+                                    /** @enum {string} */
+                                    durationUnit: 'days' | 'months' | 'years';
+                                    confirmationsRequired: number;
+                                    isEnabled: boolean;
+                                };
+                                cashAmountBaseUnits: string;
+                                receiptSnapshot?: {
+                                    /** @constant */
+                                    version: 1;
+                                    consentedAt: number;
+                                    region: {
+                                        country: string | null;
+                                        isEUCountry: boolean | null;
+                                        city: string | null;
+                                        continent: string | null;
+                                        latitude: string | null;
+                                        longitude: string | null;
+                                        postalCode: string | null;
+                                        metroCode: string | null;
+                                        region: string | null;
+                                        regionCode: string | null;
+                                        timezone: string | null;
+                                    };
+                                    statement: {
+                                        id: string;
+                                        country: string;
+                                        statement: string;
+                                    };
+                                    seller: {
+                                        name: string;
+                                        address: string;
+                                        invoiceRegistrationNumber: string;
+                                    };
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    };
+                                } | null;
+                                txHash: string | null;
+                                paidAt: number | null;
+                            }[];
+                        } | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_REVIEW_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___refunds___decide: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    requestId: string;
+                    version: number;
+                    /** @enum {string} */
+                    decision: 'approve' | 'reject';
+                    effectiveCutoffAt?: number;
+                    reason: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        version: number;
+                        /** @enum {string} */
+                        status: 'requested' | 'review_required' | 'prepared' | 'processing' | 'rejected' | 'cancelled' | 'completed';
+                        /** @enum {string} */
+                        requestedMode: 'immediate' | 'scheduled';
+                        requestedCutoffAt: number;
+                        effectiveCutoffAt: number | null;
+                        reason: string;
+                        createdAt: number;
+                        quote: {
+                            revision: number;
+                            effectiveCutoffAt: number;
+                            assignments: {
+                                id: string;
+                                orderId: string;
+                                offer: {
+                                    id: string;
+                                    serviceKey: string;
+                                    name: string;
+                                    chainId: number;
+                                    deploymentId?: string;
+                                    currencyCode?: string;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
+                                    pricingAssetKey?: string;
+                                    planGroup?: string;
+                                    sortOrder?: number;
+                                    roleId?: string | null;
+                                    contractAddress: string;
+                                    recipientAddress: string;
+                                    tokenSymbol: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    duration: number;
+                                    /** @enum {string} */
+                                    durationUnit: 'days' | 'months' | 'years';
+                                    confirmationsRequired: number;
+                                    isEnabled: boolean;
+                                };
+                                startsAt: number;
+                                expiresAt: number;
+                                provenanceComplete: boolean;
+                            }[];
+                            groups: {
+                                id: string;
+                                payerAddress: string;
+                                chainId: number;
+                                contractAddress: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                lines: {
+                                    id: string;
+                                    assignmentId: string;
+                                    amountBaseUnits: string;
+                                    sourceOrder: {
+                                        id: string;
+                                        payerAddress: string;
+                                        chainId: number;
+                                        contractAddress: string;
+                                        decimals: number;
+                                    };
+                                }[];
+                                confirmations: number;
+                            }[];
+                            reviewReasons: string[];
+                        } | null;
+                        transfers: {
+                            id: string;
+                            /** @enum {string} */
+                            status: 'prepared' | 'broadcast_pending' | 'submitted';
+                            senderAddress: string | null;
+                            startedAt: number | null;
+                            txHash: string | null;
+                        }[];
+                        events: {
+                            actorId: string;
+                            at: number;
+                            action: string;
+                            reason: string;
+                        }[];
+                        document: {
+                            adjustmentReason?: string;
+                            seller?: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            } | null;
+                            taxAdjustments?: {
+                                lineId: string;
+                                sourceOrderId: string;
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                } | null;
+                            }[];
+                            id: string;
+                            completedAt: number;
+                            requestedCutoffAt: number;
+                            effectiveCutoffAt: number;
+                            groups: {
+                                id: string;
+                                payerAddress: string;
+                                chainId: number;
+                                contractAddress: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                lines: {
+                                    id: string;
+                                    assignmentId: string;
+                                    amountBaseUnits: string;
+                                    sourceOrder: {
+                                        id: string;
+                                        payerAddress: string;
+                                        chainId: number;
+                                        contractAddress: string;
+                                        decimals: number;
+                                    };
+                                }[];
+                                confirmations: number;
+                            }[];
+                            proofs: {
+                                transferId: string;
+                                senderAddress: string;
+                                evidence: {
+                                    chainId: number;
+                                    txHash: string;
+                                    timestamp: number;
+                                    blockHash?: string;
+                                    blockNumber?: string;
+                                    transfers: {
+                                        logIndex: number;
+                                        contractAddress: string;
+                                        fromAddress: string;
+                                        toAddress: string;
+                                        amountBaseUnits: string;
+                                    }[];
+                                };
+                            }[];
+                            originalPurchases: {
+                                id: string;
+                                payerAddress: string;
+                                offer: {
+                                    id: string;
+                                    serviceKey: string;
+                                    name: string;
+                                    chainId: number;
+                                    deploymentId?: string;
+                                    currencyCode?: string;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
+                                    pricingAssetKey?: string;
+                                    planGroup?: string;
+                                    sortOrder?: number;
+                                    roleId?: string | null;
+                                    contractAddress: string;
+                                    recipientAddress: string;
+                                    tokenSymbol: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    duration: number;
+                                    /** @enum {string} */
+                                    durationUnit: 'days' | 'months' | 'years';
+                                    confirmationsRequired: number;
+                                    isEnabled: boolean;
+                                };
+                                cashAmountBaseUnits: string;
+                                receiptSnapshot?: {
+                                    /** @constant */
+                                    version: 1;
+                                    consentedAt: number;
+                                    region: {
+                                        country: string | null;
+                                        isEUCountry: boolean | null;
+                                        city: string | null;
+                                        continent: string | null;
+                                        latitude: string | null;
+                                        longitude: string | null;
+                                        postalCode: string | null;
+                                        metroCode: string | null;
+                                        region: string | null;
+                                        regionCode: string | null;
+                                        timezone: string | null;
+                                    };
+                                    statement: {
+                                        id: string;
+                                        country: string;
+                                        statement: string;
+                                    };
+                                    seller: {
+                                        name: string;
+                                        address: string;
+                                        invoiceRegistrationNumber: string;
+                                    };
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    };
+                                } | null;
+                                txHash: string | null;
+                                paidAt: number | null;
+                            }[];
+                        } | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_REVIEW_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___refunds___start: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    requestId: string;
+                    transferId: string;
+                    version: number;
+                    senderAddress: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        version: number;
+                        /** @enum {string} */
+                        status: 'requested' | 'review_required' | 'prepared' | 'processing' | 'rejected' | 'cancelled' | 'completed';
+                        /** @enum {string} */
+                        requestedMode: 'immediate' | 'scheduled';
+                        requestedCutoffAt: number;
+                        effectiveCutoffAt: number | null;
+                        reason: string;
+                        createdAt: number;
+                        quote: {
+                            revision: number;
+                            effectiveCutoffAt: number;
+                            assignments: {
+                                id: string;
+                                orderId: string;
+                                offer: {
+                                    id: string;
+                                    serviceKey: string;
+                                    name: string;
+                                    chainId: number;
+                                    deploymentId?: string;
+                                    currencyCode?: string;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
+                                    pricingAssetKey?: string;
+                                    planGroup?: string;
+                                    sortOrder?: number;
+                                    roleId?: string | null;
+                                    contractAddress: string;
+                                    recipientAddress: string;
+                                    tokenSymbol: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    duration: number;
+                                    /** @enum {string} */
+                                    durationUnit: 'days' | 'months' | 'years';
+                                    confirmationsRequired: number;
+                                    isEnabled: boolean;
+                                };
+                                startsAt: number;
+                                expiresAt: number;
+                                provenanceComplete: boolean;
+                            }[];
+                            groups: {
+                                id: string;
+                                payerAddress: string;
+                                chainId: number;
+                                contractAddress: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                lines: {
+                                    id: string;
+                                    assignmentId: string;
+                                    amountBaseUnits: string;
+                                    sourceOrder: {
+                                        id: string;
+                                        payerAddress: string;
+                                        chainId: number;
+                                        contractAddress: string;
+                                        decimals: number;
+                                    };
+                                }[];
+                                confirmations: number;
+                            }[];
+                            reviewReasons: string[];
+                        } | null;
+                        transfers: {
+                            id: string;
+                            /** @enum {string} */
+                            status: 'prepared' | 'broadcast_pending' | 'submitted';
+                            senderAddress: string | null;
+                            startedAt: number | null;
+                            txHash: string | null;
+                        }[];
+                        events: {
+                            actorId: string;
+                            at: number;
+                            action: string;
+                            reason: string;
+                        }[];
+                        document: {
+                            adjustmentReason?: string;
+                            seller?: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            } | null;
+                            taxAdjustments?: {
+                                lineId: string;
+                                sourceOrderId: string;
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                } | null;
+                            }[];
+                            id: string;
+                            completedAt: number;
+                            requestedCutoffAt: number;
+                            effectiveCutoffAt: number;
+                            groups: {
+                                id: string;
+                                payerAddress: string;
+                                chainId: number;
+                                contractAddress: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                lines: {
+                                    id: string;
+                                    assignmentId: string;
+                                    amountBaseUnits: string;
+                                    sourceOrder: {
+                                        id: string;
+                                        payerAddress: string;
+                                        chainId: number;
+                                        contractAddress: string;
+                                        decimals: number;
+                                    };
+                                }[];
+                                confirmations: number;
+                            }[];
+                            proofs: {
+                                transferId: string;
+                                senderAddress: string;
+                                evidence: {
+                                    chainId: number;
+                                    txHash: string;
+                                    timestamp: number;
+                                    blockHash?: string;
+                                    blockNumber?: string;
+                                    transfers: {
+                                        logIndex: number;
+                                        contractAddress: string;
+                                        fromAddress: string;
+                                        toAddress: string;
+                                        amountBaseUnits: string;
+                                    }[];
+                                };
+                            }[];
+                            originalPurchases: {
+                                id: string;
+                                payerAddress: string;
+                                offer: {
+                                    id: string;
+                                    serviceKey: string;
+                                    name: string;
+                                    chainId: number;
+                                    deploymentId?: string;
+                                    currencyCode?: string;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
+                                    pricingAssetKey?: string;
+                                    planGroup?: string;
+                                    sortOrder?: number;
+                                    roleId?: string | null;
+                                    contractAddress: string;
+                                    recipientAddress: string;
+                                    tokenSymbol: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    duration: number;
+                                    /** @enum {string} */
+                                    durationUnit: 'days' | 'months' | 'years';
+                                    confirmationsRequired: number;
+                                    isEnabled: boolean;
+                                };
+                                cashAmountBaseUnits: string;
+                                receiptSnapshot?: {
+                                    /** @constant */
+                                    version: 1;
+                                    consentedAt: number;
+                                    region: {
+                                        country: string | null;
+                                        isEUCountry: boolean | null;
+                                        city: string | null;
+                                        continent: string | null;
+                                        latitude: string | null;
+                                        longitude: string | null;
+                                        postalCode: string | null;
+                                        metroCode: string | null;
+                                        region: string | null;
+                                        regionCode: string | null;
+                                        timezone: string | null;
+                                    };
+                                    statement: {
+                                        id: string;
+                                        country: string;
+                                        statement: string;
+                                    };
+                                    seller: {
+                                        name: string;
+                                        address: string;
+                                        invoiceRegistrationNumber: string;
+                                    };
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    };
+                                } | null;
+                                txHash: string | null;
+                                paidAt: number | null;
+                            }[];
+                        } | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_REVIEW_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___refunds___submit: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    requestId: string;
+                    transferId: string;
+                    txHash: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        version: number;
+                        /** @enum {string} */
+                        status: 'requested' | 'review_required' | 'prepared' | 'processing' | 'rejected' | 'cancelled' | 'completed';
+                        /** @enum {string} */
+                        requestedMode: 'immediate' | 'scheduled';
+                        requestedCutoffAt: number;
+                        effectiveCutoffAt: number | null;
+                        reason: string;
+                        createdAt: number;
+                        quote: {
+                            revision: number;
+                            effectiveCutoffAt: number;
+                            assignments: {
+                                id: string;
+                                orderId: string;
+                                offer: {
+                                    id: string;
+                                    serviceKey: string;
+                                    name: string;
+                                    chainId: number;
+                                    deploymentId?: string;
+                                    currencyCode?: string;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
+                                    pricingAssetKey?: string;
+                                    planGroup?: string;
+                                    sortOrder?: number;
+                                    roleId?: string | null;
+                                    contractAddress: string;
+                                    recipientAddress: string;
+                                    tokenSymbol: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    duration: number;
+                                    /** @enum {string} */
+                                    durationUnit: 'days' | 'months' | 'years';
+                                    confirmationsRequired: number;
+                                    isEnabled: boolean;
+                                };
+                                startsAt: number;
+                                expiresAt: number;
+                                provenanceComplete: boolean;
+                            }[];
+                            groups: {
+                                id: string;
+                                payerAddress: string;
+                                chainId: number;
+                                contractAddress: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                lines: {
+                                    id: string;
+                                    assignmentId: string;
+                                    amountBaseUnits: string;
+                                    sourceOrder: {
+                                        id: string;
+                                        payerAddress: string;
+                                        chainId: number;
+                                        contractAddress: string;
+                                        decimals: number;
+                                    };
+                                }[];
+                                confirmations: number;
+                            }[];
+                            reviewReasons: string[];
+                        } | null;
+                        transfers: {
+                            id: string;
+                            /** @enum {string} */
+                            status: 'prepared' | 'broadcast_pending' | 'submitted';
+                            senderAddress: string | null;
+                            startedAt: number | null;
+                            txHash: string | null;
+                        }[];
+                        events: {
+                            actorId: string;
+                            at: number;
+                            action: string;
+                            reason: string;
+                        }[];
+                        document: {
+                            adjustmentReason?: string;
+                            seller?: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            } | null;
+                            taxAdjustments?: {
+                                lineId: string;
+                                sourceOrderId: string;
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                } | null;
+                            }[];
+                            id: string;
+                            completedAt: number;
+                            requestedCutoffAt: number;
+                            effectiveCutoffAt: number;
+                            groups: {
+                                id: string;
+                                payerAddress: string;
+                                chainId: number;
+                                contractAddress: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                lines: {
+                                    id: string;
+                                    assignmentId: string;
+                                    amountBaseUnits: string;
+                                    sourceOrder: {
+                                        id: string;
+                                        payerAddress: string;
+                                        chainId: number;
+                                        contractAddress: string;
+                                        decimals: number;
+                                    };
+                                }[];
+                                confirmations: number;
+                            }[];
+                            proofs: {
+                                transferId: string;
+                                senderAddress: string;
+                                evidence: {
+                                    chainId: number;
+                                    txHash: string;
+                                    timestamp: number;
+                                    blockHash?: string;
+                                    blockNumber?: string;
+                                    transfers: {
+                                        logIndex: number;
+                                        contractAddress: string;
+                                        fromAddress: string;
+                                        toAddress: string;
+                                        amountBaseUnits: string;
+                                    }[];
+                                };
+                            }[];
+                            originalPurchases: {
+                                id: string;
+                                payerAddress: string;
+                                offer: {
+                                    id: string;
+                                    serviceKey: string;
+                                    name: string;
+                                    chainId: number;
+                                    deploymentId?: string;
+                                    currencyCode?: string;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
+                                    pricingAssetKey?: string;
+                                    planGroup?: string;
+                                    sortOrder?: number;
+                                    roleId?: string | null;
+                                    contractAddress: string;
+                                    recipientAddress: string;
+                                    tokenSymbol: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    duration: number;
+                                    /** @enum {string} */
+                                    durationUnit: 'days' | 'months' | 'years';
+                                    confirmationsRequired: number;
+                                    isEnabled: boolean;
+                                };
+                                cashAmountBaseUnits: string;
+                                receiptSnapshot?: {
+                                    /** @constant */
+                                    version: 1;
+                                    consentedAt: number;
+                                    region: {
+                                        country: string | null;
+                                        isEUCountry: boolean | null;
+                                        city: string | null;
+                                        continent: string | null;
+                                        latitude: string | null;
+                                        longitude: string | null;
+                                        postalCode: string | null;
+                                        metroCode: string | null;
+                                        region: string | null;
+                                        regionCode: string | null;
+                                        timezone: string | null;
+                                    };
+                                    statement: {
+                                        id: string;
+                                        country: string;
+                                        statement: string;
+                                    };
+                                    seller: {
+                                        name: string;
+                                        address: string;
+                                        invoiceRegistrationNumber: string;
+                                    };
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    };
+                                } | null;
+                                txHash: string | null;
+                                paidAt: number | null;
+                            }[];
+                        } | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_REVIEW_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___refunds___check: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    requestId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        version: number;
+                        /** @enum {string} */
+                        status: 'requested' | 'review_required' | 'prepared' | 'processing' | 'rejected' | 'cancelled' | 'completed';
+                        /** @enum {string} */
+                        requestedMode: 'immediate' | 'scheduled';
+                        requestedCutoffAt: number;
+                        effectiveCutoffAt: number | null;
+                        reason: string;
+                        createdAt: number;
+                        quote: {
+                            revision: number;
+                            effectiveCutoffAt: number;
+                            assignments: {
+                                id: string;
+                                orderId: string;
+                                offer: {
+                                    id: string;
+                                    serviceKey: string;
+                                    name: string;
+                                    chainId: number;
+                                    deploymentId?: string;
+                                    currencyCode?: string;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
+                                    pricingAssetKey?: string;
+                                    planGroup?: string;
+                                    sortOrder?: number;
+                                    roleId?: string | null;
+                                    contractAddress: string;
+                                    recipientAddress: string;
+                                    tokenSymbol: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    duration: number;
+                                    /** @enum {string} */
+                                    durationUnit: 'days' | 'months' | 'years';
+                                    confirmationsRequired: number;
+                                    isEnabled: boolean;
+                                };
+                                startsAt: number;
+                                expiresAt: number;
+                                provenanceComplete: boolean;
+                            }[];
+                            groups: {
+                                id: string;
+                                payerAddress: string;
+                                chainId: number;
+                                contractAddress: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                lines: {
+                                    id: string;
+                                    assignmentId: string;
+                                    amountBaseUnits: string;
+                                    sourceOrder: {
+                                        id: string;
+                                        payerAddress: string;
+                                        chainId: number;
+                                        contractAddress: string;
+                                        decimals: number;
+                                    };
+                                }[];
+                                confirmations: number;
+                            }[];
+                            reviewReasons: string[];
+                        } | null;
+                        transfers: {
+                            id: string;
+                            /** @enum {string} */
+                            status: 'prepared' | 'broadcast_pending' | 'submitted';
+                            senderAddress: string | null;
+                            startedAt: number | null;
+                            txHash: string | null;
+                        }[];
+                        events: {
+                            actorId: string;
+                            at: number;
+                            action: string;
+                            reason: string;
+                        }[];
+                        document: {
+                            adjustmentReason?: string;
+                            seller?: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            } | null;
+                            taxAdjustments?: {
+                                lineId: string;
+                                sourceOrderId: string;
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                } | null;
+                            }[];
+                            id: string;
+                            completedAt: number;
+                            requestedCutoffAt: number;
+                            effectiveCutoffAt: number;
+                            groups: {
+                                id: string;
+                                payerAddress: string;
+                                chainId: number;
+                                contractAddress: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                lines: {
+                                    id: string;
+                                    assignmentId: string;
+                                    amountBaseUnits: string;
+                                    sourceOrder: {
+                                        id: string;
+                                        payerAddress: string;
+                                        chainId: number;
+                                        contractAddress: string;
+                                        decimals: number;
+                                    };
+                                }[];
+                                confirmations: number;
+                            }[];
+                            proofs: {
+                                transferId: string;
+                                senderAddress: string;
+                                evidence: {
+                                    chainId: number;
+                                    txHash: string;
+                                    timestamp: number;
+                                    blockHash?: string;
+                                    blockNumber?: string;
+                                    transfers: {
+                                        logIndex: number;
+                                        contractAddress: string;
+                                        fromAddress: string;
+                                        toAddress: string;
+                                        amountBaseUnits: string;
+                                    }[];
+                                };
+                            }[];
+                            originalPurchases: {
+                                id: string;
+                                payerAddress: string;
+                                offer: {
+                                    id: string;
+                                    serviceKey: string;
+                                    name: string;
+                                    chainId: number;
+                                    deploymentId?: string;
+                                    currencyCode?: string;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
+                                    pricingAssetKey?: string;
+                                    planGroup?: string;
+                                    sortOrder?: number;
+                                    roleId?: string | null;
+                                    contractAddress: string;
+                                    recipientAddress: string;
+                                    tokenSymbol: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    duration: number;
+                                    /** @enum {string} */
+                                    durationUnit: 'days' | 'months' | 'years';
+                                    confirmationsRequired: number;
+                                    isEnabled: boolean;
+                                };
+                                cashAmountBaseUnits: string;
+                                receiptSnapshot?: {
+                                    /** @constant */
+                                    version: 1;
+                                    consentedAt: number;
+                                    region: {
+                                        country: string | null;
+                                        isEUCountry: boolean | null;
+                                        city: string | null;
+                                        continent: string | null;
+                                        latitude: string | null;
+                                        longitude: string | null;
+                                        postalCode: string | null;
+                                        metroCode: string | null;
+                                        region: string | null;
+                                        regionCode: string | null;
+                                        timezone: string | null;
+                                    };
+                                    statement: {
+                                        id: string;
+                                        country: string;
+                                        statement: string;
+                                    };
+                                    seller: {
+                                        name: string;
+                                        address: string;
+                                        invoiceRegistrationNumber: string;
+                                    };
+                                    tax: {
+                                        name: string;
+                                        rate: string;
+                                        currencyCode: string;
+                                        includedBaseUnits: string;
+                                        excludedBaseUnits: string;
+                                        taxBaseUnits: string;
+                                    };
+                                } | null;
+                                txHash: string | null;
+                                paidAt: number | null;
+                            }[];
+                        } | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_REVIEW_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___prices___list: {
+        requestBody: {
+            content: {
+                'application/json': Record<string, never>;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        priceId: string;
+                        offer: {
+                            id: string;
+                            serviceKey: string;
+                            name: string;
+                            chainId: number;
+                            deploymentId?: string;
+                            currencyCode?: string;
+                            catalogPriceId?: string;
+                            priceStartsAt?: number;
+                            priceExpiresAt?: number | null;
+                            pricingAssetKey?: string;
+                            planGroup?: string;
+                            sortOrder?: number;
+                            roleId?: string | null;
+                            contractAddress: string;
+                            recipientAddress: string;
+                            tokenSymbol: string;
+                            decimals: number;
+                            amountBaseUnits: string;
+                            duration: number;
+                            /** @enum {string} */
+                            durationUnit: 'days' | 'months' | 'years';
+                            confirmationsRequired: number;
+                            isEnabled: boolean;
+                        };
+                    }[];
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___chains___delete: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    chainId: number;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        /** @constant */
+                        ok: true;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___assets___list: {
+        requestBody: {
+            content: {
+                'application/json': Record<string, never>;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        pricingAssetKey: string;
+                        name: string;
+                        symbol: string;
+                        currencyCode: string;
+                        isEnabled: boolean;
+                    }[];
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___assets___upsert: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    id: string;
+                    pricingAssetKey: string;
+                    name: string;
+                    symbol: string;
+                    currencyCode: string;
+                    isEnabled: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        pricingAssetKey: string;
+                        name: string;
+                        symbol: string;
+                        currencyCode: string;
+                        isEnabled: boolean;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___assets___delete: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    assetId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        /** @constant */
+                        ok: true;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___deployments___list: {
+        requestBody: {
+            content: {
+                'application/json': Record<string, never>;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        assetId: string;
+                        chainId: number;
+                        tokenSymbol: string;
+                        tokenName: string;
+                        contractAddress: string;
+                        decimals: number;
+                        recipientAddress: string;
+                        isEnabled: boolean;
+                    }[];
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___deployments___upsert: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    id: string;
+                    assetId: string;
+                    chainId: number;
+                    tokenSymbol: string;
+                    tokenName: string;
+                    contractAddress: string;
+                    decimals: number;
+                    recipientAddress: string;
+                    isEnabled: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        id: string;
+                        assetId: string;
+                        chainId: number;
+                        tokenSymbol: string;
+                        tokenName: string;
+                        contractAddress: string;
+                        decimals: number;
+                        recipientAddress: string;
+                        isEnabled: boolean;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___deployments___delete: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    deploymentId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        /** @constant */
+                        ok: true;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___deployments___resolve: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    chainId: number;
+                    contractAddress: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        tokenSymbol: string | null;
+                        tokenName: string | null;
+                        decimals: number;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    'admin___billing___chains___test-rpc': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    chainId: number;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        chainId: number;
+                        /** @constant */
+                        ok: true;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    'admin___billing___prices___attach-deployment': {
+        requestBody: {
+            content: {
+                'application/json': {
+                    sourcePriceId: string;
+                    deploymentId: string;
+                    offerId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        /** @constant */
+                        ok: true;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___prices___delete: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    priceId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        /** @constant */
+                        ok: true;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___policy___get: {
+        requestBody: {
+            content: {
+                'application/json': Record<string, never>;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        revision: number;
+                        policy: {
+                            countryEligibility?: {
+                                /** @enum {string} */
+                                operatorCountry: 'AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW';
+                                /** @enum {string} */
+                                mode: 'domestic' | 'allow';
+                                allowedCountries: ('AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW')[];
+                            };
+                            residenceRequiredSubdivisions?: ('AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW')[];
+                            isEnabled: boolean;
+                            trustedProxyCidrs: string[];
+                            regionRules: {
+                                /** @enum {string} */
+                                mode: 'allow' | 'deny';
+                                rules: {
+                                    country?: string;
+                                    regionCode?: string;
+                                    continent?: string;
+                                    isEUCountry?: boolean;
+                                }[];
+                            };
+                            taxName: string;
+                            taxRate: string;
+                            seller: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            };
+                            statementText: string;
+                        };
+                    } | null;
+                };
+            };
+            /** @description Empty result */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___policy___upsert: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    revision: number;
+                    policy: {
+                        countryEligibility?: {
+                            /** @enum {string} */
+                            operatorCountry: 'AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW';
+                            /** @enum {string} */
+                            mode: 'domestic' | 'allow';
+                            allowedCountries: ('AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW')[];
+                        };
+                        residenceRequiredSubdivisions?: ('AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW')[];
+                        isEnabled: boolean;
+                        trustedProxyCidrs: string[];
+                        regionRules: {
+                            /** @enum {string} */
+                            mode: 'allow' | 'deny';
+                            rules: {
+                                country?: string;
+                                regionCode?: string;
+                                continent?: string;
+                                isEUCountry?: boolean;
+                            }[];
+                        };
+                        taxName: string;
+                        taxRate: string;
+                        seller: {
+                            name: string;
+                            address: string;
+                            invoiceRegistrationNumber: string;
+                        };
+                        statementText: string;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        revision: number;
+                        policy: {
+                            countryEligibility?: {
+                                /** @enum {string} */
+                                operatorCountry: 'AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW';
+                                /** @enum {string} */
+                                mode: 'domestic' | 'allow';
+                                allowedCountries: ('AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW')[];
+                            };
+                            residenceRequiredSubdivisions?: ('AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW')[];
+                            isEnabled: boolean;
+                            trustedProxyCidrs: string[];
+                            regionRules: {
+                                /** @enum {string} */
+                                mode: 'allow' | 'deny';
+                                rules: {
+                                    country?: string;
+                                    regionCode?: string;
+                                    continent?: string;
+                                    isEUCountry?: boolean;
+                                }[];
+                            };
+                            taxName: string;
+                            taxRate: string;
+                            seller: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            };
+                            statementText: string;
+                        };
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    'billing___purchase-requirements': {
+        requestBody: {
+            content: {
+                'application/json': Record<string, never>;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        isRequired: boolean;
+                        country: string | null;
+                        statement: {
+                            id: string;
+                            country: string;
+                            statement: string;
+                        } | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    billing___orders___history: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    cursor?: string;
+                    /** @default 20 */
+                    limit?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        items: {
+                            id: string;
+                            offer: {
+                                id: string;
+                                serviceKey: string;
+                                name: string;
+                                chainId: number;
+                                deploymentId?: string;
+                                currencyCode?: string;
+                                catalogPriceId?: string;
+                                priceStartsAt?: number;
+                                priceExpiresAt?: number | null;
+                                pricingAssetKey?: string;
+                                planGroup?: string;
+                                sortOrder?: number;
+                                roleId?: string | null;
+                                contractAddress: string;
+                                recipientAddress: string;
+                                tokenSymbol: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                duration: number;
+                                /** @enum {string} */
+                                durationUnit: 'days' | 'months' | 'years';
+                                confirmationsRequired: number;
+                                isEnabled: boolean;
+                            };
+                            payerAddress: string;
+                            declaredResidence?: {
+                                /** @enum {string} */
+                                country: 'AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW';
+                                subdivision: string | null;
+                                revision: number;
+                                declaredAt: number;
+                                /** @constant */
+                                kind: 'self_declared';
+                            };
+                            amountBaseUnits: string;
+                            quote: {
+                                quoteCreatedAt: number;
+                                quoteExpiresAt: number;
+                                baseAmountBaseUnits: string;
+                                discountBaseUnits: string;
+                                payableAmountBaseUnits: string;
+                                discountAssignmentIds: string[];
+                                effectiveStartsAt: number;
+                                effectiveExpiresAt: number;
+                                currentPlan: {
+                                    id: string;
+                                    name: string;
+                                    sortOrder: number;
+                                    expiresAt: number;
+                                    priceAmountBaseUnits: string;
+                                    priceDurationDays: number;
+                                    /** @enum {string} */
+                                    priceDurationUnit: 'days' | 'months' | 'years';
+                                } | null;
+                            } | null;
+                            /** @enum {string} */
+                            status: 'pending' | 'paid' | 'expired' | 'failed';
+                            txHash: string | null;
+                            createdAt: number;
+                            expiresAt: number;
+                            paidAt: number | null;
+                            startsAt: number | null;
+                            endsAt: number | null;
+                        }[];
+                        nextCursor: string | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___orders___list: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    userId?: string;
+                    cursor?: string;
+                    /** @default 20 */
+                    limit?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        items: {
+                            userId: string | null;
+                            order: {
+                                id: string;
+                                offer: {
+                                    id: string;
+                                    serviceKey: string;
+                                    name: string;
+                                    chainId: number;
+                                    deploymentId?: string;
+                                    currencyCode?: string;
+                                    catalogPriceId?: string;
+                                    priceStartsAt?: number;
+                                    priceExpiresAt?: number | null;
+                                    pricingAssetKey?: string;
+                                    planGroup?: string;
+                                    sortOrder?: number;
+                                    roleId?: string | null;
+                                    contractAddress: string;
+                                    recipientAddress: string;
+                                    tokenSymbol: string;
+                                    decimals: number;
+                                    amountBaseUnits: string;
+                                    duration: number;
+                                    /** @enum {string} */
+                                    durationUnit: 'days' | 'months' | 'years';
+                                    confirmationsRequired: number;
+                                    isEnabled: boolean;
+                                };
+                                payerAddress: string;
+                                declaredResidence?: {
+                                    /** @enum {string} */
+                                    country: 'AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW';
+                                    subdivision: string | null;
+                                    revision: number;
+                                    declaredAt: number;
+                                    /** @constant */
+                                    kind: 'self_declared';
+                                };
+                                amountBaseUnits: string;
+                                quote: {
+                                    quoteCreatedAt: number;
+                                    quoteExpiresAt: number;
+                                    baseAmountBaseUnits: string;
+                                    discountBaseUnits: string;
+                                    payableAmountBaseUnits: string;
+                                    discountAssignmentIds: string[];
+                                    effectiveStartsAt: number;
+                                    effectiveExpiresAt: number;
+                                    currentPlan: {
+                                        id: string;
+                                        name: string;
+                                        sortOrder: number;
+                                        expiresAt: number;
+                                        priceAmountBaseUnits: string;
+                                        priceDurationDays: number;
+                                        /** @enum {string} */
+                                        priceDurationUnit: 'days' | 'months' | 'years';
+                                    } | null;
+                                } | null;
+                                /** @enum {string} */
+                                status: 'pending' | 'paid' | 'expired' | 'failed';
+                                txHash: string | null;
+                                createdAt: number;
+                                expiresAt: number;
+                                paidAt: number | null;
+                                startsAt: number | null;
+                                endsAt: number | null;
+                            };
+                            snapshot: {
+                                /** @constant */
+                                version: 1;
+                                consentedAt: number;
+                                region: {
+                                    country: string | null;
+                                    isEUCountry: boolean | null;
+                                    city: string | null;
+                                    continent: string | null;
+                                    latitude: string | null;
+                                    longitude: string | null;
+                                    postalCode: string | null;
+                                    metroCode: string | null;
+                                    region: string | null;
+                                    regionCode: string | null;
+                                    timezone: string | null;
+                                };
+                                statement: {
+                                    id: string;
+                                    country: string;
+                                    statement: string;
+                                };
+                                seller: {
+                                    name: string;
+                                    address: string;
+                                    invoiceRegistrationNumber: string;
+                                };
+                                tax: {
+                                    name: string;
+                                    rate: string;
+                                    currencyCode: string;
+                                    includedBaseUnits: string;
+                                    excludedBaseUnits: string;
+                                    taxBaseUnits: string;
+                                };
+                            } | null;
+                        }[];
+                        nextCursor: string | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___orders___check: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    orderId: string;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        userId: string | null;
+                        order: {
+                            id: string;
+                            offer: {
+                                id: string;
+                                serviceKey: string;
+                                name: string;
+                                chainId: number;
+                                deploymentId?: string;
+                                currencyCode?: string;
+                                catalogPriceId?: string;
+                                priceStartsAt?: number;
+                                priceExpiresAt?: number | null;
+                                pricingAssetKey?: string;
+                                planGroup?: string;
+                                sortOrder?: number;
+                                roleId?: string | null;
+                                contractAddress: string;
+                                recipientAddress: string;
+                                tokenSymbol: string;
+                                decimals: number;
+                                amountBaseUnits: string;
+                                duration: number;
+                                /** @enum {string} */
+                                durationUnit: 'days' | 'months' | 'years';
+                                confirmationsRequired: number;
+                                isEnabled: boolean;
+                            };
+                            payerAddress: string;
+                            declaredResidence?: {
+                                /** @enum {string} */
+                                country: 'AD' | 'AE' | 'AF' | 'AG' | 'AI' | 'AL' | 'AM' | 'AO' | 'AQ' | 'AR' | 'AS' | 'AT' | 'AU' | 'AW' | 'AX' | 'AZ' | 'BA' | 'BB' | 'BD' | 'BE' | 'BF' | 'BG' | 'BH' | 'BI' | 'BJ' | 'BL' | 'BM' | 'BN' | 'BO' | 'BQ' | 'BR' | 'BS' | 'BT' | 'BV' | 'BW' | 'BY' | 'BZ' | 'CA' | 'CC' | 'CD' | 'CF' | 'CG' | 'CH' | 'CI' | 'CK' | 'CL' | 'CM' | 'CN' | 'CO' | 'CR' | 'CU' | 'CV' | 'CW' | 'CX' | 'CY' | 'CZ' | 'DE' | 'DJ' | 'DK' | 'DM' | 'DO' | 'DZ' | 'EC' | 'EE' | 'EG' | 'EH' | 'ER' | 'ES' | 'ET' | 'FI' | 'FJ' | 'FK' | 'FM' | 'FO' | 'FR' | 'GA' | 'GB' | 'GD' | 'GE' | 'GF' | 'GG' | 'GH' | 'GI' | 'GL' | 'GM' | 'GN' | 'GP' | 'GQ' | 'GR' | 'GS' | 'GT' | 'GU' | 'GW' | 'GY' | 'HK' | 'HM' | 'HN' | 'HR' | 'HT' | 'HU' | 'ID' | 'IE' | 'IL' | 'IM' | 'IN' | 'IO' | 'IQ' | 'IR' | 'IS' | 'IT' | 'JE' | 'JM' | 'JO' | 'JP' | 'KE' | 'KG' | 'KH' | 'KI' | 'KM' | 'KN' | 'KP' | 'KR' | 'KW' | 'KY' | 'KZ' | 'LA' | 'LB' | 'LC' | 'LI' | 'LK' | 'LR' | 'LS' | 'LT' | 'LU' | 'LV' | 'LY' | 'MA' | 'MC' | 'MD' | 'ME' | 'MF' | 'MG' | 'MH' | 'MK' | 'ML' | 'MM' | 'MN' | 'MO' | 'MP' | 'MQ' | 'MR' | 'MS' | 'MT' | 'MU' | 'MV' | 'MW' | 'MX' | 'MY' | 'MZ' | 'NA' | 'NC' | 'NE' | 'NF' | 'NG' | 'NI' | 'NL' | 'NO' | 'NP' | 'NR' | 'NU' | 'NZ' | 'OM' | 'PA' | 'PE' | 'PF' | 'PG' | 'PH' | 'PK' | 'PL' | 'PM' | 'PN' | 'PR' | 'PS' | 'PT' | 'PW' | 'PY' | 'QA' | 'RE' | 'RO' | 'RS' | 'RU' | 'RW' | 'SA' | 'SB' | 'SC' | 'SD' | 'SE' | 'SG' | 'SH' | 'SI' | 'SJ' | 'SK' | 'SL' | 'SM' | 'SN' | 'SO' | 'SR' | 'SS' | 'ST' | 'SV' | 'SX' | 'SY' | 'SZ' | 'TC' | 'TD' | 'TF' | 'TG' | 'TH' | 'TJ' | 'TK' | 'TL' | 'TM' | 'TN' | 'TO' | 'TR' | 'TT' | 'TV' | 'TW' | 'TZ' | 'UA' | 'UG' | 'UM' | 'US' | 'UY' | 'UZ' | 'VA' | 'VC' | 'VE' | 'VG' | 'VI' | 'VN' | 'VU' | 'WF' | 'WS' | 'YE' | 'YT' | 'ZA' | 'ZM' | 'ZW';
+                                subdivision: string | null;
+                                revision: number;
+                                declaredAt: number;
+                                /** @constant */
+                                kind: 'self_declared';
+                            };
+                            amountBaseUnits: string;
+                            quote: {
+                                quoteCreatedAt: number;
+                                quoteExpiresAt: number;
+                                baseAmountBaseUnits: string;
+                                discountBaseUnits: string;
+                                payableAmountBaseUnits: string;
+                                discountAssignmentIds: string[];
+                                effectiveStartsAt: number;
+                                effectiveExpiresAt: number;
+                                currentPlan: {
+                                    id: string;
+                                    name: string;
+                                    sortOrder: number;
+                                    expiresAt: number;
+                                    priceAmountBaseUnits: string;
+                                    priceDurationDays: number;
+                                    /** @enum {string} */
+                                    priceDurationUnit: 'days' | 'months' | 'years';
+                                } | null;
+                            } | null;
+                            /** @enum {string} */
+                            status: 'pending' | 'paid' | 'expired' | 'failed';
+                            txHash: string | null;
+                            createdAt: number;
+                            expiresAt: number;
+                            paidAt: number | null;
+                            startsAt: number | null;
+                            endsAt: number | null;
+                        };
+                        snapshot: {
+                            /** @constant */
+                            version: 1;
+                            consentedAt: number;
+                            region: {
+                                country: string | null;
+                                isEUCountry: boolean | null;
+                                city: string | null;
+                                continent: string | null;
+                                latitude: string | null;
+                                longitude: string | null;
+                                postalCode: string | null;
+                                metroCode: string | null;
+                                region: string | null;
+                                regionCode: string | null;
+                                timezone: string | null;
+                            };
+                            statement: {
+                                id: string;
+                                country: string;
+                                statement: string;
+                            };
+                            seller: {
+                                name: string;
+                                address: string;
+                                invoiceRegistrationNumber: string;
+                            };
+                            tax: {
+                                name: string;
+                                rate: string;
+                                currencyCode: string;
+                                includedBaseUnits: string;
+                                excludedBaseUnits: string;
+                                taxBaseUnits: string;
+                            };
+                        } | null;
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    admin___billing___sales___summary: {
+        requestBody: {
+            content: {
+                'application/json': {
+                    from: number;
+                    to: number;
+                };
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        from: number;
+                        to: number;
+                        count: number;
+                        unknownTaxCount: number;
+                        byCurrency: {
+                            assetKey: string;
+                            currencyCode: string | null;
+                            decimals: number;
+                            count: number;
+                            unknownTaxCount: number;
+                            grossBaseUnits: string;
+                            netBaseUnits: string | null;
+                            taxBaseUnits: string | null;
+                            taxName?: string | null;
+                            taxRate?: string | null;
+                            serviceKey?: string;
+                            planName?: string;
+                            tokenSymbol?: string;
+                        }[];
+                        byTax: {
+                            assetKey: string;
+                            currencyCode: string | null;
+                            decimals: number;
+                            count: number;
+                            unknownTaxCount: number;
+                            grossBaseUnits: string;
+                            netBaseUnits: string | null;
+                            taxBaseUnits: string | null;
+                            taxName?: string | null;
+                            taxRate?: string | null;
+                            serviceKey?: string;
+                            planName?: string;
+                            tokenSymbol?: string;
+                        }[];
+                        byPlan: {
+                            assetKey: string;
+                            currencyCode: string | null;
+                            decimals: number;
+                            count: number;
+                            unknownTaxCount: number;
+                            grossBaseUnits: string;
+                            netBaseUnits: string | null;
+                            taxBaseUnits: string | null;
+                            taxName?: string | null;
+                            taxRate?: string | null;
+                            serviceKey?: string;
+                            planName?: string;
+                            tokenSymbol?: string;
+                        }[];
+                        byAsset: {
+                            assetKey: string;
+                            currencyCode: string | null;
+                            decimals: number;
+                            count: number;
+                            unknownTaxCount: number;
+                            grossBaseUnits: string;
+                            netBaseUnits: string | null;
+                            taxBaseUnits: string | null;
+                            taxName?: string | null;
+                            taxRate?: string | null;
+                            serviceKey?: string;
+                            planName?: string;
+                            tokenSymbol?: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description 400 */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ACCESS_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INVALID_PARAM';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_UNAVAILABLE';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 401 */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'AUTHENTICATION_FAILED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'CREDENTIAL_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 403 */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'ROLE_PERMISSION_DENIED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_SUSPENDED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'YOUR_ACCOUNT_MOVED';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'PERMISSION_DENIED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 404 */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_NOT_FOUND';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_CONFLICT';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 429 */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RATE_LIMIT_EXCEEDED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 500 */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'INTERNAL_ERROR';
+                            message: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     admin___wallets___chains___list: {
         requestBody: {
             content: {
@@ -38598,6 +52442,26 @@ export interface operations {
                             /** @constant */
                             code: 'PAYMENT_TRANSACTION_INVALID';
                             message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
                         };
                     };
                 };
@@ -38689,6 +52553,27 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'WALLET_REAUTHENTICATION_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
                             message: string;
                         };
                     };
@@ -38859,6 +52744,26 @@ export interface operations {
                             /** @constant */
                             code: 'PAYMENT_TRANSACTION_INVALID';
                             message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
                         };
                     };
                 };
@@ -38950,6 +52855,27 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'WALLET_REAUTHENTICATION_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
                             message: string;
                         };
                     };
@@ -39121,6 +53047,26 @@ export interface operations {
                             /** @constant */
                             code: 'PAYMENT_TRANSACTION_INVALID';
                             message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
                         };
                     };
                 };
@@ -39212,6 +53158,27 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'WALLET_REAUTHENTICATION_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
                             message: string;
                         };
                     };
@@ -39371,6 +53338,26 @@ export interface operations {
                             /** @constant */
                             code: 'PAYMENT_TRANSACTION_INVALID';
                             message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
                         };
                     };
                 };
@@ -39462,6 +53449,27 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'WALLET_REAUTHENTICATION_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
                             message: string;
                         };
                     };
@@ -39621,6 +53629,26 @@ export interface operations {
                             /** @constant */
                             code: 'PAYMENT_TRANSACTION_INVALID';
                             message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
                         };
                     };
                 };
@@ -39712,6 +53740,27 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'WALLET_REAUTHENTICATION_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
                             message: string;
                         };
                     };
@@ -39943,6 +53992,26 @@ export interface operations {
                             /** @constant */
                             code: 'PAYMENT_TRANSACTION_INVALID';
                             message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
                         };
                     };
                 };
@@ -40034,6 +54103,27 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'WALLET_REAUTHENTICATION_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
                             message: string;
                         };
                     };
@@ -40197,6 +54287,26 @@ export interface operations {
                             /** @constant */
                             code: 'PAYMENT_TRANSACTION_INVALID';
                             message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
                         };
                     };
                 };
@@ -40288,6 +54398,27 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'WALLET_REAUTHENTICATION_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
                             message: string;
                         };
                     };
@@ -40445,6 +54576,26 @@ export interface operations {
                             /** @constant */
                             code: 'PAYMENT_TRANSACTION_INVALID';
                             message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'BILLING_COUNTRY_UNAVAILABLE';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_REQUIRED';
+                            message: string;
                         };
                     };
                 };
@@ -40536,6 +54687,27 @@ export interface operations {
                             };
                             /** @constant */
                             code: 'WALLET_REAUTHENTICATION_REQUIRED';
+                            message: string;
+                        };
+                    };
+                };
+            };
+            /** @description 409 */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    'application/json': {
+                        error: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
+                            code: 'RESIDENCE_CONFLICT';
                             message: string;
                         };
                     };

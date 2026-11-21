@@ -259,7 +259,7 @@ async function generateApiClientJSDoc(
 		);
 
 		if (i < endpoints.length - 1) {
-			endpointOutputLine.push('\n');
+			endpointOutputLine.push('');
 		}
 	}
 	endpointOutputLine.push('  }');

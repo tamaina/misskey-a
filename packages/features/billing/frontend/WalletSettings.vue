@@ -22,6 +22,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div class="_buttons"><MkButton rounded danger :disabled="busy" @click="unlink(wallet)"><i class="ti ti-unlink"></i> {{ $locale.sfc.unlink }}</MkButton></div>
 		</div>
 	</FormSection>
+	<MkInfo v-if="props.residenceClient && !residenceReady" warn><MkA to="/settings/residence">{{ $locale.sfc.residenceRequired }}</MkA></MkInfo>
 	<FormSection>
 		<template #label>{{ $locale.sfc.register }}</template>
 		<div class="_gaps_m">
@@ -34,7 +35,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<MkButton type="submit" primary rounded>{{ $locale.sfc.continueAuthentication }}</MkButton>
 			</form>
 			<MkInfo v-if="!connectors.length" warn>{{ $locale.sfc.noWallet }}</MkInfo>
-			<div class="_buttons"><MkButton v-for="connector in connectors" :key="connector.id" primary rounded :disabled="busy || chainId === null" @click="link(connector)"><i class="ti ti-wallet"></i> {{ connector.name }} {{ $locale.sfc.link }}</MkButton></div>
+			<div class="_buttons"><MkButton v-for="connector in connectors" :key="connector.id" primary rounded :disabled="busy || chainId === null || !residenceReady" @click="link(connector)"><i class="ti ti-wallet"></i> {{ connector.name }} {{ $locale.sfc.link }}</MkButton></div>
 			<div v-if="busy && step" class="_gaps_s" role="status">
 				<div>{{ $locale.sfc[step] }}</div>
 				<MkButton v-if="step !== 'verify'" rounded @click="cancel">{{ $locale.sfc.cancel }}</MkButton>
@@ -51,18 +52,22 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { requireResidenceForStart } from './residence-client.js';
 import { linkWallet, WalletLinkCancelled } from './wallet-link.js';
+import type { ResidenceClient } from './residence-client.js';
 import type { LinkedWallet, WalletChain } from '../backend/api.definition.js';
 import type { ConnectedWallet, WalletAuthInput, WalletClient, WalletConnector, WalletProvider } from './wallet-client.js';
 import type { WalletStep } from './wallet-link.js';
 
 const props = defineProps<{
 	client: WalletClient;
+	residenceClient?: Pick<ResidenceClient, 'getResidence'>;
 	connectors: readonly WalletConnector[];
 	/** Host binds Misskey's native confirmation dialog; cancellation returns false. */
 	confirmUnlink(wallet: LinkedWallet): Promise<boolean>;
 	authenticateWithPasskey?(): Promise<NonNullable<WalletAuthInput['passkey']>>;
 }>();
+const residenceReady = ref(!props.residenceClient);
 const wallets = ref<LinkedWallet[]>([]);
 const chains = ref<WalletChain[]>([]);
 const chainItems = computed(() => chains.value.map(chain => ({ value: chain.chainId, label: `${chain.name} (${chain.chainId})` })));
@@ -112,6 +117,7 @@ async function load(): Promise<void> {
 	try {
 		const result = await Promise.all([props.client.list({}), props.client.chains({})]);
 		[wallets.value, chains.value] = result;
+		if (props.residenceClient) { residenceReady.value = false; try { residenceReady.value = (await props.residenceClient.getResidence({})).isReady; } catch { error.value = true; } }
 		if (!chains.value.some(chain => chain.chainId === chainId.value)) chainId.value = chains.value[0]?.chainId ?? null;
 	} catch { error.value = true; } finally { busy.value = false; }
 }
@@ -140,6 +146,8 @@ function submitCredentials(): void {
 	prompt.resolve(auth);
 }
 
+async function ensureResidence() { if (props.residenceClient) { residenceReady.value = false; await requireResidenceForStart(props.residenceClient); residenceReady.value = true; } }
+
 async function link(connector: WalletConnector): Promise<void> {
 	const chain = chains.value.find(value => value.chainId === chainId.value);
 	if (busy.value || !chain) return;
@@ -149,9 +157,11 @@ async function link(connector: WalletConnector): Promise<void> {
 	cancelled = false;
 	password.value = ''; twoFactorToken.value = '';
 	try {
+		await ensureResidence();
 		const authenticateWithPasskey = props.authenticateWithPasskey;
 		const wallet = await linkWallet({
 			client: props.client,
+			requireResidence: ensureResidence,
 			connector,
 			chain,
 			authenticate: usePasskey.value && authenticateWithPasskey
@@ -186,6 +196,7 @@ async function unlink(wallet: LinkedWallet): Promise<void> {
 
 <locale lang="json" locale="ja-JP">
 {
+	"residenceRequired": "ウォレット登録前に居住地を設定してください。",
 	"title": "ウォレット",
 	"description": "ウォレットの所有確認をして、このアカウントに登録します。登録の署名では送金しません。",
 	"reload": "読み込む",

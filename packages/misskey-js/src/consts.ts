@@ -138,6 +138,7 @@ export const permissions = [
 ] as const;
 
 export const moderationLogTypes = [
+	'billingCatalog',
 	'updateServerSettings',
 	'suspend',
 	'unsuspend',
@@ -277,6 +278,7 @@ type ReceivedAbuseReport = {
 };
 
 export type ModerationLogPayloads = {
+	billingCatalog: { action: string; resourceId: string; before: unknown; after: unknown };
 	updateServerSettings: {
 		before: MetaDetailed | null;
 		after: MetaDetailed | null;

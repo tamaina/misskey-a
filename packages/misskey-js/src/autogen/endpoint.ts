@@ -1,6 +1,94 @@
 import type {
 	EmptyRequest,
 	EmptyResponse,
+	AccountPeerReceiptGetRequest,
+	AccountPeerReceiptGetResponse,
+	AccountPeerReceiptSetRequest,
+	AccountPeerReceiptSetResponse,
+	AccountResidenceGetRequest,
+	AccountResidenceGetResponse,
+	AccountResidenceSetRequest,
+	AccountResidenceSetResponse,
+	BillingOrdersReceiptRequest,
+	BillingOrdersReceiptResponse,
+	BillingCatalogListRequest,
+	BillingCatalogListResponse,
+	BillingOrdersCancelRequest,
+	BillingOrdersCancelResponse,
+	BillingOrdersQuoteRequest,
+	BillingOrdersQuoteResponse,
+	AdminBillingOffersListRequest,
+	AdminBillingOffersListResponse,
+	AdminBillingOffersUpsertRequest,
+	AdminBillingOffersUpsertResponse,
+	BillingOffersListRequest,
+	BillingOffersListResponse,
+	BillingOrdersCreateRequest,
+	BillingOrdersCreateResponse,
+	BillingOrdersCheckRequest,
+	BillingOrdersCheckResponse,
+	BillingOrdersListRequest,
+	BillingOrdersListResponse,
+	BillingRefundsRequestRequest,
+	BillingRefundsRequestResponse,
+	BillingRefundsListRequest,
+	BillingRefundsListResponse,
+	BillingRefundsShowRequest,
+	BillingRefundsShowResponse,
+	BillingRefundsCancelRequest,
+	BillingRefundsCancelResponse,
+	BillingRefundsDocumentRequest,
+	BillingRefundsDocumentResponse,
+	AdminBillingRefundsListRequest,
+	AdminBillingRefundsListResponse,
+	AdminBillingRefundsShowRequest,
+	AdminBillingRefundsShowResponse,
+	AdminBillingRefundsDecideRequest,
+	AdminBillingRefundsDecideResponse,
+	AdminBillingRefundsStartRequest,
+	AdminBillingRefundsStartResponse,
+	AdminBillingRefundsSubmitRequest,
+	AdminBillingRefundsSubmitResponse,
+	AdminBillingRefundsCheckRequest,
+	AdminBillingRefundsCheckResponse,
+	AdminBillingPricesListRequest,
+	AdminBillingPricesListResponse,
+	AdminBillingChainsDeleteRequest,
+	AdminBillingChainsDeleteResponse,
+	AdminBillingAssetsListRequest,
+	AdminBillingAssetsListResponse,
+	AdminBillingAssetsUpsertRequest,
+	AdminBillingAssetsUpsertResponse,
+	AdminBillingAssetsDeleteRequest,
+	AdminBillingAssetsDeleteResponse,
+	AdminBillingDeploymentsListRequest,
+	AdminBillingDeploymentsListResponse,
+	AdminBillingDeploymentsUpsertRequest,
+	AdminBillingDeploymentsUpsertResponse,
+	AdminBillingDeploymentsDeleteRequest,
+	AdminBillingDeploymentsDeleteResponse,
+	AdminBillingDeploymentsResolveRequest,
+	AdminBillingDeploymentsResolveResponse,
+	AdminBillingChainsTestRpcRequest,
+	AdminBillingChainsTestRpcResponse,
+	AdminBillingPricesAttachDeploymentRequest,
+	AdminBillingPricesAttachDeploymentResponse,
+	AdminBillingPricesDeleteRequest,
+	AdminBillingPricesDeleteResponse,
+	AdminBillingPolicyGetRequest,
+	AdminBillingPolicyGetResponse,
+	AdminBillingPolicyUpsertRequest,
+	AdminBillingPolicyUpsertResponse,
+	BillingPurchaseRequirementsRequest,
+	BillingPurchaseRequirementsResponse,
+	BillingOrdersHistoryRequest,
+	BillingOrdersHistoryResponse,
+	AdminBillingOrdersListRequest,
+	AdminBillingOrdersListResponse,
+	AdminBillingOrdersCheckRequest,
+	AdminBillingOrdersCheckResponse,
+	AdminBillingSalesSummaryRequest,
+	AdminBillingSalesSummaryResponse,
 	AdminWalletsChainsListRequest,
 	AdminWalletsChainsListResponse,
 	AdminWalletsChainsUpsertRequest,
@@ -766,6 +854,50 @@ import type {
 } from './entities.js';
 
 export type Endpoints = {
+	'account/peer-receipt/get': { req: AccountPeerReceiptGetRequest; res: AccountPeerReceiptGetResponse };
+	'account/peer-receipt/set': { req: AccountPeerReceiptSetRequest; res: AccountPeerReceiptSetResponse };
+	'account/residence/get': { req: AccountResidenceGetRequest; res: AccountResidenceGetResponse };
+	'account/residence/set': { req: AccountResidenceSetRequest; res: AccountResidenceSetResponse };
+	'billing/orders/receipt': { req: BillingOrdersReceiptRequest; res: BillingOrdersReceiptResponse };
+	'billing/catalog/list': { req: BillingCatalogListRequest; res: BillingCatalogListResponse };
+	'billing/orders/cancel': { req: BillingOrdersCancelRequest; res: BillingOrdersCancelResponse };
+	'billing/orders/quote': { req: BillingOrdersQuoteRequest; res: BillingOrdersQuoteResponse };
+	'admin/billing/offers/list': { req: AdminBillingOffersListRequest; res: AdminBillingOffersListResponse };
+	'admin/billing/offers/upsert': { req: AdminBillingOffersUpsertRequest; res: AdminBillingOffersUpsertResponse };
+	'billing/offers/list': { req: BillingOffersListRequest; res: BillingOffersListResponse };
+	'billing/orders/create': { req: BillingOrdersCreateRequest; res: BillingOrdersCreateResponse };
+	'billing/orders/check': { req: BillingOrdersCheckRequest; res: BillingOrdersCheckResponse };
+	'billing/orders/list': { req: BillingOrdersListRequest; res: BillingOrdersListResponse };
+	'billing/refunds/request': { req: BillingRefundsRequestRequest; res: BillingRefundsRequestResponse };
+	'billing/refunds/list': { req: BillingRefundsListRequest; res: BillingRefundsListResponse };
+	'billing/refunds/show': { req: BillingRefundsShowRequest; res: BillingRefundsShowResponse };
+	'billing/refunds/cancel': { req: BillingRefundsCancelRequest; res: BillingRefundsCancelResponse };
+	'billing/refunds/document': { req: BillingRefundsDocumentRequest; res: BillingRefundsDocumentResponse };
+	'admin/billing/refunds/list': { req: AdminBillingRefundsListRequest; res: AdminBillingRefundsListResponse };
+	'admin/billing/refunds/show': { req: AdminBillingRefundsShowRequest; res: AdminBillingRefundsShowResponse };
+	'admin/billing/refunds/decide': { req: AdminBillingRefundsDecideRequest; res: AdminBillingRefundsDecideResponse };
+	'admin/billing/refunds/start': { req: AdminBillingRefundsStartRequest; res: AdminBillingRefundsStartResponse };
+	'admin/billing/refunds/submit': { req: AdminBillingRefundsSubmitRequest; res: AdminBillingRefundsSubmitResponse };
+	'admin/billing/refunds/check': { req: AdminBillingRefundsCheckRequest; res: AdminBillingRefundsCheckResponse };
+	'admin/billing/prices/list': { req: AdminBillingPricesListRequest; res: AdminBillingPricesListResponse };
+	'admin/billing/chains/delete': { req: AdminBillingChainsDeleteRequest; res: AdminBillingChainsDeleteResponse };
+	'admin/billing/assets/list': { req: AdminBillingAssetsListRequest; res: AdminBillingAssetsListResponse };
+	'admin/billing/assets/upsert': { req: AdminBillingAssetsUpsertRequest; res: AdminBillingAssetsUpsertResponse };
+	'admin/billing/assets/delete': { req: AdminBillingAssetsDeleteRequest; res: AdminBillingAssetsDeleteResponse };
+	'admin/billing/deployments/list': { req: AdminBillingDeploymentsListRequest; res: AdminBillingDeploymentsListResponse };
+	'admin/billing/deployments/upsert': { req: AdminBillingDeploymentsUpsertRequest; res: AdminBillingDeploymentsUpsertResponse };
+	'admin/billing/deployments/delete': { req: AdminBillingDeploymentsDeleteRequest; res: AdminBillingDeploymentsDeleteResponse };
+	'admin/billing/deployments/resolve': { req: AdminBillingDeploymentsResolveRequest; res: AdminBillingDeploymentsResolveResponse };
+	'admin/billing/chains/test-rpc': { req: AdminBillingChainsTestRpcRequest; res: AdminBillingChainsTestRpcResponse };
+	'admin/billing/prices/attach-deployment': { req: AdminBillingPricesAttachDeploymentRequest; res: AdminBillingPricesAttachDeploymentResponse };
+	'admin/billing/prices/delete': { req: AdminBillingPricesDeleteRequest; res: AdminBillingPricesDeleteResponse };
+	'admin/billing/policy/get': { req: AdminBillingPolicyGetRequest; res: AdminBillingPolicyGetResponse };
+	'admin/billing/policy/upsert': { req: AdminBillingPolicyUpsertRequest; res: AdminBillingPolicyUpsertResponse };
+	'billing/purchase-requirements': { req: BillingPurchaseRequirementsRequest; res: BillingPurchaseRequirementsResponse };
+	'billing/orders/history': { req: BillingOrdersHistoryRequest; res: BillingOrdersHistoryResponse };
+	'admin/billing/orders/list': { req: AdminBillingOrdersListRequest; res: AdminBillingOrdersListResponse };
+	'admin/billing/orders/check': { req: AdminBillingOrdersCheckRequest; res: AdminBillingOrdersCheckResponse };
+	'admin/billing/sales/summary': { req: AdminBillingSalesSummaryRequest; res: AdminBillingSalesSummaryResponse };
 	'admin/wallets/chains/list': { req: AdminWalletsChainsListRequest; res: AdminWalletsChainsListResponse };
 	'admin/wallets/chains/upsert': { req: AdminWalletsChainsUpsertRequest; res: AdminWalletsChainsUpsertResponse };
 	'account/wallets/link/passkey-options': { req: AccountWalletsLinkPasskeyOptionsRequest; res: AccountWalletsLinkPasskeyOptionsResponse };

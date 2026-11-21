@@ -66,10 +66,34 @@ type AbuseReportNotificationRecipient = ContractModel<'AbuseReportNotificationRe
 // Warning: (ae-forgotten-export) The symbol "ContractRequest" needs to be exported by the entry point index.d.ts
 //
 // @public (undocumented)
-type AccountWalletsLinkBeginRequest = ContractRequest<'account/wallets/link/begin'>;
+type AccountPeerReceiptGetRequest = ContractRequest<'account/peer-receipt/get'>;
 
 // Warning: (ae-forgotten-export) The symbol "ContractResponse" needs to be exported by the entry point index.d.ts
 //
+// @public (undocumented)
+type AccountPeerReceiptGetResponse = ContractResponse<'account/peer-receipt/get'>;
+
+// @public (undocumented)
+type AccountPeerReceiptSetRequest = ContractRequest<'account/peer-receipt/set'>;
+
+// @public (undocumented)
+type AccountPeerReceiptSetResponse = ContractResponse<'account/peer-receipt/set'>;
+
+// @public (undocumented)
+type AccountResidenceGetRequest = ContractRequest<'account/residence/get'>;
+
+// @public (undocumented)
+type AccountResidenceGetResponse = ContractResponse<'account/residence/get'>;
+
+// @public (undocumented)
+type AccountResidenceSetRequest = ContractRequest<'account/residence/set'>;
+
+// @public (undocumented)
+type AccountResidenceSetResponse = ContractResponse<'account/residence/set'>;
+
+// @public (undocumented)
+type AccountWalletsLinkBeginRequest = ContractRequest<'account/wallets/link/begin'>;
+
 // @public (undocumented)
 type AccountWalletsLinkBeginResponse = ContractResponse<'account/wallets/link/begin'>;
 
@@ -228,6 +252,156 @@ type AdminAvatarDecorationsListResponse = ContractResponse<'admin/avatar-decorat
 
 // @public (undocumented)
 type AdminAvatarDecorationsUpdateRequest = ContractRequest<'admin/avatar-decorations/update'>;
+
+// @public (undocumented)
+type AdminBillingAssetsDeleteRequest = ContractRequest<'admin/billing/assets/delete'>;
+
+// @public (undocumented)
+type AdminBillingAssetsDeleteResponse = ContractResponse<'admin/billing/assets/delete'>;
+
+// @public (undocumented)
+type AdminBillingAssetsListRequest = ContractRequest<'admin/billing/assets/list'>;
+
+// @public (undocumented)
+type AdminBillingAssetsListResponse = ContractResponse<'admin/billing/assets/list'>;
+
+// @public (undocumented)
+type AdminBillingAssetsUpsertRequest = ContractRequest<'admin/billing/assets/upsert'>;
+
+// @public (undocumented)
+type AdminBillingAssetsUpsertResponse = ContractResponse<'admin/billing/assets/upsert'>;
+
+// @public (undocumented)
+type AdminBillingChainsDeleteRequest = ContractRequest<'admin/billing/chains/delete'>;
+
+// @public (undocumented)
+type AdminBillingChainsDeleteResponse = ContractResponse<'admin/billing/chains/delete'>;
+
+// @public (undocumented)
+type AdminBillingChainsTestRpcRequest = ContractRequest<'admin/billing/chains/test-rpc'>;
+
+// @public (undocumented)
+type AdminBillingChainsTestRpcResponse = ContractResponse<'admin/billing/chains/test-rpc'>;
+
+// @public (undocumented)
+type AdminBillingDeploymentsDeleteRequest = ContractRequest<'admin/billing/deployments/delete'>;
+
+// @public (undocumented)
+type AdminBillingDeploymentsDeleteResponse = ContractResponse<'admin/billing/deployments/delete'>;
+
+// @public (undocumented)
+type AdminBillingDeploymentsListRequest = ContractRequest<'admin/billing/deployments/list'>;
+
+// @public (undocumented)
+type AdminBillingDeploymentsListResponse = ContractResponse<'admin/billing/deployments/list'>;
+
+// @public (undocumented)
+type AdminBillingDeploymentsResolveRequest = ContractRequest<'admin/billing/deployments/resolve'>;
+
+// @public (undocumented)
+type AdminBillingDeploymentsResolveResponse = ContractResponse<'admin/billing/deployments/resolve'>;
+
+// @public (undocumented)
+type AdminBillingDeploymentsUpsertRequest = ContractRequest<'admin/billing/deployments/upsert'>;
+
+// @public (undocumented)
+type AdminBillingDeploymentsUpsertResponse = ContractResponse<'admin/billing/deployments/upsert'>;
+
+// @public (undocumented)
+type AdminBillingOffersListRequest = ContractRequest<'admin/billing/offers/list'>;
+
+// @public (undocumented)
+type AdminBillingOffersListResponse = ContractResponse<'admin/billing/offers/list'>;
+
+// @public (undocumented)
+type AdminBillingOffersUpsertRequest = ContractRequest<'admin/billing/offers/upsert'>;
+
+// @public (undocumented)
+type AdminBillingOffersUpsertResponse = ContractResponse<'admin/billing/offers/upsert'>;
+
+// @public (undocumented)
+type AdminBillingOrdersCheckRequest = ContractRequest<'admin/billing/orders/check'>;
+
+// @public (undocumented)
+type AdminBillingOrdersCheckResponse = ContractResponse<'admin/billing/orders/check'>;
+
+// @public (undocumented)
+type AdminBillingOrdersListRequest = ContractRequest<'admin/billing/orders/list'>;
+
+// @public (undocumented)
+type AdminBillingOrdersListResponse = ContractResponse<'admin/billing/orders/list'>;
+
+// @public (undocumented)
+type AdminBillingPolicyGetRequest = ContractRequest<'admin/billing/policy/get'>;
+
+// @public (undocumented)
+type AdminBillingPolicyGetResponse = ContractResponse<'admin/billing/policy/get'>;
+
+// @public (undocumented)
+type AdminBillingPolicyUpsertRequest = ContractRequest<'admin/billing/policy/upsert'>;
+
+// @public (undocumented)
+type AdminBillingPolicyUpsertResponse = ContractResponse<'admin/billing/policy/upsert'>;
+
+// @public (undocumented)
+type AdminBillingPricesAttachDeploymentRequest = ContractRequest<'admin/billing/prices/attach-deployment'>;
+
+// @public (undocumented)
+type AdminBillingPricesAttachDeploymentResponse = ContractResponse<'admin/billing/prices/attach-deployment'>;
+
+// @public (undocumented)
+type AdminBillingPricesDeleteRequest = ContractRequest<'admin/billing/prices/delete'>;
+
+// @public (undocumented)
+type AdminBillingPricesDeleteResponse = ContractResponse<'admin/billing/prices/delete'>;
+
+// @public (undocumented)
+type AdminBillingPricesListRequest = ContractRequest<'admin/billing/prices/list'>;
+
+// @public (undocumented)
+type AdminBillingPricesListResponse = ContractResponse<'admin/billing/prices/list'>;
+
+// @public (undocumented)
+type AdminBillingRefundsCheckRequest = ContractRequest<'admin/billing/refunds/check'>;
+
+// @public (undocumented)
+type AdminBillingRefundsCheckResponse = ContractResponse<'admin/billing/refunds/check'>;
+
+// @public (undocumented)
+type AdminBillingRefundsDecideRequest = ContractRequest<'admin/billing/refunds/decide'>;
+
+// @public (undocumented)
+type AdminBillingRefundsDecideResponse = ContractResponse<'admin/billing/refunds/decide'>;
+
+// @public (undocumented)
+type AdminBillingRefundsListRequest = ContractRequest<'admin/billing/refunds/list'>;
+
+// @public (undocumented)
+type AdminBillingRefundsListResponse = ContractResponse<'admin/billing/refunds/list'>;
+
+// @public (undocumented)
+type AdminBillingRefundsShowRequest = ContractRequest<'admin/billing/refunds/show'>;
+
+// @public (undocumented)
+type AdminBillingRefundsShowResponse = ContractResponse<'admin/billing/refunds/show'>;
+
+// @public (undocumented)
+type AdminBillingRefundsStartRequest = ContractRequest<'admin/billing/refunds/start'>;
+
+// @public (undocumented)
+type AdminBillingRefundsStartResponse = ContractResponse<'admin/billing/refunds/start'>;
+
+// @public (undocumented)
+type AdminBillingRefundsSubmitRequest = ContractRequest<'admin/billing/refunds/submit'>;
+
+// @public (undocumented)
+type AdminBillingRefundsSubmitResponse = ContractResponse<'admin/billing/refunds/submit'>;
+
+// @public (undocumented)
+type AdminBillingSalesSummaryRequest = ContractRequest<'admin/billing/sales/summary'>;
+
+// @public (undocumented)
+type AdminBillingSalesSummaryResponse = ContractResponse<'admin/billing/sales/summary'>;
 
 // @public (undocumented)
 type AdminCaptchaCurrentRequest = ContractRequest<'admin/captcha/current'>;
@@ -746,6 +920,96 @@ type AvailableEndpointsRequest = ContractRequest<'available-endpoints'>;
 
 // @public (undocumented)
 type AvailableEndpointsResponse = ContractResponse<'available-endpoints'>;
+
+// @public (undocumented)
+type BillingCatalogListRequest = ContractRequest<'billing/catalog/list'>;
+
+// @public (undocumented)
+type BillingCatalogListResponse = ContractResponse<'billing/catalog/list'>;
+
+// @public (undocumented)
+type BillingOffersListRequest = ContractRequest<'billing/offers/list'>;
+
+// @public (undocumented)
+type BillingOffersListResponse = ContractResponse<'billing/offers/list'>;
+
+// @public (undocumented)
+type BillingOrdersCancelRequest = ContractRequest<'billing/orders/cancel'>;
+
+// @public (undocumented)
+type BillingOrdersCancelResponse = ContractResponse<'billing/orders/cancel'>;
+
+// @public (undocumented)
+type BillingOrdersCheckRequest = ContractRequest<'billing/orders/check'>;
+
+// @public (undocumented)
+type BillingOrdersCheckResponse = ContractResponse<'billing/orders/check'>;
+
+// @public (undocumented)
+type BillingOrdersCreateRequest = ContractRequest<'billing/orders/create'>;
+
+// @public (undocumented)
+type BillingOrdersCreateResponse = ContractResponse<'billing/orders/create'>;
+
+// @public (undocumented)
+type BillingOrdersHistoryRequest = ContractRequest<'billing/orders/history'>;
+
+// @public (undocumented)
+type BillingOrdersHistoryResponse = ContractResponse<'billing/orders/history'>;
+
+// @public (undocumented)
+type BillingOrdersListRequest = ContractRequest<'billing/orders/list'>;
+
+// @public (undocumented)
+type BillingOrdersListResponse = ContractResponse<'billing/orders/list'>;
+
+// @public (undocumented)
+type BillingOrdersQuoteRequest = ContractRequest<'billing/orders/quote'>;
+
+// @public (undocumented)
+type BillingOrdersQuoteResponse = ContractResponse<'billing/orders/quote'>;
+
+// @public (undocumented)
+type BillingOrdersReceiptRequest = ContractRequest<'billing/orders/receipt'>;
+
+// @public (undocumented)
+type BillingOrdersReceiptResponse = ContractResponse<'billing/orders/receipt'>;
+
+// @public (undocumented)
+type BillingPurchaseRequirementsRequest = ContractRequest<'billing/purchase-requirements'>;
+
+// @public (undocumented)
+type BillingPurchaseRequirementsResponse = ContractResponse<'billing/purchase-requirements'>;
+
+// @public (undocumented)
+type BillingRefundsCancelRequest = ContractRequest<'billing/refunds/cancel'>;
+
+// @public (undocumented)
+type BillingRefundsCancelResponse = ContractResponse<'billing/refunds/cancel'>;
+
+// @public (undocumented)
+type BillingRefundsDocumentRequest = ContractRequest<'billing/refunds/document'>;
+
+// @public (undocumented)
+type BillingRefundsDocumentResponse = ContractResponse<'billing/refunds/document'>;
+
+// @public (undocumented)
+type BillingRefundsListRequest = ContractRequest<'billing/refunds/list'>;
+
+// @public (undocumented)
+type BillingRefundsListResponse = ContractResponse<'billing/refunds/list'>;
+
+// @public (undocumented)
+type BillingRefundsRequestRequest = ContractRequest<'billing/refunds/request'>;
+
+// @public (undocumented)
+type BillingRefundsRequestResponse = ContractResponse<'billing/refunds/request'>;
+
+// @public (undocumented)
+type BillingRefundsShowRequest = ContractRequest<'billing/refunds/show'>;
+
+// @public (undocumented)
+type BillingRefundsShowResponse = ContractResponse<'billing/refunds/show'>;
 
 // @public (undocumented)
 type Blocking = ContractModel<'Blocking'>;
@@ -1728,6 +1992,94 @@ declare namespace entities {
         PartialRolePolicyOverride,
         EmptyRequest,
         EmptyResponse,
+        AccountPeerReceiptGetRequest,
+        AccountPeerReceiptGetResponse,
+        AccountPeerReceiptSetRequest,
+        AccountPeerReceiptSetResponse,
+        AccountResidenceGetRequest,
+        AccountResidenceGetResponse,
+        AccountResidenceSetRequest,
+        AccountResidenceSetResponse,
+        BillingOrdersReceiptRequest,
+        BillingOrdersReceiptResponse,
+        BillingCatalogListRequest,
+        BillingCatalogListResponse,
+        BillingOrdersCancelRequest,
+        BillingOrdersCancelResponse,
+        BillingOrdersQuoteRequest,
+        BillingOrdersQuoteResponse,
+        AdminBillingOffersListRequest,
+        AdminBillingOffersListResponse,
+        AdminBillingOffersUpsertRequest,
+        AdminBillingOffersUpsertResponse,
+        BillingOffersListRequest,
+        BillingOffersListResponse,
+        BillingOrdersCreateRequest,
+        BillingOrdersCreateResponse,
+        BillingOrdersCheckRequest,
+        BillingOrdersCheckResponse,
+        BillingOrdersListRequest,
+        BillingOrdersListResponse,
+        BillingRefundsRequestRequest,
+        BillingRefundsRequestResponse,
+        BillingRefundsListRequest,
+        BillingRefundsListResponse,
+        BillingRefundsShowRequest,
+        BillingRefundsShowResponse,
+        BillingRefundsCancelRequest,
+        BillingRefundsCancelResponse,
+        BillingRefundsDocumentRequest,
+        BillingRefundsDocumentResponse,
+        AdminBillingRefundsListRequest,
+        AdminBillingRefundsListResponse,
+        AdminBillingRefundsShowRequest,
+        AdminBillingRefundsShowResponse,
+        AdminBillingRefundsDecideRequest,
+        AdminBillingRefundsDecideResponse,
+        AdminBillingRefundsStartRequest,
+        AdminBillingRefundsStartResponse,
+        AdminBillingRefundsSubmitRequest,
+        AdminBillingRefundsSubmitResponse,
+        AdminBillingRefundsCheckRequest,
+        AdminBillingRefundsCheckResponse,
+        AdminBillingPricesListRequest,
+        AdminBillingPricesListResponse,
+        AdminBillingChainsDeleteRequest,
+        AdminBillingChainsDeleteResponse,
+        AdminBillingAssetsListRequest,
+        AdminBillingAssetsListResponse,
+        AdminBillingAssetsUpsertRequest,
+        AdminBillingAssetsUpsertResponse,
+        AdminBillingAssetsDeleteRequest,
+        AdminBillingAssetsDeleteResponse,
+        AdminBillingDeploymentsListRequest,
+        AdminBillingDeploymentsListResponse,
+        AdminBillingDeploymentsUpsertRequest,
+        AdminBillingDeploymentsUpsertResponse,
+        AdminBillingDeploymentsDeleteRequest,
+        AdminBillingDeploymentsDeleteResponse,
+        AdminBillingDeploymentsResolveRequest,
+        AdminBillingDeploymentsResolveResponse,
+        AdminBillingChainsTestRpcRequest,
+        AdminBillingChainsTestRpcResponse,
+        AdminBillingPricesAttachDeploymentRequest,
+        AdminBillingPricesAttachDeploymentResponse,
+        AdminBillingPricesDeleteRequest,
+        AdminBillingPricesDeleteResponse,
+        AdminBillingPolicyGetRequest,
+        AdminBillingPolicyGetResponse,
+        AdminBillingPolicyUpsertRequest,
+        AdminBillingPolicyUpsertResponse,
+        BillingPurchaseRequirementsRequest,
+        BillingPurchaseRequirementsResponse,
+        BillingOrdersHistoryRequest,
+        BillingOrdersHistoryResponse,
+        AdminBillingOrdersListRequest,
+        AdminBillingOrdersListResponse,
+        AdminBillingOrdersCheckRequest,
+        AdminBillingOrdersCheckResponse,
+        AdminBillingSalesSummaryRequest,
+        AdminBillingSalesSummaryResponse,
         AdminWalletsChainsListRequest,
         AdminWalletsChainsListResponse,
         AdminWalletsChainsUpsertRequest,
@@ -4330,7 +4682,7 @@ type ModerationLog = {
 }[keyof ModerationLogPayloads]);
 
 // @public (undocumented)
-export const moderationLogTypes: readonly ["updateServerSettings", "suspend", "unsuspend", "updateUserNote", "addCustomEmoji", "updateCustomEmoji", "deleteCustomEmoji", "assignRole", "unassignRole", "createRole", "updateRole", "deleteRole", "clearQueue", "promoteQueue", "deleteDriveFile", "deleteNote", "createGlobalAnnouncement", "createUserAnnouncement", "updateGlobalAnnouncement", "updateUserAnnouncement", "deleteGlobalAnnouncement", "deleteUserAnnouncement", "resetPassword", "suspendRemoteInstance", "unsuspendRemoteInstance", "updateRemoteInstanceNote", "markSensitiveDriveFile", "unmarkSensitiveDriveFile", "resolveAbuseReport", "forwardAbuseReport", "updateAbuseReportNote", "createInvitation", "createAd", "updateAd", "deleteAd", "createAvatarDecoration", "updateAvatarDecoration", "deleteAvatarDecoration", "unsetMfa", "unsetUserAvatar", "unsetUserBanner", "createSystemWebhook", "updateSystemWebhook", "deleteSystemWebhook", "createAbuseReportNotificationRecipient", "updateAbuseReportNotificationRecipient", "deleteAbuseReportNotificationRecipient", "deleteAccount", "deletePage", "deleteFlash", "deleteGalleryPost", "deleteChatRoom", "updateProxyAccountDescription"];
+export const moderationLogTypes: readonly ["billingCatalog", "updateServerSettings", "suspend", "unsuspend", "updateUserNote", "addCustomEmoji", "updateCustomEmoji", "deleteCustomEmoji", "assignRole", "unassignRole", "createRole", "updateRole", "deleteRole", "clearQueue", "promoteQueue", "deleteDriveFile", "deleteNote", "createGlobalAnnouncement", "createUserAnnouncement", "updateGlobalAnnouncement", "updateUserAnnouncement", "deleteGlobalAnnouncement", "deleteUserAnnouncement", "resetPassword", "suspendRemoteInstance", "unsuspendRemoteInstance", "updateRemoteInstanceNote", "markSensitiveDriveFile", "unmarkSensitiveDriveFile", "resolveAbuseReport", "forwardAbuseReport", "updateAbuseReportNote", "createInvitation", "createAd", "updateAd", "deleteAd", "createAvatarDecoration", "updateAvatarDecoration", "deleteAvatarDecoration", "unsetMfa", "unsetUserAvatar", "unsetUserBanner", "createSystemWebhook", "updateSystemWebhook", "deleteSystemWebhook", "createAbuseReportNotificationRecipient", "updateAbuseReportNotificationRecipient", "deleteAbuseReportNotificationRecipient", "deleteAccount", "deletePage", "deleteFlash", "deleteGalleryPost", "deleteChatRoom", "updateProxyAccountDescription"];
 
 // @public (undocumented)
 type MuteCreateRequest = ContractRequest<'mute/create'>;

@@ -21,6 +21,8 @@ import type { UploadResource } from './context.js';
 export interface ApiRequestContext {
 	credential: string | null | undefined;
 	ip: string;
+	/** Actual socket peer, never forwarded/caller supplied geo metadata. */
+	transportPeerIp?: string;
 	headers: Record<string, string | string[] | undefined>;
 	params?: unknown;
 	upload?: UploadResource;
@@ -70,7 +72,7 @@ export class ApiExecutionContextFactory {
 				},
 			},
 			...(request.response === undefined ? {} : { response: request.response }),
-			credential, ip: request.ip, headers: request.headers, ...(upload === undefined ? {} : { upload }),
+			credential, ip: request.ip, ...(request.transportPeerIp === undefined ? {} : { transportPeerIp: request.transportPeerIp }), headers: request.headers, ...(upload === undefined ? {} : { upload }),
 			services: {
 				authenticate: async token => {
 					try {

@@ -5,7 +5,7 @@
 
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createRouterClient } from '@orpc/server';
+import { createRouterClient, ORPCError } from '@orpc/server';
 import { createWalletRouter, createWalletProof, WALLET_CHALLENGE_TTL } from '../../../backend/built/features/billing/backend.js';
 
 const actor = { id: 'alice', isSuspended: false, movedToUri: null };
@@ -14,13 +14,14 @@ const chain = { chainId: 123456, name: 'Synthetic chain', nativeCurrencyName: 'S
 const input = { chainId: chain.chainId, address, currentPassword: 'synthetic fixture' };
 const signature = '0x1234'; // Synthetic verifier fixture, never generated with a private key.
 
-function fixture({ principal = actor, permission = null, valid = true, reauth = true, rpc = true } = {}) {
+function fixture({ principal = actor, permission = null, valid = true, reauth = true, rpc = true, residence = true } = {}) {
 	let now = Date.UTC(2026, 9, 11);
 	let counter = 0;
 	const wallets = new Map();
 	const challenges = new Map();
 	const calls = [];
 	const deps = {
+		requireResidence: async () => { if (!residence) throw new ORPCError('RESIDENCE_REQUIRED'); },
 		origin: 'https://misskey.example.test', id: () => `wallet-${++counter}`, now: () => now, nonce: () => `nonce000${++counter}`,
 		reauthenticate: async userId => { calls.push(['auth', userId]); if (!reauth) throw new Error('Sensitive auth failed'); },
 		chains: async () => [chain], rpcUrl: async () => rpc ? 'https://rpc.example.test' : null,
@@ -148,4 +149,14 @@ test('actual viem verifier rejects a domain mismatch before any RPC or signing',
 	const f = fixture(); const c = await begin(f);
 	const challenge = { ...f.challenges.get(c.nonce), domain: 'wrong.example.test' };
 	assert.equal(await createWalletProof({ send: async () => { throw new Error('Unexpected synthetic RPC'); } }).verify(challenge, signature, 'https://rpc.example.test', f.deps.now()), false);
+});
+
+test('direct wallet begin/verify require residence and completion rechecks after external verifier', async () => {
+	const missing = fixture({ residence: false }); await assert.rejects(begin(missing), { code: 'RESIDENCE_REQUIRED' });
+	await assert.rejects(missing.client().verify({ nonce: 'unknown', message: 'unknown', signature }), { code: 'RESIDENCE_REQUIRED' });
+	assert.equal(missing.challenges.size, 0); assert.equal(missing.wallets.size, 0); assert.deepEqual(missing.calls, []);
+	const valid = fixture(); const challenge = await begin(valid);
+	valid.deps.verify = async () => { valid.deps.requireResidence = async () => { throw new ORPCError('RESIDENCE_REQUIRED'); }; return true; };
+	await assert.rejects(verify(valid, challenge), { code: 'RESIDENCE_REQUIRED' }); assert.equal(valid.wallets.size, 0);
+	assert.equal(valid.challenges.get(challenge.nonce).usedAt, null);
 });

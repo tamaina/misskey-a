@@ -36,8 +36,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script setup lang="ts">
 import { computed, onActivated, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
-import type { PageMetadata } from '@features/navigation/frontend/page.js';
-import type { SuperMenuDef } from '@features/navigation/frontend/components/MkSuperMenu.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkSuperMenu from '@features/navigation/frontend/components/MkSuperMenu.vue';
 import { $i } from '@features/auth/frontend/i.js';
@@ -51,6 +49,8 @@ import { store } from '@features/preferences/frontend/store.js';
 import { signout } from '@features/auth/frontend/signout.js';
 import { genSearchIndexes } from '@features/discovery/frontend/utility/inapp-search.js';
 import { enableStoragePersistence, getStoragePersistenceStatusRef, storagePersistenceSupported, skipStoragePersistence } from '@features/runtime/frontend/utility/storage.js';
+import type { SuperMenuDef } from '@features/navigation/frontend/components/MkSuperMenu.vue';
+import type { PageMetadata } from '@features/navigation/frontend/page.js';
 
 const searchIndex = await import('search-index:settings').then(({ searchIndexes }) => genSearchIndexes(searchIndexes));
 
@@ -102,6 +102,11 @@ const menuDef = computed<SuperMenuDef[]>(() => [{
 		text: $locale.value.sfc.email,
 		to: '/settings/email',
 		active: currentPage.value?.route.name === 'email',
+	}, {
+		icon: 'ti ti-map-pin',
+		text: $locale.value.sfc.residence,
+		to: '/settings/residence',
+		active: currentPage.value?.route.name === 'residence',
 	}, {
 		icon: 'ti ti-wallet',
 		text: $locale.value.sfc.wallets,
@@ -607,6 +612,7 @@ definePage(() => INFO.value);
 
 <locale locale="ja-JP" lang="json">
 {
+	"residence": "支払い用の居住地",
 	"wallets": "ウォレット",
 	"settings": "設定",
 	"profile": "プロフィール",

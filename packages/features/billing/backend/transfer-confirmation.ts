@@ -46,7 +46,7 @@ export function createTransferReceiptReader(native: Pick<HttpRequestService, 'se
 					transfers.push({ logIndex: log.logIndex, contractAddress: log.address.toLowerCase(), fromAddress: decoded.args.from.toLowerCase(), toAddress: decoded.args.to.toLowerCase(), amountBaseUnits: decoded.args.value.toString() });
 				} catch { /* Unrelated or malformed event. */ }
 			}
-			return { status: 'confirmed', evidence: v.parse(receiptEvidenceSchema, { chainId, txHash, timestamp, transfers }) };
+			return { status: 'confirmed', evidence: v.parse(receiptEvidenceSchema, { chainId, txHash, timestamp, transfers, blockHash: receipt.blockHash.toLowerCase(), blockNumber: receipt.blockNumber.toString() }) };
 		} catch (error) {
 			if (error instanceof TransactionReceiptNotFoundError) return { status: 'pending' };
 			// Upstream details may contain private RPC URLs; never log or expose them.
