@@ -4,7 +4,7 @@
  */
 
 import * as fs from 'node:fs';
-import { FILE_TYPE_BROWSERSAFE } from '@features/drive/backend/file-types.js';
+import { FILE_TYPE_BROWSERSAFE, getDriveFileDisposition } from '@features/drive/backend/file-types.js';
 import { contentDisposition } from '@features/drive/backend/utility/content-disposition.js';
 import type { IImageStreamable } from '@features/drive/backend/services/ImageProcessingService.js';
 import type { FastifyReply } from 'fastify';
@@ -94,7 +94,7 @@ export function setFileResponseHeaders(
 ): void {
 	reply.header('Content-Type', getSafeContentType(options.mime));
 	reply.header('Cache-Control', options.cacheControl ?? 'max-age=31536000, immutable');
-	reply.header('Content-Disposition', contentDisposition('inline', options.filename));
+	reply.header('Content-Disposition', contentDisposition(getDriveFileDisposition(options.mime), options.filename));
 }
 
 /**

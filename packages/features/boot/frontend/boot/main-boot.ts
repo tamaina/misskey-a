@@ -4,7 +4,7 @@
  */
 
 import { createApp, defineAsyncComponent, markRaw } from 'vue';
-import { ui } from '@features/boot/frontend/shared/config.js';
+import { isSafeMode, ui } from '@features/boot/frontend/shared/config.js';
 import * as Misskey from 'misskey-js';
 import { compareVersions } from 'compare-versions';
 import { common } from './common.js';
@@ -13,7 +13,7 @@ import type { Component } from 'vue';
 import type { Keymap } from '@features/ui/frontend/utility/hotkey.js';
 import FeatureLocaleMessages from '@features/boot/frontend/ts-messages.vue';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
-import { alert, confirm, popup, post } from '@features/ui/frontend/os.js';
+import { alert, confirm, pageWindow, popup, post } from '@features/ui/frontend/os.js';
 import { useStream } from '@features/api/frontend/stream.js';
 import * as sound from '@features/preferences/frontend/utility/sound.js';
 import { $i } from '@features/auth/frontend/i.js';
@@ -33,6 +33,9 @@ import { unisonReload } from '@features/runtime/frontend/utility/unison-reload.j
 import { isBirthday } from '@features/users/frontend/utility/is-birthday.js';
 
 export async function mainBoot(internationalization: InternationalizationInstance) {
+	// Capture the entry before common() handles login URLs and restored fragments.
+	const homeUrl = window.location.origin + '/';
+	const enteredHome = window.location.href === homeUrl;
 	const { isClientUpdated, lastVersion } = await common(async () => {
 		let uiStyle = ui;
 		const searchParams = new URLSearchParams(window.location.search);
@@ -105,6 +108,10 @@ export async function mainBoot(internationalization: InternationalizationInstanc
 				const { dispose } = popup(defineAsyncComponent(() => import('@features/users/frontend/components/MkUserSetupDialog.vue')), {}, {
 					closed: () => dispose(),
 				});
+			} else if ($i && prefer.s['fukushu.openOnStartup'] && enteredHome && window.location.href === homeUrl &&
+				!isSafeMode && !isClientUpdated && !$i.isDeleted && !$i.unreadAnnouncements?.some(x => x.display === 'dialog')) {
+				const [navigation] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+				if (navigation?.type === 'navigate') pageWindow('/fukushu');
 			}
 		});
 

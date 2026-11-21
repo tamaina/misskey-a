@@ -13,7 +13,7 @@ import { DeleteObjectCommandInput, PutObjectCommandInput, NoSuchKey } from '@aws
 import { Logger } from '@features/runtime/backend/logging/logger.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { isDuplicateKeyValueError } from '@features/persistence/backend/utility/is-duplicate-key-value-error.js';
-import { FILE_TYPE_BROWSERSAFE } from '@features/drive/backend/file-types.js';
+import { FILE_TYPE_BROWSERSAFE, getDriveFileDisposition } from '@features/drive/backend/file-types.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
 import { contentDisposition } from '@features/drive/backend/utility/content-disposition.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
@@ -374,6 +374,7 @@ export class DriveService {
 	 */
 	@bindThis
 	private async upload(key: string, stream: fs.ReadStream | Buffer, type: string, ext?: string | null, filename?: string) {
+		const disposition = getDriveFileDisposition(type);
 		if (type === 'image/apng') type = 'image/png';
 		if (!FILE_TYPE_BROWSERSAFE.includes(type)) type = 'application/octet-stream';
 
@@ -386,7 +387,7 @@ export class DriveService {
 		} as PutObjectCommandInput;
 
 		if (filename) params.ContentDisposition = contentDisposition(
-			'inline',
+			disposition,
 			// 拡張子からContent-Typeを設定してそうな挙動を示すオブジェクトストレージ (upcloud?) も存在するので、
 			// 許可されているファイル形式でしか拡張子をつけない
 			ext ? correctFilename(filename, ext) : filename,

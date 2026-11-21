@@ -1,0 +1,30 @@
+{
+  "continuation": {
+    "nineKMatchesUpstreamStateAndLog": true,
+    "originalLogsUnchanged": 37,
+    "retryIdempotent": true,
+    "returnedToUpstream": true,
+    "finalLogCount": 40,
+    "finalReps": 2,
+    "apkgBeforeReps": 4,
+    "apkgAfterReps": 5
+  },
+  "upstreamCommit": "0efee271a13f15096beb8cbaaea25092c5927b29",
+  "chrome": "157.0.8103.78",
+  "chromiumSandbox": true,
+  "realIndexedDB": true,
+  "syntheticDataOnly": true,
+  "apkgSha256": "a97e9c2e4e737a2a2a295aef66259d9a9cdcf466047f07b7302017e75fcca81a",
+  "backupSha256": "5c3f8e213ce6221bb5f57375a0492b98953ecb7601dddb809deb1d44c166f968",
+  "resetQuestionId": "76c6b2cc-0c99-4207-a346-5ed7e2930c38",
+  "apkg": "official-21b.apkg",
+  "apkgCards": 9,
+  "ankiLogs": 36,
+  "reset": {
+    "beforeReps": 1,
+    "afterReps": 0,
+    "logs": 1
+  },
+  "desiredRetention": 0.87,
+  "upstreamRoundtripByteIdentical": true
+}

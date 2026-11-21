@@ -31,7 +31,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<button v-else-if="canResize && !maximized" v-tooltip="$locale.sfc.windowMinimize" class="_button" :class="$style.headerButton" @click="minimize()"><i class="ti ti-minimize"></i></button>
 					<button v-if="canResize && maximized" v-tooltip="$locale.sfc.windowRestore" class="_button" :class="$style.headerButton" @click="unMaximize()"><i class="ti ti-picture-in-picture"></i></button>
 					<button v-else-if="canResize && !maximized && !minimized" v-tooltip="$locale.sfc.windowMaximize" class="_button" :class="$style.headerButton" @click="maximize()"><i class="ti ti-rectangle"></i></button>
-					<button v-if="closeButton" v-tooltip="globalLocale.env.close" class="_button" :class="$style.headerButton" @click="close()"><i class="ti ti-x"></i></button>
+					<button v-if="closeButton" v-tooltip="globalLocale.env.close" :aria-label="globalLocale.env.close" class="_button" :class="$style.headerButton" @click="close()"><i class="ti ti-x"></i></button>
 				</span>
 			</div>
 			<div :class="$style.content">

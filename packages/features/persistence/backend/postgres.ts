@@ -4,10 +4,21 @@
  */
 
 // https://github.com/typeorm/typeorm/issues/2400
+import { MiFukushuAnkiMedia } from '@features/games/fukushu/backend/models/FukushuAnkiMedia.js';
+import { MiFukushuDeck } from '@features/games/fukushu/backend/models/FukushuDeck.js';
+import { MiFukushuReminder } from '@features/games/fukushu/backend/models/FukushuReminder.js';
+import { MiFukushuLearningSettings } from '@features/games/fukushu/backend/models/FukushuLearningSettings.js';
+import { MiFukushuSourceUsage } from '@features/games/fukushu/backend/models/FukushuSourceUsage.js';
+import { MiFukushuUpstreamChunk } from '@features/games/fukushu/backend/models/FukushuUpstreamChunk.js';
+import { MiFukushuUpstreamRecord } from '@features/games/fukushu/backend/models/FukushuUpstreamRecord.js';
+import { MiFukushuOperationReceipt } from '@features/games/fukushu/backend/models/FukushuOperationReceipt.js';
+import { MiFukushuQuestion } from '@features/games/fukushu/backend/models/FukushuQuestion.js';
+import { MiFukushuQuestionVersion } from '@features/games/fukushu/backend/models/FukushuQuestionVersion.js';
+import { MiFukushuStudyState } from '@features/games/fukushu/backend/models/FukushuStudyState.js';
+import { MiFukushuReviewLog } from '@features/games/fukushu/backend/models/FukushuReviewLog.js';
 import pg from 'pg';
 import { DataSource, Logger, type QueryRunner } from 'typeorm';
 import { entities as charts } from '@features/statistics/backend/charts/registry.js';
-import { Config } from '@/config.js';
 import { Logger as MisskeyLogger } from '@features/runtime/backend/logging/logger.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 
@@ -89,6 +100,7 @@ import { MiBubbleGameRecord } from '@features/games/bubble-game/backend/models/B
 import { MiReversiGame } from '@features/games/reversi/backend/models/ReversiGame.js';
 import { MiChatApproval } from '@features/chat/backend/models/ChatApproval.js';
 import { MiSystemAccount } from '@features/users/backend/models/SystemAccount.js';
+import { Config } from '@/config.js';
 
 pg.types.setTypeParser(20, Number);
 
@@ -257,6 +269,18 @@ export const entities = [
 	MiChatRoomInvitation,
 	MiChatApproval,
 	MiBubbleGameRecord,
+	MiFukushuDeck,
+	MiFukushuAnkiMedia,
+	MiFukushuUpstreamRecord,
+	MiFukushuUpstreamChunk,
+	MiFukushuReminder,
+	MiFukushuLearningSettings,
+	MiFukushuSourceUsage,
+	MiFukushuOperationReceipt,
+	MiFukushuQuestion,
+	MiFukushuQuestionVersion,
+	MiFukushuStudyState,
+	MiFukushuReviewLog,
 	MiReversiGame,
 	...charts,
 ];

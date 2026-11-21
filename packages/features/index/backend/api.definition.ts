@@ -22,6 +22,7 @@ import { chatApiContract } from '../../chat/backend/api.definition.js';
 import { channelsApiContract } from '../../channels/backend/api.definition.js';
 import { pagesContract } from '../../pages/backend/endpoints/pages.contract.js';
 import { playContract } from '../../play/backend/endpoints/play.contract.js';
+import { fukushuContract } from '../../games/fukushu/backend/material.contract.js';
 import { gamesContract } from '../../games/index/backend/endpoints/games.contract.js';
 import { federationContract } from '../../federation/backend/api.definition.js';
 import { operationsApiContract } from '../../operations/backend/api.definition.js';
@@ -41,6 +42,7 @@ export const pilotContract: {
 	channels: typeof channelsApiContract;
 	pages: typeof pagesContract;
 	play: typeof playContract;
+	fukushu: typeof fukushuContract;
 	games: typeof gamesContract;
 	federation: typeof federationContract;
 	operations: typeof operationsApiContract;
@@ -73,6 +75,7 @@ export const pilotContract: {
 	channels: channelsApiContract,
 	pages: pagesContract,
 	play: playContract,
+	fukushu: fukushuContract,
 	games: gamesContract,
 	federation: federationContract,
 	operations: operationsApiContract,

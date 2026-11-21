@@ -13,6 +13,7 @@ import { DriveManagementApiProvider } from '@features/drive/backend/api.implemen
 import { IntegrationsApiProvider } from '@features/integrations/backend/api.implementation.js';
 import { OperationsApiProvider } from '@features/operations/backend/api.implementation.js';
 import { FederationApiProvider } from '@features/federation/backend/api.implementation.js';
+import { FukushuApiProvider } from '@features/games/fukushu/backend/api.implementation.js';
 import { GamesApiProvider } from '@features/games/index/backend/api.implementation.js';
 import { PlayApiProvider } from '@features/play/backend/api.implementation.js';
 import { PagesApiProvider } from '@features/pages/backend/api.implementation.js';
@@ -43,6 +44,7 @@ export const featureProviders: Provider[] = [
 	IntegrationsApiProvider,
 	OperationsApiProvider,
 	FederationApiProvider,
+	FukushuApiProvider,
 	GamesApiProvider,
 	PlayApiProvider,
 	PagesApiProvider,

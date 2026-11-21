@@ -1,0 +1,169 @@
+# Full-application HTTP check
+
+`full-app-http.test.mjs` is an opt-in integration check against a **new, disposable,
+owned application**. It creates accounts, uploads a synthetic UTF-8 TSV, imports a
+material, edits its name/description, archives and restores it, then updates only
+a card’s explanation while retaining its original and later versions. It never
+physically deletes a material or changes prompts, answers, source identity or grading.
+
+Do not run it against an existing development or production instance. The test
+requires `FUKUSHU_E2E_RUN_DIR` pointing to an absolute, private directory owned by
+the current user, without symlinks. This directory must be prepared by the
+isolated application launcher and contain:
+
+- `.owner`: a UUID identifying this one run;
+- private `config.json` and `credentials.json` files (mode 0600);
+- `ready.json`: the launcher's readiness record, with the configured URL;
+- a PostgreSQL Unix socket directory `p` for a freshly migrated `fukushu_e2e` DB;
+- a Redis Unix socket `r/r.sock`, using prefix `fukushu-e2e-<owner UUID>`;
+- the application Unix socket `a.sock` and a loopback-only HTTP proxy at
+  `http://127.0.0.1:3220`.
+
+`credentials.json` initially contains only the launcher's `setupPassword`.
+The test stores the generated local test users and tokens there for subsequent
+browser verification. Never commit or print this file. A completed or partially
+completed run is not reusable: stop its owned processes and create a fresh run.
+The launcher should use `NODE_ENV=production`, a single server process, and no
+background daemons, with the existing authentication and upload policies enabled.
+The Unix-socket proxy must replace the forwarded client IP, and the private
+application must trust that proxy. Password signins are spaced to respect the
+real IP rate limiter; API limits are not disabled.
+
+After building the current backend, frontend and frontend-embed (both manifests
+are required for static asset serving), applying migrations to that
+owned DB, and waiting for readiness, run under the same validation lock as the
+application:
+
+```sh
+FUKUSHU_E2E_RUN_DIR=/absolute/private/run-directory \
+  node --test packages/features/games/fukushu/test/full-app-http.test.mjs
+```
+
+Without the environment variable, the test is skipped. Every HTTP request has a
+10-second timeout, redirects are rejected, and later steps stop after an earlier
+failure. Response bodies and credentials are omitted from transport failures.
+The scenario uses the actual initial-account endpoint, password signin, browser
+sessions, sudo and scoped-token issuance, multipart Drive upload and persistence,
+and Fukushu HTTP handlers; those paths are not mocked. The data and services are
+disposable test fixtures. The UI login, native file chooser and Drive picker need
+a separate browser check against this same application.
+
+Card-version checks cover the virtual baseline, exact retained records,
+explanation-only edits, stale-before-no-op behavior, explicit null removal,
+exclusive version pagination, owner separation and edits while archived. The
+scenario uses five explanation-write requests and five archive requests for Alice,
+including rejected stale writes and the accepted no-op, respecting each endpoint’s
+separate production limit without waiting for a rate-window reset or disabling
+the rate limiter. Do not add
+more same-owner writes to these endpoints without budgeting their rate window.
+
+The study extension uses the same real application to record self-rated flashcard
+reviews, retry the same request UUID, reject stale/different requests, race two
+tabs, read paginated historical snapshots, and edit an explanation after its first
+review. It checks archived history and retries without accepting new archived
+reviews. No old version is regraded or used to replay FSRS history; these assertions
+do not claim that upstream study history was imported. Bob retains one new typed
+card for a subsequent real-browser study check; `credentials.studyOwner` records
+the owned test account for that check. PostgreSQL tests separately cover concurrent mutations, total quota (including archived materials), source
+deduplication and migration round trips.
+
+## Anki Drive upload
+
+The same disposable HTTP scenario signs in as a dedicated ordinary user and uploads
+genuine Anki 25.09 anki21/21b exports with a generic multipart MIME type. It verifies
+that renamed ordinary ZIPs and truncated archives are rejected even if the sender
+claims the Anki MIME type. Successful originals round-trip byte-for-byte as
+octet-stream attachments. It then checks foreign-owner denial and runs the real
+import queue, verifying that the final deck has the expected SHA-256 and cards.
+
+## Pinned FSRS compatibility fixture
+
+`backend/fixtures/upstream-fsrs.json` was generated independently from the exact
+upstream `infrastructure/fsrs/adapter.ts` at commit
+`0efee271a13f15096beb8cbaaea25092c5927b29`, using its locked ts-fsrs 5.4.1 package.
+The official npm tarball SHA-512 was checked against the upstream lockfile:
+`sha512-mOp9+oexJexBTkwjg/jQI1aSUQRLIAvbimeKHLSmVdNJPwObugFNKmZkoggH5d6kZ0uaWLboP1Al1DnXAfIb9w==`.
+
+Start with `emptyStoredCard(2026-11-16T00:00:00.000Z)`. The four independent new-card
+cases review at `2026-11-17T00:00:00.000Z`. The separate sequence uses Again at
+Nov 17 00:00 UTC, Good at Nov 17 00:02, Hard at Nov 18 00:00, Easy at Nov 20 00:00,
+and Again at Dec 1 00:00. Every call uses retention 0.9 and fuzz false, and feeds
+the upstream serialized output into the next call. `fsrs.test.ts` compares full
+card/log outputs and checks that inputs are not mutated. This intentionally
+retains the upstream adapter's omitted `learning_steps` field. These are scheduler
+compatibility cases, not a command to replay a user's history.
+
+## Native backup restore extension
+
+The HTTP scenario also exports through the real queue into Drive, inspects the
+owned original, and restores it into a separate synthetic owner's empty library.
+It compares materials, saved versions, review history and idempotent review retry
+results, rejects a second restore, and verifies the source owner's data is unchanged.
+`credentials.restoreOwner` identifies the synthetic account whose empty library and
+owned `native-restore.json` are reserved for the Chrome confirmation/restore check.
+This verifies the 9k native v1 format, not upstream `.fukushu` import.
+
+`backend/restore.integration.test.ts` is opt-in through `FUKUSHU_TEST_SOCKET`. Use
+a fresh disposable PostgreSQL cluster with a Unix socket at that directory, TCP
+disabled, port 55474, username `fukushu`, database `postgres`. Never point this
+variable at an existing development or production cluster. The suite creates its
+own `fukushu_restore_test` schema and removes it only if this run created it; an
+existing schema makes setup fail without dropping it. Run the feature backend
+Vitest tests with one worker under the same global validation lock, then stop only
+the fixture cluster. These PostgreSQL cases are skipped without the opt-in variable.
+
+## Upstream binary inspection extension
+
+`backend/fixtures/upstream-backup.fukushu` contains synthetic data from all eight
+upstream stores. Its adjacent provenance JSON pins the original writer source
+commit, source hash, fixture hash and adapter-based generation method. Current
+cards postdate its review records; the inspector must not use them as historical
+snapshots. The archive bytes are synthetic and do not establish APKG compatibility.
+
+`backend/upstream-backup.test.ts` checks that fixture, framing, checksums, strict
+schemas, reference/identity consistency, bounded counts, binary integrity and
+explicitly unavailable historical snapshots. The HTTP scenario uploads this
+fixture through actual Drive as a synthetic administrator, inspects with a real
+normal login, rejects anonymous/scoped/foreign access, and checks that both that owner's
+empty library and the existing source library/history are unchanged.
+The default ordinary-user binary-upload rejection is asserted first; no role
+policy is changed. `credentials.upstreamOwner` identifies the synthetic
+administrator account for Chrome. This
+is inspection only; it does not assert that upstream history was imported.
+
+`frontend/upstream-local.test.ts` runs the same pinned writer fixture through the
+portable parser and Web Crypto, with network calls forbidden and storage writes
+observed. It checks early file-size/extension rejection and checksum corruption.
+UI tests verify that choosing a local file calls no Drive or API method. The
+separate Chrome check reached the local-file button as an ordinary synthetic
+user, but selecting the fixture was blocked by extension file-URL permissions.
+An isolated Playwright Chrome fallback stopped at sandbox initialization. No
+permission or sandbox setting was weakened. Post-selection browser rendering
+is unverified; final frontend types, builds and 25 real HTTP cases passed.
+Neither path imports upstream data into the database.
+
+For the long-history round trip use the same pinned upstream checkout and
+isolated Chrome harness with `FUKUSHU_LONG_HISTORY=generate`. It restores the
+checked-in synthetic APKG/GIFT fixture into an empty IndexedDB and generates
+`long-input.fukushu` using the upstream writer. Of its 9,999 history entries,
+37 come from the original fixture; the rest are synthetic records. Import
+that file from an isolated owner's Drive. Review the reset quiz once. To
+exercise GIFT editing, upload a UTF-8 file containing
+`::stable-name:: Sky is blue. {TRUE}` to that owner's Drive and apply it to
+the GIFT deck. The preview should report one changed and one reset card.
+The card should have zero repetitions and its preceding review should still
+be in history. Review the question once more and save the Drive export
+and the last successful review response. Run the same
+harness with `FUKUSHU_LONG_HISTORY=verify`, `FUKUSHU_PERSISTED_EXPORT` and
+`FUKUSHU_PERSISTED_STATE` pointing to those two test artifacts. It checks the
+restored state, continues learning and compares all 10,001 existing logs
+after one more upstream export/restore.
+
+For the former 64 MiB aggregate JSON boundary, use
+`FUKUSHU_LONG_HISTORY=generate-large` in a separate, empty output directory.
+Run the PostgreSQL suite with `FUKUSHU_LONG_ARCHIVE_DIR` set to that directory
+to import via a synthetic Drive snapshot, review, retry, and re-export. Feed
+`continued.fukushu` and `continued-state.json` from this run to the same
+`verify` scenario. This exercises the large-file store independently of the
+instance's Drive upload limits. Set `FUKUSHU_NATIVE_LONG_HISTORY=1` for the
+separate 20-deck, 10,020-answer native v1 backup round trip.

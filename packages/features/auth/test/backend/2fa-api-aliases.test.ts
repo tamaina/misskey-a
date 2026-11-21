@@ -28,6 +28,7 @@ import { authContract } from '../../backend/api.definition.js';
 import baseline from './fixtures/2fa-api-alias-baseline.json';
 import expiryRebases from './fixtures/credential-expiry-operation-rebase.json';
 import { restoreAnnouncementOperationBaseline } from '../../../announcements/test/backend/operation-rebase.js';
+import { restoreFukushuNotificationBaseline } from '../../../games/fukushu/test/backend/notification-rebase.js';
 import { testContext } from './native-context.js';
 import type { AuthRouterDependencies } from '../../backend/api.implementation.js';
 import type { ApiServices } from '@features/api/backend/transport/context.js';
@@ -335,10 +336,10 @@ test('actual portable generator preserves every legacy operation and public sche
 	if (process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON) writeFileSync(process.env.MISSKEY_TEST_EXPORT_2FA_API_JSON, JSON.stringify(spec));
 	const routes = requestRoutes(clientContract);
 	for (const [path, hash] of Object.entries(baseline.operationHashes)) {
-		const operation = restoreSessionIpOperation(path, restoreSigninHistoryOperation(path, restorePreSigninPolicyOperation(path, restorePreExpiryOperation(path, spec.paths?.[path]))));
+		const operation = restoreSessionIpOperation(path, restoreSigninHistoryOperation(path, restorePreSigninPolicyOperation(path, restorePreExpiryOperation(path, restoreFukushuNotificationBaseline('operation', path, spec.paths?.[path])))));
 		expect(schemaHash(path === '/signin-flow' ? restorePreAvailabilitySigninOperation(operation) : restoreClientQrOperationBaseline(path, restoreWebhookOperationBaseline(path, restoreAnnouncementOperationBaseline(path, operation)))), path).toBe(hash);
 	}
-	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(restoreSigninSchema(name, restoreWebhookSchemaBaseline(name, spec.components?.schemas?.[name]))), name).toBe(hash);
+	for (const [name, hash] of Object.entries(baseline.schemaHashes)) expect(schemaHash(restoreSigninSchema(name, restoreWebhookSchemaBaseline(name, restoreFukushuNotificationBaseline('schema', name, spec.components?.schemas?.[name])))), name).toBe(hash);
 	expect(Object.keys(baseline.schemaHashes)).toHaveLength(1107);
 	expect(Object.keys(spec.components?.schemas ?? {}).filter(name => !(name in baseline.schemaHashes))).toEqual(['OrpcDefinition1038']);
 	expect(Object.keys(baseline.paths)).toHaveLength(443);

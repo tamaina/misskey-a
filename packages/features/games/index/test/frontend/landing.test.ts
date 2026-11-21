@@ -16,7 +16,7 @@ vi.mock('@features/web/frontend/pages/_error_.vue', () => ({ default: { template
 vi.mock('@features/timelines/frontend/pages/timeline.vue', () => ({ default: { template: '<p>Timeline</p>' } }));
 vi.mock('@features/navigation/frontend/page.js', () => ({ definePage: vi.fn() }));
 
-test('the public /games route lazily renders the existing game links and metadata', async () => {
+test('the public /games route lazily renders Fukushu and the existing game links and metadata', async () => {
 	const route = ROUTE_DEF.find(candidate => candidate.path === '/games');
 	expect(route).toBeDefined();
 	expect(route?.loginRequired).toBe(false);
@@ -30,8 +30,13 @@ test('the public /games route lazily renders the existing game links and metadat
 	});
 	try {
 		await waitFor(() => {
-			expect(Array.from(wrapper.container.querySelectorAll('a'), link => link.getAttribute('href'))).toEqual(['/bubble-game', '/reversi']);
+			expect(Array.from(wrapper.container.querySelectorAll('a'), link => link.getAttribute('href'))).toEqual([
+				'/fukushu',
+				'/bubble-game',
+				'/reversi',
+			]);
 		});
+		expect(wrapper.getByRole('link', { name: 'Fukushu' }).getAttribute('href')).toBe('/fukushu');
 		expect(Array.from(wrapper.container.querySelectorAll('img'), image => image.getAttribute('src'))).toEqual([
 			'/client-assets/drop-and-fusion/logo.png',
 			'/client-assets/reversi/logo.png',

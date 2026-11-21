@@ -15,6 +15,7 @@ import { DriveManagementApiProvider, DriveApiProvider } from '@features/drive/ba
 import { IntegrationsApiProvider } from '@features/integrations/backend/api.implementation.js';
 import { OperationsApiProvider } from '@features/operations/backend/api.implementation.js';
 import { FederationApiProvider } from '@features/federation/backend/api.implementation.js';
+import { FukushuApiProvider } from '@features/games/fukushu/backend/api.implementation.js';
 import { GamesApiProvider } from '@features/games/index/backend/api.implementation.js';
 import { PlayApiProvider } from '@features/play/backend/api.implementation.js';
 import { PagesApiProvider } from '@features/pages/backend/api.implementation.js';
@@ -50,6 +51,7 @@ export interface ApiRouterFeatures {
 	integrations: ReturnType<IntegrationsApiProvider['compose']>;
 	operations: ReturnType<OperationsApiProvider['compose']>;
 	federation: ReturnType<FederationApiProvider['compose']>;
+	fukushu: ReturnType<FukushuApiProvider['compose']>;
 	games: ReturnType<GamesApiProvider['compose']>;
 	play: ReturnType<PlayApiProvider['compose']>;
 	pages: ReturnType<PagesApiProvider['compose']>;
@@ -102,6 +104,7 @@ export class ApiRouterProvider {
 			integrations: this.moduleRef.get(IntegrationsApiProvider, { strict: false }).compose(),
 			operations: this.moduleRef.get(OperationsApiProvider, { strict: false }).compose(),
 			federation: this.moduleRef.get(FederationApiProvider, { strict: false }).compose(),
+			fukushu: this.moduleRef.get(FukushuApiProvider, { strict: false }).compose(),
 			games: this.moduleRef.get(GamesApiProvider, { strict: false }).compose(),
 			play: this.moduleRef.get(PlayApiProvider, { strict: false }).compose(),
 			pages: this.moduleRef.get(PagesApiProvider, { strict: false }).compose(),

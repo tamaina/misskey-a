@@ -1,0 +1,20 @@
+{
+  "repository": "tamaina/fukushu",
+  "commit": "0efee271a13f15096beb8cbaaea25092c5927b29",
+  "writer": "packages/app/src/application/backupArchive.ts",
+  "writerSha256": "82855fc182c06b17f5086e7c18324b053e7fc95d41a16f65505df7140d916e78",
+  "fixtureSha256": "6372356a80b74345e0e6da1fcced503c57b1d272f3308ebe87314fb3e7a80f80",
+  "bytes": 3763,
+  "method": "Executed the unchanged pinned writer with Node TypeScript stripping, a synthetic readonly cursor adapter and Node SHA-256 adapter. No upstream app or live IndexedDB was used.",
+  "data": "Synthetic records, SVG and archive bytes only; not a valid APKG package or real user data.",
+  "counts": {
+    "settings": 1,
+    "decks": 1,
+    "questions": 2,
+    "studyStates": 1,
+    "reviewLogs": 2,
+    "importSources": 1,
+    "media": 1,
+    "imports": 1
+  }
+}

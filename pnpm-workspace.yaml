@@ -33,6 +33,8 @@ allowBuilds:
   pnpm: true
 minimumReleaseAge: 10080 # delay 7days to mitigate supply-chain attack
 minimumReleaseAgeExclude:
+  # Owner-approved (2026-11-20) new Anki import dependency; eligible 2026-11-27 10:52:18 UTC.
+  - '@aqz/anki-reader@0.1.0'
   # Owner-approved VVI 1.1.5 release; exact-version exception only.
   - vite-vue-internationalization@1.1.5
   # Owner-approved (2026-11-10) NestJS 12.4.2 from upstream #18125; exact-version exception only.

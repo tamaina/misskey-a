@@ -18,6 +18,7 @@ function loadWorker() {
 		'idb-keyval': {}, 'misskey-js': {},
 		'@/const.js': { FETCH_TIMEOUT_MS: 1000 },
 		'@/scripts/create-notification.js': {},
+		'@/scripts/get-account-from-id.js': {},
 		'@/scripts/lang.js': {},
 		'@/scripts/operations.js': {},
 		'@/scripts/share.js': { respondToShare: share },

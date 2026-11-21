@@ -108,9 +108,48 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	for (const path of addedSecurityPaths) {
 		expect(spec.paths?.[path]?.post?.operationId).toBe(`post___${path.slice(1).replaceAll('/', '___')}`);
 	}
+	const addedFukushuOperations = new Map([
+		['/fukushu/reminder/show', 'post___fukushu___reminder___show'],
+		['/fukushu/reminder/update', 'post___fukushu___reminder___update'],
+		['/fukushu/upstream/media', 'post___fukushu___upstream___media'],
+		['/fukushu/upstream/create-gift', 'post___fukushu___upstream___create-gift'],
+		['/fukushu/upstream/update-gift', 'post___fukushu___upstream___update-gift'],
+		['/fukushu/upstream/restore-job', 'post___fukushu___upstream___restore-job'],
+		['/fukushu/upstream/restore', 'post___fukushu___upstream___restore'],
+		['/fukushu/upstream/show', 'post___fukushu___upstream___show'],
+		['/fukushu/upstream/review', 'post___fukushu___upstream___review'],
+		['/fukushu/upstream/export', 'post___fukushu___upstream___export'],
+		['/fukushu/backup/inspect-upstream', 'post___fukushu___backup___inspect-upstream'],
+		['/fukushu/backup/restore', 'post___fukushu___backup___restore'],
+		['/fukushu/backup/export', 'post___fukushu___backup___export'],
+		['/fukushu/backup/inspect', 'post___fukushu___backup___inspect'],
+		['/fukushu/materials/create', 'post___fukushu___materials___create'],
+		['/fukushu/materials/show', 'post___fukushu___materials___show'],
+		['/fukushu/materials/anki-media', 'post___fukushu___materials___anki-media'],
+		['/fukushu/materials/list', 'post___fukushu___materials___list'],
+		['/fukushu/materials/import', 'post___fukushu___materials___import'],
+		['/fukushu/materials/update', 'post___fukushu___materials___update'],
+		['/fukushu/materials/archive', 'post___fukushu___materials___archive'],
+		['/fukushu/materials/update-card-explanation', 'post___fukushu___materials___update-card-explanation'],
+		['/fukushu/materials/card-versions', 'post___fukushu___materials___card-versions'],
+		['/fukushu/materials/card-version', 'post___fukushu___materials___card-version'],
+		['/fukushu/study/settings', 'post___fukushu___study___settings'],
+		['/fukushu/study/update-settings', 'post___fukushu___study___update-settings'],
+		['/fukushu/study/today', 'post___fukushu___study___today'],
+		['/fukushu/study/queue', 'post___fukushu___study___queue'],
+		['/fukushu/study/review', 'post___fukushu___study___review'],
+		['/fukushu/study/history', 'post___fukushu___study___history'],
+	]);
+	const addedFukushuIds = new Set(addedFukushuOperations.values());
+	expect(addedFukushuIds.size).toBe(30);
+	for (const [path, operationId] of addedFukushuOperations) {
+		expect(spec.paths?.[path]?.post?.operationId).toBe(operationId);
+		expect(spec.paths?.[path]?.get).toBeUndefined();
+	}
 	// Exclude the fifteen deferred SSO routes from the preceding API count.
-	expect(identifiers.filter(id => !addedSecurityIds.has(id!))).toHaveLength(481);
-	expect(identifiers).toHaveLength(481 + 27);
+	// The explicitly verified Fukushu IDs do not change the historical baseline.
+	expect(identifiers.filter(id => !addedSecurityIds.has(id!) && !addedFukushuIds.has(id!))).toHaveLength(481);
+	expect(identifiers).toHaveLength(481 + 27 + addedFukushuIds.size);
 	expect(new Set(identifiers).size).toBe(identifiers.length);
 });
 

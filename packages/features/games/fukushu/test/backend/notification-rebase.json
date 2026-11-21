@@ -1,0 +1,55 @@
+[
+	{
+		"kind": "operation",
+		"name": "/i/notifications",
+		"currentSha256": "c34b9db43d189c1981884b443e77ba07263cd3755a03ac6683b5542dc4437c05",
+		"baselineSha256": "667316b17a0ffc1191d4acc83fc0a6fc48710d7a6704c68aa731466cbb571d27",
+		"path": [
+			"post",
+			"responses",
+			"200",
+			"content",
+			"application/json",
+			"schema",
+			"items",
+			"oneOf",
+			15,
+			"properties",
+			"exportedEntity",
+			"enum"
+		]
+	},
+	{
+		"kind": "operation",
+		"name": "/i/notifications-grouped",
+		"currentSha256": "699431f9933ccf5f83ea0a567bd93c5b7ec673a6ec05d96050485bccaf3d006f",
+		"baselineSha256": "59f4f853d04224964e6804783d9f26164675cf930c43dfbd9f62fc28a0f9e092",
+		"path": [
+			"post",
+			"responses",
+			"200",
+			"content",
+			"application/json",
+			"schema",
+			"items",
+			"oneOf",
+			15,
+			"properties",
+			"exportedEntity",
+			"enum"
+		]
+	},
+	{
+		"kind": "schema",
+		"name": "Notification",
+		"currentSha256": "5c4940ba9f40844e7fe4a15398c823a5b937feaf71018371f21098c728959b9d",
+		"baselineSha256": "b5e9499674da4e6cfab08b763b4944c88203601547a2f7c98682df4336296d94",
+		"path": [
+			"oneOf",
+			15,
+			"properties",
+			"exportedEntity",
+			"enum"
+		]
+	}
+]

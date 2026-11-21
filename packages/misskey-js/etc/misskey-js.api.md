@@ -1783,6 +1783,63 @@ declare namespace entities {
         FlashSearchResponse,
         UsersFlashsRequest,
         UsersFlashsResponse,
+        FukushuReminderShowRequest,
+        FukushuReminderShowResponse,
+        FukushuReminderUpdateRequest,
+        FukushuStudySettingsRequest,
+        FukushuStudySettingsResponse,
+        FukushuStudyUpdateSettingsRequest,
+        FukushuStudyUpdateSettingsResponse,
+        FukushuStudyTodayRequest,
+        FukushuStudyTodayResponse,
+        FukushuStudyQueueRequest,
+        FukushuStudyQueueResponse,
+        FukushuStudyReviewRequest,
+        FukushuStudyReviewResponse,
+        FukushuStudyHistoryRequest,
+        FukushuStudyHistoryResponse,
+        FukushuBackupInspectUpstreamRequest,
+        FukushuBackupInspectUpstreamResponse,
+        FukushuBackupRestoreRequest,
+        FukushuBackupRestoreResponse,
+        FukushuBackupExportRequest,
+        FukushuBackupInspectRequest,
+        FukushuBackupInspectResponse,
+        FukushuUpstreamRestoreJobRequest,
+        FukushuUpstreamRestoreJobResponse,
+        FukushuUpstreamMediaRequest,
+        FukushuUpstreamMediaResponse,
+        FukushuUpstreamCreateGiftRequest,
+        FukushuUpstreamCreateGiftResponse,
+        FukushuUpstreamUpdateGiftRequest,
+        FukushuUpstreamUpdateGiftResponse,
+        FukushuUpstreamRestoreRequest,
+        FukushuUpstreamRestoreResponse,
+        FukushuUpstreamShowRequest,
+        FukushuUpstreamShowResponse,
+        FukushuUpstreamReviewRequest,
+        FukushuUpstreamReviewResponse,
+        FukushuUpstreamExportRequest,
+        FukushuMaterialsListRequest,
+        FukushuMaterialsListResponse,
+        FukushuMaterialsImportRequest,
+        FukushuMaterialsImportResponse,
+        FukushuMaterialsCreateRequest,
+        FukushuMaterialsCreateResponse,
+        FukushuMaterialsShowRequest,
+        FukushuMaterialsShowResponse,
+        FukushuMaterialsAnkiMediaRequest,
+        FukushuMaterialsAnkiMediaResponse,
+        FukushuMaterialsUpdateRequest,
+        FukushuMaterialsUpdateResponse,
+        FukushuMaterialsUpdateCardExplanationRequest,
+        FukushuMaterialsUpdateCardExplanationResponse,
+        FukushuMaterialsCardVersionsRequest,
+        FukushuMaterialsCardVersionsResponse,
+        FukushuMaterialsCardVersionRequest,
+        FukushuMaterialsCardVersionResponse,
+        FukushuMaterialsArchiveRequest,
+        FukushuMaterialsArchiveResponse,
         BubbleGameRankingRequest,
         BubbleGameRankingResponse,
         BubbleGameRegisterRequest,
@@ -3764,6 +3821,177 @@ type FollowingUpdateResponse = ContractResponse<'following/update'>;
 
 // @public (undocumented)
 export const followingVisibilities: readonly ["public", "followers", "private"];
+
+// @public (undocumented)
+type FukushuBackupExportRequest = ContractRequest<'fukushu/backup/export'>;
+
+// @public (undocumented)
+type FukushuBackupInspectRequest = ContractRequest<'fukushu/backup/inspect'>;
+
+// @public (undocumented)
+type FukushuBackupInspectResponse = ContractResponse<'fukushu/backup/inspect'>;
+
+// @public (undocumented)
+type FukushuBackupInspectUpstreamRequest = ContractRequest<'fukushu/backup/inspect-upstream'>;
+
+// @public (undocumented)
+type FukushuBackupInspectUpstreamResponse = ContractResponse<'fukushu/backup/inspect-upstream'>;
+
+// @public (undocumented)
+type FukushuBackupRestoreRequest = ContractRequest<'fukushu/backup/restore'>;
+
+// @public (undocumented)
+type FukushuBackupRestoreResponse = ContractResponse<'fukushu/backup/restore'>;
+
+// @public (undocumented)
+type FukushuMaterialsAnkiMediaRequest = ContractRequest<'fukushu/materials/anki-media'>;
+
+// @public (undocumented)
+type FukushuMaterialsAnkiMediaResponse = ContractResponse<'fukushu/materials/anki-media'>;
+
+// @public (undocumented)
+type FukushuMaterialsArchiveRequest = ContractRequest<'fukushu/materials/archive'>;
+
+// @public (undocumented)
+type FukushuMaterialsArchiveResponse = ContractResponse<'fukushu/materials/archive'>;
+
+// @public (undocumented)
+type FukushuMaterialsCardVersionRequest = ContractRequest<'fukushu/materials/card-version'>;
+
+// @public (undocumented)
+type FukushuMaterialsCardVersionResponse = ContractResponse<'fukushu/materials/card-version'>;
+
+// @public (undocumented)
+type FukushuMaterialsCardVersionsRequest = ContractRequest<'fukushu/materials/card-versions'>;
+
+// @public (undocumented)
+type FukushuMaterialsCardVersionsResponse = ContractResponse<'fukushu/materials/card-versions'>;
+
+// @public (undocumented)
+type FukushuMaterialsCreateRequest = ContractRequest<'fukushu/materials/create'>;
+
+// @public (undocumented)
+type FukushuMaterialsCreateResponse = ContractResponse<'fukushu/materials/create'>;
+
+// @public (undocumented)
+type FukushuMaterialsImportRequest = ContractRequest<'fukushu/materials/import'>;
+
+// @public (undocumented)
+type FukushuMaterialsImportResponse = ContractResponse<'fukushu/materials/import'>;
+
+// @public (undocumented)
+type FukushuMaterialsListRequest = ContractRequest<'fukushu/materials/list'>;
+
+// @public (undocumented)
+type FukushuMaterialsListResponse = ContractResponse<'fukushu/materials/list'>;
+
+// @public (undocumented)
+type FukushuMaterialsShowRequest = ContractRequest<'fukushu/materials/show'>;
+
+// @public (undocumented)
+type FukushuMaterialsShowResponse = ContractResponse<'fukushu/materials/show'>;
+
+// @public (undocumented)
+type FukushuMaterialsUpdateCardExplanationRequest = ContractRequest<'fukushu/materials/update-card-explanation'>;
+
+// @public (undocumented)
+type FukushuMaterialsUpdateCardExplanationResponse = ContractResponse<'fukushu/materials/update-card-explanation'>;
+
+// @public (undocumented)
+type FukushuMaterialsUpdateRequest = ContractRequest<'fukushu/materials/update'>;
+
+// @public (undocumented)
+type FukushuMaterialsUpdateResponse = ContractResponse<'fukushu/materials/update'>;
+
+// @public (undocumented)
+type FukushuReminderShowRequest = ContractRequest<'fukushu/reminder/show'>;
+
+// @public (undocumented)
+type FukushuReminderShowResponse = ContractResponse<'fukushu/reminder/show'>;
+
+// @public (undocumented)
+type FukushuReminderUpdateRequest = ContractRequest<'fukushu/reminder/update'>;
+
+// @public (undocumented)
+type FukushuStudyHistoryRequest = ContractRequest<'fukushu/study/history'>;
+
+// @public (undocumented)
+type FukushuStudyHistoryResponse = ContractResponse<'fukushu/study/history'>;
+
+// @public (undocumented)
+type FukushuStudyQueueRequest = ContractRequest<'fukushu/study/queue'>;
+
+// @public (undocumented)
+type FukushuStudyQueueResponse = ContractResponse<'fukushu/study/queue'>;
+
+// @public (undocumented)
+type FukushuStudyReviewRequest = ContractRequest<'fukushu/study/review'>;
+
+// @public (undocumented)
+type FukushuStudyReviewResponse = ContractResponse<'fukushu/study/review'>;
+
+// @public (undocumented)
+type FukushuStudySettingsRequest = ContractRequest<'fukushu/study/settings'>;
+
+// @public (undocumented)
+type FukushuStudySettingsResponse = ContractResponse<'fukushu/study/settings'>;
+
+// @public (undocumented)
+type FukushuStudyTodayRequest = ContractRequest<'fukushu/study/today'>;
+
+// @public (undocumented)
+type FukushuStudyTodayResponse = ContractResponse<'fukushu/study/today'>;
+
+// @public (undocumented)
+type FukushuStudyUpdateSettingsRequest = ContractRequest<'fukushu/study/update-settings'>;
+
+// @public (undocumented)
+type FukushuStudyUpdateSettingsResponse = ContractResponse<'fukushu/study/update-settings'>;
+
+// @public (undocumented)
+type FukushuUpstreamCreateGiftRequest = ContractRequest<'fukushu/upstream/create-gift'>;
+
+// @public (undocumented)
+type FukushuUpstreamCreateGiftResponse = ContractResponse<'fukushu/upstream/create-gift'>;
+
+// @public (undocumented)
+type FukushuUpstreamExportRequest = ContractRequest<'fukushu/upstream/export'>;
+
+// @public (undocumented)
+type FukushuUpstreamMediaRequest = ContractRequest<'fukushu/upstream/media'>;
+
+// @public (undocumented)
+type FukushuUpstreamMediaResponse = ContractResponse<'fukushu/upstream/media'>;
+
+// @public (undocumented)
+type FukushuUpstreamRestoreJobRequest = ContractRequest<'fukushu/upstream/restore-job'>;
+
+// @public (undocumented)
+type FukushuUpstreamRestoreJobResponse = ContractResponse<'fukushu/upstream/restore-job'>;
+
+// @public (undocumented)
+type FukushuUpstreamRestoreRequest = ContractRequest<'fukushu/upstream/restore'>;
+
+// @public (undocumented)
+type FukushuUpstreamRestoreResponse = ContractResponse<'fukushu/upstream/restore'>;
+
+// @public (undocumented)
+type FukushuUpstreamReviewRequest = ContractRequest<'fukushu/upstream/review'>;
+
+// @public (undocumented)
+type FukushuUpstreamReviewResponse = ContractResponse<'fukushu/upstream/review'>;
+
+// @public (undocumented)
+type FukushuUpstreamShowRequest = ContractRequest<'fukushu/upstream/show'>;
+
+// @public (undocumented)
+type FukushuUpstreamShowResponse = ContractResponse<'fukushu/upstream/show'>;
+
+// @public (undocumented)
+type FukushuUpstreamUpdateGiftRequest = ContractRequest<'fukushu/upstream/update-gift'>;
+
+// @public (undocumented)
+type FukushuUpstreamUpdateGiftResponse = ContractResponse<'fukushu/upstream/update-gift'>;
 
 // @public (undocumented)
 type GalleryFeaturedRequest = ContractRequest<'gallery/featured'>;

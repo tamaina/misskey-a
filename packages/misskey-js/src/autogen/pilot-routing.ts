@@ -3336,6 +3336,2251 @@ export default {
 			}
 		}
 	},
+	"fukushu": {
+		"reminderShow": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"secure": true,
+					"requestName": "fukushu/reminder/show"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/reminder/show",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"reminderUpdate": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"INVALID_REMINDER_SCHEDULE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"secure": true,
+					"requestName": "fukushu/reminder/update"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/reminder/update",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"studySettings": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/study/settings"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/study/settings",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"updateStudySettings": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/study/update-settings"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/study/update-settings",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"studyToday": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/study/today"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/study/today",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"studyQueue": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/study/queue"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/study/queue",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"studyReview": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/study/review"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/study/review",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"studyHistory": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_LIMIT": {
+						"status": 400
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/study/history"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/study/history",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"upstreamInspect": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"BACKUP_LIMIT": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"UPSTREAM_BACKUP_UNSUPPORTED": {
+						"status": 400
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "fukushu/backup/inspect-upstream",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/backup/inspect-upstream",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"backupRestore": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"BACKUP_LIMIT": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"UPSTREAM_BACKUP_UNSUPPORTED": {
+						"status": 400
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "fukushu/backup/restore",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/backup/restore",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"backupExport": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"BACKUP_LIMIT": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"UPSTREAM_BACKUP_UNSUPPORTED": {
+						"status": 400
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "fukushu/backup/export",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 86400000,
+						"max": 5
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/backup/export",
+					"successStatus": 204,
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"backupInspect": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"BACKUP_LIMIT": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"UPSTREAM_BACKUP_UNSUPPORTED": {
+						"status": 400
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requestName": "fukushu/backup/inspect",
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/backup/inspect",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"upstreamRestoreJob": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 30
+					},
+					"requestName": "fukushu/upstream/restore-job"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/upstream/restore-job",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"upstreamMedia": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"requestName": "fukushu/upstream/media",
+					"limit": {
+						"duration": 60000,
+						"max": 120
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/upstream/media",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"upstreamCreateGift": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"requestName": "fukushu/upstream/create-gift"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/upstream/create-gift",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"upstreamUpdateGift": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"requestName": "fukushu/upstream/update-gift"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/upstream/update-gift",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"upstreamRestore": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"requestName": "fukushu/upstream/restore"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/upstream/restore",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"upstreamShow": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"requestName": "fukushu/upstream/show",
+					"limit": {
+						"duration": 60000,
+						"max": 30
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/upstream/show",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"upstreamReview": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"requestName": "fukushu/upstream/review",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					}
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/upstream/review",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"upstreamExport": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"BACKUP_FAILED": {
+						"status": 400
+					},
+					"INVALID_BACKUP": {
+						"status": 400
+					},
+					"BACKUP_TOO_LARGE": {
+						"status": 400
+					},
+					"BACKUP_CONFLICT": {
+						"status": 409
+					},
+					"UPSTREAM_INSPECTION_LIMIT": {
+						"status": 400
+					},
+					"STUDY_CONFLICT": {
+						"status": 409
+					},
+					"STUDY_UNAVAILABLE": {
+						"status": 409
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"secure": true,
+					"limit": {
+						"duration": 86400000,
+						"max": 5
+					},
+					"requestName": "fukushu/upstream/export"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/upstream/export",
+					"tags": [
+						"fukushu"
+					],
+					"successStatus": 204
+				}
+			}
+		},
+		"list": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/materials/list"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/list",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"import": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"requestName": "fukushu/materials/import"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/import",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"create": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"requestName": "fukushu/materials/create"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/create",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"show": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/materials/show"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/show",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"ankiMedia": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"secure": true,
+					"requestName": "fukushu/materials/anki-media"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/anki-media",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"update": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"requestName": "fukushu/materials/update"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/update",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"updateCardExplanation": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"requestName": "fukushu/materials/update-card-explanation"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/update-card-explanation",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"listCardVersions": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/materials/card-versions"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/card-versions",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"showCardVersion": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "read:account",
+					"limit": {
+						"duration": 60000,
+						"max": 60
+					},
+					"requestName": "fukushu/materials/card-version"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/card-version",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		},
+		"archive": {
+			"~orpc": {
+				"errorMap": {
+					"ACCESS_DENIED": {
+						"status": 400
+					},
+					"ROLE_PERMISSION_DENIED": {
+						"status": 403
+					},
+					"AUTHENTICATION_FAILED": {
+						"status": 401
+					},
+					"CREDENTIAL_REQUIRED": {
+						"status": 401
+					},
+					"YOUR_ACCOUNT_SUSPENDED": {
+						"status": 403
+					},
+					"YOUR_ACCOUNT_MOVED": {
+						"status": 403
+					},
+					"PERMISSION_DENIED": {
+						"status": 403
+					},
+					"RATE_LIMIT_EXCEEDED": {
+						"status": 429
+					},
+					"INVALID_PARAM": {
+						"status": 400
+					},
+					"INTERNAL_ERROR": {
+						"status": 500
+					},
+					"CARD_HISTORY_LIMIT": {
+						"status": 400
+					},
+					"MATERIAL_CONFLICT": {
+						"status": 409
+					},
+					"NO_SUCH_FILE": {
+						"status": 404
+					},
+					"IMPORT_FAILED": {
+						"status": 400
+					},
+					"NO_SUCH_MATERIAL": {
+						"status": 404
+					},
+					"MATERIAL_EXISTS": {
+						"status": 409
+					},
+					"MATERIAL_LIMIT": {
+						"status": 400
+					},
+					"INVALID_MATERIAL": {
+						"status": 400
+					}
+				},
+				"meta": {
+					"requireCredential": true,
+					"kind": "write:account",
+					"limit": {
+						"duration": 60000,
+						"max": 5
+					},
+					"requestName": "fukushu/materials/archive"
+				},
+				"route": {
+					"method": "POST",
+					"path": "/fukushu/materials/archive",
+					"tags": [
+						"fukushu"
+					]
+				}
+			}
+		}
+	},
 	"games": {
 		"bubbleGameRanking": {
 			"~orpc": {

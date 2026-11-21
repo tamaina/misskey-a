@@ -7,6 +7,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <PageWithHeader>
 	<div class="_spacer" style="--MI_SPACER-w: 800px;">
 		<div class="_gaps">
+			<MkA to="/fukushu" class="_panel" style="display: block; padding: 24px;">Fukushu</MkA>
 			<div class="_panel" :class="$style.link">
 				<MkA to="/bubble-game">
 					<img src="/client-assets/drop-and-fusion/logo.png" style="display: block; max-width: 100%; max-height: 200px; margin: auto;"/>

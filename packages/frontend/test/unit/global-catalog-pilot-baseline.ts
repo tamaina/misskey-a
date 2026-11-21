@@ -10400,7 +10400,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/notifications/frontend/components/MkNotification.vue",
-		"currentSha256": "7b77d03b660aa58084fd40d8a93f5060beded5959c526e13ea51bd3f765961a4",
+		"currentSha256": "ced01a2b480f7c5ac6ee9b532c704e12e43b00e6fde2524b79b3102869c865c9",
 		"baselineSha256": "3ec05f2de99a4e5e50f12711f19e90e3457913568130f20874305842c9a92c61",
 		"keys": [
 			"favorites",
@@ -10461,6 +10461,12 @@ export const globalCatalogPilotOwners = [
 				"start": 14037,
 				"end": 14131,
 				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"baseline": ""
+			},
+			{
+				"start": 14699,
+				"end": 14720,
+				"current": "\tfukushu: 'Fukushu',\n",
 				"baseline": ""
 			}
 		]
@@ -15399,7 +15405,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/ui/frontend/components/MkWindow.vue",
-		"currentSha256": "8b79ea75214325a89ddbb2db5cc4d054cfb56a41a4e21760f9ef702b5a85cf63",
+		"currentSha256": "74fa78eca4df3f40e3571e59f72a5eadcdd0c5c054803cc87a2c5c53cda534c9",
 		"baselineSha256": "8751a56c744171748ecf6e98432db7383e20ed5d500de7401aa406a2c67ef172",
 		"keys": [
 			"close"
@@ -15412,14 +15418,20 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 3565,
-				"end": 3565,
+				"start": 2400,
+				"end": 2437,
+				"current": " :aria-label=\"globalLocale.env.close\"",
+				"baseline": ""
+			},
+			{
+				"start": 3602,
+				"end": 3602,
 				"current": "",
 				"baseline": "const globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 3928,
-				"end": 3986,
+				"start": 3965,
+				"end": 4023,
 				"current": ";\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
 				"baseline": ""
 			}

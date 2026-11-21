@@ -103,6 +103,63 @@ import type {
 	FlashSearchResponse,
 	UsersFlashsRequest,
 	UsersFlashsResponse,
+	FukushuReminderShowRequest,
+	FukushuReminderShowResponse,
+	FukushuReminderUpdateRequest,
+	FukushuStudySettingsRequest,
+	FukushuStudySettingsResponse,
+	FukushuStudyUpdateSettingsRequest,
+	FukushuStudyUpdateSettingsResponse,
+	FukushuStudyTodayRequest,
+	FukushuStudyTodayResponse,
+	FukushuStudyQueueRequest,
+	FukushuStudyQueueResponse,
+	FukushuStudyReviewRequest,
+	FukushuStudyReviewResponse,
+	FukushuStudyHistoryRequest,
+	FukushuStudyHistoryResponse,
+	FukushuBackupInspectUpstreamRequest,
+	FukushuBackupInspectUpstreamResponse,
+	FukushuBackupRestoreRequest,
+	FukushuBackupRestoreResponse,
+	FukushuBackupExportRequest,
+	FukushuBackupInspectRequest,
+	FukushuBackupInspectResponse,
+	FukushuUpstreamRestoreJobRequest,
+	FukushuUpstreamRestoreJobResponse,
+	FukushuUpstreamMediaRequest,
+	FukushuUpstreamMediaResponse,
+	FukushuUpstreamCreateGiftRequest,
+	FukushuUpstreamCreateGiftResponse,
+	FukushuUpstreamUpdateGiftRequest,
+	FukushuUpstreamUpdateGiftResponse,
+	FukushuUpstreamRestoreRequest,
+	FukushuUpstreamRestoreResponse,
+	FukushuUpstreamShowRequest,
+	FukushuUpstreamShowResponse,
+	FukushuUpstreamReviewRequest,
+	FukushuUpstreamReviewResponse,
+	FukushuUpstreamExportRequest,
+	FukushuMaterialsListRequest,
+	FukushuMaterialsListResponse,
+	FukushuMaterialsImportRequest,
+	FukushuMaterialsImportResponse,
+	FukushuMaterialsCreateRequest,
+	FukushuMaterialsCreateResponse,
+	FukushuMaterialsShowRequest,
+	FukushuMaterialsShowResponse,
+	FukushuMaterialsAnkiMediaRequest,
+	FukushuMaterialsAnkiMediaResponse,
+	FukushuMaterialsUpdateRequest,
+	FukushuMaterialsUpdateResponse,
+	FukushuMaterialsUpdateCardExplanationRequest,
+	FukushuMaterialsUpdateCardExplanationResponse,
+	FukushuMaterialsCardVersionsRequest,
+	FukushuMaterialsCardVersionsResponse,
+	FukushuMaterialsCardVersionRequest,
+	FukushuMaterialsCardVersionResponse,
+	FukushuMaterialsArchiveRequest,
+	FukushuMaterialsArchiveResponse,
 	BubbleGameRankingRequest,
 	BubbleGameRankingResponse,
 	BubbleGameRegisterRequest,
@@ -862,6 +919,36 @@ export type Endpoints = {
 	'flash/update': { req: FlashUpdateRequest; res: EmptyResponse };
 	'flash/search': { req: FlashSearchRequest; res: FlashSearchResponse };
 	'users/flashs': { req: UsersFlashsRequest; res: UsersFlashsResponse };
+	'fukushu/reminder/show': { req: FukushuReminderShowRequest; res: FukushuReminderShowResponse };
+	'fukushu/reminder/update': { req: FukushuReminderUpdateRequest; res: EmptyResponse };
+	'fukushu/study/settings': { req: FukushuStudySettingsRequest; res: FukushuStudySettingsResponse };
+	'fukushu/study/update-settings': { req: FukushuStudyUpdateSettingsRequest; res: FukushuStudyUpdateSettingsResponse };
+	'fukushu/study/today': { req: FukushuStudyTodayRequest; res: FukushuStudyTodayResponse };
+	'fukushu/study/queue': { req: FukushuStudyQueueRequest; res: FukushuStudyQueueResponse };
+	'fukushu/study/review': { req: FukushuStudyReviewRequest; res: FukushuStudyReviewResponse };
+	'fukushu/study/history': { req: FukushuStudyHistoryRequest; res: FukushuStudyHistoryResponse };
+	'fukushu/backup/inspect-upstream': { req: FukushuBackupInspectUpstreamRequest; res: FukushuBackupInspectUpstreamResponse };
+	'fukushu/backup/restore': { req: FukushuBackupRestoreRequest; res: FukushuBackupRestoreResponse };
+	'fukushu/backup/export': { req: FukushuBackupExportRequest; res: EmptyResponse };
+	'fukushu/backup/inspect': { req: FukushuBackupInspectRequest; res: FukushuBackupInspectResponse };
+	'fukushu/upstream/restore-job': { req: FukushuUpstreamRestoreJobRequest; res: FukushuUpstreamRestoreJobResponse };
+	'fukushu/upstream/media': { req: FukushuUpstreamMediaRequest; res: FukushuUpstreamMediaResponse };
+	'fukushu/upstream/create-gift': { req: FukushuUpstreamCreateGiftRequest; res: FukushuUpstreamCreateGiftResponse };
+	'fukushu/upstream/update-gift': { req: FukushuUpstreamUpdateGiftRequest; res: FukushuUpstreamUpdateGiftResponse };
+	'fukushu/upstream/restore': { req: FukushuUpstreamRestoreRequest; res: FukushuUpstreamRestoreResponse };
+	'fukushu/upstream/show': { req: FukushuUpstreamShowRequest; res: FukushuUpstreamShowResponse };
+	'fukushu/upstream/review': { req: FukushuUpstreamReviewRequest; res: FukushuUpstreamReviewResponse };
+	'fukushu/upstream/export': { req: FukushuUpstreamExportRequest; res: EmptyResponse };
+	'fukushu/materials/list': { req: FukushuMaterialsListRequest; res: FukushuMaterialsListResponse };
+	'fukushu/materials/import': { req: FukushuMaterialsImportRequest; res: FukushuMaterialsImportResponse };
+	'fukushu/materials/create': { req: FukushuMaterialsCreateRequest; res: FukushuMaterialsCreateResponse };
+	'fukushu/materials/show': { req: FukushuMaterialsShowRequest; res: FukushuMaterialsShowResponse };
+	'fukushu/materials/anki-media': { req: FukushuMaterialsAnkiMediaRequest; res: FukushuMaterialsAnkiMediaResponse };
+	'fukushu/materials/update': { req: FukushuMaterialsUpdateRequest; res: FukushuMaterialsUpdateResponse };
+	'fukushu/materials/update-card-explanation': { req: FukushuMaterialsUpdateCardExplanationRequest; res: FukushuMaterialsUpdateCardExplanationResponse };
+	'fukushu/materials/card-versions': { req: FukushuMaterialsCardVersionsRequest; res: FukushuMaterialsCardVersionsResponse };
+	'fukushu/materials/card-version': { req: FukushuMaterialsCardVersionRequest; res: FukushuMaterialsCardVersionResponse };
+	'fukushu/materials/archive': { req: FukushuMaterialsArchiveRequest; res: FukushuMaterialsArchiveResponse };
 	'bubble-game/ranking': { req: BubbleGameRankingRequest; res: BubbleGameRankingResponse };
 	'bubble-game/register': { req: BubbleGameRegisterRequest; res: EmptyResponse };
 	'reversi/cancel-match': { req: ReversiCancelMatchRequest; res: EmptyResponse };
