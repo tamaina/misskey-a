@@ -33,7 +33,7 @@ export default function(app: App) {
 	app.component('WidgetAiscriptApp', defineAsyncComponent(() => import('@features/play/frontend/widgets/WidgetAiscriptApp.vue')));
 	app.component('WidgetAichan', defineAsyncComponent(() => import('@features/play/frontend/widgets/WidgetAichan.vue')));
 	app.component('WidgetUserList', defineAsyncComponent(() => import('../../relationships/frontend/widgets/WidgetUserList.vue')));
-	app.component('WidgetClicker', defineAsyncComponent(() => import('@features/games/frontend/widgets/WidgetClicker.vue')));
+	app.component('WidgetClicker', defineAsyncComponent(() => import('@features/games/clicker/frontend/widgets/WidgetClicker.vue')));
 	app.component('WidgetBirthdayFollowings', defineAsyncComponent(() => import('../../relationships/frontend/widgets/WidgetBirthdayFollowings.vue')));
 	app.component('WidgetChat', defineAsyncComponent(() => import('@features/chat/frontend/widgets/WidgetChat.vue')));
 }

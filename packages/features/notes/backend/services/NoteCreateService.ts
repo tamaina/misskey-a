@@ -865,7 +865,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 			if (data.reply) {
 				// 通知
 				if (data.reply.userHost === null) {
-					await this.createReplyEvent(data.reply, noteObj, nm);
+					await this.createReplyEvent(data.reply, note, nm);
 				}
 			}
 
@@ -880,7 +880,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 
 				// Publish event
 				if ((user.id !== data.renote.userId) && data.renote.userHost === null) {
-					this.globalEventService.publishMainStream(data.renote.userId, 'renote', noteObj);
+					const packedForRenoteUser = await this.noteEntityService.pack(note, { id: data.renote.userId }, { detail: true });
+					if (!packedForRenoteUser.isHidden) this.globalEventService.publishMainStream(data.renote.userId, 'renote', packedForRenoteUser);
 				}
 			}
 
@@ -971,13 +972,14 @@ export class NoteCreateService implements OnApplicationShutdown {
 	}
 
 	@bindThis
-	private async createReplyEvent(reply: MiNote, note: Packed<'Note'>, nm: NotificationManager) {
+	private async createReplyEvent(reply: MiNote, note: MiNote, nm: NotificationManager) {
 		const isThreadMuted = await this.noteThreadMutingsRepository.exists({
 			where: { userId: reply.userId, threadId: reply.threadId ?? reply.id },
 		});
 		if (!isThreadMuted) {
 			nm.push(reply.userId, 'reply');
-			this.globalEventService.publishMainStream(reply.userId, 'reply', note);
+			const packedForReplyUser = await this.noteEntityService.pack(note, { id: reply.userId }, { detail: true });
+			if (!packedForReplyUser.isHidden) this.globalEventService.publishMainStream(reply.userId, 'reply', packedForReplyUser);
 		}
 	}
 

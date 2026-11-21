@@ -26,6 +26,7 @@ function fixture(overrides = {}) {
 		userProfilesRepository: { findOneByOrFail: async () => ({ moderationNote: 'before' }), update: async (...args) => { calls.push(['updateProfile', ...args]); } },
 		roleService: { isModerator: async () => false },
 		userSuspendService: { suspend: async (...args) => { calls.push(['suspend', ...args]); }, unsuspend: async (...args) => { calls.push(['unsuspend', ...args]); } },
+		notifyProfileImageUnset: async user => { calls.push(['notifyProfileImageUnset', user]); },
 		moderationLogService: { log: (...args) => { calls.push(['log', ...args]); } },
 		abuseUserReportsRepository: { findOneBy: async () => ({ id: 'report1' }) },
 		abuseReportService: { forward: async (...args) => { calls.push(['forward', ...args]); }, resolve: async (...args) => { calls.push(['resolve', ...args]); }, update: async (...args) => { calls.push(['updateReport', ...args]); } },
@@ -80,8 +81,10 @@ test('native avatar/banner unsets retain the original file ID in audit records; 
 	await operations.adminUnsetUserBanner({ userId: target.id });
 	assert.deepEqual(calls, [
 		['updateUser', target.id, { avatar: null, avatarId: null, avatarUrl: null, avatarBlurhash: null }],
+		['notifyProfileImageUnset', target],
 		['log', actor, 'unsetUserAvatar', { userId: target.id, userUsername: target.username, userHost: null, fileId: target.avatarId }],
 		['updateUser', target.id, { banner: null, bannerId: null, bannerUrl: null, bannerBlurhash: null }],
+		['notifyProfileImageUnset', target],
 		['log', actor, 'unsetUserBanner', { userId: target.id, userUsername: target.username, userHost: null, fileId: target.bannerId }],
 	]);
 	const empty = fixture({ usersRepository: { findOneBy: async () => ({ ...target, avatarId: null, bannerId: null }) } });

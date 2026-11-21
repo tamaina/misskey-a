@@ -154444,6 +154444,16 @@ export interface operations {
                                 [key: string]: unknown;
                             };
                             /** @constant */
+                            code: 'NO_SUCH_FOLDER';
+                            message: string;
+                        } | {
+                            id: string;
+                            /** @enum {string} */
+                            kind: 'client' | 'permission' | 'server';
+                            info?: {
+                                [key: string]: unknown;
+                            };
+                            /** @constant */
                             code: 'FILE_REQUIRED';
                             message: string;
                         } | {

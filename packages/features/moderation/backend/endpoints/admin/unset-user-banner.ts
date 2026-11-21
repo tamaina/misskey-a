@@ -7,7 +7,7 @@ import type { ApiActor } from '@features/api/backend/transport/context.js';
 import { requirePrincipal } from '@features/api/backend/transport/middleware.js';
 import { moderationContract } from '../../api.definition.js';
 import type { ModerationApiDependencies } from '../../api.implementation.js';
-export function createAdminUnsetUserBannerProcedure<Actor extends ApiActor>(deps: Pick<ModerationApiDependencies<Actor>, 'usersRepository' | 'moderationLogService'>) {
+export function createAdminUnsetUserBannerProcedure<Actor extends ApiActor>(deps: Pick<ModerationApiDependencies<Actor>, 'usersRepository' | 'moderationLogService' | 'notifyProfileImageUnset'>) {
 	return createApiProcedure<Actor>()(moderationContract.adminUnsetUserBanner).use(requirePrincipal<Actor>())
 		.handler(async ({ input, context }) => {
 			const ps = input;
@@ -17,6 +17,7 @@ export function createAdminUnsetUserBannerProcedure<Actor extends ApiActor>(deps
 			const fileId = user.bannerId;
 			if (fileId == null) return;
 			await deps.usersRepository.update(user.id, { banner: null, bannerId: null, bannerUrl: null, bannerBlurhash: null });
+			await deps.notifyProfileImageUnset(user);
 			void deps.moderationLogService.log(me, 'unsetUserBanner', { userId: user.id, userUsername: user.username, userHost: user.host, fileId });
 		});
 }
