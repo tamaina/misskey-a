@@ -9590,7 +9590,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/notes/frontend/components/MkPostForm.vue",
-		"currentSha256": "934a67f3125f5bf6e031aca8c96fc8e2c127e385bc3dac6ced9c5aa326c80f0b",
+		"currentSha256": "6607b08f0ce756f6154eae555095e680e4de4ae2757a92e304cf4cb0dfd5a8cc",
 		"baselineSha256": "3091bfb061e2e184481826df10ee9e70be8db06a7342dcdf6bb0d771bb171123",
 		"keys": [
 			"cancel",
@@ -9702,9 +9702,63 @@ export const globalCatalogPilotOwners = [
 				"baseline": "';\nimport type { ShallowRef } from 'vue';\nimport type { PostFormProps } from '../types/post-form.js';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { PollEditorModelValue } from '@features/notes/frontend/components/MkPollEditor.vue';\nimport type { UploaderItem } from '@features/drive/frontend/composables/use-uploader.js"
 			},
 			{
-				"start": 11458,
-				"end": 11916,
+				"start": 11401,
+				"end": 11528,
+				"current": "import { confirmImageAltText, createPostPreparationGuard } from '@features/notes/frontend/utility/post-image-alt-reminder.js';\n",
+				"baseline": ""
+			},
+			{
+				"start": 11585,
+				"end": 12043,
 				"current": ";\nimport type { UploaderItem } from '@features/drive/frontend/composables/use-uploader.js';\nimport type { PollEditorModelValue } from '@features/notes/frontend/components/MkPollEditor.vue';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { PostFormProps } from '../types/post-form.js';\nimport type { ShallowRef } from 'vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"baseline": ""
+			},
+			{
+				"start": 13001,
+				"end": 13086,
+				"current": "const { preparing: preparingPost, run: preparePost } = createPostPreparationGuard();\n",
+				"baseline": ""
+			},
+			{
+				"start": 17184,
+				"end": 17367,
+				"current": "\treturn !props.mock && !preparingPost.value && !posting.value && !posted.value && !uploader.uploading.value && (uploader.items.value.length === 0 || uploader.readyForUpload.value) &&\n",
+				"baseline": "\treturn !props.mock && !posting.value && !posted.value && !uploader.uploading.value && (uploader.items.value.length === 0 || uploader.readyForUpload.value) &&\n"
+			},
+			{
+				"start": 35089,
+				"end": 35634,
+				"current": "async function confirmMissingImageAltText(): Promise<boolean> {\n\treturn await confirmImageAltText(prefer.s.warnMissingImageAltText, files.value, async () => {\n\t\tconst { canceled, result } = await os.actions({\n\t\t\ttype: 'warning',\n\t\t\ttext: $locale.value.sfc.missingImageAltTextReminder,\n\t\t\tactions: [{\n\t\t\t\tvalue: 'edit',\n\t\t\t\ttext: $locale.value.sfc.returnToAltTextEditing,\n\t\t\t\tprimary: true,\n\t\t\t}, {\n\t\t\t\tvalue: 'continue',\n\t\t\t\ttext: $locale.value.sfc.continueWithoutImageAltText,\n\t\t\t}],\n\t\t});\n\n\t\treturn !canceled && result === 'continue';\n\t});\n}\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 35675,
+				"end": 35801,
+				"current": "\tif (!canPost.value) return;\n\n\tawait preparePost(() => postInternal(ev));\n}\n\nasync function postInternal(ev?: PointerEvent) {\n",
+				"baseline": ""
+			},
+			{
+				"start": 36390,
+				"end": 36442,
+				"current": "\t\tif (!await confirmMissingImageAltText()) return;\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 37558,
+				"end": 37609,
+				"current": "\tif (!await confirmMissingImageAltText()) return;\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 78390,
+				"end": 78568,
+				"current": "\t\"missingImageAltTextReminder\": \"Some images are missing alt text.\",\n\t\"returnToAltTextEditing\": \"Return to editing\",\n\t\"continueWithoutImageAltText\": \"Continue without alt text\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 96863,
+				"end": 97002,
+				"current": "\t\"missingImageAltTextReminder\": \"代替テキストが入力されていない画像があります。\",\n\t\"returnToAltTextEditing\": \"編集に戻る\",\n\t\"continueWithoutImageAltText\": \"説明なしで続ける\",\n",
 				"baseline": ""
 			}
 		],
@@ -11832,7 +11886,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
-		"currentSha256": "33e7852029af421de26b922a7b4c8bf1d9a38291d24dd8fdbf550b5e33cd05ae",
+		"currentSha256": "8fbd261879ccce03fda487c46fe08a726a0e63df49870bff649fe44cdfb284b8",
 		"baselineSha256": "b4f0d6f5bd2b505080654a35748b3c440c48306461bbb002f05767ab893a6b17",
 		"keys": [
 			"default",
@@ -12013,206 +12067,230 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 18562,
-				"end": 18738,
+				"start": 16007,
+				"end": 16415,
+				"current": "\t\t\t\t\t\t\t<SearchMarker :keywords=\"['alt text', 'accessibility', 'image', 'caption', 'attachment', 'warning']\">\n\t\t\t\t\t\t\t\t<MkPreferenceContainer k=\"warnMissingImageAltText\">\n\t\t\t\t\t\t\t\t\t<MkSwitch v-model=\"warnMissingImageAltText\">\n\t\t\t\t\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.warnMissingImageAltText }}</SearchLabel></template>\n\t\t\t\t\t\t\t\t\t</MkSwitch>\n\t\t\t\t\t\t\t\t</MkPreferenceContainer>\n\t\t\t\t\t\t\t</SearchMarker>\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 18970,
+				"end": 19146,
 				"current": "\t\t\t\t\t<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->\n\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.notifications }}</SearchLabel></template>\n",
 				"baseline": "\t\t\t\t\t<template #label><SearchLabel>{{ globalLocale.env.notifications }}</SearchLabel></template>\n"
 			},
 			{
-				"start": 35770,
-				"end": 36169,
+				"start": 36178,
+				"end": 36577,
 				"current": "\t\t\t\t\t\t\t<SearchMarker :keywords=\"['url', 'preview', 'expand', 'player', 'embed']\">\n\t\t\t\t\t\t\t\t<MkPreferenceContainer k=\"expandUrlPreviewAutomatically\">\n\t\t\t\t\t\t\t\t\t<MkSwitch v-model=\"expandUrlPreviewAutomatically\">\n\t\t\t\t\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.expandUrlPreviewAutomatically }}</SearchLabel></template>\n\t\t\t\t\t\t\t\t\t</MkSwitch>\n\t\t\t\t\t\t\t\t</MkPreferenceContainer>\n\t\t\t\t\t\t\t</SearchMarker>\n\n",
 				"baseline": ""
 			},
 			{
-				"start": 40802,
-				"end": 40802,
+				"start": 41210,
+				"end": 41210,
 				"current": "",
 				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 42809,
-				"end": 42903,
+				"start": 43217,
+				"end": 43311,
 				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			},
 			{
-				"start": 45630,
-				"end": 45715,
+				"start": 43696,
+				"end": 43769,
+				"current": "const warnMissingImageAltText = prefer.model('warnMissingImageAltText');\n",
+				"baseline": ""
+			},
+			{
+				"start": 46111,
+				"end": 46196,
 				"current": "const expandUrlPreviewAutomatically = prefer.model('expandUrlPreviewAutomatically');\n",
 				"baseline": ""
 			},
 			{
-				"start": 60741,
-				"end": 60800,
+				"start": 61222,
+				"end": 61281,
 				"current": "\t\"selectList\": \"اختر قائمة\",\n\t\"notifications\": \"الإشعارات\"\n",
 				"baseline": "\t\"selectList\": \"اختر قائمة\"\n"
 			},
 			{
-				"start": 71406,
-				"end": 71474,
+				"start": 71887,
+				"end": 71955,
 				"current": "\t\"selectList\": \"Tria una llista\",\n\t\"notifications\": \"Notificacions\"\n",
 				"baseline": "\t\"selectList\": \"Tria una llista\"\n"
 			},
 			{
-				"start": 81113,
-				"end": 81174,
+				"start": 81594,
+				"end": 81655,
 				"current": "\t\"selectList\": \"Vybrat seznam\",\n\t\"notifications\": \"Oznámení\"\n",
 				"baseline": "\t\"selectList\": \"Vybrat seznam\"\n"
 			},
 			{
-				"start": 90642,
-				"end": 90708,
+				"start": 91123,
+				"end": 91189,
 				"current": "\t\"selectList\": \"Select a list\",\n\t\"notifications\": \"Notifications\"\n",
 				"baseline": "\t\"selectList\": \"Select a list\"\n"
 			},
 			{
-				"start": 101288,
-				"end": 101361,
+				"start": 101769,
+				"end": 101842,
 				"current": "\t\"selectList\": \"Liste auswählen\",\n\t\"notifications\": \"Benachrichtigungen\"\n",
 				"baseline": "\t\"selectList\": \"Liste auswählen\"\n"
 			},
 			{
-				"start": 110829,
-				"end": 110895,
+				"start": 105145,
+				"end": 105223,
+				"current": "\t\"warnMissingImageAltText\": \"Confirm before posting images without alt text\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 111388,
+				"end": 111454,
 				"current": "\t\"selectList\": \"Select a list\",\n\t\"notifications\": \"Notifications\"\n",
 				"baseline": "\t\"selectList\": \"Select a list\"\n"
 			},
 			{
-				"start": 121694,
-				"end": 121768,
+				"start": 122253,
+				"end": 122327,
 				"current": "\t\"selectList\": \"Selecciona una lista\",\n\t\"notifications\": \"Notificaciones\"\n",
 				"baseline": "\t\"selectList\": \"Selecciona una lista\"\n"
 			},
 			{
-				"start": 131905,
-				"end": 131980,
+				"start": 132464,
+				"end": 132539,
 				"current": "\t\"selectList\": \"Sélectionner une liste\",\n\t\"notifications\": \"Notifications\"\n",
 				"baseline": "\t\"selectList\": \"Sélectionner une liste\"\n"
 			},
 			{
-				"start": 141848,
-				"end": 141910,
+				"start": 142407,
+				"end": 142469,
 				"current": "\t\"selectList\": \"Pilih daftar\",\n\t\"notifications\": \"Notifikasi\"\n",
 				"baseline": "\t\"selectList\": \"Pilih daftar\"\n"
 			},
 			{
-				"start": 152076,
-				"end": 152144,
+				"start": 152635,
+				"end": 152703,
 				"current": "\t\"selectList\": \"Seleziona una lista\",\n\t\"notifications\": \"Notifiche\"\n",
 				"baseline": "\t\"selectList\": \"Seleziona una lista\"\n"
 			},
 			{
-				"start": 152195,
-				"end": 152246,
+				"start": 152754,
+				"end": 152805,
 				"current": "\t\"expandUrlPreviewAutomatically\": \"URLプレビューを自動展開\",\n",
 				"baseline": ""
 			},
 			{
-				"start": 159228,
-				"end": 159276,
+				"start": 155238,
+				"end": 155293,
+				"current": "\t\"warnMissingImageAltText\": \"画像に代替テキストがないとき、投稿前に確認する\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 159842,
+				"end": 159890,
 				"current": "\t\"selectList\": \"リストを選択\",\n\t\"notifications\": \"通知\"\n",
 				"baseline": "\t\"selectList\": \"リストを選択\"\n"
 			},
 			{
-				"start": 166232,
-				"end": 166280,
+				"start": 166846,
+				"end": 166894,
 				"current": "\t\"selectList\": \"リストを選ぶ\",\n\t\"notifications\": \"通知\"\n",
 				"baseline": "\t\"selectList\": \"リストを選ぶ\"\n"
 			},
 			{
-				"start": 175746,
-				"end": 175805,
+				"start": 176360,
+				"end": 176419,
 				"current": "\t\"selectList\": \"Fren tabdart\",\n\t\"notifications\": \"Ilɣuyen\"\n",
 				"baseline": "\t\"selectList\": \"Fren tabdart\"\n"
 			},
 			{
-				"start": 185281,
-				"end": 185345,
+				"start": 185895,
+				"end": 185959,
 				"current": "\t\"selectList\": \"Select a list\",\n\t\"notifications\": \"ಅಧಿಸೂಚನೆಗಳು\"\n",
 				"baseline": "\t\"selectList\": \"Select a list\"\n"
 			},
 			{
-				"start": 192334,
-				"end": 192382,
+				"start": 192948,
+				"end": 192996,
 				"current": "\t\"selectList\": \"리스트 선택\",\n\t\"notifications\": \"알림\"\n",
 				"baseline": "\t\"selectList\": \"리스트 선택\"\n"
 			},
 			{
-				"start": 202096,
-				"end": 202160,
+				"start": 202710,
+				"end": 202774,
 				"current": "\t\"selectList\": \"Kies een lijst.\",\n\t\"notifications\": \"Meldingen\"\n",
 				"baseline": "\t\"selectList\": \"Kies een lijst.\"\n"
 			},
 			{
-				"start": 211636,
-				"end": 211696,
+				"start": 212250,
+				"end": 212310,
 				"current": "\t\"selectList\": \"Velg en liste\",\n\t\"notifications\": \"Varsler\"\n",
 				"baseline": "\t\"selectList\": \"Velg en liste\"\n"
 			},
 			{
-				"start": 221392,
-				"end": 221458,
+				"start": 222006,
+				"end": 222072,
 				"current": "\t\"selectList\": \"Wybierz listę\",\n\t\"notifications\": \"Powiadomienia\"\n",
 				"baseline": "\t\"selectList\": \"Wybierz listę\"\n"
 			},
 			{
-				"start": 231676,
-				"end": 231747,
+				"start": 232290,
+				"end": 232361,
 				"current": "\t\"selectList\": \"Selecione uma lista\",\n\t\"notifications\": \"Notificações\"\n",
 				"baseline": "\t\"selectList\": \"Selecione uma lista\"\n"
 			},
 			{
-				"start": 241767,
-				"end": 241833,
+				"start": 242381,
+				"end": 242447,
 				"current": "\t\"selectList\": \"Выберите список\",\n\t\"notifications\": \"Уведомления\"\n",
 				"baseline": "\t\"selectList\": \"Выберите список\"\n"
 			},
 			{
-				"start": 251378,
-				"end": 251441,
+				"start": 251992,
+				"end": 252055,
 				"current": "\t\"selectList\": \"Vyberte zoznam\",\n\t\"notifications\": \"Oznámenia\"\n",
 				"baseline": "\t\"selectList\": \"Vyberte zoznam\"\n"
 			},
 			{
-				"start": 260614,
-				"end": 260676,
+				"start": 261228,
+				"end": 261290,
 				"current": "\t\"selectList\": \"เลือกรายชื่อ\",\n\t\"notifications\": \"เเจ้งเตือน\"\n",
 				"baseline": "\t\"selectList\": \"เลือกรายชื่อ\"\n"
 			},
 			{
-				"start": 270807,
-				"end": 270871,
+				"start": 271421,
+				"end": 271485,
 				"current": "\t\"selectList\": \"Bir liste seç\",\n\t\"notifications\": \"Bildirimler\"\n",
 				"baseline": "\t\"selectList\": \"Bir liste seç\"\n"
 			},
 			{
-				"start": 280339,
-				"end": 280405,
+				"start": 280953,
+				"end": 281019,
 				"current": "\t\"selectList\": \"Select a list\",\n\t\"notifications\": \"Notifications\"\n",
 				"baseline": "\t\"selectList\": \"Select a list\"\n"
 			},
 			{
-				"start": 290471,
-				"end": 290536,
+				"start": 291085,
+				"end": 291150,
 				"current": "\t\"selectList\": \"Виберіть список\",\n\t\"notifications\": \"Сповіщення\"\n",
 				"baseline": "\t\"selectList\": \"Виберіть список\"\n"
 			},
 			{
-				"start": 300206,
-				"end": 300269,
+				"start": 300820,
+				"end": 300883,
 				"current": "\t\"selectList\": \"Chọn danh sách\",\n\t\"notifications\": \"Thông báo\"\n",
 				"baseline": "\t\"selectList\": \"Chọn danh sách\"\n"
 			},
 			{
-				"start": 306285,
-				"end": 306331,
+				"start": 306899,
+				"end": 306945,
 				"current": "\t\"selectList\": \"选择列表\",\n\t\"notifications\": \"通知\"\n",
 				"baseline": "\t\"selectList\": \"选择列表\"\n"
 			},
 			{
-				"start": 312430,
-				"end": 312476,
+				"start": 313044,
+				"end": 313090,
 				"current": "\t\"selectList\": \"選擇清單\",\n\t\"notifications\": \"通知\"\n",
 				"baseline": "\t\"selectList\": \"選擇清單\"\n"
 			}
