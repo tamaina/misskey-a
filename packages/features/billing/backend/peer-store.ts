@@ -90,6 +90,19 @@ export function createPeerPaymentStore(db: DataSource, id: (now: number) => stri
 				if (!row.recipientUserId) unavailable();
 				await localRecipient(manager, row.recipientUserId);
 				const broadcastCountryEligibility = await requireCountryEligibility(manager, userId, row.recipientUserId);
+				// A prepared address is not current ownership. Lock both original wallet
+				// rows until the first-start reservation so an unlink cannot race this check.
+				const registered = manager.getRepository(MiBillingWallet);
+				const senderWallet = await registered.findOne({
+					where: { id: row.terms.senderWalletId, userId, chainId: row.chainId, address: row.terms.fromAddress },
+					lock: { mode: 'pessimistic_read' },
+				});
+				if (!senderWallet) unavailable();
+				const recipientWallet = await registered.findOne({
+					where: { id: row.terms.recipientWalletId, userId: row.recipientUserId, chainId: row.chainId, address: row.terms.toAddress },
+					lock: { mode: 'pessimistic_read' },
+				});
+				if (!recipientWallet) unavailable();
 				const startedAt = now();
 				if (row.status !== 'pending' || row.txHash || row.expiresAt <= startedAt) unavailable();
 				await manager.update(MiPeerPaymentIntent, row.id, { broadcastStartedAt: startedAt, broadcastCountryEligibility });

@@ -142,8 +142,11 @@ After building, run `node --test --test-concurrency=1 packages/features/billing/
 with the disposable loopback database variable described above.
 
 A sender reserves one browser broadcast attempt at `/peer-payments/send/start`.
-The server checks the current declaration and intent deadline under locks, then
-retains `broadcastStartedAt`. A failed or unknown wallet response must be recovered
+The server checks the current declaration and intent deadline under locks, and
+verifies that both registered wallet IDs still match the originally approved
+users, chain and addresses. It then retains `broadcastStartedAt`. An unlink or
+relink invalidates a new send of that prepared intent; prior broadcast evidence
+remains recoverable. A failed or unknown wallet response must be recovered
 by transaction hash; the same intent cannot be broadcast again, including after
 reload or from another client. The send-start migration refuses rollback while
 attempt evidence remains. An attempt does not assert that an on-chain transfer
