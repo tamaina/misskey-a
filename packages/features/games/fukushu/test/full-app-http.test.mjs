@@ -108,7 +108,7 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		// An ordinary ZIP containing just hello.txt, unrelated to Anki.
 		const zip = Buffer.from('UEsDBBQAAAAAALGhdF3l4enCCgAAAAoAAAAJAAAAaGVsbG8udHh0SnVzdCBhIFpJUFBLAQIUAxQAAAAAALGhdF3l4enCCgAAAAoAAAAJAAAAAAAAAAAAAACAAQAAAABoZWxsby50eHRQSwUGAAAAAAEAAQA3AAAAMQAAAAAA', 'base64');
 		const legacy = await readFile(new URL('./backend/fixtures/apkg/basic-anki21.apkg', import.meta.url));
-		const current = await readFile(new URL('./backend/fixtures/apkg/basic-ja-21b.apkg', import.meta.url));
+		const current = await readFile(new URL('./backend/fixtures/apkg/static-custom-21b.apkg', import.meta.url));
 		for (const bytes of [zip, current.subarray(0, -7)]) {
 			const rejected = await upload(bytes, 'fake.apkg', mime);
 			assert.equal(rejected.status, 400);
@@ -144,8 +144,37 @@ test('real authentication, Drive, material maintenance and explanation versions'
 		assert.equal(decks[0].sourceHash, createHash('sha256').update(current).digest('hex'));
 		assert.equal(decks[0].questionCount, 1);
 		const material = ok(await call('fukushu/materials/show', { id: decks[0].id }, owner.token));
-		assert.equal(material.questions[0].payload.prompt.value, '日本の首都は？');
-		assert.equal(material.questions[0].payload.answer.value, '東京');
+		assert.equal(material.questions[0].payload.prompt.value, '箱');
+		assert.equal(material.questions[0].payload.answer.value, 'box');
+		assert.deepEqual(material.questions[0].payload.ankiTemplate.tags, ['synthetic']);
+		assert.match(material.questions[0].payload.ankiTemplate.css, /\.prompt/);
+		const study = ok(await call('fukushu/study/queue', { id: decks[0].id }, owner.token));
+		const card = study.items[0].question.payload;
+		assert.equal(card.ankiTemplate.frontHtml, '<div class="prompt">箱</div>');
+		assert.equal(card.ankiTemplate.backHtml, '<strong class="answer">box</strong>');
+		assert.equal(card.ankiTemplate.noteType, 'Custom vocabulary');
+
+		const active = await readFile(new URL('./backend/fixtures/apkg/interactive-custom-21b.apkg', import.meta.url));
+		const file = ok(await upload(active, 'interactive.apkg', 'application/octet-stream'));
+		const activeInput = { ...input, fileId: file.id, requestId: randomUUID() };
+		let activeResult = ok(await call(endpoint, activeInput, owner.token));
+		for (let attempts = 0; activeResult.status !== 'failed' && attempts < 18; attempts++) {
+			assert.ok(['waiting', 'running'].includes(activeResult.status), `Unexpected APKG job status: ${activeResult.status}`);
+			await setTimeout(1000);
+			activeResult = ok(await call(endpoint, { ...activeInput, statusOnly: true }, owner.token));
+		}
+		assert.deepEqual(activeResult, { status: 'failed', reason: 'unsupported' });
+		assert.deepEqual(ok(await call('fukushu/materials/list', {}, owner.token)), decks);
+
+		const item = study.items[0];
+		const reviewed = ok(await call('fukushu/study/review', {
+			id: decks[0].id, questionId: item.question.id, questionVersion: item.questionVersion,
+			expectedStateRevision: item.stateRevision, requestId: randomUUID(), rating: 'good', durationMs: 1000,
+		}, owner.token));
+		assert.equal(reviewed.card.reps, 1);
+		const history = ok(await call('fukushu/study/history', { id: decks[0].id }, owner.token));
+		assert.equal(history.length, 1);
+		assert.deepEqual(history[0].question.payload.ankiTemplate, card.ankiTemplate);
 	});
 	let file;
 	const source = '\uFEFF#html:false\n#notetype:Basic\n#deck:実 Drive の教材\n日本の首都は？\t東京\nフランスの首都は？\tパリ\n';

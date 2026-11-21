@@ -5,8 +5,9 @@
 
 import { createHash } from 'node:crypto';
 import { decodeArchive } from '@aqz/anki-reader/archive';
+import { HTMLElement, parse } from 'node-html-parser';
 import * as v from 'valibot';
-import { resolveAnkiReaderWasm } from '@/anki-reader.js';
+import { convertAnkiArchive, resolveAnkiReaderWasm } from '@/anki-reader.js';
 import { materialSchema } from '../shared/material.schema.js';
 import type { FukushuMaterial } from '../shared/material.schema.js';
 
@@ -128,7 +129,104 @@ function mapPlainBasicArchive(decoded: Decoded, fileName: string, sha256: string
 	return result.output;
 }
 
-/** Archive-only import of a strict single-deck Basic subset; no DOM or new review state. */
+const staticTags = new Set('p br b strong mark details summary i em u s sub sup ruby rt rp ul ol li span div section article table thead tbody tr th td blockquote pre code hr h1 h2 h3 h4 h5 h6'.split(' '));
+
+function staticHtml(value: string) {
+	// Check both pre-conversion sources and converted markup. Reject active or
+	// unsupported constructs instead of quietly dropping them; no URLs or inline CSS.
+	if (value.length > 16_384) throw new ApkgMaterialError('APKG_UNSUPPORTED');
+	const document = parse(value);
+	const pending = document.childNodes.map(node => ({ node, depth: 1 }));
+	while (pending.length) {
+		const next = pending.pop()!;
+		const { node, depth } = next;
+		if (depth > 128) throw new ApkgMaterialError('APKG_UNSUPPORTED');
+		if (node instanceof HTMLElement) {
+			const tag = node.rawTagName.toLowerCase();
+			if (!staticTags.has(tag)) throw new ApkgMaterialError('APKG_UNSUPPORTED');
+			for (const [rawName, value] of Object.entries(node.attributes)) {
+				const name = rawName.toLowerCase();
+				const allowed = name === 'id' || name === 'class' ? value.length <= 256 && /^[\w\s-]+$/.test(value)
+					: (tag === 'td' || tag === 'th') && (name === 'colspan' || name === 'rowspan') && /^(?:[1-9]|[12]\d|3[012])$/.test(value);
+				if (!allowed) throw new ApkgMaterialError('APKG_UNSUPPORTED');
+			}
+		}
+		for (const child of node.childNodes) pending.push({ node: child, depth: depth + 1 });
+	}
+	return document.text.trim();
+}
+
+async function mapStaticArchive(decoded: Decoded, fileName: string, sha256: string): Promise<FukushuMaterial> {
+	const { rows, files, format } = decoded;
+	const cards = rows.cards;
+	const notes = rows.notes;
+	if (!cards || !notes || !rows.revlog || !rows.col?.[0]) throw new ApkgMaterialError('APKG_INVALID');
+	if (!cards.length || cards.length > 1000 || notes.length > cards.length || rows.revlog.length
+		|| (files.media && (format === '21b' ? files.media.length !== 0 : new TextDecoder().decode(files.media).trim() !== '{}'))
+		|| Object.keys(files).some(name => name !== 'meta' && name !== 'media' && !(name === 'collection.anki2' && format !== 'anki2'))
+		|| cards.some(card => card.did !== cards[0].did || (card.flags !== undefined && card.flags !== 0))) {
+		throw new ApkgMaterialError('APKG_UNSUPPORTED');
+	}
+	const ids = new Set(cards.map(card => String(positiveId(card.id))));
+	const noteIds = new Set(notes.map(note => positiveId(note.id)));
+	const referenced = new Set(cards.map(card => positiveId(card.nid)));
+	if (ids.size !== cards.length || noteIds.size !== notes.length || referenced.size !== notes.length
+		|| [...referenced].some(id => !noteIds.has(id))) throw new ApkgMaterialError('APKG_INVALID');
+	for (const note of notes) {
+		if (typeof note.flds !== 'string') throw new ApkgMaterialError('APKG_INVALID');
+		for (const field of note.flds.split('\x1f')) staticHtml(field);
+	}
+	// The reader uses an isolated, non-executing DOM. Raw provenance never renders.
+	const result = await convertAnkiArchive(decoded);
+	const [deck] = result.decks;
+	if (result.decks.length !== 1 || deck.id !== String(cards[0].did) || deck.cards.length !== cards.length
+		|| result.media.length || result.stats.reviewCount || result.stats.skippedReviewCount || result.diagnostics.length
+		|| deck.cards.some(card => !ids.delete(card.source.cardId) || card.reviews.length)) {
+		throw new ApkgMaterialError('APKG_UNSUPPORTED');
+	}
+	try {
+		// Keep the existing plain study/backup representation for stock Basic text.
+		return mapPlainBasicArchive(decoded, fileName, sha256);
+	} catch (error) {
+		if (!(error instanceof ApkgMaterialError) || error.code !== 'APKG_UNSUPPORTED') throw error;
+	}
+	const id = `apkg:${sha256}`;
+	const time = new Date().toISOString();
+	const questions = deck.cards.map((card, sourceOrder) => {
+		staticHtml(card.source.qfmt);
+		staticHtml(card.source.afmt);
+		const prompt = staticHtml(card.frontHtml);
+		const answer = staticHtml(card.backHtml);
+		if (!prompt || !answer || card.acceptedAnswer !== undefined) throw new ApkgMaterialError('APKG_UNSUPPORTED');
+		const sourceKey = `anki-card:${card.source.cardId}`;
+		const questionId = `${id}:${sourceKey}`;
+		return {
+			id: questionId, deckId: id, sourceKey, sourceOrder, kind: 'flashcard',
+			enabled: true, enabledKey: 1, createdAt: time, updatedAt: time,
+			payload: {
+				id: questionId, deckId: id, sourceKey, kind: 'flashcard', categoryPath: [],
+				prompt: { format: 'plain', value: prompt }, answer: { format: 'plain', value: answer },
+				ankiTemplate: {
+					frontHtml: card.frontHtml, backHtml: card.backHtml,
+					css: card.rendering.mode === 'template' ? card.rendering.css : '',
+					source: card.source, tags: card.tags, noteType: card.noteType,
+				},
+			},
+		};
+	});
+	const parsed = v.safeParse(materialSchema, {
+		deck: {
+			id, name: deck.name, studyMode: 'flashcard', sourceType: 'anki-apkg', sourceFileName: fileName,
+			sourceHash: sha256, importedAt: time, updatedAt: time,
+			questionCount: questions.length, enabledQuestionCount: questions.length,
+		},
+		questions,
+	});
+	if (!parsed.success) throw new ApkgMaterialError('APKG_UNSUPPORTED');
+	return parsed.output;
+}
+
+/** Convert a bounded, static, single-deck export without migrating review state. */
 export async function readApkgMaterial(bytes: Uint8Array, fileName: string, sha256: string): Promise<FukushuMaterial> {
 	if (!/^[a-f0-9]{64}$/.test(sha256) || createHash('sha256').update(bytes).digest('hex') !== sha256) {
 		throw new ApkgMaterialError('APKG_INVALID');
@@ -140,5 +238,5 @@ export async function readApkgMaterial(bytes: Uint8Array, fileName: string, sha2
 	} catch {
 		throw new ApkgMaterialError('APKG_INVALID');
 	}
-	return mapPlainBasicArchive(decoded, fileName, sha256);
+	return mapStaticArchive(decoded, fileName, sha256);
 }

@@ -194,7 +194,9 @@ test('confirms an Anki export before enqueueing and preserves the format on stat
 		fileId: 'anki-file', requestId: expect.any(String), confirmRestore: true, format: 'anki-apkg', statusOnly: false,
 	}]);
 	await fireEvent.click(screen.getByText('取込状況を確認'));
-	expect((await screen.findByRole('alert')).textContent).toContain('メディアと復習履歴');
+	const issue = (await screen.findByRole('alert')).textContent;
+	expect(issue).toContain('メディア');
+	expect(issue).toContain('復習履歴');
 	expect(misskeyApi).toHaveBeenLastCalledWith('fukushu/upstream/restore-job', {
 		fileId: 'anki-file', requestId: (submit[1] as { requestId: string }).requestId, confirmRestore: true, format: 'anki-apkg', statusOnly: true,
 	});

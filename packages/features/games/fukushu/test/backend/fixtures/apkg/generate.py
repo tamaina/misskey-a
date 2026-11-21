@@ -68,3 +68,35 @@ with TemporaryDirectory() as directory:
         )
     finally:
         collection.close()
+
+
+with TemporaryDirectory() as directory:
+    set_lang("en")
+    collection = Collection(str(Path(directory) / "collection.anki2"))
+    try:
+        deck = collection.decks.id("Static custom")
+        model = collection.models.by_name("Basic")
+        assert model is not None
+        model["name"] = "Custom vocabulary"
+        model["tmpls"][0]["qfmt"] = '<div class="prompt">{{Front}}</div>'
+        model["tmpls"][0]["afmt"] = '<strong class="answer">{{Back}}</strong>'
+        model["css"] = ".prompt { color: navy; } .answer { font-weight: bold; }"
+        collection.models.update_dict(model)
+        note = collection.new_note(model)
+        note.fields = ["箱", "box"]
+        note.tags = ["synthetic"]
+        collection.add_note(note, deck)
+        collection.export_anki_package(
+            out_path=str(here / "static-custom-21b.apkg"),
+            options=ExportAnkiPackageOptions(legacy=False),
+            limit=None,
+        )
+        model["tmpls"][0]["qfmt"] = '<a href="https://example.invalid/">{{Front}}</a>'
+        collection.models.update_dict(model)
+        collection.export_anki_package(
+            out_path=str(here / "interactive-custom-21b.apkg"),
+            options=ExportAnkiPackageOptions(legacy=False),
+            limit=None,
+        )
+    finally:
+        collection.close()

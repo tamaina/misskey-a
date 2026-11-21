@@ -33,7 +33,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<p v-else-if="!item" role="status">{{ $locale.sfc.completed }}</p>
 		<article v-if="item" class="_gaps" :class="$style.card">
 			<span :class="$style.muted">{{ item.isNew ? $locale.sfc.newCard : $locale.sfc.reviewCard }}</span>
-			<p :class="$style.content">{{ item.question.payload.prompt.value }}</p>
+			<StaticAnkiCard :fallback="item.question.payload.prompt.value" :html="item.question.payload.ankiTemplate?.frontHtml" :css="item.question.payload.ankiTemplate?.css"/>
 			<template v-if="!revealed">
 				<template v-if="item.question.payload.typeAnswer">
 					<label>
@@ -48,7 +48,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<template v-else>
 				<div class="_gaps_s" :class="$style.answer">
 					<h3>{{ $locale.sfc.answer }}</h3>
-					<p :class="$style.content">{{ item.question.payload.answer.value }}</p>
+					<StaticAnkiCard :fallback="item.question.payload.answer.value" :html="item.question.payload.ankiTemplate?.backHtml" :css="item.question.payload.ankiTemplate?.css"/>
 					<p v-if="item.question.payload.explanation" :class="$style.content">{{ item.question.payload.explanation.value }}</p>
 				</div>
 				<template v-if="saved">
@@ -97,6 +97,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import StaticAnkiCard from './StaticAnkiCard.vue';
 import { computed, onBeforeUnmount, ref, watch } from 'vue';
 import StudySummary from './StudySummary.vue';
 import { useTabSession } from '../tab-session.js';

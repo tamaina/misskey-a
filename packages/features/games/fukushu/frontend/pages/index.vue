@@ -84,8 +84,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<ol v-if="!studyActive" :class="$style.questions">
 					<li v-for="question in visibleQuestions" :key="question.id" class="_panel _gaps_s" :class="$style.panel">
 						<span v-if="!question.enabled" :class="$style.muted">{{ $locale.sfc.disabled }}</span>
-						<p :class="$style.content">{{ question.payload.prompt.value }}</p>
-						<details :class="$style.answer"><summary>{{ $locale.sfc.answer }}</summary><p :class="$style.content">{{ question.payload.answer.value }}</p><p v-if="question.payload.explanation" :class="$style.content">{{ question.payload.explanation.value }}</p></details>
+						<StaticAnkiCard :fallback="question.payload.prompt.value" :html="question.payload.ankiTemplate?.frontHtml" :css="question.payload.ankiTemplate?.css"/>
+						<details :class="$style.answer"><summary>{{ $locale.sfc.answer }}</summary><StaticAnkiCard :fallback="question.payload.answer.value" :html="question.payload.ankiTemplate?.backHtml" :css="question.payload.ankiTemplate?.css"/><p v-if="question.payload.explanation" :class="$style.content">{{ question.payload.explanation.value }}</p></details>
 					</li>
 				</ol>
 				<div v-if="!studyActive" :class="$style.heading">
@@ -102,6 +102,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import StaticAnkiCard from '../components/StaticAnkiCard.vue';
 import { computed, onBeforeUnmount, ref } from 'vue';
 import { $i } from '@features/auth/frontend/i.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';

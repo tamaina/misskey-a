@@ -40,13 +40,36 @@ test.each(['basic-ja-anki21.apkg', 'basic-ja-21b.apkg'])('imports Anki’s stock
 	})]);
 });
 
-test('rejects an altered stock Japanese template with the answer field on the front', async () => {
+test('uses the actual customized Japanese front instead of assuming English Basic ordering', async () => {
 	const name = 'custom-ja-21b.apkg';
 	const { bytes, digest } = await fixture(name);
-	await expect(readApkgMaterial(bytes, name, digest)).rejects.toMatchObject({ code: 'APKG_UNSUPPORTED' });
+	const material = await readApkgMaterial(bytes, name, digest);
+	expect(material.questions[0].payload.prompt.value).toBe('東京');
 });
 
-test.each(['tagged-21b.apkg', 'generated-anki-25.09.apkg'])('refuses an export with unsupported contents rather than dropping them: %s', async name => {
+test('retains tags on a static card rather than discarding them', async () => {
+	const name = 'tagged-21b.apkg';
+	const { bytes, digest } = await fixture(name);
+	const material = await readApkgMaterial(bytes, name, digest);
+	expect(material.questions.some(row => row.payload.ankiTemplate?.tags?.includes('not-supported'))).toBe(true);
+});
+
+test('converts an Anki-generated static template with CSS and keeps source provenance separate', async () => {
+	const name = 'static-custom-21b.apkg';
+	const { bytes, digest } = await fixture(name);
+	const material = await readApkgMaterial(bytes, name, digest);
+	expect(material.questions[0].payload).toMatchObject({
+		prompt: { format: 'plain', value: '箱' }, answer: { format: 'plain', value: 'box' },
+		ankiTemplate: {
+			frontHtml: '<div class="prompt">箱</div>', backHtml: '<strong class="answer">box</strong>',
+			noteType: 'Custom vocabulary', tags: ['synthetic'],
+			source: { qfmt: '<div class="prompt">{{Front}}</div>', afmt: '<strong class="answer">{{Back}}</strong>', ordinal: 0 },
+		},
+	});
+	expect(material.questions[0].payload.ankiTemplate?.css).toContain('.prompt');
+});
+
+test.each(['interactive-custom-21b.apkg', 'generated-anki-25.09.apkg'])('refuses an export with unsupported contents rather than dropping them: %s', async name => {
 	const { bytes, digest } = await fixture(name);
 	await expect(readApkgMaterial(bytes, name, digest)).rejects.toMatchObject({ code: 'APKG_UNSUPPORTED' });
 });

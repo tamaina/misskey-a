@@ -6,7 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <section class="_gaps">
 	<p v-if="entry">{{ offset + index + 1 }} / {{ total }} · {{ entry.deckName }}</p>
 	<SourceStudy v-if="question && entry" :key="index" :practiceAhead="practiceAhead" :questions="[question]" :revisions="new Map([[question.id, entry.revision]])"
-		:flashMode="entry.origin === 'native' || entry.flash" :nativeVersion="entry.origin === 'native' ? entry.version : undefined"
+		:nativeTemplate="nativeTemplate" :flashMode="entry.origin === 'native' || entry.flash" :nativeVersion="entry.origin === 'native' ? entry.version : undefined"
 		:singleStep="true" :immediate="queue.immediate" :shuffle="queue.shuffle" @prepared="emit('prepared', $event)" @saved="advance" @rejected="emit('rejected')" @close="emit('close')"/>
 	<template v-else>
 		<p v-if="failed" role="alert">{{ $locale.sfc.loadFailed }}</p>
@@ -31,6 +31,7 @@ const emit = defineEmits<{ close: []; prepared: [answer: SessionAnswer]; saved: 
 const index = ref(0);
 const entry = computed(() => props.queue.items[index.value]);
 const question = shallowRef<SourceQuestion>();
+const nativeTemplate = shallowRef<{ frontHtml: string; backHtml: string; css: string }>();
 const failed = ref(false);
 let controller: AbortController | undefined;
 onBeforeUnmount(() => controller?.abort());
@@ -39,6 +40,7 @@ async function load() {
 	controller?.abort();
 	const current = entry.value;
 	question.value = undefined;
+	nativeTemplate.value = undefined;
 	failed.value = false;
 	if (!current) return;
 	if (current.origin === 'source') {
@@ -49,7 +51,10 @@ async function load() {
 	controller = request;
 	try {
 		const version = await misskeyApi('fukushu/materials/card-version', { id: current.deckId, questionId: current.questionId, version: current.version }, undefined, request.signal);
-		if (!request.signal.aborted) question.value = version.question;
+		if (!request.signal.aborted) {
+			question.value = version.question;
+			nativeTemplate.value = version.question.payload.ankiTemplate;
+		}
 	} catch {
 		if (!request.signal.aborted) failed.value = true;
 	}

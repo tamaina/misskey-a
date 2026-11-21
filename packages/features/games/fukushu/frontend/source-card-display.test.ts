@@ -7,6 +7,7 @@ import { cleanup, render, waitFor } from '@testing-library/vue';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { cardStyles } from './anki-card-css.js';
 import SourceContent from './components/SourceContent.vue';
+import StaticAnkiCard from './components/StaticAnkiCard.vue';
 
 vi.mock('@features/api/frontend/utility/misskey-api.js', () => ({ misskeyApi: vi.fn() }));
 const i18n = createInternationalization({ initialLocale: 'ja-JP' });
@@ -41,4 +42,22 @@ test('renders upstream text delimiters as MathML and keeps code, currency and st
 	await rerender({ content: { format: 'plain', value: 'Next card' } });
 	expect(container.querySelector('math')).toBeNull();
 	expect(container.textContent).toBe('Next card');
+});
+
+test('native static Anki cards use an opaque iframe and rebuild only inert markup', () => {
+	const { container } = render(StaticAnkiCard, { props: {
+		fallback: 'front',
+		html: '<section class="custom"><strong>Hello</strong><img alt="inert"><form>hidden</form><a title="removed">link caption</a></section><table><tbody><tr><td colspan="2" rowspan="42">Cell</td></tr></tbody></table>',
+		css: '.custom{font-weight:bold}',
+	} });
+	const frame = container.querySelector('iframe')!;
+	const generated = frame.getAttribute('srcdoc')!;
+	expect(frame.getAttribute('sandbox')).toBe('');
+	expect(frame.getAttribute('referrerpolicy')).toBe('no-referrer');
+	expect(generated).toContain("default-src 'none'");
+	expect(generated).toContain("connect-src 'none'");
+	expect(generated).toContain('<section class="custom"><strong>Hello</strong>link caption</section>');
+	expect(generated).toContain('.custom{font-weight:bold}');
+	expect(generated).toContain('<td colspan="2">Cell</td>');
+	expect(generated).not.toMatch(/<(img|form|a)\b/);
 });

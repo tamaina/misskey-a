@@ -53263,6 +53263,23 @@ export interface operations {
                                     };
                                     /** @constant */
                                     ankiNoteType?: 'Basic';
+                                    ankiTemplate?: {
+                                        frontHtml: string;
+                                        backHtml: string;
+                                        css: string;
+                                        source: {
+                                            guid?: string;
+                                            noteId: string;
+                                            cardId: string;
+                                            notetypeId: string;
+                                            ordinal: number;
+                                            qfmt: string;
+                                            afmt: string;
+                                            css: string;
+                                        };
+                                        tags?: string[];
+                                        noteType: string;
+                                    };
                                     typeAnswer?: boolean;
                                     acceptedAnswer?: string;
                                 };
@@ -53958,6 +53975,23 @@ export interface operations {
                                 };
                                 /** @constant */
                                 ankiNoteType?: 'Basic';
+                                ankiTemplate?: {
+                                    frontHtml: string;
+                                    backHtml: string;
+                                    css: string;
+                                    source: {
+                                        guid?: string;
+                                        noteId: string;
+                                        cardId: string;
+                                        notetypeId: string;
+                                        ordinal: number;
+                                        qfmt: string;
+                                        afmt: string;
+                                        css: string;
+                                    };
+                                    tags?: string[];
+                                    noteType: string;
+                                };
                                 typeAnswer?: boolean;
                                 acceptedAnswer?: string;
                             };
@@ -58883,6 +58917,23 @@ export interface operations {
                                 };
                                 /** @constant */
                                 ankiNoteType?: 'Basic';
+                                ankiTemplate?: {
+                                    frontHtml: string;
+                                    backHtml: string;
+                                    css: string;
+                                    source: {
+                                        guid?: string;
+                                        noteId: string;
+                                        cardId: string;
+                                        notetypeId: string;
+                                        ordinal: number;
+                                        qfmt: string;
+                                        afmt: string;
+                                        css: string;
+                                    };
+                                    tags?: string[];
+                                    noteType: string;
+                                };
                                 typeAnswer?: boolean;
                                 acceptedAnswer?: string;
                             };
@@ -59211,6 +59262,23 @@ export interface operations {
                                 };
                                 /** @constant */
                                 ankiNoteType?: 'Basic';
+                                ankiTemplate?: {
+                                    frontHtml: string;
+                                    backHtml: string;
+                                    css: string;
+                                    source: {
+                                        guid?: string;
+                                        noteId: string;
+                                        cardId: string;
+                                        notetypeId: string;
+                                        ordinal: number;
+                                        qfmt: string;
+                                        afmt: string;
+                                        css: string;
+                                    };
+                                    tags?: string[];
+                                    noteType: string;
+                                };
                                 typeAnswer?: boolean;
                                 acceptedAnswer?: string;
                             };
@@ -59275,6 +59343,23 @@ export interface operations {
                                 };
                                 /** @constant */
                                 ankiNoteType?: 'Basic';
+                                ankiTemplate?: {
+                                    frontHtml: string;
+                                    backHtml: string;
+                                    css: string;
+                                    source: {
+                                        guid?: string;
+                                        noteId: string;
+                                        cardId: string;
+                                        notetypeId: string;
+                                        ordinal: number;
+                                        qfmt: string;
+                                        afmt: string;
+                                        css: string;
+                                    };
+                                    tags?: string[];
+                                    noteType: string;
+                                };
                                 typeAnswer?: boolean;
                                 acceptedAnswer?: string;
                             };
@@ -59348,6 +59433,23 @@ export interface operations {
                                 };
                                 /** @constant */
                                 ankiNoteType?: 'Basic';
+                                ankiTemplate?: {
+                                    frontHtml: string;
+                                    backHtml: string;
+                                    css: string;
+                                    source: {
+                                        guid?: string;
+                                        noteId: string;
+                                        cardId: string;
+                                        notetypeId: string;
+                                        ordinal: number;
+                                        qfmt: string;
+                                        afmt: string;
+                                        css: string;
+                                    };
+                                    tags?: string[];
+                                    noteType: string;
+                                };
                                 typeAnswer?: boolean;
                                 acceptedAnswer?: string;
                             };
@@ -59689,6 +59791,23 @@ export interface operations {
                                 };
                                 /** @constant */
                                 ankiNoteType?: 'Basic';
+                                ankiTemplate?: {
+                                    frontHtml: string;
+                                    backHtml: string;
+                                    css: string;
+                                    source: {
+                                        guid?: string;
+                                        noteId: string;
+                                        cardId: string;
+                                        notetypeId: string;
+                                        ordinal: number;
+                                        qfmt: string;
+                                        afmt: string;
+                                        css: string;
+                                    };
+                                    tags?: string[];
+                                    noteType: string;
+                                };
                                 typeAnswer?: boolean;
                                 acceptedAnswer?: string;
                             };
@@ -60894,6 +61013,23 @@ export interface operations {
                                 };
                                 /** @constant */
                                 ankiNoteType?: 'Basic';
+                                ankiTemplate?: {
+                                    frontHtml: string;
+                                    backHtml: string;
+                                    css: string;
+                                    source: {
+                                        guid?: string;
+                                        noteId: string;
+                                        cardId: string;
+                                        notetypeId: string;
+                                        ordinal: number;
+                                        qfmt: string;
+                                        afmt: string;
+                                        css: string;
+                                    };
+                                    tags?: string[];
+                                    noteType: string;
+                                };
                                 typeAnswer?: boolean;
                                 acceptedAnswer?: string;
                             };

@@ -36,6 +36,7 @@ export default defineConfig((args) => {
 		'nock',
 		'sharp',
 		'@aqz/anki-reader/archive',
+		'@aqz/anki-reader/node',
 		'jsdom',
 		're2',
 		'ipaddr.js',

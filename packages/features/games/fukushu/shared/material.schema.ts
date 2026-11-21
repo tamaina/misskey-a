@@ -33,6 +33,26 @@ export const deckSchema = v.strictObject({
 	enabledQuestionCount: v.pipe(integer, v.maxValue(1000)),
 });
 
+// Raw template provenance is never rendered. The card renderer rechecks the
+// processed HTML/CSS, including cards restored from native backups or clients.
+const ankiTemplateSchema = v.strictObject({
+	frontHtml: text(16_384),
+	backHtml: text(16_384),
+	css: text(16_384),
+	source: v.strictObject({
+		guid: v.optional(text(256)),
+		noteId: sourceIdSchema,
+		cardId: sourceIdSchema,
+		notetypeId: sourceIdSchema,
+		ordinal: integer,
+		qfmt: text(16_384),
+		afmt: text(16_384),
+		css: text(16_384),
+	}),
+	tags: v.optional(v.pipe(v.array(text(256)), v.maxLength(64))),
+	noteType: sourceIdSchema,
+});
+
 const payload = v.strictObject({
 	id: sourceIdSchema,
 	deckId: sourceIdSchema,
@@ -45,6 +65,7 @@ const payload = v.strictObject({
 	kind: v.literal('flashcard'),
 	answer: plainContentSchema,
 	ankiNoteType: v.optional(v.literal('Basic')),
+	ankiTemplate: v.optional(ankiTemplateSchema),
 	typeAnswer: v.optional(v.boolean()),
 	acceptedAnswer: v.optional(text(16_384)),
 });
@@ -70,7 +91,8 @@ export const materialSchema = v.pipe(v.strictObject({
 	&& new Set(material.questions.map(q => q.id)).size === material.questions.length
 	&& new Set(material.questions.map(q => q.sourceKey)).size === material.questions.length
 	&& material.questions.every(q => q.deckId === material.deck.id && q.payload.deckId === q.deckId
-		&& q.payload.id === q.id && q.payload.sourceKey === q.sourceKey && q.enabledKey === Number(q.enabled)),
+		&& q.payload.id === q.id && q.payload.sourceKey === q.sourceKey && q.enabledKey === Number(q.enabled)
+		&& (!q.payload.ankiTemplate || material.deck.sourceType === 'anki-apkg')),
 'Inconsistent material identity or counts'),
 v.check(material => new TextEncoder().encode(JSON.stringify(material)).byteLength <= 1_048_576, 'Material exceeds 1 MiB'));
 

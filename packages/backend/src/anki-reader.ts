@@ -4,6 +4,7 @@
  */
 
 import { createRequire } from 'node:module';
+export { convertArchive as convertAnkiArchive } from '@aqz/anki-reader/node';
 
 /** Resolve the WASM from the reader's own sql.js, not an unrelated workspace version. */
 export function resolveAnkiReaderWasm(): string {

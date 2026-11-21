@@ -7,11 +7,14 @@ and other defaults come from [Anki 25.09](https://github.com/ankitects/anki/tree
 (Ankitects Pty Ltd and contributors, AGPL-3.0-or-later).
 
 - `basic-anki21.apkg` / `basic-21b.apkg`: English stock note type with Japanese
-  literal card content (control); `tagged-21b.apkg` checks that tags are rejected.
+  literal card content (control); `tagged-21b.apkg` checks that tags survive the static import.
 - `basic-ja-anki21.apkg` / `basic-ja-21b.apkg`: actual Japanese stock note type
   from a fresh Japanese-language Anki collection, exported unchanged.
 - `custom-ja-21b.apkg`: the same Japanese note type with the question switched
-  to reference `裏面`. Anki exports it normally; Fukushu must reject it.
+  to reference `裏面`. Anki exports it normally; the static importer preserves its actual card sides.
+- `static-custom-21b.apkg` uses a custom HTML/CSS template and synthetic tag.
+  `interactive-custom-21b.apkg` changes its front into an external link and
+  must be rejected rather than have its behavior silently stripped.
 
 For the separate complex source fixture, see [generated-anki-25.09.md](generated-anki-25.09.md).
 

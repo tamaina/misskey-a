@@ -6,7 +6,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 <section class="_gaps" :aria-busy="busy">
 	<template v-if="item">
 		<div v-if="!singleStep">{{ index + 1 }} / {{ questions.length }}</div>
-		<SourceContent :anki="item.payload.kind === 'flashcard' ? item.payload : undefined" :content="item.payload.prompt"/>
+		<StaticAnkiCard v-if="nativeTemplate" :fallback="item.payload.prompt.value" :html="nativeTemplate.frontHtml" :css="nativeTemplate.css"/>
+		<SourceContent v-else :anki="item.payload.kind === 'flashcard' ? item.payload : undefined" :content="item.payload.prompt"/>
 		<fieldset v-if="!revealed && (!flash || needsText)" class="_gaps_s">
 			<legend>{{ $locale.sfc.answer }}</legend>
 			<input v-if="needsText || item.kind === 'short-answer' || item.kind === 'numerical' || item.kind === 'essay'" v-model="entered" :aria-label="$locale.sfc.answer"/>
@@ -32,7 +33,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template v-else>
 			<template v-if="feedback">
 				<strong v-if="graded">{{ graded.correct ? $locale.sfc.correct : $locale.sfc.incorrect }} ({{ Math.round(graded.score) }}%)</strong>
-				<SourceContent v-for="(c, i) in solution(item.payload, $locale.sfc.yes, $locale.sfc.no)" :key="i" :anki="item.payload.kind === 'flashcard' ? item.payload : undefined" :content="c"/>
+				<StaticAnkiCard v-if="nativeTemplate && item.payload.kind === 'flashcard'" :fallback="item.payload.answer.value" :html="nativeTemplate.backHtml" :css="nativeTemplate.css"/>
+				<SourceContent v-for="(c, i) in nativeTemplate ? [] : solution(item.payload, $locale.sfc.yes, $locale.sfc.no)" :key="i" :anki="item.payload.kind === 'flashcard' ? item.payload : undefined" :content="c"/>
 				<SourceContent v-for="(c, i) in graded?.feedback" :key="'feedback' + i" :content="c"/>
 				<SourceContent v-if="item.payload.explanation" :content="item.payload.explanation"/>
 			</template>
@@ -56,11 +58,12 @@ import { sendSessionAnswer } from '../tab-session.js';
 import type { SessionAnswer } from '../tab-session.js';
 import { shuffled, solution } from '../source-study.js';
 import SourceContent from './SourceContent.vue';
+import StaticAnkiCard from './StaticAnkiCard.vue';
 import type { SourceQuestion } from '../source-study.js';
 import type { GradeResult } from '../../../shared/fukushu-grading.js';
 import type { StudyRating } from '../../shared/study.schema.js';
 
-const props = defineProps<{ questions: SourceQuestion[]; revisions: Map<string, number>; flashMode: boolean; nativeVersion?: number; singleStep?: boolean; practiceAhead?: boolean; immediate: boolean; shuffle: boolean }>();
+const props = defineProps<{ questions: SourceQuestion[]; revisions: Map<string, number>; flashMode: boolean; nativeVersion?: number; nativeTemplate?: { frontHtml: string; backHtml: string; css: string }; singleStep?: boolean; practiceAhead?: boolean; immediate: boolean; shuffle: boolean }>();
 const emit = defineEmits<{ close: []; prepared: [answer: SessionAnswer]; saved: [answer: SessionAnswer]; rejected: [] }>();
 const ratings = ['again', 'hard', 'good', 'easy'] as const;
 const index = ref(0);
