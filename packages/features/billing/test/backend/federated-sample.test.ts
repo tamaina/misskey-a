@@ -148,6 +148,46 @@ test('one chain/hash/log event cannot fulfill two agreements, even if a faulty f
 	await expect(f.harness.confirm(second.id, provider, f.proof)).rejects.toThrow();
 });
 
+test.each(['missing', 'unlinked'])('new acceptance rejects a %s target with an otherwise available proposal', async mode => {
+	const f = sampleFixture();
+	await f.harness.offer(f.offer, payer, f.payment.id);
+	if (mode === 'missing') delete f.objects[noteUri];
+	else f.note.attachment = [];
+
+	await expect(f.harness.accept(f.offer.id, provider)).rejects.toThrow();
+	expect(f.harness.status(f.offer.id, payer).state).toBe('offered');
+});
+
+test('only the identical admitted offer can replay after Note, Proposal and policy change without a fresh admission', async () => {
+	const f = await accepted();
+	const admitted = f.harness.status(f.offer.id, payer);
+	delete f.objects[noteUri];
+	f.proposal.publishes.availableQuantity.hasNumericalValue = '0';
+	f.profiles.payer.billingResidence = null;
+	f.signedGet.mockClear();
+	f.deps.readObject.mockClear();
+	f.deps.readPaymentIntent.mockClear();
+	f.deps.requireCountryEligibility.mockClear();
+
+	expect(await f.harness.offer(f.offer, payer, f.payment.id)).toEqual(admitted);
+	await expect(f.harness.offer({ ...f.offer, context: `${noteUri}/different` }, payer, f.payment.id)).rejects.toThrow();
+	await expect(f.harness.offer(f.offer, provider, f.payment.id)).rejects.toThrow();
+	await expect(f.harness.offer(f.offer, payer, 'different-intent')).rejects.toThrow();
+	expect(f.signedGet).not.toHaveBeenCalled();
+	expect(f.deps.readObject).not.toHaveBeenCalled();
+	expect(f.deps.readPaymentIntent).not.toHaveBeenCalled();
+	expect(f.deps.requireCountryEligibility).not.toHaveBeenCalled();
+});
+
+test('concurrent identical admissions return one agreement without claiming the intent twice', async () => {
+	const f = sampleFixture();
+	// Each independent lookup returns the same fresh fixture; do not test discovery supersession here.
+	const harness = createFederatedSampleHarness(f.config, { ...f.deps, freshProposal: async () => f.proposal });
+	const [one, two] = await Promise.all([harness.offer(f.offer, payer, f.payment.id), harness.offer(f.offer, payer, f.payment.id)]);
+	expect(two).toEqual(one);
+	await expect(harness.offer({ ...f.offer, id: `${f.offer.id}/different` }, payer, f.payment.id)).rejects.toThrow();
+});
+
 test('pre-acceptance confirmation and unauthorized acceptance, confirmation or status are rejected', async () => {
 	const f = sampleFixture(); await f.harness.offer(f.offer, payer, f.payment.id); f.paid();
 	await expect(f.harness.confirm(f.offer.id, provider, f.proof)).rejects.toThrow();

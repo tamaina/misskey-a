@@ -47,7 +47,10 @@ an independent review. There is no production enable switch in this slice.
    The separately supplied pending existing PaymentIntent ID is privately bound
    to this offer, payer, provider, Note and terms before any wallet send. An
    already broadcast, hash-bound or confirmed intent cannot be attached later.
-6. Only the provider may accept. `AcceptAgreement.object` references the offer;
+6. Only the provider may accept. First acceptance rechecks the target Note and
+   its individual opt-in as well as the fresh Actor/Proposal and country policy.
+   An open user-wide Proposal does not override removal of one Note's link.
+   `AcceptAgreement.object` references the offer;
    `result` contains the finalized Agreement with provider attribution and IDs
    on both commitments. Acceptance does **not** confirm payment or fulfillment.
 7. The verified-payment hook reads the same existing intent from the trusted
@@ -98,7 +101,9 @@ versions fail closed. No new public ActivityPub extension fields are registered.
 ## Replay boundaries and limitations
 
 The harness reserves each intent once and each `(chainId, txHash, logIndex)` once.
-Identical offer retries reuse the agreement; changed retries fail. Confirmation
+Authenticated identical offer retries reuse the admitted agreement without
+checking availability again; changed retries fail. This is result recovery,
+not a new admission or acceptance. Confirmation
 retries return a copy of the same receipt. Reservation and fulfillment writes
 have no intervening `await`, so concurrent calls in **one harness instance** do
 not double consume. There are at most 100 admitted offers per instance. Nothing

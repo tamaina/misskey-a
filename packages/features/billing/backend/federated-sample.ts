@@ -165,33 +165,46 @@ export function createFederatedSampleHarness(settings: SampleConfig, deps: Sampl
 		requireSample(payment.terms.token.contractAddress === config.contractAddress && payment.terms.toAddress === config.toAddress && payment.terms.amountBaseUnits === config.amountBaseUnits && payment.countryEligibility != null);
 	}
 
+	async function requireTargetOptIn(noteUri: string) {
+		const target = config.targets.find(item => item.noteUri === noteUri);
+		requireSample(target);
+		const note = v.parse(noteSchema, await deps.readObject(target.noteUri));
+		requireSample(note.id === target.noteUri && note.attributedTo === target.authorActor && target.authorActor === config.providerActor && ownedUri(note.id, note.attributedTo));
+		requireSample(note.attachment.some(value => {
+			const link = v.safeParse(linkSchema, value);
+			return link.success && link.output.href === config.proposalId && link.output.rel.includes('payment') && link.output.rel.includes(proposalRel);
+		}));
+	}
+
+	function replayOffer(offer: Offer, paymentIntentId: string) {
+		const prior = entries.get(offer.id);
+		if (!prior) return null;
+		requireSample(JSON.stringify(prior.offer) === JSON.stringify(offer) && prior.payment.id === paymentIntentId);
+		return { state: prior.state, agreementId: prior.agreementId };
+	}
+
 	return {
 		async offer(input: unknown, authenticatedActor: string, paymentIntentId: string) {
 			enabled();
 			const offer = v.parse(offerSchema, input);
 			requireSample(sameContext(offer['@context']) && offer.actor === authenticatedActor && ownedUri(offer.id, authenticatedActor) && offer.to === config.providerActor);
 			const payer = config.payers.find(item => item.actor === authenticatedActor);
-			const target = config.targets.find(item => item.noteUri === offer.context);
-			requireSample(payer && target);
-			const note = v.parse(noteSchema, await deps.readObject(target.noteUri));
-			requireSample(note.id === target.noteUri && note.attributedTo === target.authorActor && target.authorActor === config.providerActor && ownedUri(note.id, note.attributedTo));
-			requireSample(note.attachment.some(value => {
-				const link = v.safeParse(linkSchema, value);
-				return link.success && link.output.href === config.proposalId && link.output.rel.includes('payment') && link.output.rel.includes(proposalRel);
-			}));
+			requireSample(payer);
+			// Recover an admitted result, not a new approval; current availability is irrelevant.
+			const replay = replayOffer(offer, paymentIntentId);
+			if (replay) return replay;
+			await requireTargetOptIn(offer.context);
 			const proposal = validateSampleProposal(await deps.freshProposal(), config);
 			requireSample(offer.object.stipulates.satisfies === proposal.publishes.id && offer.object.stipulatesReciprocal.satisfies === proposal.reciprocal.id && sameQuantity(offer.object.stipulates.resourceQuantity, proposal.publishes.resourceQuantity) && sameQuantity(offer.object.stipulatesReciprocal.resourceQuantity, proposal.reciprocal.resourceQuantity));
-			const prior = entries.get(offer.id);
-			if (prior) {
-				requireSample(JSON.stringify(prior.offer) === JSON.stringify(offer) && prior.payment.id === paymentIntentId);
-				return { state: prior.state, agreementId: prior.agreementId };
-			}
 			const payment = await deps.readPaymentIntent(paymentIntentId);
 			requireSample(payment && payment.id === paymentIntentId && payment.status === 'pending' && payment.txHash === null && payment.broadcastStartedAt === null);
 			paymentMatches(payment, payer.userId);
 			await deps.requireCountryEligibility(payer.userId, config.providerUserId);
-			// No awaits between reservation checks and writes: atomic only within this harness instance.
-			requireSample(entries.size < 100 && !entries.has(offer.id) && !intentClaims.has(paymentIntentId));
+			// A concurrent identical admission may have completed during the reads.
+			// No awaits between this replay/claim check and the in-memory writes.
+			const concurrentReplay = replayOffer(offer, paymentIntentId);
+			if (concurrentReplay) return concurrentReplay;
+			requireSample(entries.size < 100 && !intentClaims.has(paymentIntentId));
 			const agreementId = `${config.proposalId}/agreements/${encodeURIComponent(offer.id)}`;
 			entries.set(offer.id, { offer: structuredClone(offer), payment: structuredClone(payment), agreementId, state: 'offered', receipt: null });
 			intentClaims.set(paymentIntentId, offer.id);
@@ -201,7 +214,8 @@ export function createFederatedSampleHarness(settings: SampleConfig, deps: Sampl
 			enabled(); requireSample(authenticatedActor === config.providerActor);
 			const row = entry(offerId);
 			if (row.state === 'offered') {
-				// Acceptance immediately precedes any fixture payment action; refresh conditions again.
+				// A shared Proposal can stay live when its author withdraws one specific Note.
+				await requireTargetOptIn(row.offer.context);
 				validateSampleProposal(await deps.freshProposal(), config);
 				requireSample(row.payment.senderUserId);
 				await deps.requireCountryEligibility(row.payment.senderUserId, config.providerUserId);
