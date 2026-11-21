@@ -702,7 +702,7 @@ definePage(() => ({
 	"smtpPort": "端口",
 	"smtpUser": "用户名",
 	"smtpPass": "密码",
-	"emptyToDisableSmtpAuth": "用户名和密码留空可以禁用 SMTP 验证",
+	"emptyToDisableSmtpAuth": "将用户名和密码留空可以禁用 SMTP 验证",
 	"smtpSecure": "在 SMTP 连接中使用隐式 SSL / TLS",
 	"smtpSecureInfo": "使用 STARTTLS 时关闭。",
 	"save": "保存",

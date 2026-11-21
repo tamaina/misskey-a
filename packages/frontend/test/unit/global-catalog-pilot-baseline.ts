@@ -9,6 +9,7 @@ import { resolve } from 'node:path';
 import { parse } from 'vue/compiler-sfc';
 import { locales } from 'i18n';
 import escapes from './shared-global-locale-escapes.json';
+import { restoreCrowdin18171Baseline } from './upstream-develop-source-rebase.js';
 import type { RuntimeLocaleDictionary } from 'vite-vue-internationalization/runtime';
 
 // Independently pinned source hashes; translation values remain in locales/*.yml.
@@ -741,7 +742,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/auth/frontend/components/MkSignupDialog.form.vue",
-		"currentSha256": "5520a3fa578f59b238f1d855cba577a4eea404a0be70783ce998b48dd296277c",
+		"currentSha256": "11d0b1009f8cfe793a8d662dfcb345562c9a3a733a711a8969fd0378be5948ba",
 		"baselineSha256": "66697782b1d396279dfc7174c47befe85c85301ffd2e20514a39308cfae8b92b",
 		"keys": [
 			"somethingHappened",
@@ -781,21 +782,105 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 7404,
-				"end": 7404,
+				"start": 2363,
+				"end": 2574,
+				"current": "\t\t\t<MkInput v-if=\"instance.emailRequiredForSignup\" v-model=\"email\" :debounce=\"true\" type=\"email\" :spellcheck=\"false\" required data-testid=\"signup-email\" @input=\"onInputEmail\" @update:modelValue=\"onChangeEmail\">\n",
+				"baseline": "\t\t\t<MkInput v-if=\"instance.emailRequiredForSignup\" v-model=\"email\" :debounce=\"true\" type=\"email\" :spellcheck=\"false\" required data-testid=\"signup-email\" @update:modelValue=\"onChangeEmail\">\n"
+			},
+			{
+				"start": 7426,
+				"end": 7426,
 				"current": "",
 				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 7727,
-				"end": 7727,
+				"start": 7749,
+				"end": 7749,
 				"current": "",
 				"baseline": "import type { Captcha } from '@features/auth/frontend/components/MkCaptcha.vue';\n"
 			},
 			{
-				"start": 8164,
-				"end": 8339,
+				"start": 8186,
+				"end": 8361,
 				"current": "import type { Captcha } from '@features/auth/frontend/components/MkCaptcha.vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
+				"baseline": ""
+			},
+			{
+				"start": 9800,
+				"end": 9917,
+				"current": "let usernameAbortController: AbortController | null = null;\nlet emailAbortController: AbortController | null = null;\n",
+				"baseline": "const usernameAbortController = ref<null | AbortController>(null);\nconst emailAbortController = ref<null | AbortController>(null);\n"
+			},
+			{
+				"start": 10981,
+				"end": 11083,
+				"current": "\t// 前の値の問い合わせの結果で状態を上書きしないよう中断する\n\tusernameAbortController?.abort();\n\tusernameAbortController = null;\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 11402,
+				"end": 11402,
+				"current": "",
+				"baseline": "\tif (usernameAbortController.value != null) {\n\t\tusernameAbortController.value.abort();\n\t}\n"
+			},
+			{
+				"start": 11433,
+				"end": 11525,
+				"current": "\tconst abortController = new AbortController();\n\tusernameAbortController = abortController;\n",
+				"baseline": "\tusernameAbortController.value = new AbortController();\n"
+			},
+			{
+				"start": 11590,
+				"end": 11692,
+				"current": "\t}, undefined, abortController.signal).then(result => {\n\t\tif (abortController.signal.aborted) return;\n",
+				"baseline": "\t}, undefined, usernameAbortController.value.signal).then(result => {\n"
+			},
+			{
+				"start": 11778,
+				"end": 11824,
+				"current": "\t\tif (abortController.signal.aborted) return;\n",
+				"baseline": ""
+			},
+			{
+				"start": 11905,
+				"end": 12368,
+				"current": "// 入力欄は debounce されていて email が更新されるのは遅延後なので、\n// それまでの間に前のアドレスの確認結果で送信できてしまわないよう、打鍵の時点で状態をクリアする\nfunction onInputEmail(ev: Event): void {\n\t// type=\"email\" は前後の空白を取り除くので、打鍵しても値が変わらないことがある。\n\t// その場合は update:modelValue が来ないので、状態を維持するか、クリア済みならここで確認し直す\n\tif ((ev.target as HTMLInputElement).value === email.value) {\n\t\tif (emailState.value === null) onChangeEmail();\n\t\treturn;\n\t}\n\n\temailAbortController?.abort();\n\temailAbortController = null;\n\temailState.value = null;\n}\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 12401,
+				"end": 12497,
+				"current": "\t// 前の値の問い合わせの結果で状態を上書きしないよう中断する\n\temailAbortController?.abort();\n\temailAbortController = null;\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 12565,
+				"end": 12565,
+				"current": "",
+				"baseline": "\tif (emailAbortController.value != null) {\n\t\temailAbortController.value.abort();\n\t}\n"
+			},
+			{
+				"start": 12593,
+				"end": 12682,
+				"current": "\tconst abortController = new AbortController();\n\temailAbortController = abortController;\n",
+				"baseline": "\temailAbortController.value = new AbortController();\n"
+			},
+			{
+				"start": 12753,
+				"end": 12855,
+				"current": "\t}, undefined, abortController.signal).then(result => {\n\t\tif (abortController.signal.aborted) return;\n",
+				"baseline": "\t}, undefined, emailAbortController.value.signal).then(result => {\n"
+			},
+			{
+				"start": 13263,
+				"end": 13309,
+				"current": "\t\tif (abortController.signal.aborted) return;\n",
+				"baseline": ""
+			},
+			{
+				"start": 13944,
+				"end": 14019,
+				"current": "\tif (instance.emailRequiredForSignup && emailState.value !== 'ok') return;\n",
 				"baseline": ""
 			}
 		]
@@ -3656,7 +3741,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/drive/frontend/components/MkDrive.folder.vue",
-		"currentSha256": "2ca101e06ce32560c1b3d843f18240e0cdf9f37f2810fdbba1cd4bd8512b8201",
+		"currentSha256": "99343776d176c987a4ee9b8b70672126be499f704f61846e0b896a7a4345f5ca",
 		"baselineSha256": "499cf397197d0a3bb34639bbf565c53547b59e10674789246f5e8bff5eb0676b",
 		"keys": [
 			"delete",
@@ -3703,6 +3788,18 @@ export const globalCatalogPilotOwners = [
 				"end": 6059,
 				"current": "\t\ttitle: $locale.value.sfc.renameFolder,\n",
 				"baseline": "\t\ttitle: globalLocale.value.env.renameFolder,\n"
+			},
+			{
+				"start": 6878,
+				"end": 7112,
+				"current": "async function deleteFolder() {\n\tif (prefer.s.uploadFolder === props.folder.id) {\n\t\tconst { canceled } = await os.confirm({\n\t\t\ttype: 'warning',\n\t\t\ttext: $locale.value.sfc.uploadFolderDeletionConfirm,\n\t\t});\n\t\tif (canceled) return;\n\t}\n\n",
+				"baseline": "function deleteFolder() {\n"
+			},
+			{
+				"start": 15870,
+				"end": 15973,
+				"current": "\t\"uploadFolderDeletionConfirm\": \"このフォルダは既定アップロード先に指定されています。削除すると、既定アップロード先は解除され、ファイルはルートにアップロードされます。\",\n",
+				"baseline": ""
 			}
 		]
 	},
@@ -3734,7 +3831,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/drive/frontend/components/MkDrive.vue",
-		"currentSha256": "84ce654df378ce46ee571701b2041860b1edb9d049ca3e4cc9b26dac979aea24",
+		"currentSha256": "065b3c28b90738f7932921253d25b1625536c09dba78f8af9709f8db4e1f9724",
 		"baselineSha256": "768f5a8ad56451dc23e3cae9630c3de472f345f2d3f1841bb9a500cfb78c8934",
 		"keys": [
 			"somethingHappened",
@@ -3847,9 +3944,27 @@ export const globalCatalogPilotOwners = [
 				"baseline": "\t\ttitle: globalLocale.value.env.uploadFromUrlRequested,\n\t\ttext: globalLocale.value.env.uploadFromUrlMayTakeTime,\n"
 			},
 			{
-				"start": 16606,
-				"end": 16664,
+				"start": 15912,
+				"end": 16192,
+				"current": "async function deleteFolder(folderToDelete: Misskey.entities.DriveFolder) {\n\tif (prefer.s.uploadFolder === folderToDelete.id) {\n\t\tconst { canceled } = await os.confirm({\n\t\t\ttype: 'warning',\n\t\t\ttext: $locale.value.sfc.uploadFolderDeletionConfirm,\n\t\t});\n\t\tif (canceled) return;\n\t}\n\n",
+				"baseline": "function deleteFolder(folderToDelete: Misskey.entities.DriveFolder) {\n"
+			},
+			{
+				"start": 16278,
+				"end": 16375,
+				"current": "\t\tif (prefer.s.uploadFolder === folderToDelete.id) {\n\t\t\tprefer.commit('uploadFolder', null);\n\t\t}\n",
+				"baseline": ""
+			},
+			{
+				"start": 16913,
+				"end": 16971,
 				"current": "\tif (props.excludeSensitive && file.isSensitive) return;\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 43525,
+				"end": 43628,
+				"current": "\t\"uploadFolderDeletionConfirm\": \"このフォルダは既定アップロード先に指定されています。削除すると、既定アップロード先は解除され、ファイルはルートにアップロードされます。\",\n",
 				"baseline": ""
 			}
 		]
@@ -4071,7 +4186,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/drive/frontend/components/MkLightbox.item.vue",
-		"currentSha256": "1503cab69db003ae900ef34939fabb871e9493faad8ed580034f6623ef5d8e96",
+		"currentSha256": "6af9d8d4f1e7b602512ae53f6a09183c200d667232420401c2d375d991be8ace",
 		"baselineSha256": "6b146954369cf3a0c5cdeaae585a3726df73907f986df01e548c1e4e18366e5f",
 		"keys": [
 			"sensitive"
@@ -4087,212 +4202,302 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 5376,
-				"end": 5376,
+				"start": 2389,
+				"end": 2463,
+				"current": "\t\t\t\t\t\tref=\"thumbnailEl\"\n\t\t\t\t\t\t:class=\"[$style.content, $style.thumbnail]\"\n",
+				"baseline": "\t\t\t\t\t\t:class=\"$style.content\"\n"
+			},
+			{
+				"start": 2656,
+				"end": 2677,
+				"current": "\t\t\t\t\t\t\tref=\"imageEl\"\n",
+				"baseline": ""
+			},
+			{
+				"start": 5441,
+				"end": 5441,
 				"current": "",
 				"baseline": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 6731,
-				"end": 6834,
+				"start": 6796,
+				"end": 6899,
 				"current": "import { useLocale } from 'virtual:vite-vue-internationalization';\nimport type { Locale } from 'i18n';\n",
 				"baseline": ""
 			},
 			{
-				"start": 7127,
-				"end": 7127,
+				"start": 7192,
+				"end": 7192,
 				"current": "",
 				"baseline": "import type XAudioVisualizer__TypeReferenceOnly from '@features/drive/frontend/components/MkLightbox.item.audio-visualizer.vue';\n"
 			},
 			{
-				"start": 7217,
-				"end": 7217,
+				"start": 7282,
+				"end": 7282,
 				"current": "",
 				"baseline": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\n"
 			},
 			{
-				"start": 7811,
-				"end": 8075,
+				"start": 7876,
+				"end": 8140,
 				"current": "import type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type XAudioVisualizer__TypeReferenceOnly from '@features/drive/frontend/components/MkLightbox.item.audio-visualizer.vue';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
 			},
 			{
-				"start": 11163,
-				"end": 11173,
+				"start": 8983,
+				"end": 9077,
+				"current": "const imageEl = useTemplateRef('imageEl');\nconst thumbnailEl = useTemplateRef('thumbnailEl');\n",
+				"baseline": ""
+			},
+			{
+				"start": 11322,
+				"end": 11332,
 				"current": "\t\t: null,\n",
 				"baseline": "\t\t: null\n"
 			},
 			{
-				"start": 30256,
-				"end": 30293,
+				"start": 18309,
+				"end": 18338,
+				"current": "let isBackgroundTap = false;\n",
+				"baseline": ""
+			},
+			{
+				"start": 20058,
+				"end": 21451,
+				"current": "function isOutsideImage(x: number, y: number): boolean {\n\tif (props.content.type !== 'image' || hide.value) return false;\n\tconst image = imageEl.value?.naturalWidth && imageEl.value.naturalHeight\n\t\t? imageEl.value\n\t\t: thumbnailEl.value ?? imageEl.value;\n\tif (image == null) return false;\n\n\tconst width = image.naturalWidth || props.content.width;\n\tconst height = image.naturalHeight || props.content.height;\n\tif (width == null || height == null || !Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) return false;\n\n\t// img自体は余白を含む。変形後の矩形からobject-fit: containで描画される範囲を求める。\n\tconst rect = image.getBoundingClientRect();\n\tif (!isValidRect(rect)) return false;\n\tconst scale = Math.min(rect.width / width, rect.height / height);\n\tconst left = rect.left + (rect.width - width * scale) / 2;\n\tconst top = rect.top + (rect.height - height * scale) / 2;\n\treturn x < left || x > left + width * scale || y < top || y > top + height * scale;\n}\n\nfunction isOutsideContent(x: number, y: number): boolean {\n\tif (props.content.type !== 'video') return isOutsideImage(x, y);\n\tif (hide.value || videoEl.value == null || videoAspectRatio.value == null) return false;\n\n\t// 動画要素は縦横比に合わせてサイズを指定しているため、要素の矩形が描画範囲になる。\n\tconst rect = videoEl.value.getBoundingClientRect();\n\tif (!isValidRect(rect)) return false;\n\treturn x < rect.left || x > rect.right || y < rect.top || y > rect.bottom;\n}\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 21639,
+				"end": 21680,
+				"current": "\tisClick = pointerEventCache.size === 1;\n",
+				"baseline": "\tisClick = true;\n"
+			},
+			{
+				"start": 21726,
+				"end": 21798,
+				"current": "\tisBackgroundTap = isClick && isOutsideContent(ev.clientX, ev.clientY);\n",
+				"baseline": ""
+			},
+			{
+				"start": 24915,
+				"end": 24995,
+				"current": "\tisBackgroundTap = isBackgroundTap && isOutsideContent(ev.clientX, ev.clientY);\n",
+				"baseline": ""
+			},
+			{
+				"start": 27408,
+				"end": 27434,
+				"current": "\tisBackgroundTap = false;\n",
+				"baseline": ""
+			},
+			{
+				"start": 27776,
+				"end": 27988,
+				"current": "\tif ((props.content.type === 'image' || props.content.type === 'video') && (ev.touches.length !== 1 || isOutsideContent(ev.touches[0].clientX, ev.touches[0].clientY))) {\n\t\tdoubleTapDetector.reset();\n\t\treturn;\n\t}\n",
+				"baseline": ""
+			},
+			{
+				"start": 30474,
+				"end": 30544,
+				"current": "\tconst wasClick = isClick;\n\tconst wasBackgroundTap = isBackgroundTap;\n",
+				"baseline": "\tif (!isClick) return;\n\n"
+			},
+			{
+				"start": 30606,
+				"end": 30624,
+				"current": "\tisClick = false;\n",
+				"baseline": ""
+			},
+			{
+				"start": 30645,
+				"end": 30695,
+				"current": "\tisBackgroundTap = false;\n\tif (!wasClick) return;\n",
+				"baseline": ""
+			},
+			{
+				"start": 30762,
+				"end": 30810,
+				"current": "\tif (action === 'media' && !wasBackgroundTap) {\n",
+				"baseline": "\tif (action === 'media') {\n"
+			},
+			{
+				"start": 30842,
+				"end": 30884,
+				"current": "\tif (!isTouchUsing || wasBackgroundTap) {\n",
+				"baseline": "\tif (!isTouchUsing) {\n"
+			},
+			{
+				"start": 32406,
+				"end": 32443,
 				"current": "\t\ttext: globalLocale.value.env.hide,\n",
 				"baseline": "\t\ttext: $locale.value.sfc.hide,\n"
 			},
 			{
-				"start": 35513,
-				"end": 35513,
+				"start": 37663,
+				"end": 37663,
 				"current": "",
 				"baseline": "\t\"hide\": \"إخفاء\",\n"
 			},
 			{
-				"start": 35696,
-				"end": 35696,
+				"start": 37846,
+				"end": 37846,
 				"current": "",
 				"baseline": "\t\"hide\": \"Amagar\",\n"
 			},
 			{
-				"start": 35880,
-				"end": 35880,
+				"start": 38030,
+				"end": 38030,
 				"current": "",
 				"baseline": "\t\"hide\": \"Skrýt\",\n"
 			},
 			{
-				"start": 36065,
-				"end": 36065,
+				"start": 38215,
+				"end": 38215,
 				"current": "",
 				"baseline": "\t\"hide\": \"Hide\",\n"
 			},
 			{
-				"start": 36240,
-				"end": 36240,
+				"start": 38390,
+				"end": 38390,
 				"current": "",
 				"baseline": "\t\"hide\": \"Inhalt verbergen\",\n"
 			},
 			{
-				"start": 36425,
-				"end": 36425,
+				"start": 38575,
+				"end": 38575,
 				"current": "",
 				"baseline": "\t\"hide\": \"Hide\",\n"
 			},
 			{
-				"start": 36624,
-				"end": 36624,
+				"start": 38774,
+				"end": 38774,
 				"current": "",
 				"baseline": "\t\"hide\": \"Ocultar\",\n"
 			},
 			{
-				"start": 36807,
-				"end": 36807,
+				"start": 38957,
+				"end": 38957,
 				"current": "",
 				"baseline": "\t\"hide\": \"Masquer\",\n"
 			},
 			{
-				"start": 36992,
-				"end": 36992,
+				"start": 39142,
+				"end": 39142,
 				"current": "",
 				"baseline": "\t\"hide\": \"Sembunyikan\",\n"
 			},
 			{
-				"start": 37184,
-				"end": 37184,
+				"start": 39334,
+				"end": 39334,
 				"current": "",
 				"baseline": "\t\"hide\": \"Nascondere\",\n"
 			},
 			{
-				"start": 37386,
-				"end": 37386,
+				"start": 39536,
+				"end": 39536,
 				"current": "",
 				"baseline": "\t\"hide\": \"隠す\",\n"
 			},
 			{
-				"start": 37546,
-				"end": 37546,
+				"start": 39696,
+				"end": 39696,
 				"current": "",
 				"baseline": "\t\"hide\": \"隠す\",\n"
 			},
 			{
-				"start": 37719,
-				"end": 37719,
+				"start": 39869,
+				"end": 39869,
 				"current": "",
 				"baseline": "\t\"hide\": \"Hide\",\n"
 			},
 			{
-				"start": 37895,
-				"end": 37895,
+				"start": 40045,
+				"end": 40045,
 				"current": "",
 				"baseline": "\t\"hide\": \"Hide\",\n"
 			},
 			{
-				"start": 38061,
-				"end": 38061,
+				"start": 40211,
+				"end": 40211,
 				"current": "",
 				"baseline": "\t\"hide\": \"숨기기\",\n"
 			},
 			{
-				"start": 38238,
-				"end": 38238,
+				"start": 40388,
+				"end": 40388,
 				"current": "",
 				"baseline": "\t\"hide\": \"Verbergen\",\n"
 			},
 			{
-				"start": 38420,
-				"end": 38420,
+				"start": 40570,
+				"end": 40570,
 				"current": "",
 				"baseline": "\t\"hide\": \"Skjul\",\n"
 			},
 			{
-				"start": 38601,
-				"end": 38601,
+				"start": 40751,
+				"end": 40751,
 				"current": "",
 				"baseline": "\t\"hide\": \"Ukryj\",\n"
 			},
 			{
-				"start": 38788,
-				"end": 38788,
+				"start": 40938,
+				"end": 40938,
 				"current": "",
 				"baseline": "\t\"hide\": \"Ocultar\",\n"
 			},
 			{
-				"start": 38983,
-				"end": 38983,
+				"start": 41133,
+				"end": 41133,
 				"current": "",
 				"baseline": "\t\"hide\": \"Спрятать\",\n"
 			},
 			{
-				"start": 39169,
-				"end": 39169,
+				"start": 41319,
+				"end": 41319,
 				"current": "",
 				"baseline": "\t\"hide\": \"Skryť\",\n"
 			},
 			{
-				"start": 39353,
-				"end": 39353,
+				"start": 41503,
+				"end": 41503,
 				"current": "",
 				"baseline": "\t\"hide\": \"ซ่อน\",\n"
 			},
 			{
-				"start": 39528,
-				"end": 39528,
+				"start": 41678,
+				"end": 41678,
 				"current": "",
 				"baseline": "\t\"hide\": \"Gizle\",\n"
 			},
 			{
-				"start": 39714,
-				"end": 39714,
+				"start": 41864,
+				"end": 41864,
 				"current": "",
 				"baseline": "\t\"hide\": \"Hide\",\n"
 			},
 			{
-				"start": 39906,
-				"end": 39906,
+				"start": 42056,
+				"end": 42056,
 				"current": "",
 				"baseline": "\t\"hide\": \"Сховати\",\n"
 			},
 			{
-				"start": 40098,
-				"end": 40098,
+				"start": 42248,
+				"end": 42248,
 				"current": "",
 				"baseline": "\t\"hide\": \"Ẩn\",\n"
 			},
 			{
-				"start": 40256,
-				"end": 40256,
+				"start": 42406,
+				"end": 42406,
 				"current": "",
 				"baseline": "\t\"hide\": \"隐藏\",\n"
 			},
 			{
-				"start": 40409,
-				"end": 40409,
+				"start": 42559,
+				"end": 42559,
 				"current": "",
 				"baseline": "\t\"hide\": \"隱藏\",\n"
 			}
@@ -5109,7 +5314,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/drive/frontend/ts-messages.vue",
-		"currentSha256": "9fc565b40635356c0944050ff4a10d4837cbe0ff914e2b510f321b8d534cf196",
+		"currentSha256": "8e002efab7ef21785d0fba9af465d30669dce603d90b06c8e34c34503c7063d9",
 		"baselineSha256": "60b93be53a51f7654a1b3070157ce364516d313bbb274b7b40f854a7df2c6fcf",
 		"keys": [
 			"delete",
@@ -5244,110 +5449,116 @@ export const globalCatalogPilotOwners = [
 				"baseline": "\t\"hide\": \"Nascondere\",\n"
 			},
 			{
-				"start": 17790,
-				"end": 17790,
+				"start": 16795,
+				"end": 16878,
+				"current": "\t\"cannotUploadBecauseNoSuchFolder\": \"アップロード先のフォルダが見つかりません。既定アップロード先の設定を確認してください。\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 17873,
+				"end": 17873,
 				"current": "",
 				"baseline": "\t\"hide\": \"隠す\",\n"
 			},
 			{
-				"start": 19045,
-				"end": 19045,
+				"start": 19128,
+				"end": 19128,
 				"current": "",
 				"baseline": "\t\"hide\": \"隠す\",\n"
 			},
 			{
-				"start": 20532,
-				"end": 20532,
+				"start": 20615,
+				"end": 20615,
 				"current": "",
 				"baseline": "\t\"hide\": \"Hide\",\n"
 			},
 			{
-				"start": 22113,
-				"end": 22113,
+				"start": 22196,
+				"end": 22196,
 				"current": "",
 				"baseline": "\t\"hide\": \"Hide\",\n"
 			},
 			{
-				"start": 23420,
-				"end": 23420,
+				"start": 23503,
+				"end": 23503,
 				"current": "",
 				"baseline": "\t\"hide\": \"숨기기\",\n"
 			},
 			{
-				"start": 24945,
-				"end": 24945,
+				"start": 25028,
+				"end": 25028,
 				"current": "",
 				"baseline": "\t\"hide\": \"Verbergen\",\n"
 			},
 			{
-				"start": 26530,
-				"end": 26530,
+				"start": 26613,
+				"end": 26613,
 				"current": "",
 				"baseline": "\t\"hide\": \"Skjul\",\n"
 			},
 			{
-				"start": 28171,
-				"end": 28171,
+				"start": 28254,
+				"end": 28254,
 				"current": "",
 				"baseline": "\t\"hide\": \"Ukryj\",\n"
 			},
 			{
-				"start": 29915,
-				"end": 29915,
+				"start": 29998,
+				"end": 29998,
 				"current": "",
 				"baseline": "\t\"hide\": \"Ocultar\",\n"
 			},
 			{
-				"start": 31534,
-				"end": 31534,
+				"start": 31617,
+				"end": 31617,
 				"current": "",
 				"baseline": "\t\"hide\": \"Спрятать\",\n"
 			},
 			{
-				"start": 33004,
-				"end": 33004,
+				"start": 33087,
+				"end": 33087,
 				"current": "",
 				"baseline": "\t\"hide\": \"Skryť\",\n"
 			},
 			{
-				"start": 34602,
-				"end": 34602,
+				"start": 34685,
+				"end": 34685,
 				"current": "",
 				"baseline": "\t\"hide\": \"ซ่อน\",\n"
 			},
 			{
-				"start": 36234,
-				"end": 36234,
+				"start": 36317,
+				"end": 36317,
 				"current": "",
 				"baseline": "\t\"hide\": \"Gizle\",\n"
 			},
 			{
-				"start": 37806,
-				"end": 37806,
+				"start": 37889,
+				"end": 37889,
 				"current": "",
 				"baseline": "\t\"hide\": \"Hide\",\n"
 			},
 			{
-				"start": 39468,
-				"end": 39468,
+				"start": 39551,
+				"end": 39551,
 				"current": "",
 				"baseline": "\t\"hide\": \"Сховати\",\n"
 			},
 			{
-				"start": 41055,
-				"end": 41055,
+				"start": 41138,
+				"end": 41138,
 				"current": "",
 				"baseline": "\t\"hide\": \"Ẩn\",\n"
 			},
 			{
-				"start": 42240,
-				"end": 42240,
+				"start": 42323,
+				"end": 42323,
 				"current": "",
 				"baseline": "\t\"hide\": \"隐藏\",\n"
 			},
 			{
-				"start": 43323,
-				"end": 43323,
+				"start": 43406,
+				"end": 43406,
 				"current": "",
 				"baseline": "\t\"hide\": \"隱藏\",\n"
 			}
@@ -7869,7 +8080,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/markup/frontend/components/MkUrlPreview.vue",
-		"currentSha256": "7ba71838337fb1fe11ab93e3c67b00d2a08328c15ccea1f61062010f380cad9b",
+		"currentSha256": "46ce2e391a771d04ac617c8136ea7ad9bc80362adfb5e1862ed626f56f1ddc43",
 		"baselineSha256": "7e04cff4305ae0b40dc1948f47d40e5b30b2bfef432512bccb3477068e21cc9d",
 		"keys": [
 			"close"
@@ -7884,21 +8095,81 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 3956,
-				"end": 3956,
-				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"start": 1694,
+				"end": 1761,
+				"current": "\t\t<MkButton :small=\"true\" inline @click=\"setTweetExpanded(false)\">\n",
+				"baseline": "\t\t<MkButton :small=\"true\" inline @click=\"tweetExpanded = false\">\n"
 			},
 			{
-				"start": 4182,
-				"end": 4182,
-				"current": "",
-				"baseline": "';\nimport type { SummalyResult } from '@misskey-dev/summaly"
+				"start": 3283,
+				"end": 3350,
+				"current": "\t\t\t<MkButton :small=\"true\" inline @click=\"setTweetExpanded(true)\">\n",
+				"baseline": "\t\t\t<MkButton :small=\"true\" inline @click=\"tweetExpanded = true\">\n"
 			},
 			{
-				"start": 4677,
-				"end": 4830,
-				"current": ";\nimport type { SummalyResult } from '@misskey-dev/summaly';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 3953,
+				"end": 4053,
+				"current": "import { computed, defineAsyncComponent, onActivated, onDeactivated, onUnmounted, ref } from 'vue';\n",
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport { computed, defineAsyncComponent, onDeactivated, onUnmounted, ref } from 'vue';\n"
+			},
+			{
+				"start": 4202,
+				"end": 4202,
+				"current": "",
+				"baseline": "import type { SummalyResult } from '@misskey-dev/summaly';\n"
+			},
+			{
+				"start": 4696,
+				"end": 4849,
+				"current": "import type { SummalyResult } from '@misskey-dev/summaly';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
+				"baseline": ""
+			},
+			{
+				"start": 5954,
+				"end": 6014,
+				"current": "const playerEnabled = ref(false); // 初期値はsummaly取り終わったあとに設定\n",
+				"baseline": "const playerEnabled = ref(false);\n"
+			},
+			{
+				"start": 6056,
+				"end": 6149,
+				"current": "const tweetExpanded = ref(false); // 初期値はsummaly取り終わったあとに設定\nlet tweetExpandedByUser = false;\n",
+				"baseline": "const tweetExpanded = ref(props.detail);\n"
+			},
+			{
+				"start": 6280,
+				"end": 6356,
+				"current": "let isDeactivated = false;\n\nonActivated(() => {\n\tisDeactivated = false;\n});\n",
+				"baseline": ""
+			},
+			{
+				"start": 6379,
+				"end": 6402,
+				"current": "\tisDeactivated = true;\n",
+				"baseline": ""
+			},
+			{
+				"start": 7285,
+				"end": 7393,
+				"current": "\t.catch(err => {\n\t\tif (_DEV_) {\n\t\t\tconsole.warn('Failed to fetch url preview', err);\n\t\t}\n\t\treturn null;\n\t})\n",
+				"baseline": ""
+			},
+			{
+				"start": 7524,
+				"end": 7546,
+				"current": "\t\t\tautoExpandTweet();\n",
+				"baseline": ""
+			},
+			{
+				"start": 7647,
+				"end": 7818,
+				"current": "\n\t\tif (!info.sensitive) {\n\t\t\tautoExpandTweet();\n\t\t\tif (!isDeactivated) {\n\t\t\t\tplayerEnabled.value = (props.showActions && prefer.s.expandUrlPreviewAutomatically);\n\t\t\t}\n\t\t}\n",
+				"baseline": ""
+			},
+			{
+				"start": 7823,
+				"end": 8077,
+				"current": "\nfunction setTweetExpanded(expanded: boolean) {\n\ttweetExpandedByUser = true;\n\ttweetExpanded.value = expanded;\n}\n\nfunction autoExpandTweet() {\n\tif (!isDeactivated && props.showActions && props.detail && !tweetExpandedByUser) tweetExpanded.value = true;\n}\n",
 				"baseline": ""
 			}
 		]
@@ -11087,7 +11358,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/play/frontend/pages/flash/flash.vue",
-		"currentSha256": "f70fad90397bf4633f638162592cc1294e831da31f46b615f0cea48406dc33dd",
+		"currentSha256": "a7ab89968f5057d4a6aa88bb1c519c002600002fbeac10fd39bcf7f912c18192",
 		"baselineSha256": "e31fd49ae514819d19409e18ac88de62e91a93b8e5e2866235a158736d3953a6",
 		"keys": [
 			"delete",
@@ -11116,21 +11387,57 @@ export const globalCatalogPilotOwners = [
 		"expanded": true,
 		"edits": [
 			{
-				"start": 3399,
-				"end": 3399,
-				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"start": 487,
+				"end": 534,
+				"current": "\t\t\t\t\t\t\t<MkAsUi v-if=\"root\" :component=\"root\"/>\n",
+				"baseline": "\t\t\t\t\t\t\t<MkAsUi v-if=\"root\" :component=\"root\" :components=\"components\"/>\n"
 			},
 			{
-				"start": 3692,
-				"end": 3692,
-				"current": "",
-				"baseline": "';\nimport type { Ref } from 'vue';\nimport type { AsUiComponent, AsUiRoot } from '@features/play/frontend/services/aiscript/ui.js';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { Interpreter } from '@syuilo/aiscript"
+				"start": 3367,
+				"end": 3483,
+				"current": "import { computed, nextTick, onDeactivated, onUnmounted, ref, watch, shallowRef, defineAsyncComponent } from 'vue';\n",
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport { computed, onDeactivated, onUnmounted, ref, watch, shallowRef, defineAsyncComponent } from 'vue';\n"
 			},
 			{
-				"start": 4726,
-				"end": 5078,
-				"current": ";\nimport type { Interpreter } from '@syuilo/aiscript';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { AsUiComponent, AsUiRoot } from '@features/play/frontend/services/aiscript/ui.js';\nimport type { Ref } from 'vue';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 3680,
+				"end": 3680,
+				"current": "",
+				"baseline": "import type { Ref } from 'vue';\nimport type { AsUiComponent, AsUiRoot } from '@features/play/frontend/services/aiscript/ui.js';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { Interpreter } from '@syuilo/aiscript';\n"
+			},
+			{
+				"start": 4713,
+				"end": 5018,
+				"current": "import type { Interpreter } from '@syuilo/aiscript';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { AsUiRoot } from '@features/play/frontend/services/aiscript/ui.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
+				"baseline": ""
+			},
+			{
+				"start": 7050,
+				"end": 7050,
+				"current": "",
+				"baseline": "const components = ref<Ref<AsUiComponent>[]>([]);\n"
+			},
+			{
+				"start": 7379,
+				"end": 7481,
+				"current": "\t// 前回の root で MkAsUi がマウントされないよう、新しい root が作られるまで描画させない\n\troot.value = undefined;\n\tawait nextTick();\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 7782,
+				"end": 7782,
+				"current": "",
+				"baseline": "\tcomponents.value = [];\n\n"
+			},
+			{
+				"start": 7894,
+				"end": 7951,
+				"current": "\t\t...registerAsUiLib((_root) => {\n\t\t\troot.value = _root;\n",
+				"baseline": "\t\t...registerAsUiLib(components.value, (_root) => {\n\t\t\troot.value = _root.value;\n"
+			},
+			{
+				"start": 9871,
+				"end": 9896,
+				"current": "\troot.value = undefined;\n",
 				"baseline": ""
 			}
 		]
@@ -11532,7 +11839,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/preferences/frontend/pages/settings/preferences.vue",
-		"currentSha256": "29749ad8071bdf46376d8f2de1de901371d6a262e6586e58ea3e39d783428593",
+		"currentSha256": "33e7852029af421de26b922a7b4c8bf1d9a38291d24dd8fdbf550b5e33cd05ae",
 		"baselineSha256": "b4f0d6f5bd2b505080654a35748b3c440c48306461bbb002f05767ab893a6b17",
 		"keys": [
 			"default",
@@ -11713,188 +12020,206 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 40331,
-				"end": 40331,
-				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
-			},
-			{
-				"start": 42329,
-				"end": 42423,
-				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
-				"baseline": ""
-			},
-			{
 				"start": 18562,
 				"end": 18738,
 				"current": "\t\t\t\t\t<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->\n\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.notifications }}</SearchLabel></template>\n",
 				"baseline": "\t\t\t\t\t<template #label><SearchLabel>{{ globalLocale.env.notifications }}</SearchLabel></template>\n"
 			},
 			{
-				"start": 60257,
-				"end": 60316,
+				"start": 35770,
+				"end": 36169,
+				"current": "\t\t\t\t\t\t\t<SearchMarker :keywords=\"['url', 'preview', 'expand', 'player', 'embed']\">\n\t\t\t\t\t\t\t\t<MkPreferenceContainer k=\"expandUrlPreviewAutomatically\">\n\t\t\t\t\t\t\t\t\t<MkSwitch v-model=\"expandUrlPreviewAutomatically\">\n\t\t\t\t\t\t\t\t\t\t<template #label><SearchLabel>{{ $locale.sfc.expandUrlPreviewAutomatically }}</SearchLabel></template>\n\t\t\t\t\t\t\t\t\t</MkSwitch>\n\t\t\t\t\t\t\t\t</MkPreferenceContainer>\n\t\t\t\t\t\t\t</SearchMarker>\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 40802,
+				"end": 40802,
+				"current": "",
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
+			},
+			{
+				"start": 42809,
+				"end": 42903,
+				"current": "import type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
+				"baseline": ""
+			},
+			{
+				"start": 45630,
+				"end": 45715,
+				"current": "const expandUrlPreviewAutomatically = prefer.model('expandUrlPreviewAutomatically');\n",
+				"baseline": ""
+			},
+			{
+				"start": 60741,
+				"end": 60800,
 				"current": "\t\"selectList\": \"اختر قائمة\",\n\t\"notifications\": \"الإشعارات\"\n",
 				"baseline": "\t\"selectList\": \"اختر قائمة\"\n"
 			},
 			{
-				"start": 70922,
-				"end": 70990,
+				"start": 71406,
+				"end": 71474,
 				"current": "\t\"selectList\": \"Tria una llista\",\n\t\"notifications\": \"Notificacions\"\n",
 				"baseline": "\t\"selectList\": \"Tria una llista\"\n"
 			},
 			{
-				"start": 80629,
-				"end": 80690,
+				"start": 81113,
+				"end": 81174,
 				"current": "\t\"selectList\": \"Vybrat seznam\",\n\t\"notifications\": \"Oznámení\"\n",
 				"baseline": "\t\"selectList\": \"Vybrat seznam\"\n"
 			},
 			{
-				"start": 90158,
-				"end": 90224,
+				"start": 90642,
+				"end": 90708,
 				"current": "\t\"selectList\": \"Select a list\",\n\t\"notifications\": \"Notifications\"\n",
 				"baseline": "\t\"selectList\": \"Select a list\"\n"
 			},
 			{
-				"start": 100804,
-				"end": 100877,
+				"start": 101288,
+				"end": 101361,
 				"current": "\t\"selectList\": \"Liste auswählen\",\n\t\"notifications\": \"Benachrichtigungen\"\n",
 				"baseline": "\t\"selectList\": \"Liste auswählen\"\n"
 			},
 			{
-				"start": 110345,
-				"end": 110411,
+				"start": 110829,
+				"end": 110895,
 				"current": "\t\"selectList\": \"Select a list\",\n\t\"notifications\": \"Notifications\"\n",
 				"baseline": "\t\"selectList\": \"Select a list\"\n"
 			},
 			{
-				"start": 121210,
-				"end": 121284,
+				"start": 121694,
+				"end": 121768,
 				"current": "\t\"selectList\": \"Selecciona una lista\",\n\t\"notifications\": \"Notificaciones\"\n",
 				"baseline": "\t\"selectList\": \"Selecciona una lista\"\n"
 			},
 			{
-				"start": 131421,
-				"end": 131496,
+				"start": 131905,
+				"end": 131980,
 				"current": "\t\"selectList\": \"Sélectionner une liste\",\n\t\"notifications\": \"Notifications\"\n",
 				"baseline": "\t\"selectList\": \"Sélectionner une liste\"\n"
 			},
 			{
-				"start": 141364,
-				"end": 141426,
+				"start": 141848,
+				"end": 141910,
 				"current": "\t\"selectList\": \"Pilih daftar\",\n\t\"notifications\": \"Notifikasi\"\n",
 				"baseline": "\t\"selectList\": \"Pilih daftar\"\n"
 			},
 			{
-				"start": 151592,
-				"end": 151660,
+				"start": 152076,
+				"end": 152144,
 				"current": "\t\"selectList\": \"Seleziona una lista\",\n\t\"notifications\": \"Notifiche\"\n",
 				"baseline": "\t\"selectList\": \"Seleziona una lista\"\n"
 			},
 			{
-				"start": 158693,
-				"end": 158741,
+				"start": 152195,
+				"end": 152246,
+				"current": "\t\"expandUrlPreviewAutomatically\": \"URLプレビューを自動展開\",\n",
+				"baseline": ""
+			},
+			{
+				"start": 159228,
+				"end": 159276,
 				"current": "\t\"selectList\": \"リストを選択\",\n\t\"notifications\": \"通知\"\n",
 				"baseline": "\t\"selectList\": \"リストを選択\"\n"
 			},
 			{
-				"start": 165697,
-				"end": 165745,
+				"start": 166232,
+				"end": 166280,
 				"current": "\t\"selectList\": \"リストを選ぶ\",\n\t\"notifications\": \"通知\"\n",
 				"baseline": "\t\"selectList\": \"リストを選ぶ\"\n"
 			},
 			{
-				"start": 175211,
-				"end": 175270,
+				"start": 175746,
+				"end": 175805,
 				"current": "\t\"selectList\": \"Fren tabdart\",\n\t\"notifications\": \"Ilɣuyen\"\n",
 				"baseline": "\t\"selectList\": \"Fren tabdart\"\n"
 			},
 			{
-				"start": 184746,
-				"end": 184810,
+				"start": 185281,
+				"end": 185345,
 				"current": "\t\"selectList\": \"Select a list\",\n\t\"notifications\": \"ಅಧಿಸೂಚನೆಗಳು\"\n",
 				"baseline": "\t\"selectList\": \"Select a list\"\n"
 			},
 			{
-				"start": 191799,
-				"end": 191847,
+				"start": 192334,
+				"end": 192382,
 				"current": "\t\"selectList\": \"리스트 선택\",\n\t\"notifications\": \"알림\"\n",
 				"baseline": "\t\"selectList\": \"리스트 선택\"\n"
 			},
 			{
-				"start": 201561,
-				"end": 201625,
+				"start": 202096,
+				"end": 202160,
 				"current": "\t\"selectList\": \"Kies een lijst.\",\n\t\"notifications\": \"Meldingen\"\n",
 				"baseline": "\t\"selectList\": \"Kies een lijst.\"\n"
 			},
 			{
-				"start": 211101,
-				"end": 211161,
+				"start": 211636,
+				"end": 211696,
 				"current": "\t\"selectList\": \"Velg en liste\",\n\t\"notifications\": \"Varsler\"\n",
 				"baseline": "\t\"selectList\": \"Velg en liste\"\n"
 			},
 			{
-				"start": 220857,
-				"end": 220923,
+				"start": 221392,
+				"end": 221458,
 				"current": "\t\"selectList\": \"Wybierz listę\",\n\t\"notifications\": \"Powiadomienia\"\n",
 				"baseline": "\t\"selectList\": \"Wybierz listę\"\n"
 			},
 			{
-				"start": 231141,
-				"end": 231212,
+				"start": 231676,
+				"end": 231747,
 				"current": "\t\"selectList\": \"Selecione uma lista\",\n\t\"notifications\": \"Notificações\"\n",
 				"baseline": "\t\"selectList\": \"Selecione uma lista\"\n"
 			},
 			{
-				"start": 241232,
-				"end": 241298,
+				"start": 241767,
+				"end": 241833,
 				"current": "\t\"selectList\": \"Выберите список\",\n\t\"notifications\": \"Уведомления\"\n",
 				"baseline": "\t\"selectList\": \"Выберите список\"\n"
 			},
 			{
-				"start": 250843,
-				"end": 250906,
+				"start": 251378,
+				"end": 251441,
 				"current": "\t\"selectList\": \"Vyberte zoznam\",\n\t\"notifications\": \"Oznámenia\"\n",
 				"baseline": "\t\"selectList\": \"Vyberte zoznam\"\n"
 			},
 			{
-				"start": 260079,
-				"end": 260141,
+				"start": 260614,
+				"end": 260676,
 				"current": "\t\"selectList\": \"เลือกรายชื่อ\",\n\t\"notifications\": \"เเจ้งเตือน\"\n",
 				"baseline": "\t\"selectList\": \"เลือกรายชื่อ\"\n"
 			},
 			{
-				"start": 270272,
-				"end": 270336,
+				"start": 270807,
+				"end": 270871,
 				"current": "\t\"selectList\": \"Bir liste seç\",\n\t\"notifications\": \"Bildirimler\"\n",
 				"baseline": "\t\"selectList\": \"Bir liste seç\"\n"
 			},
 			{
-				"start": 279804,
-				"end": 279870,
+				"start": 280339,
+				"end": 280405,
 				"current": "\t\"selectList\": \"Select a list\",\n\t\"notifications\": \"Notifications\"\n",
 				"baseline": "\t\"selectList\": \"Select a list\"\n"
 			},
 			{
-				"start": 289936,
-				"end": 290001,
+				"start": 290471,
+				"end": 290536,
 				"current": "\t\"selectList\": \"Виберіть список\",\n\t\"notifications\": \"Сповіщення\"\n",
 				"baseline": "\t\"selectList\": \"Виберіть список\"\n"
 			},
 			{
-				"start": 299671,
-				"end": 299734,
+				"start": 300206,
+				"end": 300269,
 				"current": "\t\"selectList\": \"Chọn danh sách\",\n\t\"notifications\": \"Thông báo\"\n",
 				"baseline": "\t\"selectList\": \"Chọn danh sách\"\n"
 			},
 			{
-				"start": 305750,
-				"end": 305796,
+				"start": 306285,
+				"end": 306331,
 				"current": "\t\"selectList\": \"选择列表\",\n\t\"notifications\": \"通知\"\n",
 				"baseline": "\t\"selectList\": \"选择列表\"\n"
 			},
 			{
-				"start": 311895,
-				"end": 311941,
+				"start": 312430,
+				"end": 312476,
 				"current": "\t\"selectList\": \"選擇清單\",\n\t\"notifications\": \"通知\"\n",
 				"baseline": "\t\"selectList\": \"選擇清單\"\n"
 			}
@@ -14288,7 +14613,7 @@ export const globalCatalogPilotOwners = [
 	},
 	{
 		"file": "packages/features/timelines/frontend/pages/antenna-timeline.vue",
-		"currentSha256": "c01fc8c7293a352873939bcc43aedc93d98b263cddbc62caa88e01a401a32dab",
+		"currentSha256": "4fa3ce7f3cc83b4d326cf31af5a335276794984a31b2b57bebe1a627d82b250b",
 		"baselineSha256": "105855c1a5fd86dc64f67c61d3043456d357f2b5e8ff71596ea978cc406562dc",
 		"keys": [
 			"antennas",
@@ -14300,16 +14625,34 @@ export const globalCatalogPilotOwners = [
 		],
 		"edits": [
 			{
-				"start": 527,
-				"end": 527,
+				"start": 520,
+				"end": 520,
 				"current": "",
-				"baseline": "type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\nimport "
+				"baseline": "import type { Locale } from 'i18n';\nconst globalLocale = useLocale<Locale>(import.meta.url);\n\n"
 			},
 			{
-				"start": 999,
-				"end": 1093,
-				"current": ";\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url)",
+				"start": 1001,
+				"end": 1241,
+				"current": "import { antennasCache } from '@features/runtime/frontend/cache.js';\nimport type { MenuItem } from '@features/navigation/frontend/types/menu.js';\nimport type { Locale } from 'i18n';\n\nconst globalLocale = useLocale<Locale>(import.meta.url);\n",
 				"baseline": ""
+			},
+			{
+				"start": 1581,
+				"end": 2221,
+				"current": "async function chooseAntenna(ev: PointerEvent): Promise<void> {\n\tconst antennas = await antennasCache.fetch();\n\tconst items: (MenuItem | undefined)[] = [\n\t\t...antennas.map(x => ({\n\t\t\ttext: x.name,\n\t\t\tindicate: x.hasUnreadNote,\n\t\t\taction: () => {\n\t\t\t\trouter.push('/timeline/antenna/:antennaId', {\n\t\t\t\t\tparams: {\n\t\t\t\t\t\tantennaId: x.id,\n\t\t\t\t\t},\n\t\t\t\t});\n\t\t\t},\n\t\t})),\n\t\t(antennas.length === 0 ? undefined : { type: 'divider' }),\n\t\t{\n\t\t\ticon: 'ti ti-plus',\n\t\t\ttext: globalLocale.value.env.createNew,\n\t\t\taction: () => {\n\t\t\t\trouter.push('/my/antennas');\n\t\t\t},\n\t\t},\n\t];\n\tos.popupMenu(items.filter(i => i != null), ev.currentTarget ?? ev.target);\n}\n\n",
+				"baseline": ""
+			},
+			{
+				"start": 2434,
+				"end": 2538,
+				"current": "\ticon: 'ti ti-switch-horizontal',\n\ttext: $locale.value.sfc.selectAntenna,\n\thandler: chooseAntenna,\n}, {\n",
+				"baseline": ""
+			},
+			{
+				"start": 3477,
+				"end": 3509,
+				"current": "{\n\t\"selectAntenna\": \"アンテナを選択\"\n}\n",
+				"baseline": "{}\n"
 			}
 		]
 	},
@@ -16680,6 +17023,7 @@ const globalValue = (dictionary: unknown, key: string): unknown => {
 
 /** Replay the pre-pilot source only after verifying both complete source boundaries. */
 export function restoreGlobalCatalogPilotSource(file: string, source: string): string {
+	source = restoreCrowdin18171Baseline(file, source);
 	const owner = globalCatalogPilotOwners.find(owner => owner.file === file);
 	if (!owner || sha256(source) === owner.baselineSha256) return source;
 	if (sha256(source) !== owner.currentSha256) throw new Error(`Global catalog pilot source differs: ${file}`);
@@ -16727,7 +17071,7 @@ export function restoreGlobalCatalogPilotDictionary(file: string, language: stri
 	for (const key of owner.keys) {
 		if (JSON.stringify(globalValue(global, key)) !== JSON.stringify(globalValue(locales[language], key))) throw new Error(`Global catalog pilot shared label differs: ${language}:${key}`);
 	}
-	const beforeFollowup = { ...dictionary };
+	const beforeFollowup = collect(restoreCrowdin18171Baseline(file, source));
 	if ('dictionaryEdits' in owner) {
 		for (const edit of owner.dictionaryEdits) {
 			if (edit.language !== language) continue;

@@ -40,7 +40,7 @@ export interface RelationshipsDependencies {
 	followingEntityService: Pick<FollowingEntityService, 'packMany'>;
 	userMutingService: Pick<UserMutingService, 'mute' | 'unmute'>;
 	userRenoteMutingService: Pick<UserRenoteMutingService, 'mute' | 'unmute'>;
-	userListService: Pick<UserListService, 'addMember' | 'removeMember' | 'updateMembership'>;
+	userListService: Pick<UserListService, 'addMember' | 'removeMember' | 'updateMembership' | 'notifyListDeleted'>;
 	idService: Pick<IdService, 'gen'>;
 	mutingsRepository: Pick<MutingsRepository, 'exists' | 'findOneBy' | 'createQueryBuilder'>;
 	renoteMutingsRepository: Pick<RenoteMutingsRepository, 'exists' | 'findOneBy' | 'createQueryBuilder'>;
