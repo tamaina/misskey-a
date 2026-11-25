@@ -24,7 +24,12 @@ export class MahjongStore {
 			await manager.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`mahjong:create:${user}`]);
 			const local = await manager.getRepository(MiUser).countBy({ id: In([...users]), host: IsNull(), isSuspended: false, isDeleted: false });
 			if (local !== 4) throw new RoomError('INVALID_ACTION');
-			const blocked = await manager.getRepository(MiBlocking).countBy({ blockerId: In([...users]), blockeeId: In([...users]) });
+			// Check only blocks involving the inviter so invitation creation cannot act as an oracle
+			// for private block relationships between invitees.
+			const blocked = await manager.getRepository(MiBlocking).countBy([
+				{ blockerId: user, blockeeId: In(invitees) },
+				{ blockerId: In(invitees), blockeeId: user },
+			]);
 			if (blocked) throw new RoomError('INVALID_ACTION');
 			const repo = manager.getRepository(MiMahjongRoom);
 			if (await repo.countBy({ ownerId: user, status: In(['waiting', 'playing']) }) >= 3) throw new RoomError('ROOM_LIMIT');
@@ -61,7 +66,15 @@ export class MahjongStore {
 			if (operation !== 'cancel') expireRoom(row.state, now);
 			let rejected: RoomError | null = null;
 			try {
-				if (operation === 'ready') readyRoom(row.state, user, now);
+				if (operation === 'ready') {
+					const others = row.userIds.filter(member => member !== user);
+					const blocked = await manager.getRepository(MiBlocking).countBy([
+						{ blockerId: user, blockeeId: In(others) },
+						{ blockerId: In(others), blockeeId: user },
+					]);
+					if (blocked) throw new RoomError('INVALID_ACTION');
+					readyRoom(row.state, user, now);
+				}
 				if (operation === 'cancel') cancelRoom(row.state, user);
 				if (operation === 'submit' && input) submitRoom(row.state, user, input.phaseId, input.actionId, input.requestId, now);
 			} catch (error) {

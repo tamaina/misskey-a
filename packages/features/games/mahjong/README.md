@@ -60,7 +60,9 @@ only that user's hand and legal actions, copied public rivers/melds/scores, and 
 names/points. The wall, other hands, ura indicators, raw model/messages, journal and `_paipu` are
 never returned, including after termination. API credentials determine identity, never request
 body seat/user IDs. No stream broadcasts or spectator channels are registered. Unknown rooms and
-nonmember requests share the same error. Room creation checks local/live users and pairwise blocks.
+nonmember requests share the same error. Room creation checks local/live users and blocks involving
+the inviter; readiness checks blocks involving the readying participant so invitation creation
+does not expose third-party block relationships.
 The owner's account deletion cascades room deletion; general room-retention policy is future work.
 
 ## Routes and UI

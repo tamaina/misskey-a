@@ -52,6 +52,14 @@ describe.skipIf(!socket)('isolated PostgreSQL mahjong transport and concurrency'
 		await db.query('INSERT INTO blocking VALUES ($1, $2, $3)', ['b', 'bob', 'alice']);
 		await expect(store.create('alice', users.slice(1))).rejects.toThrow('INVALID_ACTION');
 		await db.query('DELETE FROM blocking');
+		// A private block between two invitees must not fail room creation for an unrelated inviter,
+		// while blocking readiness for the involved participants.
+		await db.query('INSERT INTO blocking VALUES ($1, $2, $3)', ['b2', 'bob', 'carol']);
+		const thirdPartyBlockRoom = await store.create('alice', users.slice(1));
+		await expect(store.access('bob', thirdPartyBlockRoom.id, 'ready')).rejects.toThrow('INVALID_ACTION');
+		await expect(store.access('carol', thirdPartyBlockRoom.id, 'ready')).rejects.toThrow('INVALID_ACTION');
+		await store.access('alice', thirdPartyBlockRoom.id, 'cancel');
+		await db.query('DELETE FROM blocking');
 		const room = await store.create('alice', users.slice(1));
 		await expect(store.access('outsider', room.id, 'show')).rejects.toThrow('NO_SUCH_ROOM');
 		expect(await store.list('outsider')).toEqual([]);
