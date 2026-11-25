@@ -3,19 +3,25 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
-import type { Ref } from 'vue';
-import type { SoundType } from '@features/preferences/frontend/utility/sound.js';
-import type { SoundStore } from '@features/preferences/frontend/state/def.js';
 import { getSoundDuration, playMisskeySfxFile, soundsTypes } from '@features/preferences/frontend/utility/sound.js';
 import FeatureLocaleMessages from '@features/notes/frontend/ts-messages.vue';
 import * as os from '@features/ui/frontend/os.js';
+import type { Locale } from 'i18n';
+import type { Ref } from 'vue';
+import type { SoundType } from '@features/preferences/frontend/utility/sound.js';
+import type { SoundStore } from '@features/preferences/frontend/state/def.js';
+
+function getGlobalLocale() {
+	return useLocale<Locale>(import.meta.url).value.env;
+}
 
 export async function soundSettingsButton(soundSetting: Ref<SoundStore>): Promise<void> {
 	function getSoundTypeName(f: SoundType): string {
 		switch (f) {
 			case null:
-				return FeatureLocaleMessages.$locale.none;
+				return getGlobalLocale().none;
 			case '_driveFile_':
 				return FeatureLocaleMessages.$locale._soundSettings.driveFile;
 			default:
@@ -54,8 +60,8 @@ export async function soundSettingsButton(soundSetting: Ref<SoundStore>): Promis
 						type: 'warning',
 						title: FeatureLocaleMessages.$locale._soundSettings.driveFileDurationWarn,
 						text: FeatureLocaleMessages.$locale._soundSettings.driveFileDurationWarnDescription,
-						okText: FeatureLocaleMessages.$locale.continue,
-						cancelText: FeatureLocaleMessages.$locale.cancel,
+						okText: getGlobalLocale().continue,
+						cancelText: getGlobalLocale().cancel,
 					});
 					if (canceled) return false;
 				}

@@ -73,7 +73,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div class="_spacer" style="--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 16px;">
 				<div class="_buttons">
 					<MkButton primary rounded @click="save"><i class="ti ti-check"></i> {{ $locale.sfc.save }}</MkButton>
-					<MkButton rounded @click="testEmail"><i class="ti ti-send"></i> {{ $locale.sfc.testEmail }}</MkButton>
+					<MkButton rounded :disabled="!canTestEmail" @click="testEmail"><i class="ti ti-send"></i> {{ $locale.sfc.testEmail }}</MkButton>
 				</div>
 			</div>
 		</div>
@@ -104,6 +104,33 @@ const smtpPort = ref(meta.smtpPort);
 const smtpUser = ref(meta.smtpUser);
 const smtpPass = ref(meta.smtpPass);
 
+function getSettings() {
+	return {
+		enableEmail: enableEmail.value,
+		email: email.value,
+		smtpSecure: smtpSecure.value,
+		smtpHost: smtpHost.value,
+		smtpPort: smtpPort.value,
+		smtpUser: smtpUser.value,
+		smtpPass: smtpPass.value,
+	};
+}
+
+// 未入力を表す値（null・空文字・数値欄を空にしたときの NaN）を同じものとして比べる
+function normalizeSettingValue(value: unknown) {
+	if (value === '' || (typeof value === 'number' && Number.isNaN(value))) return null;
+	return value;
+}
+
+// 配信テストは保存済みの設定で行われるため、未保存の変更がある間や、SMTP サーバーが保存されていない間はテストできないようにする
+// メール配信が無効だと送信されずに正常終了し、テストが成功したように見えるため、配信が無効な間もテストできないようにする
+const savedSettings = ref(getSettings());
+const hasUnsavedChanges = computed(() => {
+	const current = getSettings();
+	return (Object.keys(current) as (keyof typeof current)[]).some(key => normalizeSettingValue(current[key]) !== normalizeSettingValue(savedSettings.value[key]));
+});
+const canTestEmail = computed(() => !hasUnsavedChanges.value && savedSettings.value.enableEmail && (savedSettings.value.smtpHost ?? '').trim() !== '');
+
 async function testEmail() {
 	const { canceled, result: destination } = await os.inputText({
 		title: 'To',
@@ -121,15 +148,9 @@ async function testEmail() {
 }
 
 function save() {
-	os.apiWithDialog('admin/update-meta', {
-		enableEmail: enableEmail.value,
-		email: email.value,
-		smtpSecure: smtpSecure.value,
-		smtpHost: smtpHost.value,
-		smtpPort: smtpPort.value,
-		smtpUser: smtpUser.value,
-		smtpPass: smtpPass.value,
-	}).then(() => {
+	const settings = getSettings();
+	os.apiWithDialog('admin/update-meta', settings).then(() => {
+		savedSettings.value = settings;
 		fetchInstance(true);
 	});
 }
@@ -681,7 +702,7 @@ definePage(() => ({
 	"smtpPort": "端口",
 	"smtpUser": "用户名",
 	"smtpPass": "密码",
-	"emptyToDisableSmtpAuth": "用户名和密码留空可以禁用 SMTP 验证",
+	"emptyToDisableSmtpAuth": "将用户名和密码留空可以禁用 SMTP 验证",
 	"smtpSecure": "在 SMTP 连接中使用隐式 SSL / TLS",
 	"smtpSecureInfo": "使用 STARTTLS 时关闭。",
 	"save": "保存",

@@ -17,7 +17,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</button>
 		</li>
 	</ul>
-	<MkButton v-if="choices.length < 10" class="add" @click="add">{{ $locale.sfc.add }}</MkButton>
+	<MkButton v-if="choices.length < 10" class="add" @click="add">{{ globalLocale.env.add }}</MkButton>
 	<MkButton v-else class="add" disabled>{{ $locale.sfc.pollNoMore }}</MkButton>
 	<MkSwitch v-model="multiple">{{ $locale.sfc.pollCanMultipleVote }}</MkSwitch>
 	<section>
@@ -45,6 +45,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, watch } from 'vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
@@ -54,6 +55,9 @@ import { formatDateTimeString } from '@features/ui/frontend/utility/format-time-
 import { addTime } from '@features/ui/frontend/utility/time.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 export type PollEditorModelValue = {
 	expiresAt: number | null;
@@ -239,7 +243,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "تحتاج إلى خيارَين على الأقل",
 	"pollChoiceN": "الخيار {n}",
-	"add": "إضافة",
 	"pollNoMore": "لا يمكنك إضافة خيارات أخرى",
 	"pollCanMultipleVote": "السماح بالإجابات المتعددة",
 	"pollExpiration": "ينتهي استطلاع الرأي في",
@@ -260,7 +263,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "Es necessita escollir dues opcions com a mínim ",
 	"pollChoiceN": "Opció {n}",
-	"add": "Afegir",
 	"pollNoMore": "No pots afegir més opcions",
 	"pollCanMultipleVote": "Permetre escollir diferents opcions",
 	"pollExpiration": "Finalitza el",
@@ -281,7 +283,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "Jsou zapotřebí alespoň dvě možnosti",
 	"pollChoiceN": "Volba {n}",
-	"add": "Přidat",
 	"pollNoMore": "Více už přidat nemůžete",
 	"pollCanMultipleVote": "Umožnit výběr více možností",
 	"pollExpiration": "Ukončení ankety",
@@ -302,7 +303,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "At least two choices are needed",
 	"pollChoiceN": "Choice {n}",
-	"add": "Add",
 	"pollNoMore": "You cannot add more choices",
 	"pollCanMultipleVote": "Allow selecting multiple choices",
 	"pollExpiration": "End poll",
@@ -323,7 +323,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "Es müssen mindestens zwei Antwortmöglichkeiten vorhanden sein",
 	"pollChoiceN": "Auswahl {n}",
-	"add": "Hinzufügen",
 	"pollNoMore": "Du kannst keine weiteren Auswahlmöglichkeiten hinzufügen",
 	"pollCanMultipleVote": "Auswahl mehrerer Antworten erlauben",
 	"pollExpiration": "Abstimmung beenden",
@@ -344,7 +343,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "At least two choices are needed",
 	"pollChoiceN": "Choice {n}",
-	"add": "Add",
 	"pollNoMore": "You cannot add more choices",
 	"pollCanMultipleVote": "Allow selecting multiple choices",
 	"pollExpiration": "End poll",
@@ -365,7 +363,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "Se necesitan al menos 2 opciones",
 	"pollChoiceN": "Opción {n}",
-	"add": "Agregar",
 	"pollNoMore": "No se pueden agregar más",
 	"pollCanMultipleVote": "Permitir seleccionar varias opciones",
 	"pollExpiration": "Termina el",
@@ -386,7 +383,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "Au moins 2 réponses nécéssaires",
 	"pollChoiceN": "Choix {n}",
-	"add": "Ajouter",
 	"pollNoMore": "Vous ne pouvez pas en ajouter davantage",
 	"pollCanMultipleVote": "Autoriser le multi-choix",
 	"pollExpiration": "Fin du sondage",
@@ -407,7 +403,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "Dibutuhkan sedikitnya dua pilihan",
 	"pollChoiceN": "Pilihan {n}",
-	"add": "Tambahkan",
 	"pollNoMore": "Kamu tidak dapat menambahkan pilihan lagi",
 	"pollCanMultipleVote": "Bolehkan memilih banyak",
 	"pollExpiration": "Batas akhir",
@@ -428,7 +423,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "Sono necessarie almeno 2 risposte",
 	"pollChoiceN": "Opzione {n}",
-	"add": "Aggiungi",
 	"pollNoMore": "Hai raggiunto il limite di opzioni.",
 	"pollCanMultipleVote": "Possibilità di risposte multiple",
 	"pollExpiration": "Scadenza",
@@ -449,7 +443,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "選択肢は最低2つ必要です",
 	"pollChoiceN": "選択肢{n}",
-	"add": "追加",
 	"pollNoMore": "これ以上追加できません",
 	"pollCanMultipleVote": "複数回答可",
 	"pollExpiration": "期限",
@@ -470,7 +463,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "選択肢は最低2つ必要やで",
 	"pollChoiceN": "選択肢{n}",
-	"add": "増やす",
 	"pollNoMore": "これ以上追加でけへん",
 	"pollCanMultipleVote": "複数回答可",
 	"pollExpiration": "期限",
@@ -491,7 +483,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "At least two choices are needed",
 	"pollChoiceN": "Choice {n}",
-	"add": "Add",
 	"pollNoMore": "You cannot add more choices",
 	"pollCanMultipleVote": "Allow selecting multiple choices",
 	"pollExpiration": "End poll",
@@ -512,7 +503,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "At least two choices are needed",
 	"pollChoiceN": "Choice {n}",
-	"add": "Add",
 	"pollNoMore": "You cannot add more choices",
 	"pollCanMultipleVote": "Allow selecting multiple choices",
 	"pollExpiration": "End poll",
@@ -533,7 +523,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "투표 항목이 최소 2개 필요합니다",
 	"pollChoiceN": "선택지 {n}",
-	"add": "추가",
 	"pollNoMore": "더 이상 추가할 수 없습니다",
 	"pollCanMultipleVote": "복수 응답 허용",
 	"pollExpiration": "투표 기한",
@@ -554,7 +543,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "At least two choices are needed",
 	"pollChoiceN": "Choice {n}",
-	"add": "Toevoegen",
 	"pollNoMore": "You cannot add more choices",
 	"pollCanMultipleVote": "Allow selecting multiple choices",
 	"pollExpiration": "End poll",
@@ -575,7 +563,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "Trenger minst to valger.",
 	"pollChoiceN": "Valg {n}",
-	"add": "Legg til",
 	"pollNoMore": "Du kan ikke legge til flere.",
 	"pollCanMultipleVote": "Allow selecting multiple choices",
 	"pollExpiration": "End poll",
@@ -596,7 +583,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "Wymagane są przynajmniej dwie opcje",
 	"pollChoiceN": "Opcja {n}",
-	"add": "Dodaj",
 	"pollNoMore": "Nie możesz dodać więcej opcji",
 	"pollCanMultipleVote": "Pozwól na wiele odpowiedzi",
 	"pollExpiration": "Ankieta kończy się",
@@ -617,7 +603,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "São necessárias, no mínimo, duas escolhas",
 	"pollChoiceN": "Escolha {n}",
-	"add": "Adicionar",
 	"pollNoMore": "Você não pode adicionar mais escolhas",
 	"pollCanMultipleVote": "Permitir múltipla seleção",
 	"pollExpiration": "Encerrar enquete",
@@ -638,7 +623,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "Нужно хотя бы два варианта.",
 	"pollChoiceN": "Выбор {n}",
-	"add": "Добавить",
 	"pollNoMore": "Больше вариантов добавить нельзя",
 	"pollCanMultipleVote": "Можно выбрать несколько вариантов",
 	"pollExpiration": "Опрос длится",
@@ -659,7 +643,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "Treba aspoň dve voľby",
 	"pollChoiceN": "Voľba {n}",
-	"add": "Pridať",
 	"pollNoMore": "Nemôžete pridať viac volieb",
 	"pollCanMultipleVote": "Povoliť hlasovať za viac volieb.",
 	"pollExpiration": "Ukončiť hlasovanie",
@@ -680,7 +663,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "จำเป็นต้องมีอย่างน้อยสองตัวเลือก",
 	"pollChoiceN": "ตัวเลือกที่ {n}",
-	"add": "เพิ่ม",
 	"pollNoMore": "เพิ่มตัวเลือกอีกไม่ได้แล้ว",
 	"pollCanMultipleVote": "สามารถตอบได้หลายคำตอบ",
 	"pollExpiration": "สิ้นสุดโพล",
@@ -701,7 +683,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "En az iki seçenek gereklidir.",
 	"pollChoiceN": "Seçim {n}",
-	"add": "Ekle",
 	"pollNoMore": "Daha fazla seçenek ekleyemezsin.",
 	"pollCanMultipleVote": "Birden fazla seçenek seçilmesine izin ver",
 	"pollExpiration": "Anketi sonlandır",
@@ -722,7 +703,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "At least two choices are needed",
 	"pollChoiceN": "Choice {n}",
-	"add": "Add",
 	"pollNoMore": "You cannot add more choices",
 	"pollCanMultipleVote": "Allow selecting multiple choices",
 	"pollExpiration": "End poll",
@@ -743,7 +723,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "Потрібні принаймні два варіанти.",
 	"pollChoiceN": "Варіант {n}",
-	"add": "Додати",
 	"pollNoMore": "Більше варіантів додати не можна",
 	"pollCanMultipleVote": "Можна вибрати кілька варіантів",
 	"pollExpiration": "Опитування закінчується",
@@ -764,7 +743,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "Cần ít nhất hai lựa chọn.",
 	"pollChoiceN": "Lựa chọn {n}",
-	"add": "Thêm",
 	"pollNoMore": "Bạn không thể thêm lựa chọn",
 	"pollCanMultipleVote": "Cho phép chọn nhiều lựa chọn",
 	"pollExpiration": "Thời hạn",
@@ -785,7 +763,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "需要至少两个选项",
 	"pollChoiceN": "选项{n}",
-	"add": "添加",
 	"pollNoMore": "无法再添加更多了",
 	"pollCanMultipleVote": "允许多选",
 	"pollExpiration": "截止时间",
@@ -806,7 +783,6 @@ watch([choices, multiple, expiration, atDate, atTime, after, unit], () => emit('
 {
 	"pollNoOnlyOneChoice": "需要至少兩個選項。",
 	"pollChoiceN": "選項 {n}",
-	"add": "新增",
 	"pollNoMore": "沒辦法再添加選項了",
 	"pollCanMultipleVote": "允許複選",
 	"pollExpiration": "期限",

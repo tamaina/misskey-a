@@ -36,7 +36,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #prefix>@</template>
 				<template #suffix>@{{ host }}</template>
 			</MkInput>
-			<MkButton type="submit" large primary rounded style="margin: 0 auto;" data-testid="signin-page-input-continue">{{ $locale.sfc.continue }} <i class="ti ti-arrow-right"></i></MkButton>
+			<MkButton type="submit" large primary rounded style="margin: 0 auto;" data-testid="signin-page-input-continue">{{ globalLocale.env.continue }} <i class="ti ti-arrow-right"></i></MkButton>
 		</form>
 
 		<!-- パスワードレスログイン -->
@@ -53,17 +53,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref } from 'vue';
 import { toUnicode } from 'punycode.js';
 
 import { query, extractDomain } from '@features/web/frontend/shared/url.js';
 import { host as configHost } from '@features/boot/frontend/shared/config.js';
-import type { OpenOnRemoteOptions } from '@features/auth/frontend/utility/please-login.js';
 import * as os from '@features/ui/frontend/os.js';
 
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import type { OpenOnRemoteOptions } from '@features/auth/frontend/utility/please-login.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	message?: string,
@@ -215,7 +219,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Specify a server host directly",
 	"or": "أو",
 	"username": "اسم المستخدم",
-	"continue": "متابعة",
 	"signinWithPasskey": "Sign in with Passkey"
 }
 </locale>
@@ -229,7 +232,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Especifica un servidor directament",
 	"or": "O",
 	"username": "Nom d'usuari",
-	"continue": "Continuar",
 	"signinWithPasskey": "Inicia sessió amb Passkey"
 }
 </locale>
@@ -243,7 +245,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Specify a server host directly",
 	"or": "Nebo",
 	"username": "Uživatelské jméno",
-	"continue": "Pokračovat",
 	"signinWithPasskey": "Sign in with Passkey"
 }
 </locale>
@@ -257,7 +258,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Specify a server host directly",
 	"or": "Or",
 	"username": "Username",
-	"continue": "Continue",
 	"signinWithPasskey": "Sign in with Passkey"
 }
 </locale>
@@ -271,7 +271,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Server-Host auswählen",
 	"or": "Oder",
 	"username": "Benutzername",
-	"continue": "Fortfahren",
 	"signinWithPasskey": "Mit Passkey anmelden"
 }
 </locale>
@@ -285,7 +284,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Specify a server host directly",
 	"or": "Or",
 	"username": "Username",
-	"continue": "Continue",
 	"signinWithPasskey": "Sign in with Passkey"
 }
 </locale>
@@ -299,7 +297,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Especifica una instancia directamente",
 	"or": "O",
 	"username": "Nombre de usuario",
-	"continue": "Continuar",
 	"signinWithPasskey": "Iniciar sesión con  clave de acceso"
 }
 </locale>
@@ -313,7 +310,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Specify a server host directly",
 	"or": "OU",
 	"username": "Nom d’utilisateur·rice",
-	"continue": "Continuer",
 	"signinWithPasskey": "Se connecter avec une clé d'accès"
 }
 </locale>
@@ -327,7 +323,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Tentukan domain peladen",
 	"or": "atau",
 	"username": "Nama Pengguna",
-	"continue": "Lanjutkan",
 	"signinWithPasskey": "Masuk dengan kunci sandi"
 }
 </locale>
@@ -341,7 +336,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Indica l'indirizzo dell'istanza",
 	"or": "oppure",
 	"username": "Nome utente",
-	"continue": "Continua",
 	"signinWithPasskey": "Accedi con passkey"
 }
 </locale>
@@ -355,7 +349,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "サーバーのドメインを直接指定",
 	"or": "もしくは",
 	"username": "ユーザー名",
-	"continue": "続ける",
 	"signinWithPasskey": "パスキーでログイン"
 }
 </locale>
@@ -369,7 +362,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "サーバーのドメインを直接指定",
 	"or": "それか",
 	"username": "ユーザー名",
-	"continue": "続けるで",
 	"signinWithPasskey": "パスキーでログイン"
 }
 </locale>
@@ -383,7 +375,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Specify a server host directly",
 	"or": "Or",
 	"username": "Isem n umseqdac",
-	"continue": "Continue",
 	"signinWithPasskey": "Sign in with Passkey"
 }
 </locale>
@@ -397,7 +388,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Specify a server host directly",
 	"or": "Or",
 	"username": "ಬಳಕೆಹೆಸರು",
-	"continue": "Continue",
 	"signinWithPasskey": "Sign in with Passkey"
 }
 </locale>
@@ -411,7 +401,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "서버 도메인 직접 지정",
 	"or": "혹은",
 	"username": "유저명",
-	"continue": "계속",
 	"signinWithPasskey": "패스키로 로그인"
 }
 </locale>
@@ -425,7 +414,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Serverhost uitkiezen",
 	"or": "Of",
 	"username": "Gebruikersnaam",
-	"continue": "Continue",
 	"signinWithPasskey": "Sign in with Passkey"
 }
 </locale>
@@ -439,7 +427,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Specify a server host directly",
 	"or": "eller",
 	"username": "Brukernavn",
-	"continue": "Fortsett",
 	"signinWithPasskey": "Sign in with Passkey"
 }
 </locale>
@@ -453,7 +440,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Specify a server host directly",
 	"or": "Lub",
 	"username": "Nazwa użytkownika",
-	"continue": "Continue",
 	"signinWithPasskey": "Sign in with Passkey"
 }
 </locale>
@@ -467,7 +453,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Especificar uma instância diretamente",
 	"or": "Ou",
 	"username": "Nome de usuário",
-	"continue": "Continuar",
 	"signinWithPasskey": "Entrar com Passkey"
 }
 </locale>
@@ -481,7 +466,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Укажите сервер напрямую",
 	"or": "или",
 	"username": "Имя пользователя",
-	"continue": "Продолжить",
 	"signinWithPasskey": "Войдите в систему, используя свой пароль"
 }
 </locale>
@@ -495,7 +479,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Specify a server host directly",
 	"or": "Alebo",
 	"username": "Meno používateľa",
-	"continue": "Continue",
 	"signinWithPasskey": "Sign in with Passkey"
 }
 </locale>
@@ -509,7 +492,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "ระบุโดเมนของเซิร์ฟเวอร์โดยตรง",
 	"or": "หรือ",
 	"username": "ชื่อผู้ใช้",
-	"continue": "ดำเนินการต่อ",
 	"signinWithPasskey": "ลงชื่อเข้าใช้ด้วย Passkey"
 }
 </locale>
@@ -523,7 +505,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Doğrudan bir sunucu ana bilgisayarı belirtin",
 	"or": "veya",
 	"username": "Kullanıcı Adı",
-	"continue": "Devam et",
 	"signinWithPasskey": "Geçiş Anahtarı ile giriş yapın"
 }
 </locale>
@@ -537,7 +518,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Specify a server host directly",
 	"or": "Or",
 	"username": "Username",
-	"continue": "Continue",
 	"signinWithPasskey": "Sign in with Passkey"
 }
 </locale>
@@ -551,7 +531,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Вказати хост сервера вручну",
 	"or": "або",
 	"username": "Ім'я користувача",
-	"continue": "Продовжити",
 	"signinWithPasskey": "Увійти, використовуючи Passkey"
 }
 </locale>
@@ -565,7 +544,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "Thiết lập một máy chủ",
 	"or": "Hoặc",
 	"username": "Tên người dùng",
-	"continue": "Tiếp tục",
 	"signinWithPasskey": "Đăng nhập bằng mật khẩu của bạn"
 }
 </locale>
@@ -579,7 +557,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "直接输入服务器域名",
 	"or": "或者",
 	"username": "用户名",
-	"continue": "继续",
 	"signinWithPasskey": "使用通行密钥登录"
 }
 </locale>
@@ -593,7 +570,6 @@ async function specifyHostAndOpenRemote(options: OpenOnRemoteOptions): Promise<v
 	"specifyServerHost": "直接指定伺服器網域",
 	"or": "或者",
 	"username": "使用者名稱",
-	"continue": "繼續",
 	"signinWithPasskey": "使用通行金鑰登入"
 }
 </locale>

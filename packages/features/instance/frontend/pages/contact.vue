@@ -8,31 +8,31 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div class="_spacer" style="--MI_SPACER-w: 600px; --MI_SPACER-min: 20px;">
 		<div class="_gaps_m">
 			<MkKeyValue :copy="instance.maintainerName">
-				<template #key>{{ $locale.sfc.administrator }}</template>
+				<template #key>{{ globalLocale.env.administrator }}</template>
 				<template #value>
 					<template v-if="instance.maintainerName">{{ instance.maintainerName }}</template>
-					<span v-else style="opacity: 0.7;">({{ $locale.sfc.none }})</span>
+					<span v-else style="opacity: 0.7;">({{ globalLocale.env.none }})</span>
 				</template>
 			</MkKeyValue>
 			<MkKeyValue :copy="instance.maintainerEmail">
 				<template #key>{{ $locale.sfc.contact }}</template>
 				<template #value>
 					<template v-if="instance.maintainerEmail">{{ instance.maintainerEmail }}</template>
-					<span v-else style="opacity: 0.7;">({{ $locale.sfc.none }})</span>
+					<span v-else style="opacity: 0.7;">({{ globalLocale.env.none }})</span>
 				</template>
 			</MkKeyValue>
 			<MkKeyValue :copy="instance.inquiryUrl">
 				<template #key>{{ $locale.sfc.inquiry }}</template>
 				<template #value>
 					<MkLink v-if="instance.inquiryUrl" :url="instance.inquiryUrl" target="_blank">{{ instance.inquiryUrl }}</MkLink>
-					<span v-else style="opacity: 0.7;">({{ $locale.sfc.none }})</span>
+					<span v-else style="opacity: 0.7;">({{ globalLocale.env.none }})</span>
 				</template>
 			</MkKeyValue>
 			<MkFolder @opened="onOpened">
 				<template #icon><i class="ti ti-report-search"></i></template>
 				<template #label>{{ $locale.sfc.deviceInfo }}</template>
 				<template #caption>{{ $locale.sfc.deviceInfoDescription }}</template>
-				<MkLoading v-if="userEnv == null" />
+				<MkLoading v-if="userEnv == null"/>
 				<MkCode v-else lang="json" :code="JSON.stringify(userEnv, null, 2)" style="max-height: 300px; overflow: auto;"/>
 			</MkFolder>
 		</div>
@@ -41,15 +41,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref } from 'vue';
 import { instance } from '@features/instance/frontend/instance.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { getUserEnvironment } from '@features/users/frontend/utility/get-user-environment.js';
-import type { UserEnvironment } from '@features/users/frontend/utility/get-user-environment.js';
 import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkLink from '@features/navigation/frontend/components/MkLink.vue';
 import MkCode from '@features/markup/frontend/components/MkCode.vue';
+import type { UserEnvironment } from '@features/users/frontend/utility/get-user-environment.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const userEnv = ref<UserEnvironment | null>(null);
 
@@ -67,8 +71,6 @@ definePage(() => ({
 
 <locale locale="ar-SA" lang="json">
 {
-	"administrator": "المدير",
-	"none": "لا شيء",
 	"contact": "التواصل",
 	"inquiry": "Contact",
 	"deviceInfo": "Device information",
@@ -78,8 +80,6 @@ definePage(() => ({
 
 <locale locale="ca-ES" lang="json">
 {
-	"administrator": "Administrador/a",
-	"none": "Res",
 	"contact": "Contacte",
 	"inquiry": "Contacte",
 	"deviceInfo": "Informació del dispositiu",
@@ -89,8 +89,6 @@ definePage(() => ({
 
 <locale locale="cs-CZ" lang="json">
 {
-	"administrator": "Administrátor",
-	"none": "Žádný",
 	"contact": "Kontakt",
 	"inquiry": "Contact",
 	"deviceInfo": "Device information",
@@ -100,8 +98,6 @@ definePage(() => ({
 
 <locale locale="da-DK" lang="json">
 {
-	"administrator": "Administrator",
-	"none": "None",
 	"contact": "Contact",
 	"inquiry": "Contact",
 	"deviceInfo": "Device information",
@@ -111,8 +107,6 @@ definePage(() => ({
 
 <locale locale="de-DE" lang="json">
 {
-	"administrator": "Administrator",
-	"none": "Nichts",
 	"contact": "Kontakt",
 	"inquiry": "Kontakt",
 	"deviceInfo": "Geräteinformation",
@@ -122,8 +116,6 @@ definePage(() => ({
 
 <locale locale="en-US" lang="json">
 {
-	"administrator": "Administrator",
-	"none": "None",
 	"contact": "Contact",
 	"inquiry": "Contact",
 	"deviceInfo": "Device information",
@@ -133,8 +125,6 @@ definePage(() => ({
 
 <locale locale="es-ES" lang="json">
 {
-	"administrator": "Administrador",
-	"none": "Ninguna",
 	"contact": "Contacto",
 	"inquiry": "Contacto",
 	"deviceInfo": "Información del dispositivo",
@@ -144,8 +134,6 @@ definePage(() => ({
 
 <locale locale="fr-FR" lang="json">
 {
-	"administrator": "Administrateur",
-	"none": "Rien",
 	"contact": "Contact",
 	"inquiry": "Contact",
 	"deviceInfo": "Device information",
@@ -155,8 +143,6 @@ definePage(() => ({
 
 <locale locale="id-ID" lang="json">
 {
-	"administrator": "Admin",
-	"none": "Tidak ada",
 	"contact": "Kontak",
 	"inquiry": "Hubungi kami",
 	"deviceInfo": "Device information",
@@ -166,8 +152,6 @@ definePage(() => ({
 
 <locale locale="it-IT" lang="json">
 {
-	"administrator": "Amministratore",
-	"none": "Nessuna",
 	"contact": "Contatti",
 	"inquiry": "Contattaci",
 	"deviceInfo": "Informazioni sul dispositivo",
@@ -177,8 +161,6 @@ definePage(() => ({
 
 <locale locale="ja-JP" lang="json">
 {
-	"administrator": "管理者",
-	"none": "なし",
 	"contact": "連絡先",
 	"inquiry": "お問い合わせ",
 	"deviceInfo": "デバイス情報",
@@ -188,8 +170,6 @@ definePage(() => ({
 
 <locale locale="ja-KS" lang="json">
 {
-	"administrator": "管理者",
-	"none": "なし",
 	"contact": "連絡先",
 	"inquiry": "問い合わせ",
 	"deviceInfo": "デバイス情報",
@@ -199,8 +179,6 @@ definePage(() => ({
 
 <locale locale="kab-KAB" lang="json">
 {
-	"administrator": "Administrator",
-	"none": "None",
 	"contact": "Contact",
 	"inquiry": "Contact",
 	"deviceInfo": "Device information",
@@ -210,8 +188,6 @@ definePage(() => ({
 
 <locale locale="kn-IN" lang="json">
 {
-	"administrator": "Administrator",
-	"none": "None",
 	"contact": "Contact",
 	"inquiry": "Contact",
 	"deviceInfo": "Device information",
@@ -221,8 +197,6 @@ definePage(() => ({
 
 <locale locale="ko-KR" lang="json">
 {
-	"administrator": "관리자",
-	"none": "없음",
 	"contact": "연락처",
 	"inquiry": "문의하기",
 	"deviceInfo": "장치 정보",
@@ -232,8 +206,6 @@ definePage(() => ({
 
 <locale locale="nl-NL" lang="json">
 {
-	"administrator": "Beheerder",
-	"none": "Niets",
 	"contact": "Contact",
 	"inquiry": "Contact",
 	"deviceInfo": "Device information",
@@ -243,8 +215,6 @@ definePage(() => ({
 
 <locale locale="no-NO" lang="json">
 {
-	"administrator": "Administrator",
-	"none": "Ingen",
 	"contact": "Kontakt",
 	"inquiry": "Contact",
 	"deviceInfo": "Device information",
@@ -254,8 +224,6 @@ definePage(() => ({
 
 <locale locale="pl-PL" lang="json">
 {
-	"administrator": "Admin",
-	"none": "Brak",
 	"contact": "Kontakt",
 	"inquiry": "Contact",
 	"deviceInfo": "Device information",
@@ -265,8 +233,6 @@ definePage(() => ({
 
 <locale locale="pt-PT" lang="json">
 {
-	"administrator": "Administrador",
-	"none": "Nenhum",
 	"contact": "Contato",
 	"inquiry": "Contato",
 	"deviceInfo": "Device information",
@@ -276,8 +242,6 @@ definePage(() => ({
 
 <locale locale="ru-RU" lang="json">
 {
-	"administrator": "Администратор",
-	"none": "Ничего",
 	"contact": "Почта для связи",
 	"inquiry": "Связаться",
 	"deviceInfo": "Об устройстве",
@@ -287,8 +251,6 @@ definePage(() => ({
 
 <locale locale="sk-SK" lang="json">
 {
-	"administrator": "Administrátor",
-	"none": "Žiadne",
 	"contact": "Kontakt",
 	"inquiry": "Contact",
 	"deviceInfo": "Device information",
@@ -298,8 +260,6 @@ definePage(() => ({
 
 <locale locale="th-TH" lang="json">
 {
-	"administrator": "ผู้ดูแลระบบ",
-	"none": "ไม่มี",
 	"contact": "ติดต่อ",
 	"inquiry": "ติดต่อเรา",
 	"deviceInfo": "รายละเอียดอุปกรณ์",
@@ -309,8 +269,6 @@ definePage(() => ({
 
 <locale locale="tr-TR" lang="json">
 {
-	"administrator": "Yönetici",
-	"none": "Hiçbiri",
 	"contact": "İletişim",
 	"inquiry": "İletişim",
 	"deviceInfo": "Cihaz Bilgileri",
@@ -320,8 +278,6 @@ definePage(() => ({
 
 <locale locale="ug-CN" lang="json">
 {
-	"administrator": "Administrator",
-	"none": "None",
 	"contact": "Contact",
 	"inquiry": "Contact",
 	"deviceInfo": "Device information",
@@ -331,8 +287,6 @@ definePage(() => ({
 
 <locale locale="uk-UA" lang="json">
 {
-	"administrator": "Адмін",
-	"none": "Відсутній",
 	"contact": "Контакт",
 	"inquiry": "Зв'язок",
 	"deviceInfo": "Відомості про пристрій",
@@ -342,8 +296,6 @@ definePage(() => ({
 
 <locale locale="vi-VN" lang="json">
 {
-	"administrator": "Quản trị viên",
-	"none": "Không",
 	"contact": "Liên hệ",
 	"inquiry": "Contact",
 	"deviceInfo": "Device information",
@@ -353,8 +305,6 @@ definePage(() => ({
 
 <locale locale="zh-CN" lang="json">
 {
-	"administrator": "管理员",
-	"none": "无",
 	"contact": "联系方式",
 	"inquiry": "联系我们",
 	"deviceInfo": "设备信息",
@@ -364,8 +314,6 @@ definePage(() => ({
 
 <locale locale="zh-TW" lang="json">
 {
-	"administrator": "管理員",
-	"none": "無",
 	"contact": "聯絡人",
 	"inquiry": "聯絡我們",
 	"deviceInfo": "硬體資訊",

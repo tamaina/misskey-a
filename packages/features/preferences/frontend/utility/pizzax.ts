@@ -7,8 +7,8 @@
 
 // TODO: Misskeyのドメイン知識があるのでutilityなどに移動する
 
+import { TypedBroadcastChannel as BroadcastChannel } from '@features/runtime/frontend/utility/typed-broadcast-channel.js';
 import { customRef, ref, watch, onScopeDispose } from 'vue';
-import { BroadcastChannel } from 'broadcast-channel';
 import type { Ref } from 'vue';
 import { $i } from '@features/auth/frontend/i.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
@@ -127,7 +127,8 @@ export class Pizzax<T extends StateDef> {
 			}
 		}
 
-		this.pizzaxChannel.addEventListener('message', ({ where, key, value, userId }) => {
+		this.pizzaxChannel.addEventListener('message', (ev) => {
+			const { where, key, value, userId } = ev.data;
 			// アカウント変更すればunisonReloadが効くため、このreturnが発火することは
 			// まずないと思うけど一応弾いておく
 			if (where === 'deviceAccount' && !($i && userId !== $i.id)) return;

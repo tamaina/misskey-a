@@ -5,13 +5,14 @@
 
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
+import { In } from 'typeorm';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import type { MiUser } from '@features/users/backend/models/User.js';
 import type { MiBlocking } from '../models/Blocking.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
 import { GlobalEventService } from '@features/runtime/backend/services/GlobalEventService.js';
 import { DI } from '@/di-symbols.js';
-import type { FollowRequestsRepository, BlockingsRepository, UserListsRepository, UserListMembershipsRepository } from '@features/persistence/backend/repositories/models.js';
+import type { FollowRequestsRepository, BlockingsRepository, ChatRoomsRepository, ChatRoomInvitationsRepository } from '@features/persistence/backend/repositories/models.js';
 import { Logger } from '@features/runtime/backend/logging/logger.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { ApRendererService } from '@features/federation/backend/services/ApRendererService.js';
@@ -19,6 +20,7 @@ import { LoggerService } from '@features/runtime/backend/services/LoggerService.
 import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { CacheService } from '@features/users/backend/services/CacheService.js';
+import { UserListService } from './UserListService.js';
 import { UserFollowingService } from './UserFollowingService.js';
 
 @Injectable()
@@ -35,14 +37,15 @@ export class UserBlockingService implements OnModuleInit {
 		@Inject(DI.blockingsRepository)
 		private blockingsRepository: BlockingsRepository,
 
-		@Inject(DI.userListsRepository)
-		private userListsRepository: UserListsRepository,
+		@Inject(DI.chatRoomsRepository)
+		private chatRoomsRepository: ChatRoomsRepository,
 
-		@Inject(DI.userListMembershipsRepository)
-		private userListMembershipsRepository: UserListMembershipsRepository,
+		@Inject(DI.chatRoomInvitationsRepository)
+		private chatRoomInvitationsRepository: ChatRoomInvitationsRepository,
 
 		private cacheService: CacheService,
 		private userEntityService: UserEntityService,
+		private userListService: UserListService,
 		private idService: IdService,
 		private queueService: QueueService,
 		private globalEventService: GlobalEventService,
@@ -64,7 +67,10 @@ export class UserBlockingService implements OnModuleInit {
 			this.cancelRequest(blockee, blocker, silent),
 			this.userFollowingService.unfollow(blocker, blockee, silent),
 			this.userFollowingService.unfollow(blockee, blocker, silent),
-			this.removeFromList(blockee, blocker),
+			// ブロックされたことがリアルタイムで伝わってしまうため、クライアントには通知しない
+			this.userListService.removeMemberFromAllLists(blockee, blocker, { notifyClients: false }),
+			this.removeRoomInvitations(blocker, blockee),
+			this.removeRoomInvitations(blockee, blocker),
 		]);
 
 		const blocking = {
@@ -122,7 +128,7 @@ export class UserBlockingService implements OnModuleInit {
 
 		// リモートにフォローリクエストをしていたらUndoFollow送信
 		if (this.userEntityService.isLocalUser(follower) && this.userEntityService.isRemoteUser(followee)) {
-			const content = this.apRendererService.addContext(this.apRendererService.renderUndo(this.apRendererService.renderFollow(follower, followee), follower));
+			const content = this.apRendererService.addContext(this.apRendererService.renderUndo(this.apRendererService.renderFollow(follower, followee, this.apRendererService.getLocalFollowRequestActivityId(request)), follower));
 			this.queueService.deliver(follower, content, followee.inbox, false);
 		}
 
@@ -134,17 +140,20 @@ export class UserBlockingService implements OnModuleInit {
 	}
 
 	@bindThis
-	private async removeFromList(listOwner: MiUser, user: MiUser) {
-		const userLists = await this.userListsRepository.findBy({
-			userId: listOwner.id,
+	private async removeRoomInvitations(roomOwner: MiUser, user: MiUser) {
+		const rooms = await this.chatRoomsRepository.find({
+			select: { id: true },
+			where: { ownerId: roomOwner.id },
 		});
 
-		for (const userList of userLists) {
-			await this.userListMembershipsRepository.delete({
-				userListId: userList.id,
-				userId: user.id,
-			});
+		if (rooms.length === 0) {
+			return;
 		}
+
+		await this.chatRoomInvitationsRepository.delete({
+			roomId: In(rooms.map(room => room.id)),
+			userId: user.id,
+		});
 	}
 
 	@bindThis

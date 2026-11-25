@@ -5,9 +5,13 @@
 
 import { createHash } from 'node:crypto';
 import * as OTPAuth from 'otpauth';
+import { IsNull, Raw } from 'typeorm';
 import type { MiUserProfile, UserProfilesRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import type * as Redis from 'ioredis';
+
+/** Invalid authentication input; infrastructure failures keep their original error. */
+export class TotpAuthenticationFailed extends Error {}
 
 export class TotpService {
 	constructor(
@@ -22,12 +26,22 @@ export class TotpService {
 	@bindThis
 	public async twoFactorAuthenticate(profile: MiUserProfile, token: string): Promise<void> {
 		if (profile.twoFactorBackupSecret?.includes(token)) {
-			await this.userProfilesRepository.update({ userId: profile.userId }, {
-				twoFactorBackupSecret: profile.twoFactorBackupSecret.filter((secret) => secret !== token),
+			// The database owns consumption: parallel requests must not restore a
+			// different code or accept the same snapshot after it was consumed.
+			const consumed = await this.userProfilesRepository.update({
+				userId: profile.userId,
+				password: profile.password ?? IsNull(),
+				twoFactorEnabled: profile.twoFactorEnabled === true,
+				passkeyMfaEnabled: profile.passkeyMfaEnabled === true,
+				twoFactorSecret: profile.twoFactorSecret ?? IsNull(),
+				twoFactorBackupSecret: Raw(column => `:backupCode = ANY(${column})`, { backupCode: token }),
+			}, {
+				twoFactorBackupSecret: () => 'array_remove("twoFactorBackupSecret", :backupCode)',
 			});
+			if (consumed.affected !== 1) throw new TotpAuthenticationFailed('authentication failed');
 		} else {
 			if (!await this.validateOtp(profile.userId, profile.twoFactorSecret!, token)) {
-				throw new Error('authentication failed');
+				throw new TotpAuthenticationFailed('authentication failed');
 			}
 		}
 	}
@@ -62,7 +76,7 @@ export class TotpService {
 		});
 
 		if (delta === null) {
-			throw new Error('authentication failed');
+			throw new TotpAuthenticationFailed('authentication failed');
 		}
 
 		// 4. totp.counter() を用い、同じタイムスタンプから基準ステップを取得

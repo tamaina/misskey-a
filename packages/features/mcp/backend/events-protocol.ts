@@ -5,11 +5,12 @@
 
 import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 
+import { webhookEventTypes } from '../../integrations/backend/webhook-events.schema.js';
 import type { McpEventName } from './events.schema.js';
 import type { StreamSubscription } from './stream-types.js';
 export { eventNames } from './events.schema.js';
 export type { McpEventName } from './events.schema.js';
-export const eventType = (name: McpEventName) => name === 'note.mentioned' ? 'mention' : name === 'note.replied' ? 'reply' : null;
+export const eventType = (name: McpEventName) => name === 'note.mentioned' ? 'mention' : name === 'note.replied' ? 'reply' : webhookEventTypes.find(type => type === name) ?? null;
 
 export class McpEventError extends Error {
 	constructor(public readonly code: number, message: string, public readonly data?: { reason: string }) { super(message); }

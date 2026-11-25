@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { accessTokenExpired } from '../access-token-expiry.js';
 import { IsNull } from 'typeorm';
 import { BrowserSessionService } from '../services/BrowserSessionService.js';
 import type { BrowserSessionIdentity } from '@features/api/backend/transport/context.js';
@@ -45,13 +46,13 @@ export class AuthenticateService implements OnApplicationShutdown {
 	}
 
 	@bindThis
-	public async authenticate(token: string | null | undefined): Promise<[MiLocalUser | null, MiAccessToken | null, BrowserSessionIdentity?]> {
+	public async authenticate(token: string | null | undefined, usage?: { ip: string; userAgent: string | null }): Promise<[MiLocalUser | null, MiAccessToken | null, BrowserSessionIdentity?]> {
 		if (token == null) {
 			return [null, null];
 		}
 
 		if (token.startsWith('bs_')) {
-			const session = await this.browserSessionService.verify(token);
+			const session = await this.browserSessionService.verify(token, usage);
 			if (!session) throw new AuthenticationError('invalid browser session');
 			// Browser credentials never borrow the legacy user cache or app scopes.
 			const user = await this.usersRepository.findOneBy({ id: session.userId, host: IsNull(), isSuspended: false, isDeleted: false }) as MiLocalUser | null;
@@ -77,7 +78,7 @@ export class AuthenticateService implements OnApplicationShutdown {
 				}],
 			});
 
-			if (accessToken == null) {
+			if (accessToken == null || accessTokenExpired(accessToken)) {
 				throw new AuthenticationError('invalid signature');
 			}
 
@@ -96,6 +97,7 @@ export class AuthenticateService implements OnApplicationShutdown {
 
 				return [user, {
 					id: accessToken.id,
+					expiresAt: accessToken.expiresAt ?? null,
 					permission: app.permission,
 				} as MiAccessToken];
 			} else {

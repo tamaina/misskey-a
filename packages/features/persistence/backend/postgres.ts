@@ -13,6 +13,7 @@ import { bindThis } from '@features/runtime/backend/decorators.js';
 
 import { MiAbuseUserReport } from '@features/moderation/backend/models/AbuseUserReport.js';
 import { MiAbuseReportNotificationRecipient } from '@features/moderation/backend/models/AbuseReportNotificationRecipient.js';
+import { MiOAuthApproval } from '@features/auth/backend/models/OAuthApproval.js';
 import { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
 import { MiAd } from '@features/instance/backend/models/Ad.js';
 import { MiAnnouncement } from '@features/announcements/backend/models/Announcement.js';
@@ -87,8 +88,8 @@ import { MiChatMessage } from '@features/chat/backend/models/ChatMessage.js';
 import { MiChatRoom } from '@features/chat/backend/models/ChatRoom.js';
 import { MiChatRoomMembership } from '@features/chat/backend/models/ChatRoomMembership.js';
 import { MiChatRoomInvitation } from '@features/chat/backend/models/ChatRoomInvitation.js';
-import { MiBubbleGameRecord } from '@features/games/backend/models/BubbleGameRecord.js';
-import { MiReversiGame } from '@features/games/backend/models/ReversiGame.js';
+import { MiBubbleGameRecord } from '@features/games/bubble-game/backend/models/BubbleGameRecord.js';
+import { MiReversiGame } from '@features/games/reversi/backend/models/ReversiGame.js';
 import { MiChatApproval } from '@features/chat/backend/models/ChatApproval.js';
 import { MiSystemAccount } from '@features/users/backend/models/SystemAccount.js';
 
@@ -191,6 +192,7 @@ export const entities = [
 	MiAvatarDecoration,
 	MiAuthSession,
 	MiBrowserSession,
+	MiOAuthApproval,
 	MiAccessToken,
 	MiUser,
 	MiUserProfile,

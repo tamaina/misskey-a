@@ -98,7 +98,7 @@ the implementations are now in the assigned feature directories.
 - `announcements/backend/templates`: `announcement.tsx`.
 - `pages/backend/templates`: `page.tsx`.
 - `play/backend/templates`: `flash.tsx`.
-- `games/backend/templates`: `reversi-game.tsx`.
+- `games/reversi/backend/templates`: `reversi-game.tsx`.
 
 Email has no standalone template files in the current tree. Its common wrapper
 is inline in EmailService; auth/report message bodies belong to their calling
@@ -339,7 +339,7 @@ existing frontend-owned runner, compiler and lint configuration:
 | Owner | Candidates relative to `packages/frontend/` |
 | --- | --- |
 | users | `test/unit/home.test.ts` (user profile home) |
-| drive | `test/unit/note.test.ts` (actually `MkMediaImage`), `test/unit/uploader-locale-migration.test.ts` |
+| drive | `test/unit/note.test.ts` (actually `MkMediaImage`) |
 | emojis | `test/unit/emoji.test.ts` |
 | markup | `test/unit/url-preview.test.ts` |
 | ui | `test/unit/result-locale.test.ts` |

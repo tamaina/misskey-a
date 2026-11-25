@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #preview>
 			<canvas ref="canvasEl" :class="$style.previewCanvas"></canvas>
 			<div :class="$style.previewContainer">
-				<div class="_acrylic" :class="$style.previewTitle">{{ $locale.sfc.preview }}</div>
+				<div class="_acrylic" :class="$style.previewTitle">{{ globalLocale.env.preview }}</div>
 				<div v-if="props.image == null" class="_acrylic" :class="$style.previewControls">
 					<button class="_button" :class="[$style.previewControlsButton, sampleImageType === '3_2' ? $style.active : null]" @click="sampleImageType = '3_2'"><i class="ti ti-crop-landscape"></i></button>
 					<button class="_button" :class="[$style.previewControlsButton, sampleImageType === '2_3' ? $style.active : null]" @click="sampleImageType = '2_3'"><i class="ti ti-crop-portrait"></i></button>
@@ -57,7 +57,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 					<div class="_gaps">
 						<MkSwitch v-model="params.labelTop.enabled">
-							<template #label>{{ $locale.sfc.show }}</template>
+							<template #label>{{ globalLocale.env.show }}</template>
 						</MkSwitch>
 
 						<MkRange v-model="params.labelTop.padding" :min="0.01" :max="0.5" :step="0.01" :continuousUpdate="true">
@@ -91,7 +91,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 					<div class="_gaps">
 						<MkSwitch v-model="params.labelBottom.enabled">
-							<template #label>{{ $locale.sfc.show }}</template>
+							<template #label>{{ globalLocale.env.show }}</template>
 						</MkSwitch>
 
 						<MkRange v-model="params.labelBottom.padding" :min="0.01" :max="0.5" :step="0.01" :continuousUpdate="true">
@@ -153,11 +153,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, useTemplateRef, watch, onMounted, onUnmounted, reactive, nextTick } from 'vue';
 import ExifReader from 'exifreader';
 import { throttle } from 'throttle-debounce';
 import MkPreviewWithControls from '@features/markup/frontend/components/MkPreviewWithControls.vue';
-import type { ImageFrameParams, ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
 import { ImageFrameRenderer } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
@@ -171,6 +171,10 @@ import * as os from '@features/ui/frontend/os.js';
 import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
+import type { ImageFrameParams, ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 
@@ -360,7 +364,7 @@ onUnmounted(() => {
 async function save() {
 	if (props.presetEditMode) {
 		const { canceled, result: name } = await os.inputText({
-			title: $locale.value.sfc.name,
+			title: globalLocale.value.env.name,
 			default: preset.name,
 		});
 		if (canceled) return;
@@ -470,9 +474,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "الإسم",
 	"title": "Edit frame",
-	"preview": "معاينة",
 	"borderThickness": "Frame width",
 	"backgroundColor": "Background color",
 	"textColor": "Text color",
@@ -480,7 +482,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "الخط",
 	"header": "Header",
-	"show": "المظهر",
 	"labelThickness": "Label width",
 	"labelScale": "Label scale",
 	"centered": "Centered",
@@ -515,9 +516,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Sortir sense desar?",
 	"failedToLoadImage": "Error en carregar la imatge",
-	"name": "Nom",
 	"title": "Edició de fotogrames ",
-	"preview": "Vista prèvia",
 	"borderThickness": "Amplada de la vora",
 	"backgroundColor": "Color del fons",
 	"textColor": "Color del text",
@@ -525,7 +524,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "Lletra tipogràfica",
 	"header": "Capçalera",
-	"show": "Veure",
 	"labelThickness": "Amplada de l'etiqueta ",
 	"labelScale": "Mida de l'etiqueta ",
 	"centered": "Alinea al centre",
@@ -560,9 +558,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Jméno",
 	"title": "Edit frame",
-	"preview": "Náhled",
 	"borderThickness": "Frame width",
 	"backgroundColor": "Background color",
 	"textColor": "Text color",
@@ -570,7 +566,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "Písmo",
 	"header": "Nadpis",
-	"show": "Zobrazit",
 	"labelThickness": "Label width",
 	"labelScale": "Label scale",
 	"centered": "Centered",
@@ -605,9 +600,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Name",
 	"title": "Edit frame",
-	"preview": "Preview",
 	"borderThickness": "Frame width",
 	"backgroundColor": "Background color",
 	"textColor": "Text color",
@@ -615,7 +608,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "Font",
 	"header": "Header",
-	"show": "Show",
 	"labelThickness": "Label width",
 	"labelScale": "Label scale",
 	"centered": "Centered",
@@ -650,9 +642,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Nicht gespeicherte Änderungen verwerfen?",
 	"failedToLoadImage": "Das Laden des Bildes ist fehlgeschlagen.",
-	"name": "Name",
 	"title": "Rahmenbearbeitung",
-	"preview": "Vorschau",
 	"borderThickness": "Randbreite",
 	"backgroundColor": "Hintergrundfarbe",
 	"textColor": "Textfarbe",
@@ -660,7 +650,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "Schriftart",
 	"header": "Kopfzeile",
-	"show": "Anzeigen",
 	"labelThickness": "Beschriftungsbreite",
 	"labelScale": "Etikettenskala",
 	"centered": "Zentriert",
@@ -695,9 +684,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Name",
 	"title": "Edit frame",
-	"preview": "Preview",
 	"borderThickness": "Frame width",
 	"backgroundColor": "Background color",
 	"textColor": "Text color",
@@ -705,7 +692,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "Font",
 	"header": "Header",
-	"show": "Show",
 	"labelThickness": "Label width",
 	"labelScale": "Label scale",
 	"centered": "Centered",
@@ -740,9 +726,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "¿Descartar cambios no guardados?",
 	"failedToLoadImage": "Error al cargar la imagen",
-	"name": "Nombre",
 	"title": "Edición de Fotos",
-	"preview": "Vista previa",
 	"borderThickness": "Ancho del borde",
 	"backgroundColor": "Color de fondo",
 	"textColor": "Color del texto",
@@ -750,7 +734,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "Fuente",
 	"header": "Título",
-	"show": "Apariencia",
 	"labelThickness": "Ancho de la etiqueta",
 	"labelScale": "Escala de la Etiqueta",
 	"centered": "Alinear al centro",
@@ -785,9 +768,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Nom",
 	"title": "Edit frame",
-	"preview": "Aperçu",
 	"borderThickness": "Frame width",
 	"backgroundColor": "Background color",
 	"textColor": "Text color",
@@ -795,7 +776,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "Police de caractères",
 	"header": "Entête",
-	"show": "Affichage",
 	"labelThickness": "Label width",
 	"labelScale": "Label scale",
 	"centered": "Centered",
@@ -830,9 +810,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Nama",
 	"title": "Edit frame",
-	"preview": "Pratinjau",
 	"borderThickness": "Frame width",
 	"backgroundColor": "Warna latar belakang",
 	"textColor": "Text color",
@@ -840,7 +818,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "Font",
 	"header": "Header",
-	"show": "Tampilkan",
 	"labelThickness": "Label width",
 	"labelScale": "Label scale",
 	"centered": "Centered",
@@ -875,9 +852,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Uscire senza salvare?",
 	"failedToLoadImage": "Impossibile caricare l'immagine",
-	"name": "Nome",
 	"title": "Modifica fotogramma",
-	"preview": "Anteprima",
 	"borderThickness": "Larghezza del bordo",
 	"backgroundColor": "Colore dello sfondo",
 	"textColor": "Colore del testo",
@@ -885,7 +860,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "Tipo di carattere",
 	"header": "Intestazione",
-	"show": "Visualizza",
 	"labelThickness": "Spessore etichetta",
 	"labelScale": "Dimensione etichetta",
 	"centered": "Allinea al centro",
@@ -920,9 +894,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "保存せずに終了しますか？",
 	"failedToLoadImage": "画像の読み込みに失敗しました",
-	"name": "名前",
 	"title": "フレームの編集",
-	"preview": "プレビュー",
 	"borderThickness": "フチの幅",
 	"backgroundColor": "背景色",
 	"textColor": "文字色",
@@ -930,7 +902,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "セリフ",
 	"font": "フォント",
 	"header": "ヘッダー",
-	"show": "表示",
 	"labelThickness": "ラベルの幅",
 	"labelScale": "ラベルのスケール",
 	"centered": "中央揃え",
@@ -965,9 +936,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "保存せずに終わってもええんか？",
 	"failedToLoadImage": "あかん、画像読み込まれへんわ",
-	"name": "名前",
 	"title": "フレームの編集",
-	"preview": "プレビュー",
 	"borderThickness": "フチの幅",
 	"backgroundColor": "背景色",
 	"textColor": "文字色",
@@ -975,7 +944,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "セリフ",
 	"font": "フォント",
 	"header": "ヘッダー",
-	"show": "表示",
 	"labelThickness": "ラベルの幅",
 	"labelScale": "ラベルのスケール",
 	"centered": "中央揃え",
@@ -1010,9 +978,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Name",
 	"title": "Edit frame",
-	"preview": "Preview",
 	"borderThickness": "Frame width",
 	"backgroundColor": "Background color",
 	"textColor": "Text color",
@@ -1020,7 +986,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "Tasefsit",
 	"header": "Header",
-	"show": "Show",
 	"labelThickness": "Label width",
 	"labelScale": "Label scale",
 	"centered": "Centered",
@@ -1055,9 +1020,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Name",
 	"title": "Edit frame",
-	"preview": "Preview",
 	"borderThickness": "Frame width",
 	"backgroundColor": "Background color",
 	"textColor": "Text color",
@@ -1065,7 +1028,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "Font",
 	"header": "Header",
-	"show": "Show",
 	"labelThickness": "Label width",
 	"labelScale": "Label scale",
 	"centered": "Centered",
@@ -1100,9 +1062,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "보존하지 않고 종료하시겠습니까?",
 	"failedToLoadImage": "이미지 로드에 실패했습니다.",
-	"name": "이름",
 	"title": "프레임 편집",
-	"preview": "미리보기",
 	"borderThickness": "테두리의 폭",
 	"backgroundColor": "배경색",
 	"textColor": "글꼴 색상",
@@ -1110,7 +1070,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "명조체",
 	"font": "폰트",
 	"header": "헤더",
-	"show": "표시",
 	"labelThickness": "라벨의 폭",
 	"labelScale": "라벨의 스케일",
 	"centered": "중앙 정렬",
@@ -1145,9 +1104,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Naam",
 	"title": "Edit frame",
-	"preview": "Voorbeeld",
 	"borderThickness": "Frame width",
 	"backgroundColor": "Background color",
 	"textColor": "Text color",
@@ -1155,7 +1112,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "Font",
 	"header": "Header",
-	"show": "Weergave",
 	"labelThickness": "Label width",
 	"labelScale": "Label scale",
 	"centered": "Centered",
@@ -1190,9 +1146,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Navn",
 	"title": "Edit frame",
-	"preview": "Preview",
 	"borderThickness": "Frame width",
 	"backgroundColor": "Background color",
 	"textColor": "Text color",
@@ -1200,7 +1154,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "Font",
 	"header": "Header",
-	"show": "Vis",
 	"labelThickness": "Label width",
 	"labelScale": "Label scale",
 	"centered": "Centered",
@@ -1235,9 +1188,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Nazwa",
 	"title": "Edit frame",
-	"preview": "Podgląd",
 	"borderThickness": "Frame width",
 	"backgroundColor": "Background color",
 	"textColor": "Text color",
@@ -1245,7 +1196,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Szeryfowa",
 	"font": "Czcionka",
 	"header": "Nagłówek",
-	"show": "Wyświetlanie",
 	"labelThickness": "Label width",
 	"labelScale": "Label scale",
 	"centered": "Centered",
@@ -1280,9 +1230,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Descartar mudanças?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Nome",
 	"title": "Edit frame",
-	"preview": "Pré-visualizar",
 	"borderThickness": "Frame width",
 	"backgroundColor": "Background color",
 	"textColor": "Text color",
@@ -1290,7 +1238,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "Fonte",
 	"header": "Cabeçalho",
-	"show": "Visualizar",
 	"labelThickness": "Label width",
 	"labelScale": "Label scale",
 	"centered": "Centered",
@@ -1325,9 +1272,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Выйти без сохранения?",
 	"failedToLoadImage": "Не удалось загрузить изображение",
-	"name": "Название",
 	"title": "Редактировать рамку",
-	"preview": "Предпросмотр",
 	"borderThickness": "Толщина рамки",
 	"backgroundColor": "Цвет фона",
 	"textColor": "Цвет текста",
@@ -1335,7 +1280,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Антиква (с засечками)",
 	"font": "Шрифт",
 	"header": "Заголовок",
-	"show": "Показать",
 	"labelThickness": "Толщина границ",
 	"labelScale": "Label scale",
 	"centered": "Centered",
@@ -1370,9 +1314,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Názov",
 	"title": "Edit frame",
-	"preview": "Náhľad",
 	"borderThickness": "Frame width",
 	"backgroundColor": "Background color",
 	"textColor": "Text color",
@@ -1380,7 +1322,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Pätkové",
 	"font": "Písmo",
 	"header": "Hlavička",
-	"show": "Zobraziť",
 	"labelThickness": "Label width",
 	"labelScale": "Label scale",
 	"centered": "Centered",
@@ -1415,9 +1356,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "ต้องการออกโดยไม่บันทึกหรือไม่?",
 	"failedToLoadImage": "โหลดภาพล้มเหลว",
-	"name": "ชื่อ",
 	"title": "แก้ไขเฟรม",
-	"preview": "แสดงตัวอย่าง",
 	"borderThickness": "ความกว้างขอบ",
 	"backgroundColor": "สีพื้นหลัง",
 	"textColor": "สีตัวอักษร",
@@ -1425,7 +1364,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "แบบอักษร",
 	"header": "ส่วนหัว",
-	"show": "แสดงผล",
 	"labelThickness": "ความกว้างป้าย",
 	"labelScale": "สเกลของป้าย",
 	"centered": "จัดกึ่งกลาง",
@@ -1460,9 +1398,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Kaydedilmemiş değişiklikleri silmek ister misin?",
 	"failedToLoadImage": "Görüntü yükleme başarısız oldu ",
-	"name": "İsim",
 	"title": "Düzenleme kareleri",
-	"preview": "Önizleme",
 	"borderThickness": "jantın genişliği",
 	"backgroundColor": "Arka Plan Rengi ",
 	"textColor": "Metin Rengi ",
@@ -1470,7 +1406,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "Yazı tipi",
 	"header": "Başlık",
-	"show": "Göster",
 	"labelThickness": "Etiket genişliği",
 	"labelScale": "Etiket ölçeği",
 	"centered": "Merkezlenmiş",
@@ -1505,9 +1440,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Name",
 	"title": "Edit frame",
-	"preview": "Preview",
 	"borderThickness": "Frame width",
 	"backgroundColor": "Background color",
 	"textColor": "Text color",
@@ -1515,7 +1448,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "Font",
 	"header": "Header",
-	"show": "Show",
 	"labelThickness": "Label width",
 	"labelScale": "Label scale",
 	"centered": "Centered",
@@ -1550,9 +1482,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Вийти без збереження?",
 	"failedToLoadImage": "Не вдалося завантажити зображення",
-	"name": "Ім'я",
 	"title": "Редагувати рамку",
-	"preview": "Попередній перегляд",
 	"borderThickness": "Товщина рамки",
 	"backgroundColor": "Колір фону",
 	"textColor": "Колір тексту",
@@ -1560,7 +1490,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "Шрифт",
 	"header": "Заголовок",
-	"show": "Відображення",
 	"labelThickness": "Label width",
 	"labelScale": "Розмір ",
 	"centered": "Центрувати",
@@ -1595,9 +1524,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "Discard unsaved changes?",
 	"failedToLoadImage": "Failed to load image",
-	"name": "Tên",
 	"title": "Edit frame",
-	"preview": "Xem trước",
 	"borderThickness": "Frame width",
 	"backgroundColor": "Background color",
 	"textColor": "Text color",
@@ -1605,7 +1532,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "Serif",
 	"font": "Phông chữ",
 	"header": "Ảnh bìa",
-	"show": "Hiển thị",
 	"labelThickness": "Label width",
 	"labelScale": "Label scale",
 	"centered": "Centered",
@@ -1640,9 +1566,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "放弃未保存的更改？",
 	"failedToLoadImage": "图片加载失败",
-	"name": "名称",
 	"title": "编辑边框",
-	"preview": "预览",
 	"borderThickness": "边框宽度",
 	"backgroundColor": "背景颜色",
 	"textColor": "文本颜色",
@@ -1650,7 +1574,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "衬线字体",
 	"font": "字体",
 	"header": "顶栏",
-	"show": "显示",
 	"labelThickness": "标签宽度",
 	"labelScale": "标签比例",
 	"centered": "居中",
@@ -1685,9 +1608,7 @@ function getRgb(hex: string | number): [number, number, number] | null {
 {
 	"quitWithoutSaveConfirm": "不儲存就退出嗎？",
 	"failedToLoadImage": "圖片載入失敗",
-	"name": "名稱",
 	"title": "編輯邊框",
-	"preview": "預覽",
 	"borderThickness": "邊框寬度",
 	"backgroundColor": "背景顏色",
 	"textColor": "文字顏色",
@@ -1695,7 +1616,6 @@ function getRgb(hex: string | number): [number, number, number] | null {
 	"fontSerif": "襯線體",
 	"font": "字型",
 	"header": "標題",
-	"show": "檢視",
 	"labelThickness": "標籤寬度",
 	"labelScale": "標籤縮放比例",
 	"centered": "置中對齊",

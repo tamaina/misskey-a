@@ -17,6 +17,12 @@ import { NotificationService } from '@features/notifications/backend/services/No
 import type { AuthSessionRequest, AuthSessionEffects } from '../session.effects.js';
 import { BrowserSessionService } from '../services/BrowserSessionService.js';
 import { toSessionHeaders } from '../session.schema.js';
+import { MiUser } from '@features/users/backend/models/User.js';
+import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
+import { MiUserSecurityKey } from '../models/UserSecurityKey.js';
+import { MiBrowserSession } from '../models/BrowserSession.js';
+import { assertCurrentSigninAssurance, assertSigninDeadline, consumeSigninAssurance, SigninPolicyError } from '../signin-assurance.js';
+import type { SigninAssurance } from '../signin-assurance.js';
 
 @Injectable()
 export class SigninService {
@@ -37,22 +43,46 @@ export class SigninService {
 	}
 
 	@bindThis
-	public async signin(request: AuthSessionRequest, reply: AuthSessionEffects, user: Pick<MiLocalUser, 'id' | 'token'>): Promise<{ finished: true; id: string; i: string }> {
-		const { token } = await this.browserSessionService.issue(user.id);
+	public async signin(request: AuthSessionRequest, reply: AuthSessionEffects, user: Pick<MiLocalUser, 'id' | 'token'>, proof: SigninAssurance): Promise<{ finished: true; id: string; i: string }> {
+		consumeSigninAssurance(proof, user.id);
+		const { token, session } = await this.userProfilesRepository.manager.transaction(async manager => {
+			// Match account deletion and token regeneration: user precedes profile/session locks.
+			const current = await manager.getRepository(MiUser).findOne({ where: { id: user.id }, lock: { mode: 'pessimistic_write' } });
+			if (!current) throw new SigninPolicyError();
+			const profile = await manager.getRepository(MiUserProfile).findOne({ where: { userId: user.id }, lock: { mode: 'pessimistic_write' } });
+			if (!profile) throw new SigninPolicyError();
+			const keys = await manager.getRepository(MiUserSecurityKey).findBy({ userId: user.id });
+			assertCurrentSigninAssurance(proof, current, profile, keys);
+			const issued = await this.browserSessionService.issue(user.id, manager.getRepository(MiBrowserSession), { ip: request.ip, userAgent: typeof request.headers['user-agent'] === 'string' ? request.headers['user-agent'] : null });
+			assertSigninDeadline(proof);
+			return issued;
+		});
+		return this.completeSignin(request, reply, user.id, token, session.id);
+	}
+
+	@bindThis
+	public async signinSignup(request: AuthSessionRequest, reply: AuthSessionEffects, account: Pick<MiLocalUser, 'id' | 'token'>): Promise<{ finished: true; id: string; i: string }> {
+		const { token, session } = await this.browserSessionService.issueForNewAccount(account, { ip: request.ip, userAgent: typeof request.headers['user-agent'] === 'string' ? request.headers['user-agent'] : null });
+		return this.completeSignin(request, reply, account.id, token, session.id);
+	}
+
+	private completeSignin(request: AuthSessionRequest, reply: AuthSessionEffects, userId: string, token: string, browserSessionId: string): { finished: true; id: string; i: string } {
+		// The transaction has committed before any login side effect is scheduled.
 		setImmediate(async () => {
-			this.notificationService.createNotification(user.id, 'login', {});
+			this.notificationService.createNotification(userId, 'login', {});
 
 			const record = await this.signinsRepository.insertOne({
 				id: this.idService.gen(),
-				userId: user.id,
+				userId,
+				browserSessionId,
 				ip: request.ip,
 				headers: toSessionHeaders(request.headers),
 				success: true,
 			});
 
-			this.globalEventService.publishMainStream(user.id, 'signin', await this.signinEntityService.pack(record));
+			this.globalEventService.publishMainStream(userId, 'signin', await this.signinEntityService.pack(record));
 
-			const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
+			const profile = await this.userProfilesRepository.findOneByOrFail({ userId });
 			if (profile.email && profile.emailVerified) {
 				this.emailService.sendEmail(profile.email, 'New login / ログインがありました',
 					'There is a new login. If you do not recognize this login, update the security status of your account, including changing your password. / 新しいログインがありました。このログインに心当たりがない場合は、パスワードを変更するなど、アカウントのセキュリティ状態を更新してください。',
@@ -63,7 +93,7 @@ export class SigninService {
 		reply.code(200);
 		return {
 			finished: true,
-			id: user.id,
+			id: userId,
 			i: token,
 		};
 	}

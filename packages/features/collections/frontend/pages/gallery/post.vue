@@ -26,10 +26,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<MkButton v-else v-tooltip="$locale.sfc.like" class="button" @click="like()"><i class="ti ti-heart"></i><span v-if="post.likedCount > 0" class="count">{{ post.likedCount }}</span></MkButton>
 							</div>
 							<div class="other">
-								<button v-if="$i && $i.id === post.user.id" v-tooltip="$locale.sfc.edit" v-click-anime class="_button" @click="edit"><i class="ti ti-pencil ti-fw"></i></button>
+								<button v-if="$i && $i.id === post.user.id" v-tooltip="globalLocale.env.edit" v-click-anime class="_button" @click="edit"><i class="ti ti-pencil ti-fw"></i></button>
 								<button v-tooltip="$locale.sfc.shareWithNote" v-click-anime class="_button" @click="shareWithNote"><i class="ti ti-repeat ti-fw"></i></button>
 								<button v-tooltip="$locale.sfc.copyLink" v-click-anime class="_button" @click="copyLink"><i class="ti ti-link ti-fw"></i></button>
-								<button v-if="isSupportShare()" v-tooltip="$locale.sfc.share" v-click-anime class="_button" @click="share"><i class="ti ti-share ti-fw"></i></button>
+								<button v-if="isSupportShare()" v-tooltip="globalLocale.env.share" v-click-anime class="_button" @click="share"><i class="ti ti-share ti-fw"></i></button>
 								<button v-if="$i && $i.id !== post.user.id" v-click-anime class="_button" @click="showMenu"><i class="ti ti-dots ti-fw"></i></button>
 							</div>
 						</div>
@@ -62,10 +62,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, watch, ref, defineAsyncComponent, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
 import { url } from '@features/boot/frontend/shared/config.js';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
@@ -80,6 +80,10 @@ import { isSupportShare } from '@features/navigation/frontend/utility/navigator.
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const router = useRouter();
 
@@ -192,7 +196,7 @@ function showMenu(ev: PointerEvent) {
 				type: 'divider',
 			}, {
 				icon: 'ti ti-trash',
-				text: $locale.value.sfc.delete,
+				text: globalLocale.value.env.delete,
 				danger: true,
 				action: () => os.confirm({
 					type: 'warning',
@@ -340,15 +344,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "أتريد إلغاء إعجابك؟",
 	"reportAbuse": "أبلغ",
-	"delete": "حذف",
 	"deleteConfirm": "أمتأكد من الحذف؟",
 	"gallery": "المعرض",
 	"unlike": "أزل الإعجاب",
 	"like": "أعجبني",
-	"edit": "التعديل",
 	"shareWithNote": "شاركه في ملاحظة",
 	"copyLink": "انسخ الرابط",
-	"share": "شارِك",
 	"recentPosts": "المشاركات الحديثة"
 }
 </locale>
@@ -357,15 +358,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "Vols esborrar el teu m'agrada?",
 	"reportAbuse": "Denuncia un abús ",
-	"delete": "Elimina",
 	"deleteConfirm": "Segur que vols esborrar?",
 	"gallery": "Galeria",
 	"unlike": "Ja no m'agrada",
 	"like": "M'agrada ",
-	"edit": "Editar",
 	"shareWithNote": "Comparteix amb una nota",
 	"copyLink": "Copia l'enllaç",
-	"share": "Comparteix",
 	"recentPosts": "Articles recents"
 }
 </locale>
@@ -374,15 +372,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "Opravdu chcete odstranit like?",
 	"reportAbuse": "Nahlášení",
-	"delete": "Smazat",
 	"deleteConfirm": "Opravdu smazat?",
 	"gallery": "Galerie",
 	"unlike": "Už se mi to nelíbí",
 	"like": "To se mi líbí",
-	"edit": "Upravit",
 	"shareWithNote": "Sdílet s poznámkou",
 	"copyLink": "Kopírovat odkaz",
-	"share": "Sdílet",
 	"recentPosts": "Poslední příspěvky"
 }
 </locale>
@@ -391,15 +386,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "Really remove your like?",
 	"reportAbuse": "Report",
-	"delete": "Delete",
 	"deleteConfirm": "Really delete?",
 	"gallery": "Gallery",
 	"unlike": "Remove like",
 	"like": "Like",
-	"edit": "Edit",
 	"shareWithNote": "Share with note",
 	"copyLink": "Copy link",
-	"share": "Share",
 	"recentPosts": "Recent posts"
 }
 </locale>
@@ -408,15 +400,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "\"Gefällt mir\" wirklich entfernen?",
 	"reportAbuse": "Melden",
-	"delete": "Löschen",
 	"deleteConfirm": "Wirklich löschen?",
 	"gallery": "Galerie",
 	"unlike": "\"Gefällt mir\" entfernen",
 	"like": "Gefällt mir",
-	"edit": "Bearbeiten",
 	"shareWithNote": "Mit Notiz teilen",
 	"copyLink": "Link kopieren",
-	"share": "Teilen",
 	"recentPosts": "Neue Beiträge"
 }
 </locale>
@@ -425,15 +414,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "Really remove your like?",
 	"reportAbuse": "Report",
-	"delete": "Delete",
 	"deleteConfirm": "Really delete?",
 	"gallery": "Gallery",
 	"unlike": "Remove like",
 	"like": "Like",
-	"edit": "Edit",
 	"shareWithNote": "Share with note",
 	"copyLink": "Copy link",
-	"share": "Share",
 	"recentPosts": "Recent posts"
 }
 </locale>
@@ -442,15 +428,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "¿Quitar como favorito?",
 	"reportAbuse": "Reportar",
-	"delete": "Borrar",
 	"deleteConfirm": "¿Desea eliminarlo?",
 	"gallery": "Galería",
 	"unlike": "Quitar me gusta",
 	"like": "¡Muy bien!",
-	"edit": "Editar",
 	"shareWithNote": "Compartir con una nota",
 	"copyLink": "Copiar enlace",
-	"share": "Compartir",
 	"recentPosts": "Publicaciones recientes"
 }
 </locale>
@@ -459,15 +442,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "Êtes-vous sûr·e de ne plus vouloir aimer cette publication ?",
 	"reportAbuse": "Signaler",
-	"delete": "Supprimer",
 	"deleteConfirm": "Confirmez-vous la suppression?",
 	"gallery": "Galerie",
 	"unlike": "Je n’aime pas",
 	"like": "J'aime",
-	"edit": "Editer",
 	"shareWithNote": "Partager dans une note",
 	"copyLink": "Copier le lien",
-	"share": "Partager",
 	"recentPosts": "Les plus récentes"
 }
 </locale>
@@ -476,15 +456,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "Yakin ingin hapus sukamu?",
 	"reportAbuse": "Laporkan",
-	"delete": "Hapus",
 	"deleteConfirm": "Yakin hapus?",
 	"gallery": "Galeri",
 	"unlike": "Hapus suka",
 	"like": "Suka",
-	"edit": "Sunting",
 	"shareWithNote": "Bagikan dengan catatan",
 	"copyLink": "Salin tautan",
-	"share": "Bagikan",
 	"recentPosts": "Postingan terbaru"
 }
 </locale>
@@ -493,15 +470,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "Non ti piace più?",
 	"reportAbuse": "Segnalare",
-	"delete": "Elimina",
 	"deleteConfirm": "Rimuovere?",
 	"gallery": "Gallerie",
 	"unlike": "Non mi piace più",
 	"like": "Mi piace!",
-	"edit": "Modifica",
 	"shareWithNote": "Condividere in nota",
 	"copyLink": "Copia il link",
-	"share": "Condividi",
 	"recentPosts": "Pubblicazioni recenti"
 }
 </locale>
@@ -510,15 +484,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "いいね解除しますか？",
 	"reportAbuse": "通報",
-	"delete": "削除",
 	"deleteConfirm": "削除しますか？",
 	"gallery": "ギャラリー",
 	"unlike": "いいね解除",
 	"like": "いいね！",
-	"edit": "編集",
 	"shareWithNote": "ノートで共有",
 	"copyLink": "リンクをコピー",
-	"share": "共有",
 	"recentPosts": "最近の投稿"
 }
 </locale>
@@ -527,15 +498,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "いいね解除するんか？",
 	"reportAbuse": "通報",
-	"delete": "ほかす",
 	"deleteConfirm": "ホンマにほかすで？",
 	"gallery": "ギャラリー",
 	"unlike": "良くないわ",
 	"like": "ええやん！",
-	"edit": "編集",
 	"shareWithNote": "ノートで共有",
 	"copyLink": "リンクをコピー",
-	"share": "わけわけ",
 	"recentPosts": "最近の投稿"
 }
 </locale>
@@ -544,15 +512,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "Really remove your like?",
 	"reportAbuse": "Report",
-	"delete": "Kkes",
 	"deleteConfirm": "Really delete?",
 	"gallery": "Gallery",
 	"unlike": "Remove like",
 	"like": "Like",
-	"edit": "Edit",
 	"shareWithNote": "Share with note",
 	"copyLink": "Copy link",
-	"share": "Share",
 	"recentPosts": "Recent posts"
 }
 </locale>
@@ -561,15 +526,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "Really remove your like?",
 	"reportAbuse": "Report",
-	"delete": "ಅಳಿಸು",
 	"deleteConfirm": "Really delete?",
 	"gallery": "Gallery",
 	"unlike": "Remove like",
 	"like": "Like",
-	"edit": "Edit",
 	"shareWithNote": "Share with note",
 	"copyLink": "ಲಿಂಕನ್ನು ನಕಲಿಸು",
-	"share": "Share",
 	"recentPosts": "Recent posts"
 }
 </locale>
@@ -578,15 +540,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "좋아요를 취소할까요?",
 	"reportAbuse": "신고",
-	"delete": "삭제",
 	"deleteConfirm": "삭제하시겠습니까?",
 	"gallery": "갤러리",
 	"unlike": "좋아요 취소",
 	"like": "좋아요!",
-	"edit": "편집",
 	"shareWithNote": "노트로 공유",
 	"copyLink": "링크 복사",
-	"share": "공유",
 	"recentPosts": "최근 게시물"
 }
 </locale>
@@ -595,15 +554,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "Wil je echt je like verwijderen?",
 	"reportAbuse": "Meld",
-	"delete": "Verwijderen",
 	"deleteConfirm": "Echt verwijderen?",
 	"gallery": "Galerij",
 	"unlike": "Remove like",
 	"like": "Like",
-	"edit": "Bewerken",
 	"shareWithNote": "Delen met notitie",
 	"copyLink": "Kopiëren link",
-	"share": "Delen",
 	"recentPosts": "Recente berichten"
 }
 </locale>
@@ -612,15 +568,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "Really remove your like?",
 	"reportAbuse": "Rappoter",
-	"delete": "Slett",
 	"deleteConfirm": "Vil du slette?",
 	"gallery": "Galleri",
 	"unlike": "Liker ikke",
 	"like": "Liker!",
-	"edit": "Rediger",
 	"shareWithNote": "Share with note",
 	"copyLink": "Kopier lenke",
-	"share": "Del",
 	"recentPosts": "Recent posts"
 }
 </locale>
@@ -629,15 +582,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "Na pewno chcesz usunąć\u00a0polubienie?",
 	"reportAbuse": "Zgłoś",
-	"delete": "Usuń",
 	"deleteConfirm": "Na pewno usunąć?",
 	"gallery": "Galeria",
 	"unlike": "Cofnij polubienie",
 	"like": "Polub",
-	"edit": "Edytuj",
 	"shareWithNote": "Udostępnij z wpisem",
 	"copyLink": "Skopiuj odnośnik",
-	"share": "Udostępnij",
 	"recentPosts": "Ostatnie wpisy"
 }
 </locale>
@@ -646,15 +596,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "Deseja realmente deixar de curtir?",
 	"reportAbuse": "Denunciar",
-	"delete": "Excluir",
 	"deleteConfirm": "Confirma a exclusão?",
 	"gallery": "Galeria",
 	"unlike": "Remover curtida",
 	"like": "Curtir",
-	"edit": "Editar",
 	"shareWithNote": "Compartilhar em Notas",
 	"copyLink": "Copiar link",
-	"share": "Compartilhar",
 	"recentPosts": "Notas recentes"
 }
 </locale>
@@ -663,15 +610,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "В самом деле убрать «нравится»?",
 	"reportAbuse": "Жалоба",
-	"delete": "Удалить",
 	"deleteConfirm": "Удалить?",
 	"gallery": "Галерея",
 	"unlike": "Отменить «нравится»",
 	"like": "Нравится!",
-	"edit": "Изменить",
 	"shareWithNote": "Поделиться заметкой",
 	"copyLink": "Скопировать ссылку",
-	"share": "Поделиться",
 	"recentPosts": "Недавние публикации"
 }
 </locale>
@@ -680,15 +624,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "Naozaj odstrániť váš like?",
 	"reportAbuse": "Nahlásiť",
-	"delete": "Odstrániť",
 	"deleteConfirm": "Naozaj odstrániť?",
 	"gallery": "Galéria",
 	"unlike": "Nepáči sa mi",
 	"like": "Páči sa mi",
-	"edit": "Upraviť",
 	"shareWithNote": "Zdieľať s poznámkou",
 	"copyLink": "Kopírovať odkaz",
-	"share": "Zdieľať",
 	"recentPosts": "Najnovšie príspevky"
 }
 </locale>
@@ -697,15 +638,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "ต้องการเลิกถูกใจใช่ไหม?",
 	"reportAbuse": "รายงาน",
-	"delete": "ลบ",
 	"deleteConfirm": "ต้องการลบใช่ไหม?",
 	"gallery": "แกลเลอรี่",
 	"unlike": "เลิกถูกใจ",
 	"like": "ถูกใจ!",
-	"edit": "แก้ไข",
 	"shareWithNote": "แบ่งปันด้วยโน้ต",
 	"copyLink": "คัดลอกลิงก์",
-	"share": "แบ่งปัน",
 	"recentPosts": "โพสต์ล่าสุด"
 }
 </locale>
@@ -714,15 +652,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "Cidden beğenini kaldırmak mı istiyorsun?",
 	"reportAbuse": "Rapor",
-	"delete": "Sil",
 	"deleteConfirm": "Cidden silmek istiyor musunuz?",
 	"gallery": "Galeri",
 	"unlike": "Benzerlerini kaldır",
 	"like": "Beğen",
-	"edit": "Düzenle",
 	"shareWithNote": "Notla paylaş",
 	"copyLink": "Link kopyala",
-	"share": "Paylaş",
 	"recentPosts": "Son gönderiler"
 }
 </locale>
@@ -731,15 +666,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "Really remove your like?",
 	"reportAbuse": "Report",
-	"delete": "ئۆچۈرۈش",
 	"deleteConfirm": "Really delete?",
 	"gallery": "Gallery",
 	"unlike": "Remove like",
 	"like": "Like",
-	"edit": "Edit",
 	"shareWithNote": "Share with note",
 	"copyLink": "Copy link",
-	"share": "Share",
 	"recentPosts": "Recent posts"
 }
 </locale>
@@ -748,15 +680,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "Бажаєте відписатися від подібних?",
 	"reportAbuse": "Поскаржитись",
-	"delete": "Видалити",
 	"deleteConfirm": "Ви дійсно бажаєте це видалити?",
 	"gallery": "Галерея",
 	"unlike": "Не вподобати",
 	"like": "Вподобати",
-	"edit": "Редагувати",
 	"shareWithNote": "Поділитися нотаткою",
 	"copyLink": "Скопіювати посилання",
-	"share": "Поділитись",
 	"recentPosts": "Нещодавні дописи"
 }
 </locale>
@@ -765,15 +694,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "Bạn có chắc muốn bỏ thích ?",
 	"reportAbuse": "Báo cáo",
-	"delete": "Xóa",
 	"deleteConfirm": "Bạn có muốn xóa không?",
 	"gallery": "Thư viện ảnh",
 	"unlike": "Bỏ thích",
 	"like": "Thích",
-	"edit": "Sửa",
 	"shareWithNote": "Chia sẻ kèm với tút",
 	"copyLink": "Chép liên kết",
-	"share": "Chia sẻ",
 	"recentPosts": "Tút gần đây"
 }
 </locale>
@@ -782,15 +708,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "取消赞？",
 	"reportAbuse": "举报",
-	"delete": "删除",
 	"deleteConfirm": "确定删除?",
 	"gallery": "相册",
 	"unlike": "取消喜欢",
 	"like": "喜欢！",
-	"edit": "编辑",
 	"shareWithNote": "分享到帖文",
 	"copyLink": "复制链接",
-	"share": "分享",
 	"recentPosts": "最新发布"
 }
 </locale>
@@ -799,15 +722,12 @@ definePage(() => ({
 {
 	"unlikeConfirm": "要取消按讚嗎？",
 	"reportAbuse": "檢舉",
-	"delete": "刪除",
 	"deleteConfirm": "你確定要刪除嗎？",
 	"gallery": "相簿",
 	"unlike": "收回讚好",
 	"like": "讚好",
-	"edit": "編輯",
 	"shareWithNote": "在貼文中分享",
 	"copyLink": "複製連結",
-	"share": "分享",
 	"recentPosts": "最新貼文"
 }
 </locale>

@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<MkPreviewWithControls>
 		<template #preview>
 			<div :class="$style.previewWrapper">
-				<div class="_acrylic" :class="$style.previewTitle">{{ $locale.sfc.preview }}</div>
+				<div class="_acrylic" :class="$style.previewTitle">{{ globalLocale.env.preview }}</div>
 
 				<div ref="resizerRootEl" :class="$style.previewResizerRoot" inert>
 					<div
@@ -47,14 +47,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { useTemplateRef, ref, computed, onBeforeUnmount, onMounted } from 'vue';
 import MkPreviewWithControls from '@features/markup/frontend/components/MkPreviewWithControls.vue';
-import type { Form } from '@features/ui/frontend/utility/form.js';
-import type { WidgetName } from '@features/index/frontend/widgets.js';
 import { deepClone } from '@features/runtime/frontend/utility/clone.js';
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import MkForm from '@features/ui/frontend/components/MkForm.vue';
+import type { WidgetName } from '@features/index/frontend/widgets.js';
+import type { Form } from '@features/ui/frontend/utility/form.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	widgetName: WidgetName;
@@ -208,8 +212,7 @@ onBeforeUnmount(() => {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"preview": "معاينة"
+	}
 }
 </locale>
 
@@ -248,8 +251,7 @@ onBeforeUnmount(() => {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Usuaris que fan l'aniversari avui",
 		"chat": "Xateja amb aquest usuari"
-	},
-	"preview": "Vista prèvia"
+	}
 }
 </locale>
 
@@ -288,8 +290,7 @@ onBeforeUnmount(() => {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"preview": "Náhled"
+	}
 }
 </locale>
 
@@ -328,8 +329,7 @@ onBeforeUnmount(() => {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"preview": "Preview"
+	}
 }
 </locale>
 
@@ -368,8 +368,7 @@ onBeforeUnmount(() => {
 		"clicker": "Klickzähler",
 		"birthdayFollowings": "Nutzer, die heute Geburtstag haben",
 		"chat": "Mit dem Benutzer chatten"
-	},
-	"preview": "Vorschau"
+	}
 }
 </locale>
 
@@ -408,8 +407,7 @@ onBeforeUnmount(() => {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"preview": "Preview"
+	}
 }
 </locale>
 
@@ -448,8 +446,7 @@ onBeforeUnmount(() => {
 		"clicker": "Cliqueador",
 		"birthdayFollowings": "Hoy cumplen años",
 		"chat": "Chatear"
-	},
-	"preview": "Vista previa"
+	}
 }
 </locale>
 
@@ -488,8 +485,7 @@ onBeforeUnmount(() => {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Utilisateurs qui fêtent l'anniversaire aujourd'hui",
 		"chat": "Chat with user"
-	},
-	"preview": "Aperçu"
+	}
 }
 </locale>
 
@@ -528,8 +524,7 @@ onBeforeUnmount(() => {
 		"clicker": "Pengeklik",
 		"birthdayFollowings": "Pengguna yang merayakan hari ulang tahunnya hari ini",
 		"chat": "Obrolan pengguna"
-	},
-	"preview": "Pratinjau"
+	}
 }
 </locale>
 
@@ -568,8 +563,7 @@ onBeforeUnmount(() => {
 		"clicker": "Cliccheria",
 		"birthdayFollowings": "Compleanni del giorno",
 		"chat": "Messaggi diretti"
-	},
-	"preview": "Anteprima"
+	}
 }
 </locale>
 
@@ -608,8 +602,7 @@ onBeforeUnmount(() => {
 		"clicker": "クリッカー",
 		"birthdayFollowings": "もうすぐ誕生日のユーザー",
 		"chat": "ダイレクトメッセージ"
-	},
-	"preview": "プレビュー"
+	}
 }
 </locale>
 
@@ -648,8 +641,7 @@ onBeforeUnmount(() => {
 		"clicker": "クリッカー",
 		"birthdayFollowings": "今日誕生日のツレ",
 		"chat": "チャットしよか"
-	},
-	"preview": "プレビュー"
+	}
 }
 </locale>
 
@@ -688,8 +680,7 @@ onBeforeUnmount(() => {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"preview": "Preview"
+	}
 }
 </locale>
 
@@ -728,8 +719,7 @@ onBeforeUnmount(() => {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"preview": "Preview"
+	}
 }
 </locale>
 
@@ -768,8 +758,7 @@ onBeforeUnmount(() => {
 		"clicker": "클리커",
 		"birthdayFollowings": "곧 생일인 사용자",
 		"chat": "채팅하기"
-	},
-	"preview": "미리보기"
+	}
 }
 </locale>
 
@@ -808,8 +797,7 @@ onBeforeUnmount(() => {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"preview": "Voorbeeld"
+	}
 }
 </locale>
 
@@ -848,8 +836,7 @@ onBeforeUnmount(() => {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"preview": "Preview"
+	}
 }
 </locale>
 
@@ -888,8 +875,7 @@ onBeforeUnmount(() => {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"preview": "Podgląd"
+	}
 }
 </locale>
 
@@ -928,8 +914,7 @@ onBeforeUnmount(() => {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Usuários de aniversário hoje",
 		"chat": "Conversar com usuário"
-	},
-	"preview": "Pré-visualizar"
+	}
 }
 </locale>
 
@@ -968,8 +953,7 @@ onBeforeUnmount(() => {
 		"clicker": "Счётчик щелчков",
 		"birthdayFollowings": "Пользователи, у которых сегодня день рождения",
 		"chat": "Открыть личные сообщения"
-	},
-	"preview": "Предпросмотр"
+	}
 }
 </locale>
 
@@ -1008,8 +992,7 @@ onBeforeUnmount(() => {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"preview": "Náhľad"
+	}
 }
 </locale>
 
@@ -1048,8 +1031,7 @@ onBeforeUnmount(() => {
 		"clicker": "คลิกเกอร์",
 		"birthdayFollowings": "วันเกิดผู้ใช้ในวันนี้",
 		"chat": "แชตเลย"
-	},
-	"preview": "แสดงตัวอย่าง"
+	}
 }
 </locale>
 
@@ -1088,8 +1070,7 @@ onBeforeUnmount(() => {
 		"clicker": "Tıklayıcı",
 		"birthdayFollowings": "Bugünün Doğum Günleri",
 		"chat": "Sohbet"
-	},
-	"preview": "Önizleme"
+	}
 }
 </locale>
 
@@ -1128,8 +1109,7 @@ onBeforeUnmount(() => {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"preview": "Preview"
+	}
 }
 </locale>
 
@@ -1168,8 +1148,7 @@ onBeforeUnmount(() => {
 		"clicker": "Clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Написати цьому користувачу"
-	},
-	"preview": "Попередній перегляд"
+	}
 }
 </locale>
 
@@ -1208,8 +1187,7 @@ onBeforeUnmount(() => {
 		"clicker": "clicker",
 		"birthdayFollowings": "Today's Birthdays",
 		"chat": "Chat with user"
-	},
-	"preview": "Xem trước"
+	}
 }
 </locale>
 
@@ -1248,8 +1226,7 @@ onBeforeUnmount(() => {
 		"clicker": "点击器",
 		"birthdayFollowings": "今天是他们的生日",
 		"chat": "私信"
-	},
-	"preview": "预览"
+	}
 }
 </locale>
 
@@ -1288,7 +1265,6 @@ onBeforeUnmount(() => {
 		"clicker": "點擊器",
 		"birthdayFollowings": "今天生日的使用者",
 		"chat": "聊天"
-	},
-	"preview": "預覽"
+	}
 }
 </locale>

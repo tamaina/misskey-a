@@ -12,12 +12,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</MkCodeEditor>
 
 	<div>
-		<MkButton :disabled="code == null || code.trim() === ''" primary inline @click="install"><i class="ti ti-check"></i> {{ $locale.sfc.install }}</MkButton>
+		<MkButton :disabled="code == null || code.trim() === ''" primary inline @click="install"><i class="ti ti-check"></i> {{ globalLocale.env.install }}</MkButton>
 	</div>
 </div>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { nextTick, ref, computed } from 'vue';
 import MkCodeEditor from '@features/markup/frontend/components/MkCodeEditor.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -26,6 +27,9 @@ import * as os from '@features/ui/frontend/os.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { installPlugin } from '@features/integrations/frontend/plugin.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const router = useRouter();
 const code = ref<string | null>(null);
@@ -62,7 +66,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "رجاءً لا تثبت إضافات غير موثوقة.",
 	"code": "Code",
-	"install": "ثبّت",
 	"pluginInstall": "ثبّت إضافات"
 }
 </locale>
@@ -71,7 +74,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Si us plau, no instal·lis extensions que no siguin de confiança.",
 	"code": "Codi",
-	"install": "Instal·lació ",
 	"pluginInstall": "Instal·lar un afegit "
 }
 </locale>
@@ -80,7 +82,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Neinstalujte nedůvěryhodné pluginy.",
 	"code": "Code",
-	"install": "Nainstalovat",
 	"pluginInstall": "Instalovat plugin"
 }
 </locale>
@@ -89,7 +90,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Please do not install untrustworthy plugins.",
 	"code": "Code",
-	"install": "Install",
 	"pluginInstall": "Install plugins"
 }
 </locale>
@@ -98,7 +98,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Installiere bitte nur vertrauenswürdige Plugins.",
 	"code": "Code",
-	"install": "Installieren",
 	"pluginInstall": "Plugins installieren"
 }
 </locale>
@@ -107,7 +106,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Please do not install untrustworthy plugins.",
 	"code": "Code",
-	"install": "Install",
 	"pluginInstall": "Install plugins"
 }
 </locale>
@@ -116,7 +114,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Por favor no instale plugins que no son de confianza",
 	"code": "Código",
-	"install": "Instalación",
 	"pluginInstall": "Instalar plugins"
 }
 </locale>
@@ -125,7 +122,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "N’installez que des extensions provenant de sources de confiance.",
 	"code": "Code",
-	"install": "Installation",
 	"pluginInstall": "Installation d'extensions"
 }
 </locale>
@@ -134,7 +130,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Mohon jangan memasang plugin yang tidak dapat dipercayai.",
 	"code": "Kode",
-	"install": "Pasang",
 	"pluginInstall": "Memasang plugin"
 }
 </locale>
@@ -143,7 +138,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Si prega di installare soltanto estensioni che provengono da fonti affidabili.",
 	"code": "Codice",
-	"install": "Installa",
 	"pluginInstall": "Installa estensioni"
 }
 </locale>
@@ -152,7 +146,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "信頼できないプラグインはインストールしないでください。",
 	"code": "コード",
-	"install": "インストール",
 	"pluginInstall": "プラグインのインストール"
 }
 </locale>
@@ -161,7 +154,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "信頼できへんプラグインはインストールせんとってな",
 	"code": "コード",
-	"install": "インストール",
 	"pluginInstall": "プラグインのインストール"
 }
 </locale>
@@ -170,7 +162,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Please do not install untrustworthy plugins.",
 	"code": "Code",
-	"install": "Install",
 	"pluginInstall": "Install plugins"
 }
 </locale>
@@ -179,7 +170,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Please do not install untrustworthy plugins.",
 	"code": "Code",
-	"install": "Install",
 	"pluginInstall": "Install plugins"
 }
 </locale>
@@ -188,7 +178,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "신뢰할 수 없는 플러그인은 설치하지 않는 것이 좋습니다.",
 	"code": "문자열",
-	"install": "설치",
 	"pluginInstall": "플러그인 설치"
 }
 </locale>
@@ -197,7 +186,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Please do not install untrustworthy plugins.",
 	"code": "Code",
-	"install": "Installeren",
 	"pluginInstall": "Install plugins"
 }
 </locale>
@@ -206,7 +194,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Please do not install untrustworthy plugins.",
 	"code": "Code",
-	"install": "Installer",
 	"pluginInstall": "Install plugins"
 }
 </locale>
@@ -215,7 +202,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Nie instaluj niezaufanych wtyczek.",
 	"code": "Code",
-	"install": "Zainstaluj",
 	"pluginInstall": "Zainstaluj wtyczki"
 }
 </locale>
@@ -224,7 +210,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Por favor, não instale plugins duvidosos.",
 	"code": "Código",
-	"install": "Instalar",
 	"pluginInstall": "Instalar plugins"
 }
 </locale>
@@ -233,7 +218,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Пожалуйста, не устанавливайте расширения, которым не доверяете.",
 	"code": "Код",
-	"install": "Установить",
 	"pluginInstall": "Установка расширений"
 }
 </locale>
@@ -242,7 +226,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Prosím neinštalujte nedôveryhodné pluginy.",
 	"code": "Code",
-	"install": "Nainštalovať",
 	"pluginInstall": "Inštalova pluginy"
 }
 </locale>
@@ -251,7 +234,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "กรุณาอย่าติดตั้งปลั๊กอินที่ไม่น่าเชื่อถือนะคะ",
 	"code": "โค้ด",
-	"install": "ติดตั้ง",
 	"pluginInstall": "ติดตั้งปลั๊กอิน"
 }
 </locale>
@@ -260,7 +242,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Güvenilir olmayan eklentileri yükleme.",
 	"code": "Kod",
-	"install": "Yükle",
 	"pluginInstall": "Eklentileri yükle takip isteği aldınız"
 }
 </locale>
@@ -269,7 +250,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Please do not install untrustworthy plugins.",
 	"code": "Code",
-	"install": "Install",
 	"pluginInstall": "Install plugins"
 }
 </locale>
@@ -278,7 +258,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Будь ласка, не встановлюйте плагінів, яким ви не довіряєте.",
 	"code": "Код",
-	"install": "Встановити",
 	"pluginInstall": "Встановити плагін"
 }
 </locale>
@@ -287,7 +266,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "Vui lòng không cài đặt những tiện ích đáng ngờ.",
 	"code": "Code",
-	"install": "Cài đặt",
 	"pluginInstall": "Cài đặt tiện ích"
 }
 </locale>
@@ -296,7 +274,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "请不要安装不可信的插件。",
 	"code": "代码",
-	"install": "安装",
 	"pluginInstall": "安装插件"
 }
 </locale>
@@ -305,7 +282,6 @@ definePage(() => ({
 {
 	"pluginInstallWarn": "請不要安裝來源不明的外掛。",
 	"code": "程式碼",
-	"install": "安裝",
 	"pluginInstall": "安裝外掛組件"
 }
 </locale>

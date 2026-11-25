@@ -4,6 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
+<!-- 設定検索の静的解析はglobalLocaleを読めないため、意図的に$locale.sfcを使用。globalLocaleに戻さないこと。 -->
 <SearchMarker path="/settings/drive" :label="$locale.sfc.drive" :keywords="['drive']" icon="ti ti-cloud">
 	<div class="_gaps_m">
 		<MkFeatureBanner icon="/fluent-emoji/2601.png" color="#0059ff">
@@ -115,7 +116,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 								<SearchMarker :keywords="['default', 'watermark', 'preset']">
 									<MkPreferenceContainer k="defaultWatermarkPresetId">
-										<MkSelect v-model="defaultWatermarkPresetId" :items="[{ label: $locale.sfc.none, value: null }, ...prefer.r.watermarkPresets.value.map(p => ({ label: p.name || $locale.sfc.noName, value: p.id }))]">
+										<MkSelect v-model="defaultWatermarkPresetId" :items="[{ label: globalLocale.env.none, value: null }, ...prefer.r.watermarkPresets.value.map(p => ({ label: p.name || globalLocale.env.noName, value: p.id }))]">
 											<template #label><SearchLabel>{{ $locale.sfc.defaultPreset }}</SearchLabel></template>
 										</MkSelect>
 									</MkPreferenceContainer>
@@ -156,10 +157,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkPreferenceContainer k="defaultImageCompressionLevel">
 							<MkSelect
 								v-model="defaultImageCompressionLevel" :items="[
-									{ label: $locale.sfc.none, value: 0 },
-									{ label: `${$locale.sfc.low} (${$locale.sfc.compressionQualityHigh}; ${$locale.sfc.compressionSizeLarge})`, value: 1 },
-									{ label: `${$locale.sfc.medium} (${$locale.sfc.compressionQualityMedium}; ${$locale.sfc.compressionSizeMedium})`, value: 2 },
-									{ label: `${$locale.sfc.high} (${$locale.sfc.compressionQualityLow}; ${$locale.sfc.compressionSizeSmall})`, value: 3 },
+									{ label: globalLocale.env.none, value: 0 },
+									{ label: `${globalLocale.env.low} (${$locale.sfc.compressionQualityHigh}; ${$locale.sfc.compressionSizeLarge})`, value: 1 },
+									{ label: `${globalLocale.env.medium} (${$locale.sfc.compressionQualityMedium}; ${$locale.sfc.compressionSizeMedium})`, value: 2 },
+									{ label: `${globalLocale.env.high} (${$locale.sfc.compressionQualityLow}; ${$locale.sfc.compressionSizeSmall})`, value: 3 },
 								]"
 							>
 								<template #label><SearchLabel>{{ $locale.sfc.defaultCompressionLevel }}</SearchLabel></template>
@@ -180,10 +181,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkPreferenceContainer k="defaultVideoCompressionLevel">
 							<MkSelect
 								v-model="defaultVideoCompressionLevel" :items="[
-									{ label: $locale.sfc.none, value: 0 },
-									{ label: `${$locale.sfc.low} (${$locale.sfc.compressionQualityHigh}; ${$locale.sfc.compressionSizeLarge})`, value: 1 },
-									{ label: `${$locale.sfc.medium} (${$locale.sfc.compressionQualityMedium}; ${$locale.sfc.compressionSizeMedium})`, value: 2 },
-									{ label: `${$locale.sfc.high} (${$locale.sfc.compressionQualityLow}; ${$locale.sfc.compressionSizeSmall})`, value: 3 },
+									{ label: globalLocale.env.none, value: 0 },
+									{ label: `${globalLocale.env.low} (${$locale.sfc.compressionQualityHigh}; ${$locale.sfc.compressionSizeLarge})`, value: 1 },
+									{ label: `${globalLocale.env.medium} (${$locale.sfc.compressionQualityMedium}; ${$locale.sfc.compressionSizeMedium})`, value: 2 },
+									{ label: `${globalLocale.env.high} (${$locale.sfc.compressionQualityLow}; ${$locale.sfc.compressionSizeSmall})`, value: 3 },
 								]"
 							>
 								<template #label><SearchLabel>{{ $locale.sfc.defaultCompressionLevel }}</SearchLabel></template>
@@ -199,13 +200,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, defineAsyncComponent, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import tinycolor from 'tinycolor2';
 import XWatermarkItem from '@features/drive/frontend/pages/settings/drive.WatermarkItem.vue';
 import XImageFrameItem from '@features/drive/frontend/pages/settings/drive.ImageFrameItem.vue';
-import type { WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';
-import type { ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
 import FormLink from '@features/ui/frontend/components/form/link.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
@@ -225,6 +225,11 @@ import { selectDriveFolder } from '@features/drive/frontend/utility/drive.js';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { genId } from '@features/runtime/frontend/utility/id.js';
+import type { ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
+import type { WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 
@@ -388,7 +393,7 @@ function saveProfile() {
 	}).catch(err => {
 		os.alert({
 			type: 'error',
-			title: $locale.value.sfc.error,
+			title: globalLocale.value.env.error,
 			text: err.message,
 		});
 		alwaysMarkNsfw.value = true;
@@ -400,7 +405,7 @@ const headerActions = computed(() => []);
 const headerTabs = computed(() => []);
 
 definePage(() => ({
-	title: $locale.value.sfc.drive,
+	title: globalLocale.value.env.drive,
 	icon: 'ti ti-cloud',
 }));
 </script>
@@ -421,7 +426,6 @@ definePage(() => ({
 
 <locale lang="json" locale="ar-SA">
 {
-	"drive": "قرص التخرين",
 	"settingsDriveBanner": "You can manage and configure the drive, check usage, and configure file upload settings.",
 	"usageAmount": "الإستخدام",
 	"capacity": "السعة",
@@ -440,30 +444,24 @@ definePage(() => ({
 	"watermark": "Watermark",
 	"watermarkEditorTip": "A watermark, such as credit information, can be added to the image.",
 	"syncBetweenDevices": "Sync between devices",
-	"none": "لا شيء",
-	"noName": "No name",
 	"defaultPreset": "Default Preset",
 	"frame": "Frame",
 	"imageFrameEditorTip": "You can decorate images by adding labels that include frames and metadata.",
-	"low": "منخفضة",
 	"compressionQualityHigh": "High quality",
 	"compressionSizeLarge": "Large size",
-	"medium": "متوسط",
 	"compressionQualityMedium": "Medium quality",
 	"compressionSizeMedium": "Medium size",
-	"high": "عالية",
 	"compressionQualityLow": "Low quality",
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
 	"video": "فيديو",
-	"error": "خطأ"
+	"drive": "قرص التخرين"
 }
 </locale>
 
 <locale lang="json" locale="ca-ES">
 {
-	"drive": "Disc",
 	"settingsDriveBanner": "Pots gestionar i configurar el Disc, comprovar el seu ús i establir una configuració per a la càrrega d'arxius.",
 	"usageAmount": "Ús ",
 	"capacity": "Capacitat",
@@ -482,30 +480,24 @@ definePage(() => ({
 	"watermark": "Marca d'aigua ",
 	"watermarkEditorTip": "A la imatge es pot afegir una marca d'aigua com informació sobre drets.",
 	"syncBetweenDevices": "Sincronització entre dispositius",
-	"none": "Res",
-	"noName": "No hi ha un nom disponible ",
 	"defaultPreset": "Per defecte",
 	"frame": "Marc",
 	"imageFrameEditorTip": "Pots decorar les imatges afegint etiquetes que continguin marcs i metadades.",
-	"low": "Baixa",
 	"compressionQualityHigh": "Qualitat alta",
 	"compressionSizeLarge": "Mida gran",
-	"medium": "Mitjà",
 	"compressionQualityMedium": "Qualitat mitjana",
 	"compressionSizeMedium": "Mida mitjana",
-	"high": "Alta",
 	"compressionQualityLow": "Qualitat baixa",
 	"compressionSizeSmall": "Mida petita",
 	"defaultCompressionLevel": "Nivell de compressió predeterminat",
 	"defaultCompressionLevel_description": "Si el redueixes augmentaràs la qualitat de la imatge, però la mida de l'arxiu serà més gran. <br>Si augmentes l'opció redueixes la mida de l'arxiu i la qualitat de la imatge és pitjor.",
 	"video": "Vídeo",
-	"error": "Error"
+	"drive": "Disc"
 }
 </locale>
 
 <locale lang="json" locale="cs-CZ">
 {
-	"drive": "Úložiště",
 	"settingsDriveBanner": "You can manage and configure the drive, check usage, and configure file upload settings.",
 	"usageAmount": "Využití",
 	"capacity": "Kapacita",
@@ -524,30 +516,24 @@ definePage(() => ({
 	"watermark": "Watermark",
 	"watermarkEditorTip": "A watermark, such as credit information, can be added to the image.",
 	"syncBetweenDevices": "Sync between devices",
-	"none": "Žádný",
-	"noName": "No name",
 	"defaultPreset": "Default Preset",
 	"frame": "Frame",
 	"imageFrameEditorTip": "You can decorate images by adding labels that include frames and metadata.",
-	"low": "Nízká",
 	"compressionQualityHigh": "High quality",
 	"compressionSizeLarge": "Large size",
-	"medium": "Střední",
 	"compressionQualityMedium": "Medium quality",
 	"compressionSizeMedium": "Medium size",
-	"high": "Vysoká",
 	"compressionQualityLow": "Low quality",
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
 	"video": "Video",
-	"error": "Chyba"
+	"drive": "Úložiště"
 }
 </locale>
 
 <locale lang="json" locale="da-DK">
 {
-	"drive": "Drive",
 	"settingsDriveBanner": "You can manage and configure the drive, check usage, and configure file upload settings.",
 	"usageAmount": "Usage",
 	"capacity": "Capacity",
@@ -566,30 +552,24 @@ definePage(() => ({
 	"watermark": "Watermark",
 	"watermarkEditorTip": "A watermark, such as credit information, can be added to the image.",
 	"syncBetweenDevices": "Sync between devices",
-	"none": "None",
-	"noName": "No name",
 	"defaultPreset": "Default Preset",
 	"frame": "Frame",
 	"imageFrameEditorTip": "You can decorate images by adding labels that include frames and metadata.",
-	"low": "Low",
 	"compressionQualityHigh": "High quality",
 	"compressionSizeLarge": "Large size",
-	"medium": "Medium",
 	"compressionQualityMedium": "Medium quality",
 	"compressionSizeMedium": "Medium size",
-	"high": "High",
 	"compressionQualityLow": "Low quality",
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
 	"video": "Video",
-	"error": "Error"
+	"drive": "Drive"
 }
 </locale>
 
 <locale lang="json" locale="de-DE">
 {
-	"drive": "Drive",
 	"settingsDriveBanner": "Du kannst den Drive verwalten und konfigurieren, die Auslastung überprüfen und Einstellungen für das Hochladen von Dateien vornehmen.",
 	"usageAmount": "Verwendung",
 	"capacity": "Kapazität",
@@ -608,30 +588,24 @@ definePage(() => ({
 	"watermark": "Wasserzeichen",
 	"watermarkEditorTip": "Dem Bild kann ein Wasserzeichen, z. B. eine Quellenangabe, hinzugefügt werden.",
 	"syncBetweenDevices": "Zwischen Geräten synchronisieren",
-	"none": "Nichts",
-	"noName": "Kein Name",
 	"defaultPreset": "Standard-Voreinstellungen",
 	"frame": "Rahmen",
 	"imageFrameEditorTip": "Sie können das Bild dekorieren, indem Sie einen Rahmen sowie ein Etikett mit Metadaten hinzufügen.",
-	"low": "Niedrig",
 	"compressionQualityHigh": "Hohe Qualität",
 	"compressionSizeLarge": "Groß",
-	"medium": "Mittel",
 	"compressionQualityMedium": "Mittlere Qualität",
 	"compressionSizeMedium": "Medium",
-	"high": "Hoch",
 	"compressionQualityLow": "Niedrige Qualität",
 	"compressionSizeSmall": "Klein",
 	"defaultCompressionLevel": "Standard-Kompressionsgrad",
 	"defaultCompressionLevel_description": "Bei einem niedrigeren Wert bleibt die Qualität erhalten, aber die Dateigröße nimmt zu.<br> Bei einem höheren Wert lässt sich die Dateigröße verringern, aber die Qualität nimmt ab.",
 	"video": "Video",
-	"error": "Fehler"
+	"drive": "Drive"
 }
 </locale>
 
 <locale lang="json" locale="en-US">
 {
-	"drive": "Drive",
 	"settingsDriveBanner": "You can manage and configure the drive, check usage, and configure file upload settings.",
 	"usageAmount": "Usage",
 	"capacity": "Capacity",
@@ -650,30 +624,24 @@ definePage(() => ({
 	"watermark": "Watermark",
 	"watermarkEditorTip": "A watermark, such as credit information, can be added to the image.",
 	"syncBetweenDevices": "Sync between devices",
-	"none": "None",
-	"noName": "No name",
 	"defaultPreset": "Default Preset",
 	"frame": "Frame",
 	"imageFrameEditorTip": "You can decorate images by adding labels that include frames and metadata.",
-	"low": "Low",
 	"compressionQualityHigh": "High quality",
 	"compressionSizeLarge": "Large size",
-	"medium": "Medium",
 	"compressionQualityMedium": "Medium quality",
 	"compressionSizeMedium": "Medium size",
-	"high": "High",
 	"compressionQualityLow": "Low quality",
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
 	"video": "Video",
-	"error": "Error"
+	"drive": "Drive"
 }
 </locale>
 
 <locale lang="json" locale="es-ES">
 {
-	"drive": "Drive",
 	"settingsDriveBanner": "Puedes gestionar y configurar la unidad, comprobar su uso y configurar los ajustes de carga de archivos.",
 	"usageAmount": "Uso",
 	"capacity": "Capacidad",
@@ -692,30 +660,24 @@ definePage(() => ({
 	"watermark": "Marca de Agua",
 	"watermarkEditorTip": "Se puede añadir a la imagen una marca de agua, como información crediticia.",
 	"syncBetweenDevices": "Sincronizar entre dispositivos",
-	"none": "Ninguna",
-	"noName": "No hay nombre.",
 	"defaultPreset": "Por defecto",
 	"frame": "Marco",
 	"imageFrameEditorTip": "Decora tus imágenes con marcos y etiquetas que contengan metadatos.",
-	"low": "Baja",
 	"compressionQualityHigh": "Calidad\u00a0alta",
 	"compressionSizeLarge": "Tamaño grande",
-	"medium": "Mediano",
 	"compressionQualityMedium": "Calidad media",
 	"compressionSizeMedium": "Tamaño mediano",
-	"high": "Alta",
 	"compressionQualityLow": "Calidad baja",
 	"compressionSizeSmall": "Tamaño pequeño",
 	"defaultCompressionLevel": "Nivel de compresión predeterminado",
 	"defaultCompressionLevel_description": "Al reducir el ajuste se conserva la calidad, pero aumenta el tamaño del archivo.<br>Al aumentar el ajuste se reduce el tamaño del archivo, pero disminuye la calidad.",
 	"video": "Video",
-	"error": "Error"
+	"drive": "Drive"
 }
 </locale>
 
 <locale lang="json" locale="fr-FR">
 {
-	"drive": "Disque",
 	"settingsDriveBanner": "You can manage and configure the drive, check usage, and configure file upload settings.",
 	"usageAmount": "Utilisation",
 	"capacity": "Capacité\u00a0",
@@ -734,30 +696,24 @@ definePage(() => ({
 	"watermark": "Watermark",
 	"watermarkEditorTip": "A watermark, such as credit information, can be added to the image.",
 	"syncBetweenDevices": "Sync between devices",
-	"none": "Rien",
-	"noName": "No name",
 	"defaultPreset": "Default Preset",
 	"frame": "Frame",
 	"imageFrameEditorTip": "You can decorate images by adding labels that include frames and metadata.",
-	"low": "Basse",
 	"compressionQualityHigh": "High quality",
 	"compressionSizeLarge": "Large size",
-	"medium": "Moyen",
 	"compressionQualityMedium": "Medium quality",
 	"compressionSizeMedium": "Medium size",
-	"high": "Haute",
 	"compressionQualityLow": "Low quality",
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
 	"video": "Vidéo",
-	"error": "Erreur"
+	"drive": "Disque"
 }
 </locale>
 
 <locale lang="json" locale="id-ID">
 {
-	"drive": "Drive",
 	"settingsDriveBanner": "Anda dapat mengelola dan mengatur drive, melihat penggunaan, dan mengatur pengaturan unggahan berkas.",
 	"usageAmount": "Penggunaan",
 	"capacity": "Kapasitas",
@@ -776,30 +732,24 @@ definePage(() => ({
 	"watermark": "Watermark",
 	"watermarkEditorTip": "A watermark, such as credit information, can be added to the image.",
 	"syncBetweenDevices": "Sync between devices",
-	"none": "Tidak ada",
-	"noName": "Tidak ada nama",
 	"defaultPreset": "Default Preset",
 	"frame": "Frame",
 	"imageFrameEditorTip": "You can decorate images by adding labels that include frames and metadata.",
-	"low": "Rendah",
 	"compressionQualityHigh": "High quality",
 	"compressionSizeLarge": "Large size",
-	"medium": "Sedang",
 	"compressionQualityMedium": "Medium quality",
 	"compressionSizeMedium": "Medium size",
-	"high": "Tinggi",
 	"compressionQualityLow": "Low quality",
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Kompresi yang rendah akan menjaga kualitas namun memperbesar ukuran berkas. Kompresi yang tinggi akan mengurangi ukuran berkas namun mengurangi kualitas.",
 	"video": "Video",
-	"error": "Galat"
+	"drive": "Drive"
 }
 </locale>
 
 <locale lang="json" locale="it-IT">
 {
-	"drive": "Drive",
 	"settingsDriveBanner": "Permette di gestire e configurare il Drive, controllare il consumo di spazio e configurare il caricamento dei file.",
 	"usageAmount": "Quantità utilizzata",
 	"capacity": "Capacità",
@@ -818,30 +768,24 @@ definePage(() => ({
 	"watermark": "Filigrana",
 	"watermarkEditorTip": "Puoi aggiungere una filigrana, ad esempio con i crediti alle tue immagini.",
 	"syncBetweenDevices": "Sincronizzazione tra i dispositivi",
-	"none": "Nessuna",
-	"noName": "Senza nome",
 	"defaultPreset": "Impostazioni predefinite",
 	"frame": "Cornice",
 	"imageFrameEditorTip": "Puoi decorare le immagini aggiungendo etichette con cornici e metadati.",
-	"low": "Bassa",
 	"compressionQualityHigh": "Alta qualità",
 	"compressionSizeLarge": "Taglia grande",
-	"medium": "Medio",
 	"compressionQualityMedium": "Media qualità",
 	"compressionSizeMedium": "Taglia media",
-	"high": "Alta",
 	"compressionQualityLow": "Bassa qualità",
 	"compressionSizeSmall": "Taglia piccola",
 	"defaultCompressionLevel": "Compressione predefinita",
 	"defaultCompressionLevel_description": "Diminuisci per mantenere la qualità aumentando le dimensioni del file.<br> Aumenta per ridurre le dimensioni del file e anche la qualità.",
 	"video": "Video",
-	"error": "Errore"
+	"drive": "Drive"
 }
 </locale>
 
 <locale lang="json" locale="ja-JP">
 {
-	"drive": "ドライブ",
 	"settingsDriveBanner": "ドライブの管理と設定、使用量の確認、ファイルをアップロードする際の設定を行えます。",
 	"usageAmount": "使用量",
 	"capacity": "容量",
@@ -860,30 +804,24 @@ definePage(() => ({
 	"watermark": "ウォーターマーク",
 	"watermarkEditorTip": "画像にクレジット情報などのウォーターマークを追加できます。",
 	"syncBetweenDevices": "デバイス間で同期",
-	"none": "なし",
-	"noName": "名前はありません",
 	"defaultPreset": "デフォルトのプリセット",
 	"frame": "フレーム",
 	"imageFrameEditorTip": "画像にフレームやメタデータを含んだラベルを追加して装飾できます。",
-	"low": "低",
 	"compressionQualityHigh": "高品質",
 	"compressionSizeLarge": "サイズ大",
-	"medium": "中",
 	"compressionQualityMedium": "中品質",
 	"compressionSizeMedium": "サイズ中",
-	"high": "高",
 	"compressionQualityLow": "低品質",
 	"compressionSizeSmall": "サイズ小",
 	"defaultCompressionLevel": "デフォルトの圧縮度",
 	"defaultCompressionLevel_description": "低くすると品質を保てますが、ファイルサイズは増加します。<br>高くするとファイルサイズを減らせますが、品質は低下します。",
 	"video": "動画",
-	"error": "エラー"
+	"drive": "ドライブ"
 }
 </locale>
 
 <locale lang="json" locale="ja-KS">
 {
-	"drive": "ドライブ",
 	"settingsDriveBanner": "ドライブの管理と設定、使用量の確認、ファイルをアップロードするときの設定ができるで。",
 	"usageAmount": "使用量",
 	"capacity": "容量",
@@ -902,30 +840,24 @@ definePage(() => ({
 	"watermark": "ウォーターマーク",
 	"watermarkEditorTip": "画像にクレジット情報とかのウォーターマークをのっけられるで。",
 	"syncBetweenDevices": "デバイス間で同期",
-	"none": "なし",
-	"noName": "名前はあらへんで",
 	"defaultPreset": "デフォルトのプリセット",
 	"frame": "フレーム",
 	"imageFrameEditorTip": "画像にフレームとかメタデータを入れたラベルとかを付け足していい感じにできるで。",
-	"low": "低い",
 	"compressionQualityHigh": "高品質",
 	"compressionSizeLarge": "サイズ大",
-	"medium": "ふつう",
 	"compressionQualityMedium": "中品質",
 	"compressionSizeMedium": "サイズ中",
-	"high": "高い",
 	"compressionQualityLow": "低品質",
 	"compressionSizeSmall": "サイズ小",
 	"defaultCompressionLevel": "デフォルトの圧縮度",
 	"defaultCompressionLevel_description": "低くすると品質は保てるんやけど、ファイルサイズが増えるで。<br>高くするとファイルサイズは減らせるんやけど、品質が落ちるで。",
 	"video": "動画",
-	"error": "おかしなったで"
+	"drive": "ドライブ"
 }
 </locale>
 
 <locale lang="json" locale="kab-KAB">
 {
-	"drive": "Drive",
 	"settingsDriveBanner": "You can manage and configure the drive, check usage, and configure file upload settings.",
 	"usageAmount": "Usage",
 	"capacity": "Capacity",
@@ -944,30 +876,24 @@ definePage(() => ({
 	"watermark": "Watermark",
 	"watermarkEditorTip": "A watermark, such as credit information, can be added to the image.",
 	"syncBetweenDevices": "Sync between devices",
-	"none": "None",
-	"noName": "No name",
 	"defaultPreset": "Default Preset",
 	"frame": "Frame",
 	"imageFrameEditorTip": "You can decorate images by adding labels that include frames and metadata.",
-	"low": "Low",
 	"compressionQualityHigh": "High quality",
 	"compressionSizeLarge": "Large size",
-	"medium": "Medium",
 	"compressionQualityMedium": "Medium quality",
 	"compressionSizeMedium": "Medium size",
-	"high": "High",
 	"compressionQualityLow": "Low quality",
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
 	"video": "Video",
-	"error": "Error"
+	"drive": "Drive"
 }
 </locale>
 
 <locale lang="json" locale="kn-IN">
 {
-	"drive": "Drive",
 	"settingsDriveBanner": "You can manage and configure the drive, check usage, and configure file upload settings.",
 	"usageAmount": "Usage",
 	"capacity": "Capacity",
@@ -986,30 +912,24 @@ definePage(() => ({
 	"watermark": "Watermark",
 	"watermarkEditorTip": "A watermark, such as credit information, can be added to the image.",
 	"syncBetweenDevices": "Sync between devices",
-	"none": "None",
-	"noName": "No name",
 	"defaultPreset": "Default Preset",
 	"frame": "Frame",
 	"imageFrameEditorTip": "You can decorate images by adding labels that include frames and metadata.",
-	"low": "Low",
 	"compressionQualityHigh": "High quality",
 	"compressionSizeLarge": "Large size",
-	"medium": "Medium",
 	"compressionQualityMedium": "Medium quality",
 	"compressionSizeMedium": "Medium size",
-	"high": "High",
 	"compressionQualityLow": "Low quality",
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
 	"video": "Video",
-	"error": "Error"
+	"drive": "Drive"
 }
 </locale>
 
 <locale lang="json" locale="ko-KR">
 {
-	"drive": "드라이브",
 	"settingsDriveBanner": "드라이브 관리, 사용량 확인, 파일 업로드에 관한 설정을 합니다.",
 	"usageAmount": "사용량",
 	"capacity": "용량",
@@ -1028,30 +948,24 @@ definePage(() => ({
 	"watermark": "워터마크",
 	"watermarkEditorTip": "이미지에 크레딧 정보 등의 워터마크를 추가할 수 있습니다.",
 	"syncBetweenDevices": "장치간 동기화",
-	"none": "없음",
-	"noName": "이름이 없습니다.",
 	"defaultPreset": "기본 프리셋",
 	"frame": "프레임",
 	"imageFrameEditorTip": "이미지에 프레임이나 메타 데이터를 포함한 라벨을 추가해 장식할 수 있습니다.",
-	"low": "낮음",
 	"compressionQualityHigh": "고품질",
 	"compressionSizeLarge": "대형",
-	"medium": "보통",
 	"compressionQualityMedium": "중간 품질",
 	"compressionSizeMedium": "중형",
-	"high": "높음",
 	"compressionQualityLow": "저품질",
 	"compressionSizeSmall": "소형",
 	"defaultCompressionLevel": "기본 압축 정도 ",
 	"defaultCompressionLevel_description": "낮추면 품질을 유지합니다만 파일 크기는 증가합니다. <br>높이면 파일 크기를 줄일 수 있습니다만 품질은 저하됩니다.",
 	"video": "동영상",
-	"error": "오류"
+	"drive": "드라이브"
 }
 </locale>
 
 <locale lang="json" locale="nl-NL">
 {
-	"drive": "Schijf",
 	"settingsDriveBanner": "You can manage and configure the drive, check usage, and configure file upload settings.",
 	"usageAmount": "Gebruik",
 	"capacity": "Capaciteit",
@@ -1070,30 +984,24 @@ definePage(() => ({
 	"watermark": "Watermark",
 	"watermarkEditorTip": "A watermark, such as credit information, can be added to the image.",
 	"syncBetweenDevices": "Sync between devices",
-	"none": "Niets",
-	"noName": "No name",
 	"defaultPreset": "Default Preset",
 	"frame": "Frame",
 	"imageFrameEditorTip": "You can decorate images by adding labels that include frames and metadata.",
-	"low": "Lage",
 	"compressionQualityHigh": "High quality",
 	"compressionSizeLarge": "Large size",
-	"medium": "Medium",
 	"compressionQualityMedium": "Medium quality",
 	"compressionSizeMedium": "Medium size",
-	"high": "Hoge",
 	"compressionQualityLow": "Low quality",
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
 	"video": "Video",
-	"error": "Fout"
+	"drive": "Schijf"
 }
 </locale>
 
 <locale lang="json" locale="no-NO">
 {
-	"drive": "Drive",
 	"settingsDriveBanner": "You can manage and configure the drive, check usage, and configure file upload settings.",
 	"usageAmount": "Usage",
 	"capacity": "Capacity",
@@ -1112,30 +1020,24 @@ definePage(() => ({
 	"watermark": "Watermark",
 	"watermarkEditorTip": "A watermark, such as credit information, can be added to the image.",
 	"syncBetweenDevices": "Sync between devices",
-	"none": "Ingen",
-	"noName": "No name",
 	"defaultPreset": "Default Preset",
 	"frame": "Frame",
 	"imageFrameEditorTip": "You can decorate images by adding labels that include frames and metadata.",
-	"low": "Lav",
 	"compressionQualityHigh": "High quality",
 	"compressionSizeLarge": "Large size",
-	"medium": "Medium",
 	"compressionQualityMedium": "Medium quality",
 	"compressionSizeMedium": "Medium size",
-	"high": "Høy",
 	"compressionQualityLow": "Low quality",
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
 	"video": "Video",
-	"error": "Feil"
+	"drive": "Drive"
 }
 </locale>
 
 <locale lang="json" locale="pl-PL">
 {
-	"drive": "Dysk",
 	"settingsDriveBanner": "You can manage and configure the drive, check usage, and configure file upload settings.",
 	"usageAmount": "Użycie",
 	"capacity": "Pojemność",
@@ -1154,30 +1056,24 @@ definePage(() => ({
 	"watermark": "Watermark",
 	"watermarkEditorTip": "A watermark, such as credit information, can be added to the image.",
 	"syncBetweenDevices": "Sync between devices",
-	"none": "Brak",
-	"noName": "No name",
 	"defaultPreset": "Default Preset",
 	"frame": "Frame",
 	"imageFrameEditorTip": "You can decorate images by adding labels that include frames and metadata.",
-	"low": "Niski",
 	"compressionQualityHigh": "High quality",
 	"compressionSizeLarge": "Large size",
-	"medium": "Średnie",
 	"compressionQualityMedium": "Medium quality",
 	"compressionSizeMedium": "Medium size",
-	"high": "Wysoki",
 	"compressionQualityLow": "Low quality",
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
 	"video": "Video",
-	"error": "Błąd"
+	"drive": "Dysk"
 }
 </locale>
 
 <locale lang="json" locale="pt-PT">
 {
-	"drive": "Drive",
 	"settingsDriveBanner": "Você consegue administrar e configurar o drive, conferir o seu uso e configurar as opções de envio de arquivos.",
 	"usageAmount": "Quantidade utilizada",
 	"capacity": "Capacidade",
@@ -1196,30 +1092,24 @@ definePage(() => ({
 	"watermark": "Marca d'água",
 	"watermarkEditorTip": "Uma marca d'água, como informação de autoria, pode ser adicionada à imagem.",
 	"syncBetweenDevices": "Sincronizar entre dispositivos",
-	"none": "Nenhum",
-	"noName": "Sem nome",
 	"defaultPreset": "Predefinição Padrão",
 	"frame": "Frame",
 	"imageFrameEditorTip": "You can decorate images by adding labels that include frames and metadata.",
-	"low": "Baixo",
 	"compressionQualityHigh": "Qualidade alta",
 	"compressionSizeLarge": "Tamanho grande",
-	"medium": "Médio",
 	"compressionQualityMedium": "Qualidade média",
 	"compressionSizeMedium": "Tamanho médio",
-	"high": "Alto",
 	"compressionQualityLow": "Qualidade baixa",
 	"compressionSizeSmall": "Tamanho pequeno",
 	"defaultCompressionLevel": "Nível padrão de compressão",
 	"defaultCompressionLevel_description": "Menor compressão preserva a qualidade mas aumenta o tamanho do arquivo.<br>Maior compressão reduz o tamanho do arquivo mas diminui a qualidade.",
 	"video": "Vídeo",
-	"error": "Erro"
+	"drive": "Drive"
 }
 </locale>
 
 <locale lang="json" locale="ru-RU">
 {
-	"drive": "Диск",
 	"settingsDriveBanner": "You can manage and configure the drive, check usage, and configure file upload settings.",
 	"usageAmount": "Использовано",
 	"capacity": "Ёмкость",
@@ -1238,30 +1128,24 @@ definePage(() => ({
 	"watermark": "Watermark",
 	"watermarkEditorTip": "A watermark, such as credit information, can be added to the image.",
 	"syncBetweenDevices": "Синхронизировать между устройствами",
-	"none": "Ничего",
-	"noName": "Имя не указано",
 	"defaultPreset": "Default Preset",
 	"frame": "Рамки",
 	"imageFrameEditorTip": "You can decorate images by adding labels that include frames and metadata.",
-	"low": "Низкий",
 	"compressionQualityHigh": "Высокое качество",
 	"compressionSizeLarge": "Крупный размер",
-	"medium": "Средне",
 	"compressionQualityMedium": "Среднее качество",
 	"compressionSizeMedium": "Средний размер",
-	"high": "Высокий",
 	"compressionQualityLow": "Низкое качество",
 	"compressionSizeSmall": "Маленький размер",
 	"defaultCompressionLevel": "Уровень сжатия по умолчанию",
 	"defaultCompressionLevel_description": "Уровень сжатия ниже сохраняет качество лучше, но увеличивает размер файла.<br>Уровень сжатия выше уменьшает размер файла, но уменьшает качество.",
 	"video": "Видео",
-	"error": "Ошибка"
+	"drive": "Диск"
 }
 </locale>
 
 <locale lang="json" locale="sk-SK">
 {
-	"drive": "Disk",
 	"settingsDriveBanner": "You can manage and configure the drive, check usage, and configure file upload settings.",
 	"usageAmount": "Využitie",
 	"capacity": "Kapacita",
@@ -1280,30 +1164,24 @@ definePage(() => ({
 	"watermark": "Watermark",
 	"watermarkEditorTip": "A watermark, such as credit information, can be added to the image.",
 	"syncBetweenDevices": "Sync between devices",
-	"none": "Žiadne",
-	"noName": "No name",
 	"defaultPreset": "Default Preset",
 	"frame": "Frame",
 	"imageFrameEditorTip": "You can decorate images by adding labels that include frames and metadata.",
-	"low": "Málo",
 	"compressionQualityHigh": "High quality",
 	"compressionSizeLarge": "Large size",
-	"medium": "Stredné",
 	"compressionQualityMedium": "Medium quality",
 	"compressionSizeMedium": "Medium size",
-	"high": "Vysoká",
 	"compressionQualityLow": "Low quality",
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
 	"video": "Video",
-	"error": "Chyba"
+	"drive": "Disk"
 }
 </locale>
 
 <locale lang="json" locale="th-TH">
 {
-	"drive": "ไดรฟ์",
 	"settingsDriveBanner": "สามารถจัดการและตั้งค่าไดรฟ์ ตรวจสอบการใช้งาน และตั้งค่าการอัปโหลดไฟล์ได้",
 	"usageAmount": "การใช้งาน",
 	"capacity": "ความจุ",
@@ -1322,30 +1200,24 @@ definePage(() => ({
 	"watermark": "ลายน้ำ",
 	"watermarkEditorTip": "สามารถเพิ่มลายน้ำ เช่น ข้อมูลเครดิต ลงในภาพได้",
 	"syncBetweenDevices": "ซิงค์ระหว่างอุปกรณ์",
-	"none": "ไม่มี",
-	"noName": "ไม่มีชื่อ",
 	"defaultPreset": "พรีเซ็ตเริ่มต้น",
 	"frame": "เฟรม",
 	"imageFrameEditorTip": "สามารถตกแต่งภาพโดยการเพิ่มป้ายที่มีเฟรมหรือเมทาเดต้าได้",
-	"low": "ต่ำ",
 	"compressionQualityHigh": "คุณภาพสูง",
 	"compressionSizeLarge": "ขนาดใหญ่",
-	"medium": "ปานกลาง",
 	"compressionQualityMedium": "คุณภาพปานกลาง",
 	"compressionSizeMedium": "ขนาดปานกลาง",
-	"high": "สูง",
 	"compressionQualityLow": "คุณภาพต่ำ",
 	"compressionSizeSmall": "ขนาดเล็ก",
 	"defaultCompressionLevel": "ค่าการบีบอัดเริ่มต้น",
 	"defaultCompressionLevel_description": "ถ้าต่ำ จะรักษาคุณภาพได้ แต่ขนาดไฟล์จะเพิ่มขึ้น<br>ถ้าสูง จะลดขนาดไฟล์ได้ แต่คุณภาพจะลดลง",
 	"video": "วีดีโอ",
-	"error": "ผิดพลาด!"
+	"drive": "ไดรฟ์"
 }
 </locale>
 
 <locale lang="json" locale="tr-TR">
 {
-	"drive": "Drive",
 	"settingsDriveBanner": "Drive'ı yönetebilir ve yapılandırabilir, kullanımı kontrol edebilir ve dosya yükleme ayarlarını yapılandırabilirsin.",
 	"usageAmount": "Kullanım",
 	"capacity": "Kapasite",
@@ -1364,30 +1236,24 @@ definePage(() => ({
 	"watermark": "Filigran",
 	"watermarkEditorTip": "Kredi bilgileri gibi bir filigran görüntüye eklenebilir.",
 	"syncBetweenDevices": "Cihazlar arasında senkronizasyon",
-	"none": "Hiçbiri",
-	"noName": "İsim yok",
 	"defaultPreset": "Varsayılan Ön Ayar",
 	"frame": "Çerçeve",
 	"imageFrameEditorTip": "Görselleri, meta verileri içeren çerçeveler ve etiketler ekleyerek süsleyebilirsiniz.",
-	"low": "Düşük",
 	"compressionQualityHigh": "Yüksek Kalite ",
 	"compressionSizeLarge": "Büyük Boyut",
-	"medium": "Orta",
 	"compressionQualityMedium": "Orta Kalite",
 	"compressionSizeMedium": "Orta Boyut",
-	"high": "Yüksek",
 	"compressionQualityLow": "Düşük Kalite ",
 	"compressionSizeSmall": "Küçük Boyut",
 	"defaultCompressionLevel": "Varsayılan sıkıştırma seviyesi",
 	"defaultCompressionLevel_description": "Ayarı düşürmek kaliteyi koruyacak ancak dosya boyutunu artıracaktır. <br> Ayarı yükseltmek dosya boyutunu küçültecek ancak kaliteyi düşürecektir.",
 	"video": "Video",
-	"error": "Hata"
+	"drive": "Drive"
 }
 </locale>
 
 <locale lang="json" locale="ug-CN">
 {
-	"drive": "Drive",
 	"settingsDriveBanner": "You can manage and configure the drive, check usage, and configure file upload settings.",
 	"usageAmount": "Usage",
 	"capacity": "Capacity",
@@ -1406,30 +1272,24 @@ definePage(() => ({
 	"watermark": "Watermark",
 	"watermarkEditorTip": "A watermark, such as credit information, can be added to the image.",
 	"syncBetweenDevices": "Sync between devices",
-	"none": "None",
-	"noName": "No name",
 	"defaultPreset": "Default Preset",
 	"frame": "Frame",
 	"imageFrameEditorTip": "You can decorate images by adding labels that include frames and metadata.",
-	"low": "Low",
 	"compressionQualityHigh": "High quality",
 	"compressionSizeLarge": "Large size",
-	"medium": "Medium",
 	"compressionQualityMedium": "Medium quality",
 	"compressionSizeMedium": "Medium size",
-	"high": "High",
 	"compressionQualityLow": "Low quality",
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
 	"video": "Video",
-	"error": "Error"
+	"drive": "Drive"
 }
 </locale>
 
 <locale lang="json" locale="uk-UA">
 {
-	"drive": "Диск",
 	"settingsDriveBanner": "Ви можете курувати та налаштовувати диск, дивитися використовування, та керувати налаштуваннями вивантаження файлів. ",
 	"usageAmount": "Використане",
 	"capacity": "Ємність",
@@ -1448,30 +1308,24 @@ definePage(() => ({
 	"watermark": "Водяний знак",
 	"watermarkEditorTip": "A watermark, such as credit information, can be added to the image.",
 	"syncBetweenDevices": "Синхронізувати між пристроями",
-	"none": "Відсутній",
-	"noName": "Ім'я не вказано",
 	"defaultPreset": "Default Preset",
 	"frame": "Кадр",
 	"imageFrameEditorTip": "Ви можете декорувати зображення додаючи позначки, які мають кадри або метаданні.",
-	"low": "Низький",
 	"compressionQualityHigh": "Висока якість",
 	"compressionSizeLarge": "Великий розмір",
-	"medium": "Середній",
 	"compressionQualityMedium": "Середня якість",
 	"compressionSizeMedium": "Середній розмір",
-	"high": "Високий",
 	"compressionQualityLow": "Низька якість",
 	"compressionSizeSmall": "Малий розмір",
 	"defaultCompressionLevel": "Рівень стиснення по замовчуванню",
 	"defaultCompressionLevel_description": "Нижчий рівень стиснення зберігає якість, але збільшує розмір файлу.<br>Вищий рівень стиснення зменшує розмір файлу, але погіршує якість.",
 	"video": "Відео",
-	"error": "Помилка"
+	"drive": "Диск"
 }
 </locale>
 
 <locale lang="json" locale="vi-VN">
 {
-	"drive": "Ổ đĩa",
 	"settingsDriveBanner": "You can manage and configure the drive, check usage, and configure file upload settings.",
 	"usageAmount": "Sử dụng",
 	"capacity": "Sức chứa",
@@ -1490,30 +1344,24 @@ definePage(() => ({
 	"watermark": "Watermark",
 	"watermarkEditorTip": "A watermark, such as credit information, can be added to the image.",
 	"syncBetweenDevices": "Sync between devices",
-	"none": "Không",
-	"noName": "No name",
 	"defaultPreset": "Default Preset",
 	"frame": "Frame",
 	"imageFrameEditorTip": "You can decorate images by adding labels that include frames and metadata.",
-	"low": "Thấp",
 	"compressionQualityHigh": "High quality",
 	"compressionSizeLarge": "Large size",
-	"medium": "Vừa",
 	"compressionQualityMedium": "Medium quality",
 	"compressionSizeMedium": "Medium size",
-	"high": "Cao",
 	"compressionQualityLow": "Low quality",
 	"compressionSizeSmall": "Small size",
 	"defaultCompressionLevel": "Default compression level",
 	"defaultCompressionLevel_description": "Lower compression preserves quality but increases file size.<br>Higher compression reduces file size but lowers quality.",
 	"video": "Video",
-	"error": "Lỗi"
+	"drive": "Ổ đĩa"
 }
 </locale>
 
 <locale lang="json" locale="zh-CN">
 {
-	"drive": "网盘",
 	"settingsDriveBanner": "可在此管理和设置网盘、确认使用量及配置上传文件的设置。",
 	"usageAmount": "使用量",
 	"capacity": "容量",
@@ -1532,30 +1380,24 @@ definePage(() => ({
 	"watermark": "水印",
 	"watermarkEditorTip": "可在图像内增加包含作者等信息的水印。",
 	"syncBetweenDevices": "设备间同步",
-	"none": "无",
-	"noName": "未命名",
 	"defaultPreset": "默认预设",
 	"frame": "边框",
 	"imageFrameEditorTip": "您可以通过添加包含边框和元数据的标签来装饰图片。",
-	"low": "低",
 	"compressionQualityHigh": "高质量",
 	"compressionSizeLarge": "大",
-	"medium": "中",
 	"compressionQualityMedium": "中质量",
 	"compressionSizeMedium": "中",
-	"high": "高",
 	"compressionQualityLow": "低质量",
 	"compressionSizeSmall": "小",
 	"defaultCompressionLevel": "默认压缩等级",
 	"defaultCompressionLevel_description": "较低的等级可以保持质量，但会增加文件大小。<br>较高的等级可以减少文件大小，但相对应的质量将会降低。",
 	"video": "视频",
-	"error": "错误"
+	"drive": "网盘"
 }
 </locale>
 
 <locale lang="json" locale="zh-TW">
 {
-	"drive": "雲端硬碟",
 	"settingsDriveBanner": "您可以管理和設定雲端硬碟、確認使用量，以及調整上傳檔案時的設定。",
 	"usageAmount": "使用量",
 	"capacity": "容量",
@@ -1574,23 +1416,18 @@ definePage(() => ({
 	"watermark": "浮水印",
 	"watermarkEditorTip": "可以在圖片中以浮水印加上出處等資訊。",
 	"syncBetweenDevices": "裝置之間的同步化",
-	"none": "無",
-	"noName": "沒有名稱",
 	"defaultPreset": "預設值",
 	"frame": "邊框",
 	"imageFrameEditorTip": "可以在圖片上添加包含邊框或 EXIF 的標籤來裝飾圖片。",
-	"low": "低",
 	"compressionQualityHigh": "高品質",
 	"compressionSizeLarge": "大",
-	"medium": "中",
 	"compressionQualityMedium": "中品質",
 	"compressionSizeMedium": "中",
-	"high": "高",
 	"compressionQualityLow": "低品質",
 	"compressionSizeSmall": "小",
 	"defaultCompressionLevel": "預設的壓縮程度",
 	"defaultCompressionLevel_description": "低的話可以保留品質，但是會增加檔案的大小。<br>高的話可以減少檔案大小，但是會降低品質。",
 	"video": "影片",
-	"error": "錯誤"
+	"drive": "雲端硬碟"
 }
 </locale>

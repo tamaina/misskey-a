@@ -7,19 +7,23 @@ SPDX-License-Identifier: AGPL-3.0-only
 <div v-if="hasDisconnected && prefer.s.serverDisconnectedBehavior === 'quiet'" :class="$style.root" class="_panel _shadow" @click="resetDisconnected">
 	<div><i class="ti ti-alert-triangle"></i> {{ $locale.sfc.disconnectedFromServer }}</div>
 	<div :class="$style.command" class="_buttons">
-		<MkButton small primary @click="reload">{{ $locale.sfc.reload }}</MkButton>
+		<MkButton small primary @click="reload">{{ globalLocale.env.reload }}</MkButton>
 		<MkButton small>{{ $locale.sfc.doNothing }}</MkButton>
 	</div>
 </div>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { onUnmounted, ref } from 'vue';
 import { useStream } from '@features/api/frontend/stream.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { store } from '@features/preferences/frontend/store.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const zIndex = os.claimZIndex('high');
 
@@ -66,7 +70,6 @@ if (store.s.realtimeMode) {
 <locale locale="ar-SA" lang="json">
 {
   "disconnectedFromServer": "قُطِع الإتصال بالخادم",
-  "reload": "انعش",
   "doNothing": "تجاهل"
 }
 </locale>
@@ -74,7 +77,6 @@ if (store.s.realtimeMode) {
 <locale locale="ca-ES" lang="json">
 {
   "disconnectedFromServer": "Desconnectat pel servidor",
-  "reload": "Actualitzar",
   "doNothing": "Ignora"
 }
 </locale>
@@ -82,7 +84,6 @@ if (store.s.realtimeMode) {
 <locale locale="cs-CZ" lang="json">
 {
   "disconnectedFromServer": "Spojení bylo přerušeno",
-  "reload": "Aktualizovat",
   "doNothing": "Ignorovat"
 }
 </locale>
@@ -90,7 +91,6 @@ if (store.s.realtimeMode) {
 <locale locale="da-DK" lang="json">
 {
   "disconnectedFromServer": "Connection to server has been lost",
-  "reload": "Refresh",
   "doNothing": "Ignore"
 }
 </locale>
@@ -98,7 +98,6 @@ if (store.s.realtimeMode) {
 <locale locale="de-DE" lang="json">
 {
   "disconnectedFromServer": "Die Verbindung zum Server wurde getrennt",
-  "reload": "Aktualisieren",
   "doNothing": "Ignorieren"
 }
 </locale>
@@ -106,7 +105,6 @@ if (store.s.realtimeMode) {
 <locale locale="en-US" lang="json">
 {
   "disconnectedFromServer": "Connection to server has been lost",
-  "reload": "Refresh",
   "doNothing": "Ignore"
 }
 </locale>
@@ -114,7 +112,6 @@ if (store.s.realtimeMode) {
 <locale locale="es-ES" lang="json">
 {
   "disconnectedFromServer": "Desconectado del servidor",
-  "reload": "Recargar",
   "doNothing": "No hacer nada"
 }
 </locale>
@@ -122,7 +119,6 @@ if (store.s.realtimeMode) {
 <locale locale="fr-FR" lang="json">
 {
   "disconnectedFromServer": "Déconnecté·e du serveur",
-  "reload": "Rafraîchir",
   "doNothing": "Ignorer"
 }
 </locale>
@@ -130,7 +126,6 @@ if (store.s.realtimeMode) {
 <locale locale="id-ID" lang="json">
 {
   "disconnectedFromServer": "Terputus koneksi dari peladen",
-  "reload": "Muat ulang",
   "doNothing": "Abaikan"
 }
 </locale>
@@ -138,7 +133,6 @@ if (store.s.realtimeMode) {
 <locale locale="it-IT" lang="json">
 {
   "disconnectedFromServer": "Connessione persa",
-  "reload": "Ricarica",
   "doNothing": "Ignora"
 }
 </locale>
@@ -146,7 +140,6 @@ if (store.s.realtimeMode) {
 <locale locale="ja-JP" lang="json">
 {
   "disconnectedFromServer": "サーバーから切断されました",
-  "reload": "リロード",
   "doNothing": "なにもしない"
 }
 </locale>
@@ -154,7 +147,6 @@ if (store.s.realtimeMode) {
 <locale locale="ja-KS" lang="json">
 {
   "disconnectedFromServer": "サーバーが機嫌悪いねん",
-  "reload": "リロード",
   "doNothing": "何もせんとく"
 }
 </locale>
@@ -162,7 +154,6 @@ if (store.s.realtimeMode) {
 <locale locale="kab-KAB" lang="json">
 {
   "disconnectedFromServer": "Connection to server has been lost",
-  "reload": "Refresh",
   "doNothing": "Ignore"
 }
 </locale>
@@ -170,7 +161,6 @@ if (store.s.realtimeMode) {
 <locale locale="kn-IN" lang="json">
 {
   "disconnectedFromServer": "Connection to server has been lost",
-  "reload": "Refresh",
   "doNothing": "Ignore"
 }
 </locale>
@@ -178,7 +168,6 @@ if (store.s.realtimeMode) {
 <locale locale="ko-KR" lang="json">
 {
   "disconnectedFromServer": "서버와의 연결이 끊어졌습니다",
-  "reload": "새로고침",
   "doNothing": "무시하기"
 }
 </locale>
@@ -186,7 +175,6 @@ if (store.s.realtimeMode) {
 <locale locale="nl-NL" lang="json">
 {
   "disconnectedFromServer": "Verbinding met de server onderbroken.",
-  "reload": "Verversen",
   "doNothing": "Negeren"
 }
 </locale>
@@ -194,7 +182,6 @@ if (store.s.realtimeMode) {
 <locale locale="no-NO" lang="json">
 {
   "disconnectedFromServer": "Connection to server has been lost",
-  "reload": "Refresh",
   "doNothing": "Ignorer"
 }
 </locale>
@@ -202,7 +189,6 @@ if (store.s.realtimeMode) {
 <locale locale="pl-PL" lang="json">
 {
   "disconnectedFromServer": "Utracono połączenie z serwerem.",
-  "reload": "Odśwież",
   "doNothing": "Ignoruj"
 }
 </locale>
@@ -210,7 +196,6 @@ if (store.s.realtimeMode) {
 <locale locale="pt-PT" lang="json">
 {
   "disconnectedFromServer": "Desconectado do servidor",
-  "reload": "Recarregar",
   "doNothing": "Nenhuma ação adicional"
 }
 </locale>
@@ -218,7 +203,6 @@ if (store.s.realtimeMode) {
 <locale locale="ru-RU" lang="json">
 {
   "disconnectedFromServer": "Разорвано соединение с сервером",
-  "reload": "Перезагрузить",
   "doNothing": "Ничего не делать"
 }
 </locale>
@@ -226,7 +210,6 @@ if (store.s.realtimeMode) {
 <locale locale="sk-SK" lang="json">
 {
   "disconnectedFromServer": "Spojenie so serverom bolo prerušené",
-  "reload": "Obnoviť",
   "doNothing": "Ignorovať"
 }
 </locale>
@@ -234,7 +217,6 @@ if (store.s.realtimeMode) {
 <locale locale="th-TH" lang="json">
 {
   "disconnectedFromServer": "การเชื่อมต่อเซิร์ฟเวอร์ถูกตัด",
-  "reload": "รีโหลด",
   "doNothing": "ช่างมัน"
 }
 </locale>
@@ -242,7 +224,6 @@ if (store.s.realtimeMode) {
 <locale locale="tr-TR" lang="json">
 {
   "disconnectedFromServer": "Sunucu bağlantısı kesildi",
-  "reload": "Yenile",
   "doNothing": "Yoksay"
 }
 </locale>
@@ -250,7 +231,6 @@ if (store.s.realtimeMode) {
 <locale locale="ug-CN" lang="json">
 {
   "disconnectedFromServer": "Connection to server has been lost",
-  "reload": "Refresh",
   "doNothing": "Ignore"
 }
 </locale>
@@ -258,7 +238,6 @@ if (store.s.realtimeMode) {
 <locale locale="uk-UA" lang="json">
 {
   "disconnectedFromServer": "Зв’язок із сервером було перервано",
-  "reload": "Оновити",
   "doNothing": "Нічого не робити"
 }
 </locale>
@@ -266,7 +245,6 @@ if (store.s.realtimeMode) {
 <locale locale="vi-VN" lang="json">
 {
   "disconnectedFromServer": "Mất kết nối tới máy chủ",
-  "reload": "Tải lại",
   "doNothing": "Bỏ qua"
 }
 </locale>
@@ -274,7 +252,6 @@ if (store.s.realtimeMode) {
 <locale locale="zh-CN" lang="json">
 {
   "disconnectedFromServer": "已和服务器断开连接",
-  "reload": "刷新",
   "doNothing": "关闭"
 }
 </locale>
@@ -282,7 +259,6 @@ if (store.s.realtimeMode) {
 <locale locale="zh-TW" lang="json">
 {
   "disconnectedFromServer": "與伺服器中斷連線",
-  "reload": "重新整理",
   "doNothing": "無視"
 }
 </locale>

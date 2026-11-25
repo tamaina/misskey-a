@@ -53,8 +53,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 						/>
 						<div v-else :class="$style.hiddenPlaceholder"></div>
 						<div :class="[$style.hiddenText, { [$style.withBlur]: content.type === 'video' && content.thumbnailUrl != null }]">
-							<div :class="$style.hiddenTextWrapper">
-								<b v-if="content.file?.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ $locale.sfc.sensitive }}</b>
+							<div>
+								<b v-if="content.file?.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ globalLocale.env.sensitive }}</b>
 								<b v-else style="display: block;"><i class="ti" :class="contentHideFileIcon"></i> {{ contentHideFileText }}</b>
 								<span style="display: block;">{{ $locale.sfc.clickToShow }}</span>
 							</div>
@@ -64,6 +64,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template v-else>
 					<img
 						v-if="(!originalContentLoaded || !thumbnailContentLoaded) && (content.thumbnailUrl != null)"
+						ref="thumbnailEl"
 						:class="[$style.content, $style.thumbnail]"
 						:src="content.thumbnailUrl"
 						draggable="false"
@@ -73,6 +74,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<template v-if="activated">
 						<img
 							v-if="content.type === 'image'"
+							ref="imageEl"
 							:class="[$style.content, { [$style.pixelatedZoom]: pixelatedZoom }]"
 							:src="content.url"
 							:alt="content.file?.comment ?? undefined"
@@ -197,12 +199,12 @@ export function calculateSourceTransform({
 </script>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import type { Locale } from 'i18n';
 import { computed, nextTick, ref, useTemplateRef, markRaw, watch, provide, onBeforeUnmount, defineAsyncComponent } from 'vue';
 import MkBlurhash from '@features/drive/frontend/components/MkBlurhash.vue';
 import XControl from '@features/drive/frontend/components/MkLightbox.item.controls.vue';
-import type XAudioVisualizer__TypeReferenceOnly from '@features/drive/frontend/components/MkLightbox.item.audio-visualizer.vue';
 import XFileInfo from '@features/drive/frontend/components/MkLightbox.item.fileinfo.vue';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { DI } from '@features/ui/frontend/di.js';
 import * as os from '@features/ui/frontend/os.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
@@ -211,6 +213,10 @@ import { makeDoubleTapDetector } from '@features/ui/frontend/utility/double-tap.
 import { deviceKind } from '@features/ui/frontend/utility/device-kind.js';
 import { isTouchUsing } from '@features/ui/frontend/utility/touch.js';
 import { getFileMenu } from '@features/drive/frontend/utility/get-file-menu.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type XAudioVisualizer__TypeReferenceOnly from '@features/drive/frontend/components/MkLightbox.item.audio-visualizer.vue';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	content: Content;
@@ -237,6 +243,8 @@ const pixelatedZoom = defineModel<boolean>('pixelatedZoom', { required: true });
 
 const rootEl = useTemplateRef('rootEl');
 const mainEl = useTemplateRef('mainEl');
+const imageEl = useTemplateRef('imageEl');
+const thumbnailEl = useTemplateRef('thumbnailEl');
 const videoEl = useTemplateRef('videoEl');
 const audioEl = useTemplateRef('audioEl'); // ネイティブUI時
 const audioVisualizer = useTemplateRef<InstanceType<typeof XAudioVisualizer__TypeReferenceOnly>>('audioVisualizer'); // ネイティブUIじゃない場合
@@ -300,7 +308,7 @@ const contentHideFileText = computed(() => {
 const videoAspectRatio = ref<number | null>(
 	props.content.width != null && props.content.height != null && props.content.width > 0 && props.content.height > 0
 		? props.content.width / props.content.height
-		: null
+		: null,
 );
 
 function onVideoLoadedMetadata() {
@@ -553,6 +561,7 @@ const VELOCITY_WINDOW = 100;
 let isDragging = false;
 let isClick = false;
 let clickAction: 'hidden' | 'media' | null = null;
+let isBackgroundTap = false;
 let lastX = 0;
 let lastY = 0;
 let currentPointerId: number | null = null;
@@ -607,14 +616,45 @@ function resolveClickAction(target: EventTarget | null): 'hidden' | 'media' | nu
 	return null;
 }
 
+function isOutsideImage(x: number, y: number): boolean {
+	if (props.content.type !== 'image' || hide.value) return false;
+	const image = imageEl.value?.naturalWidth && imageEl.value.naturalHeight
+		? imageEl.value
+		: thumbnailEl.value ?? imageEl.value;
+	if (image == null) return false;
+
+	const width = image.naturalWidth || props.content.width;
+	const height = image.naturalHeight || props.content.height;
+	if (width == null || height == null || !Number.isFinite(width) || !Number.isFinite(height) || width <= 0 || height <= 0) return false;
+
+	// img自体は余白を含む。変形後の矩形からobject-fit: containで描画される範囲を求める。
+	const rect = image.getBoundingClientRect();
+	if (!isValidRect(rect)) return false;
+	const scale = Math.min(rect.width / width, rect.height / height);
+	const left = rect.left + (rect.width - width * scale) / 2;
+	const top = rect.top + (rect.height - height * scale) / 2;
+	return x < left || x > left + width * scale || y < top || y > top + height * scale;
+}
+
+function isOutsideContent(x: number, y: number): boolean {
+	if (props.content.type !== 'video') return isOutsideImage(x, y);
+	if (hide.value || videoEl.value == null || videoAspectRatio.value == null) return false;
+
+	// 動画要素は縦横比に合わせてサイズを指定しているため、要素の矩形が描画範囲になる。
+	const rect = videoEl.value.getBoundingClientRect();
+	if (!isValidRect(rect)) return false;
+	return x < rect.left || x > rect.right || y < rect.top || y > rect.bottom;
+}
+
 function onPointerdown(ev: PointerEvent) {
 	if (mainEl.value == null) return;
 	pointerEventCache.set(ev.pointerId, ev);
 	mainEl.value.setPointerCapture(ev.pointerId);
 
 	isDragging = true;
-	isClick = true;
+	isClick = pointerEventCache.size === 1;
 	clickAction = resolveClickAction(ev.target);
+	isBackgroundTap = isClick && isOutsideContent(ev.clientX, ev.clientY);
 	lastX = ev.clientX;
 	lastY = ev.clientY;
 	pointerVec = { x: 0, y: 0 };
@@ -723,6 +763,7 @@ function onPointermove(ev: PointerEvent) {
 
 function onPointerup(ev: PointerEvent) {
 	if (mainEl.value == null) return;
+	isBackgroundTap = isBackgroundTap && isOutsideContent(ev.clientX, ev.clientY);
 	pointerEventCache.delete(ev.pointerId);
 	mainEl.value.releasePointerCapture(ev.pointerId);
 	prevTwoTouchPointsDistance = 0;
@@ -791,6 +832,7 @@ function cancelPointerGesture() {
 	isDragging = false;
 	isClick = false;
 	clickAction = null;
+	isBackgroundTap = false;
 	pointerVec = { x: 0, y: 0 };
 	velocitySamples = [];
 	horizontalSwipeDelta = 0;
@@ -804,6 +846,10 @@ function cancelPointerGesture() {
 }
 
 function onTouchstart(ev: TouchEvent) {
+	if ((props.content.type === 'image' || props.content.type === 'video') && (ev.touches.length !== 1 || isOutsideContent(ev.touches[0].clientX, ev.touches[0].clientY))) {
+		doubleTapDetector.reset();
+		return;
+	}
 	doubleTapDetector.onTouchstart(ev);
 }
 
@@ -890,22 +936,25 @@ watch(rootEl, (newRootEl) => {
 }, { immediate: true });
 
 function onClick(ev: MouseEvent) {
-	if (!isClick) return;
-
+	const wasClick = isClick;
+	const wasBackgroundTap = isBackgroundTap;
 	const action = clickAction ?? resolveClickAction(ev.target);
+	isClick = false;
 	clickAction = null;
+	isBackgroundTap = false;
+	if (!wasClick) return;
 
 	if (action === 'hidden') {
 		void onHiddenClick();
 		return;
 	}
 
-	if (action === 'media') {
+	if (action === 'media' && !wasBackgroundTap) {
 		onMediaClick();
 		return;
 	}
 
-	if (!isTouchUsing) {
+	if (!isTouchUsing || wasBackgroundTap) {
 		if (isZooming.value) {
 			isZooming.value = false;
 			resetToNeutral();
@@ -986,7 +1035,7 @@ function openMenu(ev: PointerEvent) {
 	}
 
 	menu.push({
-		text: $locale.value.sfc.hide,
+		text: globalLocale.value.env.hide,
 		icon: 'ti ti-eye-off',
 		action: () => {
 			hide.value = true;
@@ -1311,8 +1360,6 @@ defineExpose({
 	"video": "فيديو",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "إخفاء",
-	"sensitive": "محتوى حساس",
 	"clickToShow": "اضغط للعرض"
 }
 </locale>
@@ -1323,8 +1370,6 @@ defineExpose({
 	"video": "Vídeo",
 	"audio": "So",
 	"pixelatedZoom": "Mode de zoom d'art pixelat",
-	"hide": "Amagar",
-	"sensitive": "Sensible",
 	"clickToShow": "Fes clic per mostrar"
 }
 </locale>
@@ -1335,8 +1380,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Zvuk",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Skrýt",
-	"sensitive": "NSFW",
 	"clickToShow": "Klikněte pro zobrazení"
 }
 </locale>
@@ -1347,8 +1390,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Hide",
-	"sensitive": "Sensitive",
 	"clickToShow": "Click to show"
 }
 </locale>
@@ -1359,8 +1400,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Inhalt verbergen",
-	"sensitive": "Sensibel",
 	"clickToShow": "Zum Anzeigen anklicken"
 }
 </locale>
@@ -1371,8 +1410,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Hide",
-	"sensitive": "Sensitive",
 	"clickToShow": "Click to show"
 }
 </locale>
@@ -1383,8 +1420,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Sonido",
 	"pixelatedZoom": "Modo de ampliación para pixel art",
-	"hide": "Ocultar",
-	"sensitive": "Marcado como sensible (NSFW)",
 	"clickToShow": "Haz clic para verlo"
 }
 </locale>
@@ -1395,8 +1430,6 @@ defineExpose({
 	"video": "Vidéo",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Masquer",
-	"sensitive": "Contenu sensible",
 	"clickToShow": "Cliquer pour afficher"
 }
 </locale>
@@ -1407,8 +1440,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Suara",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Sembunyikan",
-	"sensitive": "Konten sensitif",
 	"clickToShow": "Klik untuk melihat"
 }
 </locale>
@@ -1419,8 +1450,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Ingrandimento pixelato",
-	"hide": "Nascondere",
-	"sensitive": "Esplicito",
 	"clickToShow": "Media nascosto, cliccare solo se si intende vedere"
 }
 </locale>
@@ -1431,8 +1460,6 @@ defineExpose({
 	"video": "動画",
 	"audio": "音声",
 	"pixelatedZoom": "ピクセルアート拡大モード",
-	"hide": "隠す",
-	"sensitive": "センシティブ",
 	"clickToShow": "クリックして表示"
 }
 </locale>
@@ -1443,8 +1470,6 @@ defineExpose({
 	"video": "動画",
 	"audio": "音声",
 	"pixelatedZoom": "ピクセルアート拡大モード",
-	"hide": "隠す",
-	"sensitive": "気いつけて見いや",
 	"clickToShow": "押したら見えるで"
 }
 </locale>
@@ -1455,8 +1480,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Hide",
-	"sensitive": "Sensitive",
 	"clickToShow": "Click to show"
 }
 </locale>
@@ -1467,8 +1490,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Hide",
-	"sensitive": "Sensitive",
 	"clickToShow": "Click to show"
 }
 </locale>
@@ -1479,8 +1500,6 @@ defineExpose({
 	"video": "동영상",
 	"audio": "소리",
 	"pixelatedZoom": "픽셀 아트 확대 모드",
-	"hide": "숨기기",
-	"sensitive": "열람 주의",
 	"clickToShow": "클릭하여 보기"
 }
 </locale>
@@ -1491,8 +1510,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Verbergen",
-	"sensitive": "NSFW",
 	"clickToShow": "Klik om te bekijken"
 }
 </locale>
@@ -1503,8 +1520,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Skjul",
-	"sensitive": "Sensitive",
 	"clickToShow": "Klikk for å vise"
 }
 </locale>
@@ -1515,8 +1530,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Ukryj",
-	"sensitive": "NSFW",
 	"clickToShow": "Kliknij, aby wyświetlić"
 }
 </locale>
@@ -1527,8 +1540,6 @@ defineExpose({
 	"video": "Vídeo",
 	"audio": "Áudio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Ocultar",
-	"sensitive": "Conteúdo sensível",
 	"clickToShow": "Clique para ver"
 }
 </locale>
@@ -1539,8 +1550,6 @@ defineExpose({
 	"video": "Видео",
 	"audio": "Звук",
 	"pixelatedZoom": "Пиксельное масштабирование",
-	"hide": "Спрятать",
-	"sensitive": "Содержимое не для всех",
 	"clickToShow": "Нажмите для просмотра"
 }
 </locale>
@@ -1551,8 +1560,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Skryť",
-	"sensitive": "NSFW",
 	"clickToShow": "Kliknutím zobrazíte"
 }
 </locale>
@@ -1563,8 +1570,6 @@ defineExpose({
 	"video": "วีดีโอ",
 	"audio": "เสียง",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "ซ่อน",
-	"sensitive": "เนื้อหาที่ละเอียดอ่อน",
 	"clickToShow": "คลิกเพื่อแสดง"
 }
 </locale>
@@ -1575,8 +1580,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Ses",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Gizle",
-	"sensitive": "Hassas",
 	"clickToShow": "Göstermek için tıklayın"
 }
 </locale>
@@ -1587,8 +1590,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Audio",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Hide",
-	"sensitive": "Sensitive",
 	"clickToShow": "Click to show"
 }
 </locale>
@@ -1599,8 +1600,6 @@ defineExpose({
 	"video": "Відео",
 	"audio": "Аудіо",
 	"pixelatedZoom": "Пікселізоване приближення",
-	"hide": "Сховати",
-	"sensitive": "NSFW",
 	"clickToShow": "Натисніть для перегляду"
 }
 </locale>
@@ -1611,8 +1610,6 @@ defineExpose({
 	"video": "Video",
 	"audio": "Âm thanh",
 	"pixelatedZoom": "Pixelated Zoom",
-	"hide": "Ẩn",
-	"sensitive": "Nhạy cảm",
 	"clickToShow": "Nhấn để xem"
 }
 </locale>
@@ -1623,8 +1620,6 @@ defineExpose({
 	"video": "视频",
 	"audio": "音频",
 	"pixelatedZoom": "像素画放大模式",
-	"hide": "隐藏",
-	"sensitive": "敏感内容",
 	"clickToShow": "点击以显示"
 }
 </locale>
@@ -1635,8 +1630,6 @@ defineExpose({
 	"video": "影片",
 	"audio": "音效",
 	"pixelatedZoom": "像素藝術縮放模式",
-	"hide": "隱藏",
-	"sensitive": "敏感內容",
 	"clickToShow": "點擊查看"
 }
 </locale>

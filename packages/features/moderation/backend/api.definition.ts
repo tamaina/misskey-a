@@ -139,6 +139,8 @@ export const moderationContract = {
  .errors({ ...commonErrors }).input(objectInput({
 	'userId': misskeyId,
 })).output(v.array(v.strictObject({
+	'id': v.string(),
+	'lastSeenAt': v.pipe(v.string(), v.metadata({ 'format': 'date-time' })),
 	'ip': v.string(),
 	'createdAt': v.pipe(v.string(), v.metadata({ 'format': 'date-time' })),
 }))),

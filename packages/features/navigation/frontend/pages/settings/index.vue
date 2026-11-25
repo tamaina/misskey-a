@@ -35,9 +35,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, onActivated, onMounted, onUnmounted, ref, useTemplateRef, watch } from 'vue';
-import type { PageMetadata } from '@features/navigation/frontend/page.js';
-import type { SuperMenuDef } from '@features/navigation/frontend/components/MkSuperMenu.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import MkSuperMenu from '@features/navigation/frontend/components/MkSuperMenu.vue';
 import { $i } from '@features/auth/frontend/i.js';
@@ -51,13 +50,18 @@ import { store } from '@features/preferences/frontend/store.js';
 import { signout } from '@features/auth/frontend/signout.js';
 import { genSearchIndexes } from '@features/discovery/frontend/utility/inapp-search.js';
 import { enableStoragePersistence, getStoragePersistenceStatusRef, storagePersistenceSupported, skipStoragePersistence } from '@features/runtime/frontend/utility/storage.js';
+import type { SuperMenuDef } from '@features/navigation/frontend/components/MkSuperMenu.vue';
+import type { PageMetadata } from '@features/navigation/frontend/page.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const searchIndex = await import('search-index:settings').then(({ searchIndexes }) => genSearchIndexes(searchIndexes));
 
 const storagePersisted = await getStoragePersistenceStatusRef();
 
 const indexInfo = {
-	title: $locale.value.sfc.settings,
+	title: globalLocale.value.env.settings,
 	icon: 'ti ti-settings',
 	hideHeader: true,
 };
@@ -94,7 +98,7 @@ const menuDef = computed<SuperMenuDef[]>(() => [{
 		active: currentPage.value?.route.name === 'privacy',
 	}, {
 		icon: 'ti ti-bell',
-		text: $locale.value.sfc.notifications,
+		text: globalLocale.value.env.notifications,
 		to: '/settings/notifications',
 		active: currentPage.value?.route.name === 'notifications',
 	}, {
@@ -143,7 +147,7 @@ const menuDef = computed<SuperMenuDef[]>(() => [{
 }, {
 	items: [{
 		icon: 'ti ti-cloud',
-		text: $locale.value.sfc.drive,
+		text: globalLocale.value.env.drive,
 		to: '/settings/drive',
 		active: currentPage.value?.route.name === 'drive',
 	}, {
@@ -277,10 +281,8 @@ definePage(() => INFO.value);
 
 <locale locale="ar-SA" lang="json">
 {
-	"settings": "الاعدادات",
 	"profile": "الملف التعريفي",
 	"privacy": "الخصوصية",
-	"notifications": "الإشعارات",
 	"email": "البريد الإلكتروني ",
 	"security": "الأمان",
 	"preferences": "Preferences",
@@ -288,7 +290,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Emoji palette",
 	"sounds": "الرنات",
 	"plugins": "الإضافات",
-	"drive": "قرص التخرين",
 	"muteAndBlock": "المكتومون والمحجوبون",
 	"serviceConnection": "Service integration",
 	"accountData": "Account data",
@@ -310,10 +311,8 @@ definePage(() => INFO.value);
 
 <locale locale="ca-ES" lang="json">
 {
-	"settings": "Preferències",
 	"profile": "Perfil",
 	"privacy": "Privadesa",
-	"notifications": "Notificacions",
 	"email": "Correu electrònic",
 	"security": "Seguretat",
 	"preferences": "Preferències ",
@@ -321,7 +320,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Calaix d'emojis",
 	"sounds": "Sons",
 	"plugins": "Extensions",
-	"drive": "Disc",
 	"muteAndBlock": "Silencia i bloca",
 	"serviceConnection": "Relació entre serveis",
 	"accountData": "Dades del compte",
@@ -343,10 +341,8 @@ definePage(() => INFO.value);
 
 <locale locale="cs-CZ" lang="json">
 {
-	"settings": "Nastavení",
 	"profile": "Váš profil",
 	"privacy": "Soukromí",
-	"notifications": "Oznámení",
 	"email": "Email",
 	"security": "Zabezpečení",
 	"preferences": "Preferences",
@@ -354,7 +350,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Emoji palette",
 	"sounds": "Zvuky",
 	"plugins": "Pluginy",
-	"drive": "Úložiště",
 	"muteAndBlock": "Ztlumení a blokování",
 	"serviceConnection": "Service integration",
 	"accountData": "Account data",
@@ -376,10 +371,8 @@ definePage(() => INFO.value);
 
 <locale locale="da-DK" lang="json">
 {
-	"settings": "Settings",
 	"profile": "Profile",
 	"privacy": "Privacy",
-	"notifications": "Notifications",
 	"email": "Email",
 	"security": "Security",
 	"preferences": "Preferences",
@@ -387,7 +380,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Emoji palette",
 	"sounds": "Sounds",
 	"plugins": "Plugins",
-	"drive": "Drive",
 	"muteAndBlock": "Mutes and Blocks",
 	"serviceConnection": "Service integration",
 	"accountData": "Account data",
@@ -409,10 +401,8 @@ definePage(() => INFO.value);
 
 <locale locale="de-DE" lang="json">
 {
-	"settings": "Einstellungen",
 	"profile": "Profil",
 	"privacy": "Privatsphäre",
-	"notifications": "Benachrichtigungen",
 	"email": "Email",
 	"security": "Sicherheit",
 	"preferences": "Einstellungen",
@@ -420,7 +410,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Emoji-Palette",
 	"sounds": "Töne",
 	"plugins": "Plugins",
-	"drive": "Drive",
 	"muteAndBlock": "Stummschaltungen und Blockierungen",
 	"serviceConnection": "Integrierte Dienste",
 	"accountData": "Kontodaten",
@@ -442,10 +431,8 @@ definePage(() => INFO.value);
 
 <locale locale="en-US" lang="json">
 {
-	"settings": "Settings",
 	"profile": "Profile",
 	"privacy": "Privacy",
-	"notifications": "Notifications",
 	"email": "Email",
 	"security": "Security",
 	"preferences": "Preferences",
@@ -453,7 +440,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Emoji palette",
 	"sounds": "Sounds",
 	"plugins": "Plugins",
-	"drive": "Drive",
 	"muteAndBlock": "Mutes and Blocks",
 	"serviceConnection": "Service integration",
 	"accountData": "Account data",
@@ -475,10 +461,8 @@ definePage(() => INFO.value);
 
 <locale locale="es-ES" lang="json">
 {
-	"settings": "Configuración",
 	"profile": "Perfil",
 	"privacy": "Privacidad",
-	"notifications": "Notificaciones",
 	"email": "Correo",
 	"security": "Seguridad",
 	"preferences": "Preferencias",
@@ -486,7 +470,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Paleta emoji",
 	"sounds": "Sonidos",
 	"plugins": "Plugins",
-	"drive": "Drive",
 	"muteAndBlock": "Silenciar y bloquear",
 	"serviceConnection": "Integraciones",
 	"accountData": "Datos de la cuenta",
@@ -508,10 +491,8 @@ definePage(() => INFO.value);
 
 <locale locale="fr-FR" lang="json">
 {
-	"settings": "Paramètres",
 	"profile": "Profil",
 	"privacy": "Confidentialité",
-	"notifications": "Notifications",
 	"email": "E-mail ",
 	"security": "Sécurité",
 	"preferences": "Preferences",
@@ -519,7 +500,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Emoji palette",
 	"sounds": "Sons",
 	"plugins": "Extensions",
-	"drive": "Disque",
 	"muteAndBlock": "Masqué·e·s / Bloqué·e·s",
 	"serviceConnection": "Service integration",
 	"accountData": "Account data",
@@ -541,10 +521,8 @@ definePage(() => INFO.value);
 
 <locale locale="id-ID" lang="json">
 {
-	"settings": "Pengaturan",
 	"profile": "Profil",
 	"privacy": "Privasi",
-	"notifications": "Notifikasi",
 	"email": "Surel",
 	"security": "Keamanan",
 	"preferences": "Preferences",
@@ -552,7 +530,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Palet emoji",
 	"sounds": "Bunyi",
 	"plugins": "Plugin",
-	"drive": "Drive",
 	"muteAndBlock": "Bisukan / Blokir",
 	"serviceConnection": "Service integration",
 	"accountData": "Account data",
@@ -574,10 +551,8 @@ definePage(() => INFO.value);
 
 <locale locale="it-IT" lang="json">
 {
-	"settings": "Impostazioni",
 	"profile": "Profilo",
 	"privacy": "Privacy",
-	"notifications": "Notifiche",
 	"email": "Email",
 	"security": "Sicurezza",
 	"preferences": "Preferenze",
@@ -585,7 +560,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Tavolozza emoji",
 	"sounds": "Impostazioni suoni",
 	"plugins": "Estensioni",
-	"drive": "Drive",
 	"muteAndBlock": "Silenziare e bloccare",
 	"serviceConnection": "Integrazione servizi",
 	"accountData": "Dati del profilo",
@@ -608,10 +582,8 @@ definePage(() => INFO.value);
 <locale locale="ja-JP" lang="json">
 {
 	"wallets": "ウォレット",
-	"settings": "設定",
 	"profile": "プロフィール",
 	"privacy": "プライバシー",
-	"notifications": "通知",
 	"email": "メール",
 	"security": "セキュリティ",
 	"preferences": "環境設定",
@@ -619,7 +591,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "絵文字パレット",
 	"sounds": "サウンド",
 	"plugins": "プラグイン",
-	"drive": "ドライブ",
 	"muteAndBlock": "ミュートとブロック",
 	"serviceConnection": "サービス連携",
 	"accountData": "アカウントのデータ",
@@ -641,10 +612,8 @@ definePage(() => INFO.value);
 
 <locale locale="ja-KS" lang="json">
 {
-	"settings": "設定",
 	"profile": "プロフィール",
 	"privacy": "プライバシー",
-	"notifications": "通知",
 	"email": "メール",
 	"security": "セキュリティ",
 	"preferences": "環境設定",
@@ -652,7 +621,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "絵文字パレット",
 	"sounds": "音",
 	"plugins": "プラグイン",
-	"drive": "ドライブ",
 	"muteAndBlock": "ミュートとブロック",
 	"serviceConnection": "サービス連携",
 	"accountData": "アカウントのデータ",
@@ -674,10 +642,8 @@ definePage(() => INFO.value);
 
 <locale locale="kab-KAB" lang="json">
 {
-	"settings": "Iɣewwaṛen",
 	"profile": "Amaɣnu",
 	"privacy": "Tabaḍnit",
-	"notifications": "Ilɣuyen",
 	"email": "Imayl",
 	"security": "Taɣellist",
 	"preferences": "Preferences",
@@ -685,7 +651,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Emoji palette",
 	"sounds": "Sounds",
 	"plugins": "Izegrar",
-	"drive": "Drive",
 	"muteAndBlock": "Mutes and Blocks",
 	"serviceConnection": "Service integration",
 	"accountData": "Account data",
@@ -707,10 +672,8 @@ definePage(() => INFO.value);
 
 <locale locale="kn-IN" lang="json">
 {
-	"settings": "ಸಿದ್ಧತೆಗಳು",
 	"profile": "ಪ್ರೊಫೈಲು",
 	"privacy": "Privacy",
-	"notifications": "ಅಧಿಸೂಚನೆಗಳು",
 	"email": "Email",
 	"security": "Security",
 	"preferences": "Preferences",
@@ -718,7 +681,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Emoji palette",
 	"sounds": "Sounds",
 	"plugins": "Plugins",
-	"drive": "Drive",
 	"muteAndBlock": "Mutes and Blocks",
 	"serviceConnection": "Service integration",
 	"accountData": "Account data",
@@ -740,10 +702,8 @@ definePage(() => INFO.value);
 
 <locale locale="ko-KR" lang="json">
 {
-	"settings": "설정",
 	"profile": "프로필",
 	"privacy": "프라이버시",
-	"notifications": "알림",
 	"email": "이메일",
 	"security": "보안",
 	"preferences": "환경설정",
@@ -751,7 +711,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "이모지 팔레트",
 	"sounds": "소리",
 	"plugins": "플러그인",
-	"drive": "드라이브",
 	"muteAndBlock": "뮤트 및 차단",
 	"serviceConnection": "서비스 연동",
 	"accountData": "계정 데이터",
@@ -773,10 +732,8 @@ definePage(() => INFO.value);
 
 <locale locale="nl-NL" lang="json">
 {
-	"settings": "Instellingen",
 	"profile": "Profiel",
 	"privacy": "Privacy",
-	"notifications": "Meldingen",
 	"email": "Email",
 	"security": "Beveiliging",
 	"preferences": "Preferences",
@@ -784,7 +741,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Emoji palette",
 	"sounds": "Geluiden",
 	"plugins": "Plugins",
-	"drive": "Schijf",
 	"muteAndBlock": "Gedempt en geblokkeerd",
 	"serviceConnection": "Service integration",
 	"accountData": "Account data",
@@ -806,10 +762,8 @@ definePage(() => INFO.value);
 
 <locale locale="no-NO" lang="json">
 {
-	"settings": "Innstillinger",
 	"profile": "Profil",
 	"privacy": "Personvern",
-	"notifications": "Varsler",
 	"email": "E-post",
 	"security": "Sikkerhet",
 	"preferences": "Preferences",
@@ -817,7 +771,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Emoji palette",
 	"sounds": "Sounds",
 	"plugins": "Plugins",
-	"drive": "Drive",
 	"muteAndBlock": "Skjul og blokker",
 	"serviceConnection": "Service integration",
 	"accountData": "Account data",
@@ -839,10 +792,8 @@ definePage(() => INFO.value);
 
 <locale locale="pl-PL" lang="json">
 {
-	"settings": "Ustawienia",
 	"profile": "Profil",
 	"privacy": "Prywatność",
-	"notifications": "Powiadomienia",
 	"email": "Adres e-mail",
 	"security": "Bezpieczeństwo",
 	"preferences": "Preferences",
@@ -850,7 +801,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Emoji palette",
 	"sounds": "Dźwięk",
 	"plugins": "Wtyczki",
-	"drive": "Dysk",
 	"muteAndBlock": "Wycisz / Zablokuj",
 	"serviceConnection": "Service integration",
 	"accountData": "Account data",
@@ -872,10 +822,8 @@ definePage(() => INFO.value);
 
 <locale locale="pt-PT" lang="json">
 {
-	"settings": "Configurações",
 	"profile": "Perfil",
 	"privacy": "Privacidade",
-	"notifications": "Notificações",
 	"email": "E-mail",
 	"security": "Segurança",
 	"preferences": "Preferências",
@@ -883,7 +831,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Paleta de emojis",
 	"sounds": "Sons",
 	"plugins": "Plugins",
-	"drive": "Drive",
 	"muteAndBlock": "Silenciar e bloquear",
 	"serviceConnection": "Integração de serviço",
 	"accountData": "Dados da conta",
@@ -905,10 +852,8 @@ definePage(() => INFO.value);
 
 <locale locale="ru-RU" lang="json">
 {
-	"settings": "Настройки",
 	"profile": "Профиль",
 	"privacy": "Конфиденциальность",
-	"notifications": "Уведомления",
 	"email": "Электронная почта",
 	"security": "Безопасность",
 	"preferences": "Основное",
@@ -916,7 +861,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Палитра эмодзи",
 	"sounds": "Звуки",
 	"plugins": "Расширения",
-	"drive": "Диск",
 	"muteAndBlock": "Скрытие и блокировка",
 	"serviceConnection": "Интеграция сервисов",
 	"accountData": "Данные аккаунта",
@@ -938,10 +882,8 @@ definePage(() => INFO.value);
 
 <locale locale="sk-SK" lang="json">
 {
-	"settings": "Nastavenia",
 	"profile": "Profil",
 	"privacy": "Súkromie",
-	"notifications": "Oznámenia",
 	"email": "Email",
 	"security": "Zabezpečenie",
 	"preferences": "Preferences",
@@ -949,7 +891,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Emoji palette",
 	"sounds": "Zvuky",
 	"plugins": "Pluginy",
-	"drive": "Disk",
 	"muteAndBlock": "Umlčania a blokácie",
 	"serviceConnection": "Service integration",
 	"accountData": "Account data",
@@ -971,10 +912,8 @@ definePage(() => INFO.value);
 
 <locale locale="th-TH" lang="json">
 {
-	"settings": "การตั้งค่า",
 	"profile": "โปรไฟล์",
 	"privacy": "ความเป็นส่วนตัว",
-	"notifications": "เเจ้งเตือน",
 	"email": "อีเมล",
 	"security": "ความปลอดภัย",
 	"preferences": "การตั้งค่าสภาพแวดล้อม",
@@ -982,7 +921,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "จานสีเอโมจิ",
 	"sounds": "เสียง",
 	"plugins": "ปลั๊กอิน",
-	"drive": "ไดรฟ์",
 	"muteAndBlock": "ปิดเสียงและบล็อก",
 	"serviceConnection": "การเชื่อมต่อกับบริการ",
 	"accountData": "ข้อมูลบัญชี",
@@ -1004,10 +942,8 @@ definePage(() => INFO.value);
 
 <locale locale="tr-TR" lang="json">
 {
-	"settings": "Ayarlar",
 	"profile": "Profil",
 	"privacy": "Gizlilik",
-	"notifications": "Bildirimler",
 	"email": "E-Posta",
 	"security": "Güvenlik",
 	"preferences": "Tercihler",
@@ -1015,7 +951,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Emoji paleti",
 	"sounds": "Sesler",
 	"plugins": "Eklentiler",
-	"drive": "Drive",
 	"muteAndBlock": "Sessize Alma ve Engelleme",
 	"serviceConnection": "Hizmet entegrasyonu",
 	"accountData": "Hesap verileri",
@@ -1037,10 +972,8 @@ definePage(() => INFO.value);
 
 <locale locale="ug-CN" lang="json">
 {
-	"settings": "Settings",
 	"profile": "profile",
 	"privacy": "Privacy",
-	"notifications": "Notifications",
 	"email": "Email",
 	"security": "Security",
 	"preferences": "Preferences",
@@ -1048,7 +981,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Emoji palette",
 	"sounds": "Sounds",
 	"plugins": "Plugins",
-	"drive": "Drive",
 	"muteAndBlock": "Mutes and Blocks",
 	"serviceConnection": "Service integration",
 	"accountData": "Account data",
@@ -1070,10 +1002,8 @@ definePage(() => INFO.value);
 
 <locale locale="uk-UA" lang="json">
 {
-	"settings": "Налаштування",
 	"profile": "Профіль",
 	"privacy": "Конфіденційність",
-	"notifications": "Сповіщення",
 	"email": "E-mail",
 	"security": "Безпека",
 	"preferences": "Налаштування",
@@ -1081,7 +1011,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Палітра емодзі",
 	"sounds": "Звуки",
 	"plugins": "Плагіни",
-	"drive": "Диск",
 	"muteAndBlock": "Заглушення і блокування",
 	"serviceConnection": "Інтеграції",
 	"accountData": "Інформація про обліковий запис",
@@ -1103,10 +1032,8 @@ definePage(() => INFO.value);
 
 <locale locale="vi-VN" lang="json">
 {
-	"settings": "Cài đặt",
 	"profile": "Trang cá nhân",
 	"privacy": "Riêng tư",
-	"notifications": "Thông báo",
 	"email": "Email",
 	"security": "Bảo mật",
 	"preferences": "Thiết lập môi trường",
@@ -1114,7 +1041,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "Emoji palette",
 	"sounds": "Âm thanh",
 	"plugins": "Plugin",
-	"drive": "Ổ đĩa",
 	"muteAndBlock": "Ẩn và Chặn",
 	"serviceConnection": "Service integration",
 	"accountData": "Account data",
@@ -1136,10 +1062,8 @@ definePage(() => INFO.value);
 
 <locale locale="zh-CN" lang="json">
 {
-	"settings": "设置",
 	"profile": "个人资料",
 	"privacy": "隐私",
-	"notifications": "通知",
 	"email": "邮箱",
 	"security": "安全",
 	"preferences": "偏好设置",
@@ -1147,7 +1071,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "表情符号选择器",
 	"sounds": "提示音",
 	"plugins": "插件",
-	"drive": "网盘",
 	"muteAndBlock": "隐藏和屏蔽",
 	"serviceConnection": "连接服务",
 	"accountData": "账户数据",
@@ -1169,10 +1092,8 @@ definePage(() => INFO.value);
 
 <locale locale="zh-TW" lang="json">
 {
-	"settings": "設定",
 	"profile": "個人檔案",
 	"privacy": "隱私",
-	"notifications": "通知",
 	"email": "電子郵件",
 	"security": "安全性",
 	"preferences": "環境設定",
@@ -1180,7 +1101,6 @@ definePage(() => INFO.value);
 	"emojiPalette": "表情符號調色盤",
 	"sounds": "音效",
 	"plugins": "外掛",
-	"drive": "雲端硬碟",
 	"muteAndBlock": "靜音和封鎖",
 	"serviceConnection": "服務整合",
 	"accountData": "帳戶資料",

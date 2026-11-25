@@ -7,12 +7,13 @@ import { oc } from '@orpc/contract';
 import * as v from 'valibot';
 import type { Meta } from '@orpc/contract';
 import type { ApiProcedureMetadata } from '../../api/backend/transport/policy.types.js';
+import { webhookEventTypes } from '../../integrations/backend/webhook-events.schema.js';
 import { eventNames } from './events.schema.js';
 import { streamChannelArguments, streamNoteArguments } from './stream.schema.js';
 
 const url = v.pipe(v.string(), v.minLength(1), v.maxLength(1024));
 const identities = [
-	{ name: v.picklist(['note.mentioned', 'note.replied']), arguments: v.strictObject({}) },
+	{ name: v.picklist([...webhookEventTypes, 'note.mentioned', 'note.replied']), arguments: v.strictObject({}) },
 	{ name: v.literal('antenna.note'), arguments: v.strictObject({ antennaId: v.pipe(v.string(), v.minLength(1), v.maxLength(32)) }) },
 	{ name: v.literal('stream.channel'), arguments: streamChannelArguments },
 	{ name: v.literal('stream.broadcast'), arguments: v.strictObject({}) },

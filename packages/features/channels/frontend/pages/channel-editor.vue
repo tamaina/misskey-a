@@ -8,11 +8,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div class="_spacer" style="--MI_SPACER-w: 700px;">
 		<div v-if="channelId == null || channel != null" class="_gaps_m">
 			<MkInput v-model="name">
-				<template #label>{{ $locale.sfc.name }}</template>
+				<template #label>{{ globalLocale.env.name }}</template>
 			</MkInput>
 
 			<MkTextarea v-model="description" mfmAutocomplete :mfmPreview="true">
-				<template #label>{{ $locale.sfc.description }}</template>
+				<template #label>{{ globalLocale.env.description }}</template>
 			</MkTextarea>
 
 			<MkColorInput v-model="color">
@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkColorInput>
 
 			<MkSwitch v-model="isSensitive">
-				<template #label>{{ $locale.sfc.sensitive }}</template>
+				<template #label>{{ globalLocale.env.sensitive }}</template>
 			</MkSwitch>
 
 			<MkSwitch v-model="allowRenoteToExternal">
@@ -59,7 +59,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkFolder>
 
 			<div class="_buttons">
-				<MkButton primary @click="save()"><i class="ti ti-device-floppy"></i> {{ channelId ? $locale.sfc.save : $locale.sfc.create }}</MkButton>
+				<MkButton primary @click="save()"><i class="ti ti-device-floppy"></i> {{ channelId ? globalLocale.env.save : globalLocale.env.create }}</MkButton>
 				<MkButton v-if="channelId" danger @click="archive()"><i class="ti ti-trash"></i> {{ $locale.sfc.archive }}</MkButton>
 			</div>
 		</div>
@@ -68,6 +68,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -83,6 +84,9 @@ import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import MkDraggable from '@features/ui/frontend/components/MkDraggable.vue';
 import { useRouter } from '@features/navigation/frontend/router.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const router = useRouter();
 
@@ -247,16 +251,11 @@ definePage(() => ({
 
 <locale lang="json" locale="ar-SA">
 {
-	"name": "الإسم",
-	"description": "الوصف",
 	"color": "اللون",
-	"sensitive": "محتوى حساس",
 	"channelAllowRenoteToExternal": "Allow renote and quote outside the channel",
 	"channelSetBanner": "عيّن اللافتة",
 	"channelRemoveBanner": "أزل اللافتة",
 	"pinnedNotes": "ملاحظة مثبتة",
-	"save": "حفظ",
-	"create": "أنشئ",
 	"archive": "الأرشيف",
 	"noteIdOrUrl": "معرف الملاحظة أو رابطها",
 	"channelArchiveConfirmTitle": "أتريد أرشفت {name}؟",
@@ -268,16 +267,11 @@ definePage(() => ({
 
 <locale lang="json" locale="ca-ES">
 {
-	"name": "Nom",
-	"description": "Descripció",
 	"color": "Color",
-	"sensitive": "Sensible",
 	"channelAllowRenoteToExternal": "Permet la citació i l'impuls fora del canal",
 	"channelSetBanner": "Estableix el bàner ",
 	"channelRemoveBanner": "Eliminar el.bàner",
 	"pinnedNotes": "Nota fixada",
-	"save": "Desa",
-	"create": "Crear",
 	"archive": "Arxiu",
 	"noteIdOrUrl": "ID o URL de la nota",
 	"channelArchiveConfirmTitle": "Vols arxivar {name}?",
@@ -289,16 +283,11 @@ definePage(() => ({
 
 <locale lang="json" locale="cs-CZ">
 {
-	"name": "Jméno",
-	"description": "Popis",
 	"color": "Barva",
-	"sensitive": "NSFW",
 	"channelAllowRenoteToExternal": "Allow renote and quote outside the channel",
 	"channelSetBanner": "Nastavit banner",
 	"channelRemoveBanner": "Odstranit banner",
 	"pinnedNotes": "Připnutá poznámka",
-	"save": "Uložit",
-	"create": "Vytvořit",
 	"archive": "Archiv",
 	"noteIdOrUrl": "ID nebo URL poznámky",
 	"channelArchiveConfirmTitle": "Opravdu chcete archivovat {name}?",
@@ -310,16 +299,11 @@ definePage(() => ({
 
 <locale lang="json" locale="da-DK">
 {
-	"name": "Name",
-	"description": "Description",
 	"color": "Color",
-	"sensitive": "Sensitive",
 	"channelAllowRenoteToExternal": "Allow renote and quote outside the channel",
 	"channelSetBanner": "Set banner",
 	"channelRemoveBanner": "Remove banner",
 	"pinnedNotes": "Pinned notes",
-	"save": "Save",
-	"create": "Create",
 	"archive": "Archive",
 	"noteIdOrUrl": "Note ID or URL",
 	"channelArchiveConfirmTitle": "Really archive {name}?",
@@ -331,16 +315,11 @@ definePage(() => ({
 
 <locale lang="json" locale="de-DE">
 {
-	"name": "Name",
-	"description": "Beschreibung",
 	"color": "Farbe",
-	"sensitive": "Sensibel",
 	"channelAllowRenoteToExternal": "Renotes und Zitierungen außerhalb des Kanals erlauben",
 	"channelSetBanner": "Kanalbanner festlegen",
 	"channelRemoveBanner": "Kanalbanner entfernen",
 	"pinnedNotes": "Angeheftete Notizen",
-	"save": "Speichern",
-	"create": "Erstellen",
 	"archive": "Archivieren",
 	"noteIdOrUrl": "Notiz-ID oder URL",
 	"channelArchiveConfirmTitle": "{name} wirklich archivieren?",
@@ -352,16 +331,11 @@ definePage(() => ({
 
 <locale lang="json" locale="en-US">
 {
-	"name": "Name",
-	"description": "Description",
 	"color": "Color",
-	"sensitive": "Sensitive",
 	"channelAllowRenoteToExternal": "Allow renote and quote outside the channel",
 	"channelSetBanner": "Set banner",
 	"channelRemoveBanner": "Remove banner",
 	"pinnedNotes": "Pinned notes",
-	"save": "Save",
-	"create": "Create",
 	"archive": "Archive",
 	"noteIdOrUrl": "Note ID or URL",
 	"channelArchiveConfirmTitle": "Really archive {name}?",
@@ -373,16 +347,11 @@ definePage(() => ({
 
 <locale lang="json" locale="es-ES">
 {
-	"name": "Nombre",
-	"description": "Descripción",
 	"color": "Color",
-	"sensitive": "Marcado como sensible (NSFW)",
 	"channelAllowRenoteToExternal": "Permitir renotas y menciones fuera del canal",
 	"channelSetBanner": "Elegir banner",
 	"channelRemoveBanner": "Borrar banner",
 	"pinnedNotes": "Nota fijada",
-	"save": "Guardar",
-	"create": "Crear",
 	"archive": "Archivo",
 	"noteIdOrUrl": "ID o URL de la nota",
 	"channelArchiveConfirmTitle": "¿Seguro de archivar {name}?",
@@ -394,16 +363,11 @@ definePage(() => ({
 
 <locale lang="json" locale="fr-FR">
 {
-	"name": "Nom",
-	"description": "Description",
 	"color": "Couleur",
-	"sensitive": "Contenu sensible",
 	"channelAllowRenoteToExternal": "Permettre la renote et la citation hors du canal",
 	"channelSetBanner": "Sélectionner la bannière",
 	"channelRemoveBanner": "Supprimer la bannière",
 	"pinnedNotes": "Note épinglée",
-	"save": "Enregistrer",
-	"create": "Créer",
 	"archive": "Archive",
 	"noteIdOrUrl": "Identifiant de la note ou URL",
 	"channelArchiveConfirmTitle": "Voulez-vous vraiment archiver {name} ?",
@@ -415,16 +379,11 @@ definePage(() => ({
 
 <locale lang="json" locale="id-ID">
 {
-	"name": "Nama",
-	"description": "Deskripsi",
 	"color": "Warna",
-	"sensitive": "Konten sensitif",
 	"channelAllowRenoteToExternal": "Perbolehkan catat ulang dan kutipan di luar dari kanal",
 	"channelSetBanner": "Setel banner",
 	"channelRemoveBanner": "Hapus banner",
 	"pinnedNotes": "Catatan yang disematkan",
-	"save": "Simpan",
-	"create": "Buat",
 	"archive": "Arsipkan",
 	"noteIdOrUrl": "ID catatan atau URL",
 	"channelArchiveConfirmTitle": "Yakin untuk mengarsipkan {name}?",
@@ -436,16 +395,11 @@ definePage(() => ({
 
 <locale lang="json" locale="it-IT">
 {
-	"name": "Nome",
-	"description": "Descrizione",
 	"color": "Colore",
-	"sensitive": "Esplicito",
 	"channelAllowRenoteToExternal": "Consenti i Rinota e le citazioni all'esterno del canale",
 	"channelSetBanner": "Scegli intestazione",
 	"channelRemoveBanner": "Rimuovi intestazione",
 	"pinnedNotes": "Note in primo piano",
-	"save": "Salva",
-	"create": "Crea",
 	"archive": "Archivio",
 	"noteIdOrUrl": "ID della Nota o URL",
 	"channelArchiveConfirmTitle": "Vuoi davvero archiviare {name}?",
@@ -457,16 +411,11 @@ definePage(() => ({
 
 <locale lang="json" locale="ja-JP">
 {
-	"name": "名前",
-	"description": "説明",
 	"color": "色",
-	"sensitive": "センシティブ",
 	"channelAllowRenoteToExternal": "チャンネル外へのリノートと引用リノートを許可する",
 	"channelSetBanner": "バナーを設定",
 	"channelRemoveBanner": "バナーを削除",
 	"pinnedNotes": "ピン留めされたノート",
-	"save": "保存",
-	"create": "作成",
 	"archive": "アーカイブ",
 	"noteIdOrUrl": "ノートIDまたはURL",
 	"channelArchiveConfirmTitle": "{name}をアーカイブしますか？",
@@ -478,16 +427,11 @@ definePage(() => ({
 
 <locale lang="json" locale="ja-KS">
 {
-	"name": "名前",
-	"description": "説明",
 	"color": "色",
-	"sensitive": "気いつけて見いや",
 	"channelAllowRenoteToExternal": "チャンネルの外にリノートできるようにする",
 	"channelSetBanner": "バナーを設定",
 	"channelRemoveBanner": "バナーを削除",
 	"pinnedNotes": "ピン留めされとるノート",
-	"save": "とっとく",
-	"create": "作成",
 	"archive": "アーカイブ",
 	"noteIdOrUrl": "ノートIDかURL",
 	"channelArchiveConfirmTitle": "{name}をアーカイブしてええか？",
@@ -499,16 +443,11 @@ definePage(() => ({
 
 <locale lang="json" locale="kab-KAB">
 {
-	"name": "Name",
-	"description": "Description",
 	"color": "Color",
-	"sensitive": "Sensitive",
 	"channelAllowRenoteToExternal": "Allow renote and quote outside the channel",
 	"channelSetBanner": "Set banner",
 	"channelRemoveBanner": "Remove banner",
 	"pinnedNotes": "Pinned notes",
-	"save": "Sekles",
-	"create": "Create",
 	"archive": "Archive",
 	"noteIdOrUrl": "Note ID or URL",
 	"channelArchiveConfirmTitle": "Really archive {name}?",
@@ -520,16 +459,11 @@ definePage(() => ({
 
 <locale lang="json" locale="kn-IN">
 {
-	"name": "Name",
-	"description": "Description",
 	"color": "Color",
-	"sensitive": "Sensitive",
 	"channelAllowRenoteToExternal": "Allow renote and quote outside the channel",
 	"channelSetBanner": "Set banner",
 	"channelRemoveBanner": "Remove banner",
 	"pinnedNotes": "Pinned notes",
-	"save": "ಉಳಿಸಿ",
-	"create": "Create",
 	"archive": "Archive",
 	"noteIdOrUrl": "Note ID or URL",
 	"channelArchiveConfirmTitle": "Really archive {name}?",
@@ -541,16 +475,11 @@ definePage(() => ({
 
 <locale lang="json" locale="ko-KR">
 {
-	"name": "이름",
-	"description": "설명",
 	"color": "색",
-	"sensitive": "열람 주의",
 	"channelAllowRenoteToExternal": "채널 외부로의 리노트와 인용 리노트를 허가",
 	"channelSetBanner": "배너 설정",
 	"channelRemoveBanner": "배너 삭제",
 	"pinnedNotes": "고정된 노트",
-	"save": "저장",
-	"create": "생성",
 	"archive": "아카이브",
 	"noteIdOrUrl": "노트 ID 및 URL",
 	"channelArchiveConfirmTitle": "{name} 채널을 보존하시겠습니까?",
@@ -562,16 +491,11 @@ definePage(() => ({
 
 <locale lang="json" locale="nl-NL">
 {
-	"name": "Naam",
-	"description": "Beschrijving",
 	"color": "Color",
-	"sensitive": "NSFW",
 	"channelAllowRenoteToExternal": "Allow renote and quote outside the channel",
 	"channelSetBanner": "Set banner",
 	"channelRemoveBanner": "Remove banner",
 	"pinnedNotes": "Vastgemaakte notitie",
-	"save": "Opslaan",
-	"create": "Creëer",
 	"archive": "Archive",
 	"noteIdOrUrl": "Note ID or URL",
 	"channelArchiveConfirmTitle": "Really archive {name}?",
@@ -583,16 +507,11 @@ definePage(() => ({
 
 <locale lang="json" locale="no-NO">
 {
-	"name": "Navn",
-	"description": "Beskrivelse",
 	"color": "Farge",
-	"sensitive": "Sensitive",
 	"channelAllowRenoteToExternal": "Allow renote and quote outside the channel",
 	"channelSetBanner": "Set banner",
 	"channelRemoveBanner": "Remove banner",
 	"pinnedNotes": "Festet Note",
-	"save": "Lagre",
-	"create": "Opprett",
 	"archive": "Archive",
 	"noteIdOrUrl": "Note ID or URL",
 	"channelArchiveConfirmTitle": "Really archive {name}?",
@@ -604,16 +523,11 @@ definePage(() => ({
 
 <locale lang="json" locale="pl-PL">
 {
-	"name": "Nazwa",
-	"description": "Opis",
 	"color": "Kolor",
-	"sensitive": "NSFW",
 	"channelAllowRenoteToExternal": "Allow renote and quote outside the channel",
 	"channelSetBanner": "Ustaw baner",
 	"channelRemoveBanner": "Usuń baner",
 	"pinnedNotes": "Przypięty wpis",
-	"save": "Zapisz",
-	"create": "Utwórz",
 	"archive": "Archive",
 	"noteIdOrUrl": "Note ID or URL",
 	"channelArchiveConfirmTitle": "Really archive {name}?",
@@ -625,16 +539,11 @@ definePage(() => ({
 
 <locale lang="json" locale="pt-PT">
 {
-	"name": "Nome",
-	"description": "Descrição",
 	"color": "Cor",
-	"sensitive": "Conteúdo sensível",
 	"channelAllowRenoteToExternal": "Permitir repostagens e citações de fora do canal",
 	"channelSetBanner": "Definir banner",
 	"channelRemoveBanner": "Remover banner",
 	"pinnedNotes": "Post fixado",
-	"save": "Salvar",
-	"create": "Criar",
 	"archive": "Arquivo",
 	"noteIdOrUrl": "ID ou URL de nota",
 	"channelArchiveConfirmTitle": "Deseja realmente arquivar {name}?",
@@ -646,16 +555,11 @@ definePage(() => ({
 
 <locale lang="json" locale="ru-RU">
 {
-	"name": "Название",
-	"description": "Описание",
 	"color": "Цвет",
-	"sensitive": "Содержимое не для всех",
 	"channelAllowRenoteToExternal": "Allow renote and quote outside the channel",
 	"channelSetBanner": "Установить баннер",
 	"channelRemoveBanner": "Удалить баннер",
 	"pinnedNotes": "Закреплённая заметка",
-	"save": "Сохранить",
-	"create": "Создать",
 	"archive": "Архив",
 	"noteIdOrUrl": "ID или ссылка на заметку",
 	"channelArchiveConfirmTitle": "Переместить {name} в архив?",
@@ -667,16 +571,11 @@ definePage(() => ({
 
 <locale lang="json" locale="sk-SK">
 {
-	"name": "Názov",
-	"description": "Popis",
 	"color": "Farba",
-	"sensitive": "NSFW",
 	"channelAllowRenoteToExternal": "Allow renote and quote outside the channel",
 	"channelSetBanner": "Nastaviť banner",
 	"channelRemoveBanner": "Odstrániť banner",
 	"pinnedNotes": "Pripnuté poznámky",
-	"save": "Uložiť",
-	"create": "Vytvoriť",
 	"archive": "Archive",
 	"noteIdOrUrl": "Note ID or URL",
 	"channelArchiveConfirmTitle": "Really archive {name}?",
@@ -688,16 +587,11 @@ definePage(() => ({
 
 <locale lang="json" locale="th-TH">
 {
-	"name": "ชื่อ",
-	"description": "คำอธิบาย",
 	"color": "สี",
-	"sensitive": "เนื้อหาที่ละเอียดอ่อน",
 	"channelAllowRenoteToExternal": "อนุญาตให้รีโน้ตและอ้างอิงนอกช่องได้",
 	"channelSetBanner": "เซตแบนเนอร์",
 	"channelRemoveBanner": "ลบแบนเนอร์",
 	"pinnedNotes": "โน้ตที่ปักหมุดไว้",
-	"save": "บันทึก",
-	"create": "สร้าง",
 	"archive": "เก็บถาวร",
 	"noteIdOrUrl": "ID ของโน้ต หรือ URL",
 	"channelArchiveConfirmTitle": "ต้องการเก็บถาวรเจ้า {name} ใช่ไหม?",
@@ -709,16 +603,11 @@ definePage(() => ({
 
 <locale lang="json" locale="tr-TR">
 {
-	"name": "İsim",
-	"description": "Açıklama",
 	"color": "Renk",
-	"sensitive": "Hassas",
 	"channelAllowRenoteToExternal": "Kanal dışında yeniden not alma ve alıntı yapmaya izin ver",
 	"channelSetBanner": "Afiş ayarla",
 	"channelRemoveBanner": "Afişi kaldır",
 	"pinnedNotes": "Sabitlenmiş notlar",
-	"save": "Kaydet",
-	"create": "Oluştur",
 	"archive": "Arşiv",
 	"noteIdOrUrl": "Not ID veya URL",
 	"channelArchiveConfirmTitle": "Cidden {name} arşivlemek mi istiyorsun?",
@@ -730,16 +619,11 @@ definePage(() => ({
 
 <locale lang="json" locale="ug-CN">
 {
-	"name": "Name",
-	"description": "Description",
 	"color": "Color",
-	"sensitive": "Sensitive",
 	"channelAllowRenoteToExternal": "Allow renote and quote outside the channel",
 	"channelSetBanner": "Set banner",
 	"channelRemoveBanner": "Remove banner",
 	"pinnedNotes": "Pinned notes",
-	"save": "Save",
-	"create": "Create",
 	"archive": "Archive",
 	"noteIdOrUrl": "Note ID or URL",
 	"channelArchiveConfirmTitle": "Really archive {name}?",
@@ -751,16 +635,11 @@ definePage(() => ({
 
 <locale lang="json" locale="uk-UA">
 {
-	"name": "Ім'я",
-	"description": "Опис",
 	"color": "Колір",
-	"sensitive": "NSFW",
 	"channelAllowRenoteToExternal": "Allow renote and quote outside the channel",
 	"channelSetBanner": "Встановити банер",
 	"channelRemoveBanner": "Видалити банер",
 	"pinnedNotes": "Закріплена нотатка",
-	"save": "Зберегти",
-	"create": "Створити",
 	"archive": "Архів",
 	"noteIdOrUrl": "ID або URL нотатки",
 	"channelArchiveConfirmTitle": "Справді архівувати {name}?",
@@ -772,16 +651,11 @@ definePage(() => ({
 
 <locale lang="json" locale="vi-VN">
 {
-	"name": "Tên",
-	"description": "Mô tả",
 	"color": "Màu sắc",
-	"sensitive": "Nhạy cảm",
 	"channelAllowRenoteToExternal": "Allow renote and quote outside the channel",
 	"channelSetBanner": "Đặt ảnh bìa",
 	"channelRemoveBanner": "Xóa ảnh bìa",
 	"pinnedNotes": "Bài viết đã ghim",
-	"save": "Lưu",
-	"create": "Tạo",
 	"archive": "Lưu trữ",
 	"noteIdOrUrl": "Note ID or URL",
 	"channelArchiveConfirmTitle": "Really archive {name}?",
@@ -793,16 +667,11 @@ definePage(() => ({
 
 <locale lang="json" locale="zh-CN">
 {
-	"name": "名称",
-	"description": "描述",
 	"color": "颜色",
-	"sensitive": "敏感内容",
 	"channelAllowRenoteToExternal": "允许转发至频道外及引用",
 	"channelSetBanner": "设置横幅",
 	"channelRemoveBanner": "删除横幅",
 	"pinnedNotes": "置顶的帖子",
-	"save": "保存",
-	"create": "创建",
 	"archive": "归档",
 	"noteIdOrUrl": "帖子 ID 或 URL",
 	"channelArchiveConfirmTitle": "要将 {name} 归档吗？",
@@ -814,16 +683,11 @@ definePage(() => ({
 
 <locale lang="json" locale="zh-TW">
 {
-	"name": "名稱",
-	"description": "描述",
 	"color": "顏色",
-	"sensitive": "敏感內容",
 	"channelAllowRenoteToExternal": "允許在頻道外轉發和引用",
 	"channelSetBanner": "設定橫幅圖像",
 	"channelRemoveBanner": "移除橫幅圖像",
 	"pinnedNotes": "已置頂的貼文",
-	"save": "儲存",
-	"create": "新增",
 	"archive": "封存",
 	"noteIdOrUrl": "貼文 ID 或 URL",
 	"channelArchiveConfirmTitle": "要封存{name}嗎？",

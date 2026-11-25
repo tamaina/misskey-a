@@ -19,7 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		{{ multiple ? $locale.sfc.selectFiles : $locale.sfc.selectFile }}
 		<span v-if="selected.length > 0" style="margin-left: 8px; opacity: 0.5;">({{ selected.length }})</span>
 	</template>
-	<MkDrive :multiple="multiple" select="file" :initialFolder="initialFolder" @changeSelectedFiles="onChangeSelection"/>
+	<MkDrive :multiple="multiple" select="file" :initialFolder="initialFolder" :excludeSensitive="excludeSensitive" @changeSelectedFiles="onChangeSelection"/>
 </MkModalWindow>
 </template>
 
@@ -31,8 +31,11 @@ import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 
 withDefaults(defineProps<{
 	initialFolder?: Misskey.entities.DriveFolder['id'] | null;
-	multiple: boolean;
+	multiple?: boolean;
+	excludeSensitive?: boolean;
 }>(), {
+	multiple: false,
+	excludeSensitive: false,
 });
 
 const emit = defineEmits<{

@@ -9,7 +9,7 @@ import type { App } from 'vue';
 import { expect, test, vi } from 'vitest';
 import ts from 'typescript';
 import { createInternationalization, setActiveInternationalization } from 'virtual:vite-vue-internationalization';
-import locales from 'i18n';
+import { locales } from './pruned-global-locale-baseline.js';
 import previewSource from '../../.storybook/preview.ts?raw';
 import { preferState } from '../setup.unit.js';
 import { startComponentLocales } from '@features/boot/frontend/index.js';
@@ -25,16 +25,24 @@ test('actual Storybook preview setup readies real component locales and installs
 	const create = vi.fn(createInternationalization);
 	const activate = vi.fn(setActiveInternationalization);
 	const initialized: string[] = [];
+	const onUnhandledFrame = vi.fn();
+	let completeWorkerStart!: () => void;
+	const workerReady = new Promise<void>(resolve => { completeWorkerStart = resolve; });
+	const start = vi.fn<(options: { onUnhandledFrame: typeof onUnhandledFrame }) => Promise<void>>().mockReturnValue(workerReady);
+	const worker = { start };
+	const setupWorker = vi.fn(() => worker);
+	const mswLoader = vi.fn<(createWorker: () => Promise<unknown>) => () => Promise<unknown>>(createWorker => createWorker);
 	const collaborators: Record<string, unknown> = {
-		'@storybook/core-events': { FORCE_RE_RENDER: 'render', FORCE_REMOUNT: 'remount' },
-		'@storybook/preview-api': { addons: { getChannel: () => ({ emit: vi.fn() }) } },
+		'storybook/internal/core-events': { FORCE_RE_RENDER: 'render', FORCE_REMOUNT: 'remount' },
+		'storybook/preview-api': { addons: { getChannel: () => ({ emit: vi.fn() }) } },
 		'@storybook/vue3': { setup },
 		'virtual:vite-vue-internationalization': { createInternationalization: create, setActiveInternationalization: activate },
 		'@features/boot/frontend/index.js': { startComponentLocales },
 		'chromatic/isChromatic': { default: () => false },
-		'msw-storybook-addon': { initialize: vi.fn(), mswLoader: vi.fn() },
+		'msw/browser': { setupWorker },
+		'msw-storybook-addon/csf3': { mswLoader },
 		'./fakes.js': { userDetailed: () => ({ id: 'storybook-fixture' }) },
-		'./mocks.js': { commonHandlers: [], onUnhandledRequest: vi.fn() },
+		'./mocks.js': { commonHandlers: [], onUnhandledFrame },
 		'./themes.js': { default: { 'l-light': {} } },
 		'../src/style.scss': {},
 		'../../features/index/frontend/components.js': { default: registerComponents },
@@ -53,7 +61,7 @@ test('actual Storybook preview setup readies real component locales and installs
 		reportDiagnostics: true,
 	});
 	expect(compiled.diagnostics).toEqual([]);
-	await runInNewContext('(async () => {\n' + compiled.outputText + '\n})()', {
+	const previewReady = runInNewContext('(async () => {\n' + compiled.outputText + '\n})()', {
 		exports: {},
 		require(specifier: string) {
 			if (specifier.startsWith('../../features/')) {
@@ -66,9 +74,21 @@ test('actual Storybook preview setup readies real component locales and installs
 		},
 		window, localStorage, queueMicrotask, MutationObserver,
 	});
+	await vi.waitFor(() => expect(start).toHaveBeenCalledOnce());
+	expect(create).not.toHaveBeenCalled();
+	expect(initialized).toEqual([]);
+	expect(setup).not.toHaveBeenCalled();
+	completeWorkerStart();
+	await previewReady;
 	await vi.waitFor(() => expect(setup).toHaveBeenCalledOnce());
+	expect(mswLoader).toHaveBeenCalledOnce();
+	expect(setupWorker).toHaveBeenCalledOnce();
+	expect(await mswLoader.mock.calls[0][0]()).toBe(worker);
+	expect(setupWorker).toHaveBeenCalledOnce();
+	expect(start).toHaveBeenCalledExactlyOnceWith({ onUnhandledFrame });
 	expect(create).toHaveBeenCalledExactlyOnceWith({ initialLocale: lang });
 	expect(initialized).toHaveLength(6);
+	expect(initialized[0]).toBe('../../features/ui/frontend/os.js');
 	expect(activate).toHaveBeenCalledOnce();
 	const configure = setup.mock.calls[0][0];
 	preferState.emojiStyle = 'native';
@@ -76,10 +96,10 @@ test('actual Storybook preview setup readies real component locales and installs
 		setup: () => () => h('div', [h(MkEmoji, { emoji: '\u2764' }), h(MkResult, { type: 'empty' })]),
 	}));
 	const use = vi.spyOn(app, 'use');
-	const element = document.createElement('div');
+	const element = window.document.createElement('div');
 	const secondApp = createApp(MkResult, { type: 'notFound' });
 	const secondUse = vi.spyOn(secondApp, 'use');
-	const secondElement = document.createElement('div');
+	const secondElement = window.document.createElement('div');
 	try {
 		configure(app);
 		configure(app);

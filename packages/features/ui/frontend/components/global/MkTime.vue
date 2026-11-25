@@ -32,15 +32,14 @@ const props = withDefaults(defineProps<{
 });
 
 // eslint-disable-next-line vue/no-setup-props-reactivity-loss
-const _time = parseTime(props.time);
-const invalid = Number.isNaN(_time);
-const absolute = !invalid ? dateTimeFormat.format(_time) : $locale.value.sfc.agoInvalid;
+const _time = computed(() => parseTime(props.time));
+const invalid = computed(() => Number.isNaN(_time.value));
+const absolute = computed(() => !invalid.value ? dateTimeFormat.format(_time.value) : $locale.value.sfc.agoInvalid);
 
 const actualNow = useLowresTime();
 const now = computed(() => (props.origin ? props.origin.getTime() : actualNow.value));
 
-// eslint-disable-next-line vue/no-setup-props-reactivity-loss
-const ago = computed(() => (now.value - _time) / 1000/*ms*/);
+const ago = computed(() => (now.value - _time.value) / 1000/*ms*/);
 
 const relativeTimeLocale: RelativeTimeLocale = {
 	ago: {
@@ -66,7 +65,7 @@ const relativeTimeLocale: RelativeTimeLocale = {
 
 const relative = computed<string>(() => {
 	if (props.mode === 'absolute') return ''; // absoluteではrelativeを使わないので計算しない
-	if (invalid) return $locale.value.sfc.agoInvalid;
+	if (invalid.value) return $locale.value.sfc.agoInvalid;
 
 	return formatRelativeTime(ago.value, relativeTimeLocale);
 });

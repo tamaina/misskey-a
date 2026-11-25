@@ -63,6 +63,7 @@ ormconfig.json
 temp
 /packages/frontend/src/**/*.stories.ts
 /packages/features/*/frontend/**/*.stories.ts
+/packages/features/games/*/frontend/**/*.stories.ts
 tsdoc-metadata.json
 misskey-assets
 

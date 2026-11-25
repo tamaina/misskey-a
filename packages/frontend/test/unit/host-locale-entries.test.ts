@@ -10,6 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { readFileSync } from 'node:fs';
 import { runInNewContext } from 'node:vm';
 import { afterEach, expect, test } from 'vitest';
+import { build } from 'vite';
 import { pluginHostLocaleEntries } from '../../lib/vite-plugin-host-locale-entries.js';
 import { parseLocaleEntryManifest } from '../../../features/web/shared/locale-entry-manifest.js';
 import type { ResolvedConfig } from 'vite';
@@ -30,13 +31,31 @@ test.each([false, true])('resolves supported VVI entry variants before the host 
 		const chunk = { file: 'scripts/entry.js', imports: [], dynamicImports: [], css: ['assets/entry.css'], ...(inline ? { locales: { 'ja-JP': { file: 'scripts/entry.ja-JP.js' }, 'fr-FR': { file: 'scripts/entry.fr-FR.js' } } } : {}) };
 		await writeFile(join(outDir, '.vite/internationalization-manifest.json'), JSON.stringify({ version: 1, base: '/', primaryLocale: 'ja-JP', locales: ['ja-JP', 'fr-FR'], entries: { [entry]: chunk.file }, modules: {}, chunks: { [chunk.file]: chunk } }));
 		const plugin = pluginHostLocaleEntries({ embed });
-		if (typeof plugin.configResolved !== 'function' || typeof plugin.closeBundle !== 'function') throw new Error('Unexpected test hooks');
+		if (typeof plugin.configResolved !== 'function' || typeof plugin.closeBundle !== 'function' || typeof plugin.writeBundle !== 'function') throw new Error('Unexpected test hooks');
 		plugin.configResolved.call({} as never, { root, build: { outDir } } as ResolvedConfig);
+		plugin.writeBundle.call({} as never, {} as never, {});
 		await plugin.closeBundle.call({} as never);
 		const result = parseLocaleEntryManifest(JSON.parse(await readFile(join(outDir, 'locale-entry-manifest.json'), 'utf8')));
 		expect(result.entries['fr-FR']).toBe(`scripts/entry${inline ? '.fr-FR' : ''}.js`);
 		expect(result.entries['ja-JP']).toBe(`scripts/entry${inline ? '.ja-JP' : ''}.js`);
 	}
+});
+
+test.each(['transform', 'generateBundle'] as const)('preserves the original %s failure before a VVI manifest is written', async hook => {
+	const directory = await mkdtemp(join(tmpdir(), 'misskey-host-failure-'));
+	directories.push(directory);
+	const entry = join(directory, 'entry.js');
+	await writeFile(entry, 'console.log("entry");');
+	await expect(build({
+		configFile: false,
+		root: directory,
+		logLevel: 'silent',
+		plugins: [pluginHostLocaleEntries(), {
+			name: 'original-failure',
+			[hook]() { throw new Error('Original locale build failure'); },
+		}],
+		build: { outDir: join(directory, 'out'), rolldownOptions: { input: entry } },
+	})).rejects.toThrow('Original locale build failure');
 });
 
 test.each([null, { version: 2, entries: {} }, { version: 1, entries: [] }, { version: 1, entries: { 'fr-FR': '../entry.js' } }, { version: 1, entries: { 'fr-FR': '/entry.js' } }, { version: 1, entries: { 'fr-FR': 'https://example.test/entry.js' } }])('rejects malformed host artifact: %j', value => {

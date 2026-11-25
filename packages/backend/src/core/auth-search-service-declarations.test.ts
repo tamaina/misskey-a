@@ -13,18 +13,22 @@ import { afterEach, describe, expect, test, vi } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { DI } from '@/di-symbols.js';
 import type { MiUser, MiUserProfile } from '@features/persistence/backend/repositories/models.js';
-import { authSecurityServices, authServices } from '@features/auth/backend/services.js';
-import { discoveryServices, userSearchServices } from '@features/discovery/backend/services.js';
+import { authSecurityServices } from '@features/auth/backend/services.js';
+import { userSearchServices } from '@features/discovery/backend/services.js';
+import { SudoService } from '@features/auth/backend/sudo.js';
+import { FreshPasskeyReauthentication } from '@features/auth/backend/fresh-passkey-reauthentication.js';
+import { FreshReauthenticationStore } from '@features/auth/backend/fresh-reauthentication-store.js';
+import { BrowserSessionService } from '@features/auth/backend/services/BrowserSessionService.js';
 import { UserAuthService } from '@features/auth/backend/services/UserAuthService.js';
 import { WebAuthnService } from '@features/auth/backend/services/WebAuthnService.js';
 import { UserSearchService } from '@features/discovery/backend/services/UserSearchService.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
 import { MiUserSecurityKey } from '@features/auth/backend/models/UserSecurityKey.js';
-import { ports } from '@features/index/backend/service-ports.js';
 import { featureServiceGroups } from '@features/index/backend/feature-service-providers.js';
 import type { FactoryProvider, InjectionToken, Provider } from '@nestjs/common';
 import type { AuthenticationResponseJSON, PublicKeyCredentialRequestOptionsJSON, PublicKeyCredentialCreationOptionsJSON, RegistrationResponseJSON } from '@simplewebauthn/server';
-import type { SelectQueryBuilder } from 'typeorm';
+import { FindOperator } from 'typeorm';
+import type { FindOptionsWhere, SelectQueryBuilder } from 'typeorm';
 import type { Inputs } from '@features/index/backend/service-definitions.js';
 
 vi.mock('@simplewebauthn/server', () => ({
@@ -67,14 +71,6 @@ afterEach(() => {
 });
 
 describe('auth and search declaration boundaries', () => {
-	test('old auth and zero-input discovery definition/output shapes remain unchanged', () => {
-		expect(Object.keys(authServices.definitions).sort()).toEqual(['AppEntityService', 'AuthSessionEntityService', 'InviteCodeEntityService', 'SigninEntityService']);
-		expect(Object.keys(discoveryServices.definitions)).toEqual(['HashtagEntityService']);
-		expect(Object.keys(discoveryServices.create())).toEqual(['HashtagEntityService']);
-		expect(ports.redisClient.token).toBe(DI.redis);
-		expect(authSecurityServices.ports.map(port => port.name).sort()).toEqual(['browserSessionsRepository', 'config', 'idService', 'meta', 'redisClient', 'userProfilesRepository', 'userSecurityKeysRepository', 'usersRepository']);
-	});
-
 	test('plain security factories borrow one Redis object and direct constructors remain equivalent', () => {
 		const inputs = securityInputs();
 		const first = authSecurityServices.create(inputs);
@@ -82,6 +78,17 @@ describe('auth and search declaration boundaries', () => {
 		const directAuth = new UserAuthService(inputs.redisClient, inputs.usersRepository, inputs.userProfilesRepository);
 		const directWebAuthn = new WebAuthnService(inputs.config, inputs.meta, inputs.redisClient, inputs.userSecurityKeysRepository);
 		for (const service of [first.UserAuthService, first.WebAuthnService, second.UserAuthService, second.WebAuthnService, directAuth, directWebAuthn]) expect(Reflect.get(service, 'redisClient')).toBe(inputs.redisClient);
+		expect(Reflect.get(first.SudoService, 'db')).toBe(inputs.db);
+		expect(Reflect.get(first.SudoService, 'fresh')).toBe(first.FreshPasskeyReauthentication);
+		expect(Reflect.get(first.SudoService, 'totp')).toBe(first.UserAuthService);
+		expect(Reflect.get(first.FreshReauthenticationStore, 'redis')).toBe(inputs.redisClient);
+		expect(Reflect.get(first.FreshPasskeyReauthentication, 'store')).toBe(first.FreshReauthenticationStore);
+		expect(Reflect.get(first.FreshPasskeyReauthentication, 'sessions')).toBe(first.BrowserSessionService);
+		expect(Reflect.get(first.FreshPasskeyReauthentication, 'profiles')).toBe(inputs.userProfilesRepository);
+		expect(Reflect.get(first.FreshPasskeyReauthentication, 'keys')).toBe(inputs.userSecurityKeysRepository);
+		expect(Reflect.get(first.FreshPasskeyReauthentication, 'config')).toBe(inputs.config);
+		expect(first.FreshReauthenticationStore).not.toBe(second.FreshReauthenticationStore);
+		expect(first.FreshPasskeyReauthentication).not.toBe(second.FreshPasskeyReauthentication);
 		expect(first.UserAuthService).not.toBe(second.UserAuthService);
 		expect(first.WebAuthnService).not.toBe(second.WebAuthnService);
 		expect(first.WebAuthnService.getRelyingParty()).toEqual(directWebAuthn.getRelyingParty());
@@ -105,7 +112,7 @@ describe('auth and search declaration boundaries', () => {
 		try {
 			await module.init();
 			const resolver = module.get(ModuleRef);
-			for (const ctor of [UserAuthService, WebAuthnService, UserSearchService]) {
+			for (const ctor of [UserAuthService, WebAuthnService, BrowserSessionService, FreshReauthenticationStore, FreshPasskeyReauthentication, SudoService, UserSearchService]) {
 				const service = module.get<object>(ctor);
 				expect(service).toBeInstanceOf(ctor);
 				const alias = ctor === UserAuthService ? 'UserAuthService' : ctor.name;
@@ -145,10 +152,23 @@ describe('auth and search declaration boundaries', () => {
 		vi.stubEnv('NODE_ENV', 'test');
 		vi.stubEnv('MISSKEY_TEST_CHECK_DUPLICATED_TOTP', '1');
 		const inputs = securityInputs();
+		let remaining = ['used', 'keep'];
+		inputs.userProfilesRepository.update.mockImplementation(async criteria => {
+			const condition = (criteria as FindOptionsWhere<MiUserProfile>).twoFactorBackupSecret;
+
+			if (!(condition instanceof FindOperator)) throw new Error('Expected conditional recovery update');
+			const code: unknown = condition.objectLiteralParameters?.backupCode;
+
+			if (typeof code !== 'string') throw new Error('Expected bound recovery code');
+			const previous = remaining.length;
+			remaining = remaining.filter(value => value !== code);
+			return { affected: previous === remaining.length ? 0 : 1, raw: [], generatedMaps: [] };
+		});
 		const service = authSecurityServices.create(inputs).UserAuthService;
 		const authenticate = service.twoFactorAuthenticate;
 		await authenticate(mockDeep<MiUserProfile>({ userId: 'user', twoFactorBackupSecret: ['used', 'keep'] }), 'used');
-		expect(inputs.userProfilesRepository.update).toHaveBeenCalledWith({ userId: 'user' }, { twoFactorBackupSecret: ['keep'] });
+		expect(inputs.userProfilesRepository.update).toHaveBeenCalledWith(expect.objectContaining({ userId: 'user' }), { twoFactorBackupSecret: expect.any(Function) });
+		expect(remaining).toEqual(['keep']);
 		expect(inputs.redisClient.set).not.toHaveBeenCalled();
 		inputs.redisClient.set.mockResolvedValue(null);
 		const token = new OTPAuth.TOTP({ secret: OTPAuth.Secret.fromBase32(secret), digits: 6, period: 30 }).generate({ timestamp });

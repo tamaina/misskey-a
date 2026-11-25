@@ -7,7 +7,7 @@ import { URL } from 'node:url';
 import * as htmlParser from 'node-html-parser';
 import type { Config } from '@/config.js';
 import { intersperse } from '@features/runtime/backend/data/array.js';
-import { normalizeForSearch } from '@features/discovery/backend/utility/normalize-for-search.js';
+import { normalizeTag } from '@features/discovery/backend/utility/normalize-tag.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { escapeHtml } from '../utility/escape-html.js';
 import type { IMentionedRemoteUsers } from '@features/notes/backend/models/Note.js';
@@ -23,15 +23,30 @@ export class MfmService {
 	}
 
 	@bindThis
-	public fromHtml(html: string, hashtagNames?: string[]): string {
+	public fromHtml(
+		html: string,
+		options: {
+			hashtagNames?: string[],
+			hasQuote?: boolean,
+		} = {},
+	): string {
 		// some AP servers like Pixelfed use br tags as well as newlines
 		html = html.replace(/<br\s?\/?>\r?\n/gi, '\n');
 
-		const normalizedHashtagNames = hashtagNames == null ? undefined : new Set<string>(hashtagNames.map(x => normalizeForSearch(x)));
+		const normalizedHashtagNames = options.hashtagNames == null ? undefined : new Set<string>(options.hashtagNames.map(x => normalizeTag(x)));
 
 		const doc = htmlParser.parse(`<div>${html}</div>`);
 
 		let text = '';
+
+		if (options.hasQuote) {
+			for (const n of doc.children[0].children) {
+				if (n.classList.contains('quote-inline') && n.querySelector('a') != null) {
+					n.remove();
+					break;
+				}
+			}
+		}
 
 		for (const n of doc.childNodes) {
 			analyze(n);
@@ -82,7 +97,7 @@ export class MfmService {
 					const href = node.attributes.href;
 
 					// ハッシュタグ
-					if (normalizedHashtagNames && href != null && normalizedHashtagNames.has(normalizeForSearch(txt))) {
+					if (normalizedHashtagNames && href != null && normalizedHashtagNames.has(normalizeTag(txt))) {
 						text += txt;
 						// メンション
 					} else if (txt.startsWith('@') && !(rel != null && rel.startsWith('me '))) {

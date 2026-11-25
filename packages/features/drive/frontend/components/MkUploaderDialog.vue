@@ -41,19 +41,19 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template #footer>
 		<div class="_buttonsCenter">
 			<MkButton v-if="uploader.uploading.value" rounded @click="abortWithConfirm()"><i class="ti ti-x"></i> {{ $locale.sfc.abort }}</MkButton>
-			<MkButton v-else-if="!firstUploadAttempted" primary rounded :disabled="!uploader.readyForUpload.value" @click="upload()"><i class="ti ti-upload"></i> {{ $locale.sfc.upload }}</MkButton>
+			<MkButton v-else-if="!firstUploadAttempted" primary rounded :disabled="!uploader.readyForUpload.value" @click="upload()"><i class="ti ti-upload"></i> {{ globalLocale.env.upload }}</MkButton>
 
-			<MkButton v-if="canRetry" rounded @click="upload()"><i class="ti ti-reload"></i> {{ $locale.sfc.retry }}</MkButton>
-			<MkButton v-if="canDone" rounded @click="done()"><i class="ti ti-arrow-right"></i> {{ $locale.sfc.done }}</MkButton>
+			<MkButton v-if="canRetry" rounded @click="upload()"><i class="ti ti-reload"></i> {{ globalLocale.env.retry }}</MkButton>
+			<MkButton v-if="canDone" rounded @click="done()"><i class="ti ti-arrow-right"></i> {{ globalLocale.env.done }}</MkButton>
 		</div>
 	</template>
 </MkModalWindow>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, onMounted, ref, useTemplateRef, watch } from 'vue';
 import * as Misskey from 'misskey-js';
-import type { UploaderFeatures, UploaderItem } from '@features/drive/frontend/composables/use-uploader.js';
 import MkModalWindow from '@features/ui/frontend/components/MkModalWindow.vue';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -61,6 +61,10 @@ import * as os from '@features/ui/frontend/os.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
 import { useUploader } from '@features/drive/frontend/composables/use-uploader.js';
 import MkUploaderItems from '@features/drive/frontend/components/MkUploaderItems.vue';
+import type { UploaderFeatures, UploaderItem } from '@features/drive/frontend/composables/use-uploader.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const $i = ensureSignin();
 
@@ -124,8 +128,8 @@ async function cancel() {
 	const { canceled } = await os.confirm({
 		type: 'question',
 		text: $locale.value.sfc.uploaderAbortConfirm,
-		okText: $locale.value.sfc.yes,
-		cancelText: $locale.value.sfc.no,
+		okText: globalLocale.value.env.yes,
+		cancelText: globalLocale.value.env.no,
 	});
 	if (canceled) return;
 
@@ -143,8 +147,8 @@ async function abortWithConfirm() {
 	const { canceled } = await os.confirm({
 		type: 'question',
 		text: $locale.value.sfc.uploaderAbortConfirm,
-		okText: $locale.value.sfc.yes,
-		cancelText: $locale.value.sfc.no,
+		okText: globalLocale.value.env.yes,
+		cancelText: globalLocale.value.env.no,
 	});
 	if (canceled) return;
 
@@ -156,8 +160,8 @@ async function done() {
 		const { canceled } = await os.confirm({
 			type: 'question',
 			text: $locale.value.sfc.uploaderDoneConfirm,
-			okText: $locale.value.sfc.yes,
-			cancelText: $locale.value.sfc.no,
+			okText: globalLocale.value.env.yes,
+			cancelText: globalLocale.value.env.no,
 		});
 		if (canceled) return;
 	}
@@ -210,12 +214,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "The maximum file size that can be uploaded is {x}",
 	"uploaderAllowedTypes": "Uploadable file types",
 	"abort": "Abort",
-	"upload": "ارفع",
-	"retry": "حاول مجددًا",
-	"done": "تمّ",
 	"uploaderAbortConfirm": "Some files have not been uploaded, do you want to abort?",
-	"yes": "نعم",
-	"no": "لا",
 	"uploaderDoneConfirm": "Some files have not been uploaded, do you want to continue anyway?"
 }
 </locale>
@@ -227,12 +226,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "La mida màxima d'arxiu que es pot pujar és {x}.",
 	"uploaderAllowedTypes": "Tipus de fitxers que en podeu pujar",
 	"abort": "Cancel·lar",
-	"upload": "Puja",
-	"retry": "Torna-ho a provar",
-	"done": "Fet",
 	"uploaderAbortConfirm": "Hi ha un arxiu que no s'ha pujat, vols cancel·lar?",
-	"yes": "Sí ",
-	"no": "No",
 	"uploaderDoneConfirm": "Hi han fitxers no pujats, vols completar-los?"
 }
 </locale>
@@ -244,12 +238,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "The maximum file size that can be uploaded is {x}",
 	"uploaderAllowedTypes": "Uploadable file types",
 	"abort": "Abort",
-	"upload": "Nahrát soubory",
-	"retry": "Opakovat",
-	"done": "Hotovo",
 	"uploaderAbortConfirm": "Some files have not been uploaded, do you want to abort?",
-	"yes": "Ano",
-	"no": "Ne",
 	"uploaderDoneConfirm": "Some files have not been uploaded, do you want to continue anyway?"
 }
 </locale>
@@ -261,12 +250,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "The maximum file size that can be uploaded is {x}",
 	"uploaderAllowedTypes": "Uploadable file types",
 	"abort": "Abort",
-	"upload": "Upload",
-	"retry": "Retry",
-	"done": "Done",
 	"uploaderAbortConfirm": "Some files have not been uploaded, do you want to abort?",
-	"yes": "Yes",
-	"no": "No",
 	"uploaderDoneConfirm": "Some files have not been uploaded, do you want to continue anyway?"
 }
 </locale>
@@ -278,12 +262,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "Die maximale Dateigröße, die hochgeladen werden kann, beträgt {x}.",
 	"uploaderAllowedTypes": "Hochladbare Dateitypen",
 	"abort": "Abbrechen",
-	"upload": "Hochladen",
-	"retry": "Wiederholen",
-	"done": "Fertig",
 	"uploaderAbortConfirm": "Einige Dateien wurden nicht hochgeladen. Möchtest du den Vorgang abbrechen?",
-	"yes": "Ja",
-	"no": "Nein",
 	"uploaderDoneConfirm": "Einige Dateien wurden nicht hochgeladen. Möchtest du den Vorgang fortsetzen?"
 }
 </locale>
@@ -295,12 +274,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "The maximum file size that can be uploaded is {x}",
 	"uploaderAllowedTypes": "Uploadable file types",
 	"abort": "Abort",
-	"upload": "Upload",
-	"retry": "Retry",
-	"done": "Done",
 	"uploaderAbortConfirm": "Some files have not been uploaded, do you want to abort?",
-	"yes": "Yes",
-	"no": "No",
 	"uploaderDoneConfirm": "Some files have not been uploaded, do you want to continue anyway?"
 }
 </locale>
@@ -312,12 +286,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "El tamaño máximo de archivo que se puede cargar es de {x}",
 	"uploaderAllowedTypes": "Tipos de archivos que se pueden cargar.",
 	"abort": "Abortar",
-	"upload": "Subir",
-	"retry": "Reintentar",
-	"done": "Hecho",
 	"uploaderAbortConfirm": "Algunos archivos no se han cargado, ¿deseas cancelar?",
-	"yes": "Si",
-	"no": "No",
 	"uploaderDoneConfirm": "Algunos archivos no se han cargado, ¿deseas continuar de todos modos?"
 }
 </locale>
@@ -329,12 +298,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "The maximum file size that can be uploaded is {x}",
 	"uploaderAllowedTypes": "Uploadable file types",
 	"abort": "Abort",
-	"upload": "Téléverser",
-	"retry": "Réessayer",
-	"done": "Terminé",
 	"uploaderAbortConfirm": "Some files have not been uploaded, do you want to abort?",
-	"yes": "Oui",
-	"no": "Non",
 	"uploaderDoneConfirm": "Some files have not been uploaded, do you want to continue anyway?"
 }
 </locale>
@@ -346,12 +310,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "The maximum file size that can be uploaded is {x}",
 	"uploaderAllowedTypes": "Jenis berkas yang dapat diunggah",
 	"abort": "Abort",
-	"upload": "Unggah",
-	"retry": "Coba lagi",
-	"done": "Selesai",
 	"uploaderAbortConfirm": "Some files have not been uploaded, do you want to abort?",
-	"yes": "Iya",
-	"no": "Tidak",
 	"uploaderDoneConfirm": "Some files have not been uploaded, do you want to continue anyway?"
 }
 </locale>
@@ -363,12 +322,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "La dimensione massima del file che puoi caricare è {x}.",
 	"uploaderAllowedTypes": "Tipi di file caricabili",
 	"abort": "Annulla",
-	"upload": "Carica",
-	"retry": "Riprova",
-	"done": "Fine",
 	"uploaderAbortConfirm": "Alcuni file non sono stati caricati. Vuoi annullare l'operazione?",
-	"yes": "Sì",
-	"no": "No",
 	"uploaderDoneConfirm": "Alcuni file non sono stati caricati. Vuoi completarli?"
 }
 </locale>
@@ -380,12 +334,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "アップロード可能な最大ファイルサイズは{x}です。",
 	"uploaderAllowedTypes": "アップロード可能なファイル種別",
 	"abort": "中止",
-	"upload": "アップロード",
-	"retry": "再試行",
-	"done": "完了",
 	"uploaderAbortConfirm": "アップロードされていないファイルがありますが、中止しますか？",
-	"yes": "はい",
-	"no": "いいえ",
 	"uploaderDoneConfirm": "アップロードされていないファイルがありますが、完了しますか？"
 }
 </locale>
@@ -397,12 +346,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "アップロードできるファイルサイズは{x}までやで。",
 	"uploaderAllowedTypes": "アップロード可能なファイル種別",
 	"abort": "中止",
-	"upload": "アップロード",
-	"retry": "もっぺんやる？",
-	"done": "でけた",
 	"uploaderAbortConfirm": "アップロードされてへんファイルがあるんやけど、やめてもええんか？",
-	"yes": "ええで",
-	"no": "あかん",
 	"uploaderDoneConfirm": "アップロードされてへんファイルがあるんやけど、完了してもええんか？"
 }
 </locale>
@@ -414,12 +358,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "The maximum file size that can be uploaded is {x}",
 	"uploaderAllowedTypes": "Uploadable file types",
 	"abort": "Abort",
-	"upload": "Upload",
-	"retry": "Retry",
-	"done": "Done",
 	"uploaderAbortConfirm": "Some files have not been uploaded, do you want to abort?",
-	"yes": "Yes",
-	"no": "No",
 	"uploaderDoneConfirm": "Some files have not been uploaded, do you want to continue anyway?"
 }
 </locale>
@@ -431,12 +370,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "The maximum file size that can be uploaded is {x}",
 	"uploaderAllowedTypes": "Uploadable file types",
 	"abort": "Abort",
-	"upload": "Upload",
-	"retry": "Retry",
-	"done": "Done",
 	"uploaderAbortConfirm": "Some files have not been uploaded, do you want to abort?",
-	"yes": "Yes",
-	"no": "No",
 	"uploaderDoneConfirm": "Some files have not been uploaded, do you want to continue anyway?"
 }
 </locale>
@@ -448,12 +382,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "업로드 가능한 최대 파일 크기는 {x}입니다.",
 	"uploaderAllowedTypes": "업로드 가능한 파일 유형",
 	"abort": "중지",
-	"upload": "업로드",
-	"retry": "다시 시도",
-	"done": "완료",
 	"uploaderAbortConfirm": "업로드되지 않은 파일이 있습니다만, 그만 두시겠습니까?",
-	"yes": "예",
-	"no": "아니오",
 	"uploaderDoneConfirm": "업로드되지 않은 파일이 있습니다만, 완료하시겠습니까?"
 }
 </locale>
@@ -465,12 +394,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "The maximum file size that can be uploaded is {x}",
 	"uploaderAllowedTypes": "Uploadable file types",
 	"abort": "Abort",
-	"upload": "Uploaden",
-	"retry": "Probeer opnieuw",
-	"done": "Klaar",
 	"uploaderAbortConfirm": "Some files have not been uploaded, do you want to abort?",
-	"yes": "Ja",
-	"no": "Nee",
 	"uploaderDoneConfirm": "Some files have not been uploaded, do you want to continue anyway?"
 }
 </locale>
@@ -482,12 +406,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "The maximum file size that can be uploaded is {x}",
 	"uploaderAllowedTypes": "Uploadable file types",
 	"abort": "Abort",
-	"upload": "Laste opp",
-	"retry": "Prøv igjen",
-	"done": "Ferdig",
 	"uploaderAbortConfirm": "Some files have not been uploaded, do you want to abort?",
-	"yes": "Ja",
-	"no": "Nei",
 	"uploaderDoneConfirm": "Some files have not been uploaded, do you want to continue anyway?"
 }
 </locale>
@@ -499,12 +418,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "The maximum file size that can be uploaded is {x}",
 	"uploaderAllowedTypes": "Uploadable file types",
 	"abort": "Abort",
-	"upload": "Wyślij",
-	"retry": "Spróbuj ponownie",
-	"done": "Gotowe",
 	"uploaderAbortConfirm": "Some files have not been uploaded, do you want to abort?",
-	"yes": "Tak",
-	"no": "Nie",
 	"uploaderDoneConfirm": "Some files have not been uploaded, do you want to continue anyway?"
 }
 </locale>
@@ -516,12 +430,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "O tamanho máximo de arquivos enviados é {x}",
 	"uploaderAllowedTypes": "Tipos de arquivo enviáveis",
 	"abort": "Abortar",
-	"upload": "Fazer upload",
-	"retry": "Tente novamente",
-	"done": "Concluído",
 	"uploaderAbortConfirm": "Alguns arquivos não foram enviados, deseja abortar?",
-	"yes": "Sim",
-	"no": "Não",
 	"uploaderDoneConfirm": "Alguns arquivos não foram enviados, deseja continuar mesmo assim?"
 }
 </locale>
@@ -533,12 +442,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "The maximum file size that can be uploaded is {x}",
 	"uploaderAllowedTypes": "Uploadable file types",
 	"abort": "Отменить",
-	"upload": "Загрузить",
-	"retry": "Повторить попытку",
-	"done": "Готово",
 	"uploaderAbortConfirm": "Some files have not been uploaded, do you want to abort?",
-	"yes": "Да",
-	"no": "Нет",
 	"uploaderDoneConfirm": "Some files have not been uploaded, do you want to continue anyway?"
 }
 </locale>
@@ -550,12 +454,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "The maximum file size that can be uploaded is {x}",
 	"uploaderAllowedTypes": "Uploadable file types",
 	"abort": "Abort",
-	"upload": "Nahrať súbor",
-	"retry": "Opakovať",
-	"done": "Hotovo",
 	"uploaderAbortConfirm": "Some files have not been uploaded, do you want to abort?",
-	"yes": "Áno",
-	"no": "Nie",
 	"uploaderDoneConfirm": "Some files have not been uploaded, do you want to continue anyway?"
 }
 </locale>
@@ -567,12 +466,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "ขนาดไฟล์สูงสุดที่สามารถอัปโหลดได้คือ {x}",
 	"uploaderAllowedTypes": "ประเภทไฟล์ที่สามารถอัปโหลดได้",
 	"abort": "หยุดและยกเลิก",
-	"upload": "อัปโหลด",
-	"retry": "ลองใหม่อีกครั้ง",
-	"done": "เสร็จสิ้น",
 	"uploaderAbortConfirm": "มีไฟล์ที่ยังไม่ได้อัปโหลด ต้องการยกเลิกหรือไม่?",
-	"yes": "ใช่",
-	"no": "ไม่",
 	"uploaderDoneConfirm": "มีไฟล์ที่ยังไม่ได้อัปโหลด ต้องการดำเนินการให้เสร็จสิ้นหรือไม่?"
 }
 </locale>
@@ -584,12 +478,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "Yükleyebileceğin maksimum dosya boyutu {x}",
 	"uploaderAllowedTypes": "Yüklenebilir dosya türleri",
 	"abort": "İptal",
-	"upload": "Yükle",
-	"retry": "Tekrar dene",
-	"done": "Tamam",
 	"uploaderAbortConfirm": "Bazı dosyalar yüklenmedi, iptal etmek ister misin?",
-	"yes": "Evet",
-	"no": "Hayır",
 	"uploaderDoneConfirm": "Bazı dosyalar yüklenmedi, yine de devam etmek istiyor musun?"
 }
 </locale>
@@ -601,12 +490,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "The maximum file size that can be uploaded is {x}",
 	"uploaderAllowedTypes": "Uploadable file types",
 	"abort": "Abort",
-	"upload": "Upload",
-	"retry": "Retry",
-	"done": "Done",
 	"uploaderAbortConfirm": "Some files have not been uploaded, do you want to abort?",
-	"yes": "Yes",
-	"no": "No",
 	"uploaderDoneConfirm": "Some files have not been uploaded, do you want to continue anyway?"
 }
 </locale>
@@ -618,12 +502,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "The maximum file size that can be uploaded is {x}",
 	"uploaderAllowedTypes": "Uploadable file types",
 	"abort": "Перервати",
-	"upload": "Завантажити",
-	"retry": "Спробувати знову",
-	"done": "Готово",
 	"uploaderAbortConfirm": "Some files have not been uploaded, do you want to abort?",
-	"yes": "Так",
-	"no": "Ні",
 	"uploaderDoneConfirm": "Some files have not been uploaded, do you want to continue anyway?"
 }
 </locale>
@@ -635,12 +514,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "The maximum file size that can be uploaded is {x}",
 	"uploaderAllowedTypes": "Uploadable file types",
 	"abort": "Abort",
-	"upload": "Tải lên",
-	"retry": "Thử lại",
-	"done": "Xong",
 	"uploaderAbortConfirm": "Some files have not been uploaded, do you want to abort?",
-	"yes": "Đồng ý",
-	"no": "Từ chối",
 	"uploaderDoneConfirm": "Some files have not been uploaded, do you want to continue anyway?"
 }
 </locale>
@@ -652,12 +526,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "可上传最大 {x} 的文件。",
 	"uploaderAllowedTypes": "可上传的文件类型",
 	"abort": "中止",
-	"upload": "本地上传",
-	"retry": "重试",
-	"done": "完成",
 	"uploaderAbortConfirm": "还有未上传的文件，要中止吗？",
-	"yes": "是",
-	"no": "否",
 	"uploaderDoneConfirm": "部分文件尚未上传，是否继续？"
 }
 </locale>
@@ -669,12 +538,7 @@ function showPerItemMenuViaContextmenu(item: UploaderItem, ev: PointerEvent) {
 	"uploaderMaxFileSizeIsX": "可上傳的最大檔案大小為 {x}。",
 	"uploaderAllowedTypes": "可上傳的檔案類型。",
 	"abort": "取消",
-	"upload": "上傳",
-	"retry": "重試",
-	"done": "完成",
 	"uploaderAbortConfirm": "有些檔案尚未上傳，您要中止嗎？",
-	"yes": "是",
-	"no": "否",
 	"uploaderDoneConfirm": "有些檔案尚未上傳，是否要完成上傳？"
 }
 </locale>

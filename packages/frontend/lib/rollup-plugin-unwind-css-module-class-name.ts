@@ -503,7 +503,7 @@ export default function pluginUnwindCssModuleClassName(): Plugin {
 			const ast = ('ast' in meta ? meta.ast ?? this.parse(code) : this.parse(code)) as ESTree.Program;
 			const magicString = meta.magicString ?? new RolldownMagicString(code);
 			unwindCssModuleClassName(ast, magicString);
-			return magicString;
+			return { code: magicString.toString(), map: magicString.generateMap({ hires: true }).toString() };
 		},
 	};
 }
