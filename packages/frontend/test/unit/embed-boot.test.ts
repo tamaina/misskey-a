@@ -6,8 +6,6 @@
 import { h, inject } from 'vue';
 import { expect, test, vi } from 'vitest';
 import { createInternationalization, setActiveInternationalization, useInternationalization } from 'vite-vue-internationalization/runtime';
-import { locales } from './pruned-global-locale-baseline.js';
-import { I18n } from '@features/runtime/frontend/shared/i18n.js';
 import messages from '../../../features/boot/frontend/embed/boot-messages.json';
 
 test.each(['ja-JP', 'en-US', 'fr-FR', 'pt-PT'] as const)('real embed boot installs the supplied runtime and preserves boot errors, ready and self-XSS messages in %s', async language => {
@@ -20,7 +18,7 @@ test.each(['ja-JP', 'en-US', 'fr-FR', 'pt-PT'] as const)('real embed boot instal
 	const ready = vi.fn();
 	const mounted = vi.fn();
 	const marker = Symbol('installed-runtime');
-	const dictionary = locales[language];
+	const dictionary = messages[language];
 	vi.doMock('@features/drive/frontend/shared/media-proxy.js', () => ({ MediaProxy: class MediaProxy {} }));
 	vi.doMock('@features/preferences/frontend/embed/theme.js', () => ({ applyTheme: theme, assertIsTheme: () => true }));
 	vi.doMock('@features/emojis/frontend/embed/custom-emojis.js', () => ({ fetchCustomEmojis: async () => {} }));
@@ -53,13 +51,12 @@ test.each(['ja-JP', 'en-US', 'fr-FR', 'pt-PT'] as const)('real embed boot instal
 		expect(install).toHaveBeenCalledTimes(1);
 		expect(window.document.getElementById('embed-mounted')?.textContent).toBe('ready');
 		expect(JSON.parse(localStorage.getItem('bootloaderLocales')!)).toEqual({ ...dictionary._bootErrors, reload: dictionary.reload });
-		const legacy = new I18n(dictionary);
 		expect(log.mock.calls.slice(-5).map(call => call[0])).toEqual([
-			`%c${legacy.ts._selfXssPrevention.warning}`,
-			`%c${legacy.ts._selfXssPrevention.title}`,
-			`%c${legacy.ts._selfXssPrevention.description1}`,
-			`%c${legacy.ts._selfXssPrevention.description2}`,
-			legacy.tsx._selfXssPrevention.description3({ link: 'https://misskey-hub.net/docs/for-users/resources/self-xss/' }),
+			`%c${dictionary._selfXssPrevention.warning}`,
+			`%c${dictionary._selfXssPrevention.title}`,
+			`%c${dictionary._selfXssPrevention.description1}`,
+			`%c${dictionary._selfXssPrevention.description2}`,
+			dictionary._selfXssPrevention.description3.replace('{link}', 'https://misskey-hub.net/docs/for-users/resources/self-xss/'),
 		]);
 		expect(ready).toHaveBeenCalledExactlyOnceWith('misskey:embed:ready');
 		expect(theme).toHaveBeenCalledTimes(1);
