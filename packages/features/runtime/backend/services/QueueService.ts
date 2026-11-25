@@ -16,6 +16,8 @@ import type { MiAnnouncement } from '@features/announcements/backend/models/Anno
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
 import type { MiWebhook, WebhookEventTypes } from '@features/integrations/backend/models/Webhook.js';
 import type { MiSystemWebhook, SystemWebhookEventType } from '@features/integrations/backend/models/SystemWebhook.js';
+import { gameTurnEvent, gameTurnIdentity, parseGameTurnReference } from '@features/games/index/shared/turn-webhook.schema.js';
+import type { GameTurnReference } from '@features/games/index/shared/turn-webhook.schema.js';
 import type { Config } from '@/config.js';
 import { DI } from '@/di-symbols.js';
 import { bindThis } from '../decorators.js';
@@ -777,6 +779,20 @@ export class QueueService {
 			removeOnFail: { age: STREAM_QUEUE_RETENTION_SECONDS } });
 		} catch (error) { if (error instanceof StreamQueueFullError) return 'full'; if (error instanceof StreamQueueExpiredError) return 'inactive'; throw error; }
 		return 'queued';
+	}
+
+	public gameTurnWebhookDeliver(webhook: MiWebhook, turn: GameTurnReference, createdAt: number, stateKey?: string) {
+		if (webhook.mode !== 'mcp' || webhook.name !== gameTurnEvent || !webhook.active || !webhook.mcpGeneration
+			|| !webhook.mcpExpiresAt || webhook.mcpExpiresAt.getTime() <= Date.now()) return;
+		const reference = parseGameTurnReference(turn);
+		if (!reference) return;
+		const identity = gameTurnIdentity(reference, stateKey);
+		if (!identity) return;
+		const eventId = createHash('sha256').update(JSON.stringify([webhook.id, webhook.mcpGeneration, gameTurnEvent, ...identity])).digest('hex');
+		const data: UserWebhookDeliverJobData = { mode: 'mcp', type: gameTurnEvent, webhookId: webhook.id, userId: webhook.userId,
+			generation: webhook.mcpGeneration, noteId: '', gameTurn: reference, ...(stateKey === undefined ? {} : { gameTurnStateKey: stateKey }), createdAt, eventId };
+		return this.userWebhookDeliverQueue.add(webhook.id, data, { jobId: eventId, attempts: 4,
+			backoff: { type: 'custom' }, removeOnComplete: { age: 86400, count: 1000 }, removeOnFail: { age: 86400, count: 1000 } });
 	}
 
 	/** Isolated retention prevents legacy queue count cleanup evicting antenna IDs. */

@@ -13,6 +13,8 @@ import { bindThis } from '@features/runtime/backend/decorators.js';
 import { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
 import type { Packed } from '@features/index/backend/packed.schema.js';
 import { QueueService } from '@features/runtime/backend/services/QueueService.js';
+import { gameTurnEvent } from '@features/games/index/shared/turn-webhook.schema.js';
+import type { GameTurnReference } from '@features/games/index/shared/turn-webhook.schema.js';
 
 export type NotificationWebhookOccurrence = Pick<Packed<'Notification'>, 'id' | 'createdAt' | 'type'>;
 
@@ -105,6 +107,12 @@ export class UserWebhookService implements OnApplicationShutdown {
 				return notification ? this.queueService.userWebhookDeliver(webhook, type, content, { notification }) : this.queueService.userWebhookDeliver(webhook, type, content);
 			}),
 		);
+	}
+
+	/** MCP-only: no legacy URL registration or cache entry gains access to private game events. */
+	public async enqueueGameTurn(userId: string, turn: GameTurnReference, createdAt: number, stateKey?: string) {
+		const webhooks = await this.webhooksRepository.findBy({ userId, mode: 'mcp', active: true, name: gameTurnEvent });
+		return Promise.all(webhooks.map(webhook => this.queueService.gameTurnWebhookDeliver(webhook, turn, createdAt, stateKey)));
 	}
 
 	@bindThis

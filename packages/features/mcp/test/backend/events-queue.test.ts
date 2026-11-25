@@ -119,3 +119,53 @@ it.each(['user', 'room'])('queues only message references for received %s chat',
 	expect(add.mock.calls[0][1].data).toEqual({ messageId: 'message' });
 	expect(JSON.stringify(add.mock.calls[0][1])).not.toContain('PRIVATE_CHAT');
 });
+
+it('selects only the recipient’s MCP game.turn hooks and queues a stable reference per phase', async () => {
+	const redis = mockDeep<Redis.Redis>();
+	const webhooks = mockDeep<WebhooksRepository>();
+	const queue = mockDeep<QueueService>();
+	const row = { ...mcp, name: 'game.turn', on: [] };
+	webhooks.findBy.mockResolvedValue([row]);
+	const service = new UserWebhookService(redis, webhooks, queue);
+	const turn = { game: 'mahjong' as const, roomId: '50000000-0000-4000-8000-000000000001', phaseId: '50000000-0000-4000-8000-000000000002', revision: 5 };
+	await service.enqueueGameTurn('account', turn, 123);
+	expect(webhooks.findBy).toHaveBeenCalledWith({ userId: 'account', mode: 'mcp', active: true, name: 'game.turn' });
+	expect(queue.gameTurnWebhookDeliver).toHaveBeenCalledExactlyOnceWith(row, turn, 123, undefined);
+	expect(queue.userWebhookDeliver).not.toHaveBeenCalled();
+	service.dispose();
+
+	const add = vi.fn();
+	const realQueue = Object.assign(Object.create(QueueService.prototype), { userWebhookDeliverQueue: { add } }) as QueueService;
+	await realQueue.gameTurnWebhookDeliver(row, turn, 123);
+	await realQueue.gameTurnWebhookDeliver(row, { ...turn, revision: 6 }, 456);
+	const [, job, opts] = add.mock.calls[0];
+	expect(job).toEqual({ mode: 'mcp', type: 'game.turn', userId: 'account', webhookId: 'sub', generation: 'generation', gameTurn: turn, noteId: '', createdAt: 123, eventId: opts.jobId });
+	expect(add.mock.calls[1][2].jobId).toBe(opts.jobId);
+	await realQueue.gameTurnWebhookDeliver({ ...row, mcpGeneration: 'rotated' }, turn, 123);
+	expect(add.mock.calls[2][2].jobId).not.toBe(opts.jobId);
+	await realQueue.gameTurnWebhookDeliver({ ...row, mode: 'legacy' }, turn, 123);
+	await realQueue.gameTurnWebhookDeliver({ ...row, active: false }, turn, 123);
+	await realQueue.gameTurnWebhookDeliver({ ...row, mcpExpiresAt: new Date(0) }, turn, 123);
+	await realQueue.gameTurnWebhookDeliver(row, { ...turn, ...{ wall: ['private'] } }, 123);
+	expect(add).toHaveBeenCalledTimes(3);
+});
+
+it('deduplicates the same Reversi snapshot without leaking credentials or raw native state into the queue', async () => {
+	const row = { ...mcp, name: 'game.turn', on: [] };
+	const add = vi.fn();
+	const queue = Object.assign(Object.create(QueueService.prototype), { userWebhookDeliverQueue: { add } }) as QueueService;
+	const turn = { game: 'reversi', gameId: 'game1', revision: 2 } as const;
+	await queue.gameTurnWebhookDeliver(row, turn, 123);
+	await queue.gameTurnWebhookDeliver(row, turn, 123, 'invalid');
+	expect(add).not.toHaveBeenCalled();
+	await queue.gameTurnWebhookDeliver(row, turn, 123, 'a'.repeat(64));
+	await queue.gameTurnWebhookDeliver(row, turn, 456, 'a'.repeat(64));
+	await queue.gameTurnWebhookDeliver(row, turn, 123, 'b'.repeat(64));
+	const [, data, opts] = add.mock.calls[0];
+	expect(data.gameTurn).toEqual(turn);
+	expect(data.gameTurnStateKey).toBe('a'.repeat(64));
+	expect(data).not.toHaveProperty('to');
+	expect(data).not.toHaveProperty('secret');
+	expect(add.mock.calls[1][2].jobId).toBe(opts.jobId);
+	expect(add.mock.calls[2][2].jobId).not.toBe(opts.jobId);
+});

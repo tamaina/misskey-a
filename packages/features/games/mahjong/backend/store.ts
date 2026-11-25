@@ -9,11 +9,13 @@ import { MiUser } from '@features/users/backend/models/User.js';
 import { MiBlocking } from '@features/relationships/backend/models/Blocking.js';
 import { MiMahjongRoom } from './models/MahjongRoom.js';
 import { cancelRoom, createRoom, expireRoom, projectRoom, readyRoom, RoomError, submitRoom } from './room.js';
+import { actionableTurnUsers } from './turn-webhook.js';
+import type { MahjongTurnReference } from '../../index/shared/turn-webhook.schema.js';
 import type { DataSource } from 'typeorm';
 import type { Four } from './reply-gate.js';
 
 export class MahjongStore {
-	constructor(private readonly db: DataSource) {}
+	constructor(private readonly db: DataSource, private readonly publishTurn?: (userId: string, turn: MahjongTurnReference, createdAt: number) => Promise<unknown>) {}
 
 	async create(user: string, invitees: string[]) {
 		if (invitees.length !== 3) throw new RoomError('INVALID_ACTION');
@@ -60,6 +62,7 @@ export class MahjongStore {
 			if (row.state.version !== '9k-invite-v1') throw new Error('Unsupported mahjong rule version');
 			const now = Date.now();
 			const before = row.state.revision;
+			const previousPhase = row.state.phase?.id;
 			// Timeouts are system decisions, processed before a participant's next request.
 			// A disconnected room consumes no background timers; a newly opened phase gets a full deadline.
 			// Explicit cancellation must not advance a timed-out hand first.
@@ -82,7 +85,19 @@ export class MahjongStore {
 				rejected = error;
 			}
 			if (row.state.revision !== before) await repo.update(row.id, { state: row.state, status: row.state.status, updatedAt: new Date(now) });
-			return { view: projectRoom(row.id, row.state, user, now), rejected };
-		}).then(({ view, rejected }) => { if (rejected) throw rejected; return view; });
+			const phaseId = row.state.phase?.id;
+			const turn = this.publishTurn && phaseId && phaseId !== previousPhase
+				? { reference: { game: 'mahjong' as const, roomId: row.id, phaseId, revision: row.state.revision }, users: actionableTurnUsers(row.state, now), createdAt: now }
+				: null;
+			return { view: projectRoom(row.id, row.state, user, now), rejected, turn };
+		}).then(({ view, rejected, turn }) => {
+			// Best effort after PostgreSQL commits, independent of the HTTP response or a late action error.
+			if (turn) for (const recipient of turn.users) {
+				void Promise.resolve().then(() => this.publishTurn!(recipient, turn.reference, turn.createdAt))
+					.catch(() => console.error('Mahjong turn webhook enqueue failed'));
+			}
+			if (rejected) throw rejected;
+			return view;
+		});
 	}
 }

@@ -19,6 +19,8 @@ import { GlobalEventService } from '@features/runtime/backend/services/GlobalEve
 import { IdService } from '@features/runtime/backend/services/IdService.js';
 import { NotificationService } from '@features/notifications/backend/services/NotificationService.js';
 import { Serialized } from '@features/runtime/backend/types.js';
+import { UserWebhookService } from '@features/integrations/backend/services/UserWebhookService.js';
+import { projectReversiTurn } from '../turn-webhook.js';
 import { ReversiGameEntityService } from '../serializers/ReversiGameEntityService.js';
 import type { OnApplicationShutdown, OnModuleInit } from '@nestjs/common';
 
@@ -80,6 +82,16 @@ export class ReversiService implements OnApplicationShutdown, OnModuleInit {
 	@bindThis
 	private async cacheGame(game: MiReversiGame) {
 		await this.redisClient.setex(`reversi:game:cache:${game.id}`, 60 * 60, JSON.stringify(game));
+	}
+
+	private enqueueTurnAfterStream(game: MiReversiGame, engine: Reversi.Game, stored: Promise<unknown>) {
+		const turn = projectReversiTurn(game, engine);
+		const createdAt = Date.now();
+		// The WebSocket is not awaited or delayed. Only the webhook waits for
+		// this same path's cache/timer writes so a fast worker can verify it.
+		void stored.then(() => turn && this.moduleRef.get(UserWebhookService, { strict: false })
+			.enqueueGameTurn(turn.userId, turn.reference, createdAt, turn.stateKey))
+			.catch(() => console.error('Reversi turn webhook enqueue failed'));
 	}
 
 	@bindThis
@@ -367,7 +379,7 @@ export class ReversiService implements OnApplicationShutdown, OnModuleInit {
 		// キャッシュ効率化のためにユーザー情報は再利用
 		updatedGame.user1 = game.user1;
 		updatedGame.user2 = game.user2;
-		this.cacheGame(updatedGame);
+		const cached = this.cacheGame(updatedGame);
 
 		//#region 盤面に最初から石がないなどして始まった瞬間に勝敗が決定する場合があるのでその処理
 		if (engine.isEnded) {
@@ -386,11 +398,16 @@ export class ReversiService implements OnApplicationShutdown, OnModuleInit {
 		}
 		//#endregion
 
-		this.redisClient.setex(`reversi:game:turnTimer:${game.id}:1`, updatedGame.timeLimitForEachTurn, '');
+		const timer = this.redisClient.setex(`reversi:game:turnTimer:${game.id}:1`, updatedGame.timeLimitForEachTurn, '');
+		// Observe possible early rejection while the existing WebSocket view is packed.
+		const stored = Promise.allSettled([cached, timer]);
 
 		this.globalEventService.publishReversiGameStream(game.id, 'started', {
 			game: await this.reversiGameEntityService.packDetail(updatedGame),
 		});
+		this.enqueueTurnAfterStream(updatedGame, engine, stored.then(results => {
+			if (results.some(result => result.status === 'rejected')) throw new Error('Reversi turn write failed');
+		}));
 	}
 
 	@bindThis
@@ -523,7 +540,7 @@ export class ReversiService implements OnApplicationShutdown, OnModuleInit {
 			crc32,
 			logs: serializeLogs,
 		};
-		this.cacheGame(updatedGame);
+		const cached = this.cacheGame(updatedGame);
 
 		this.globalEventService.publishReversiGameStream(game.id, 'log', {
 			...log,
@@ -542,7 +559,8 @@ export class ReversiService implements OnApplicationShutdown, OnModuleInit {
 
 			await this.endGame(updatedGame, winnerId, null);
 		} else {
-			this.redisClient.setex(`reversi:game:turnTimer:${game.id}:${engine.turn ? '1' : '0'}`, updatedGame.timeLimitForEachTurn, '');
+			const timer = this.redisClient.setex(`reversi:game:turnTimer:${game.id}:${engine.turn ? '1' : '0'}`, updatedGame.timeLimitForEachTurn, '');
+			this.enqueueTurnAfterStream(updatedGame, engine, Promise.all([cached, timer]));
 		}
 	}
 
