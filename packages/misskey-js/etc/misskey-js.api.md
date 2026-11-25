@@ -24,6 +24,7 @@ import type { InferContractRouterOutputs } from '@orpc/contract';
 import { IntegerAction } from 'valibot';
 import { IntersectSchema } from 'valibot';
 import { LazySchema } from 'valibot';
+import { LengthAction } from 'valibot';
 import { LiteralSchema } from 'valibot';
 import { MaxCodePointsAction } from 'valibot';
 import { MaxLengthAction } from 'valibot';
@@ -54,6 +55,7 @@ import { TransformAction } from 'valibot';
 import { TupleSchema } from 'valibot';
 import { UnionSchema } from 'valibot';
 import { UnknownSchema } from 'valibot';
+import { UuidAction } from 'valibot';
 import * as v from 'valibot';
 import { VariantSchema } from 'valibot';
 import { VoidSchema } from 'valibot';
@@ -1783,6 +1785,18 @@ declare namespace entities {
         FlashSearchResponse,
         UsersFlashsRequest,
         UsersFlashsResponse,
+        MahjongCreateRequest,
+        MahjongCreateResponse,
+        MahjongRoomsRequest,
+        MahjongRoomsResponse,
+        MahjongShowRequest,
+        MahjongShowResponse,
+        MahjongReadyRequest,
+        MahjongReadyResponse,
+        MahjongCancelRequest,
+        MahjongCancelResponse,
+        MahjongSubmitRequest,
+        MahjongSubmitResponse,
         BubbleGameRankingRequest,
         BubbleGameRankingResponse,
         BubbleGameRegisterRequest,
@@ -4416,6 +4430,42 @@ type IWebhooksUpdateRequest = ContractRequest<'i/webhooks/update'>;
 
 // @public (undocumented)
 type JsonValue = ContractModel<'JsonValue'>;
+
+// @public (undocumented)
+type MahjongCancelRequest = ContractRequest<'mahjong/cancel'>;
+
+// @public (undocumented)
+type MahjongCancelResponse = ContractResponse<'mahjong/cancel'>;
+
+// @public (undocumented)
+type MahjongCreateRequest = ContractRequest<'mahjong/create'>;
+
+// @public (undocumented)
+type MahjongCreateResponse = ContractResponse<'mahjong/create'>;
+
+// @public (undocumented)
+type MahjongReadyRequest = ContractRequest<'mahjong/ready'>;
+
+// @public (undocumented)
+type MahjongReadyResponse = ContractResponse<'mahjong/ready'>;
+
+// @public (undocumented)
+type MahjongRoomsRequest = ContractRequest<'mahjong/rooms'>;
+
+// @public (undocumented)
+type MahjongRoomsResponse = ContractResponse<'mahjong/rooms'>;
+
+// @public (undocumented)
+type MahjongShowRequest = ContractRequest<'mahjong/show'>;
+
+// @public (undocumented)
+type MahjongShowResponse = ContractResponse<'mahjong/show'>;
+
+// @public (undocumented)
+type MahjongSubmitRequest = ContractRequest<'mahjong/submit'>;
+
+// @public (undocumented)
+type MahjongSubmitResponse = ContractResponse<'mahjong/submit'>;
 
 // @public (undocumented)
 type MeDetailed = ContractModel<'MeDetailed'>;
