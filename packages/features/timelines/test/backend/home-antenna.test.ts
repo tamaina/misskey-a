@@ -58,6 +58,31 @@ test('only current followees match, including across two warmed worker caches af
 	expect(f.followings.find).toHaveBeenCalledWith({ where: { followerId: 'owner', isFollowerSuspended: false }, select: { followeeId: true, withReplies: true } });
 });
 
+test('in-flight fetch started before unfollow does not repopulate stale followings after delete', async () => {
+	const f = fixture();
+	f.following.add('author');
+	let releaseStaleRead!: () => void;
+	const staleReadStarted = new Promise<void>(resolve => {
+		f.followings.find.mockImplementationOnce(async () => {
+			resolve();
+			await new Promise<void>(done => { releaseStaleRead = done; });
+			return [{ followeeId: 'author', withReplies: false } as MiFollowing];
+		});
+	});
+
+	const staleFetch = f.hit(0);
+	await staleReadStarted;
+
+	f.following.delete('author');
+	await f.publish('unfollow');
+	releaseStaleRead();
+
+	expect(await staleFetch).toBe(true);
+	// Subsequent checks on both workers must not observe the stale follow cached by the racing fetch.
+	expect(await f.hit(0)).toBe(false);
+	expect(await f.hit(1)).toBe(false);
+});
+
 test('does not implicitly include the owner or inherited object keys', async () => {
 	const f = fixture();
 	for (const userId of ['owner', 'toString', 'constructor']) {

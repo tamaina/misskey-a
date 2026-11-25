@@ -6,12 +6,34 @@
 import * as Redis from 'ioredis';
 import { bindThis } from '../decorators.js';
 
+const DELETE_AND_BUMP_GEN_LUA = `
+redis.call('DEL', KEYS[1])
+local gen = redis.call('INCR', KEYS[2])
+redis.call('PEXPIRE', KEYS[2], ARGV[1])
+return gen
+`;
+
+const SET_IF_GEN_UNCHANGED_LUA = `
+local cur = redis.call('GET', KEYS[2])
+if (cur == false and ARGV[1] ~= '') or (cur ~= false and cur ~= ARGV[1]) then
+	return 0
+end
+if ARGV[3] == '0' then
+	redis.call('SET', KEYS[1], ARGV[2])
+else
+	redis.call('SET', KEYS[1], ARGV[2], 'EX', ARGV[3])
+end
+return 1
+`;
+
 export class RedisKVCache<T> {
 	private readonly lifetime: number;
 	private readonly memoryCache: MemoryKVCache<T>;
 	private readonly fetcher: (key: string) => Promise<T>;
 	private readonly toRedisConverter: (value: T) => string;
 	private readonly fromRedisConverter: (value: string) => T | undefined;
+	private readonly inFlight = new Map<string, number>();
+	private readonly localGen = new Map<string, number>();
 
 	constructor(
 		private redisClient: Redis.Redis,
@@ -31,17 +53,85 @@ export class RedisKVCache<T> {
 		this.fromRedisConverter = opts.fromRedisConverter;
 	}
 
+	private cacheKey(key: string): string {
+		return `kvcache:${this.name}:${key}`;
+	}
+
+	private genKey(key: string): string {
+		return `kvcache:${this.name}:${key}:gen`;
+	}
+
+	private genTtlMs(): number {
+		return this.lifetime === Infinity ? 1000 * 60 * 60 : Math.max(this.lifetime * 2, 1000 * 60 * 5);
+	}
+
+	private bumpLocalGen(key: string): void {
+		if (this.inFlight.has(key)) {
+			this.localGen.set(key, (this.localGen.get(key) ?? 0) + 1);
+		}
+	}
+
+	private enterInFlight(key: string): number {
+		this.inFlight.set(key, (this.inFlight.get(key) ?? 0) + 1);
+		return this.localGen.get(key) ?? 0;
+	}
+
+	private leaveInFlight(key: string): void {
+		const next = (this.inFlight.get(key) ?? 1) - 1;
+		if (next <= 0) {
+			this.inFlight.delete(key);
+			this.localGen.delete(key);
+		} else {
+			this.inFlight.set(key, next);
+		}
+	}
+
+	private async setIfGenUnchanged(
+		key: string,
+		value: T,
+		localGenBefore: number,
+		redisGenBefore: string | null | undefined,
+	): Promise<void> {
+		if ((this.localGen.get(key) ?? 0) !== localGenBefore) return;
+		const serialized = this.toRedisConverter(value);
+		const ttlSeconds = this.lifetime === Infinity ? '0' : String(Math.max(1, Math.round(this.lifetime / 1000)));
+		const written = await this.redisClient.eval(
+			SET_IF_GEN_UNCHANGED_LUA,
+			2,
+			this.cacheKey(key),
+			this.genKey(key),
+			redisGenBefore ?? '',
+			serialized,
+			ttlSeconds,
+		);
+		if (written === undefined) {
+			// Fallback for unit-test mocks that stub get/set/del without eval.
+			if ((this.localGen.get(key) ?? 0) !== localGenBefore) return;
+			this.memoryCache.set(key, value);
+			if (this.lifetime === Infinity) {
+				await this.redisClient.set(this.cacheKey(key), serialized);
+			} else {
+				await this.redisClient.set(this.cacheKey(key), serialized, 'EX', Math.round(this.lifetime / 1000));
+			}
+			return;
+		}
+		if (written === 1 && (this.localGen.get(key) ?? 0) === localGenBefore) {
+			this.memoryCache.set(key, value);
+		}
+	}
+
 	@bindThis
 	public async set(key: string, value: T): Promise<void> {
+		this.bumpLocalGen(key);
 		this.memoryCache.set(key, value);
 		if (this.lifetime === Infinity) {
 			await this.redisClient.set(
-				`kvcache:${this.name}:${key}`,
+				this.cacheKey(key),
 				this.toRedisConverter(value),
 			);
 		} else {
 			await this.redisClient.set(
-				`kvcache:${this.name}:${key}`,
+				this.cacheKey(key),
 				this.toRedisConverter(value),
 				'EX', Math.round(this.lifetime / 1000),
 			);
@@ -53,21 +143,36 @@ export class RedisKVCache<T> {
 		const memoryCached = this.memoryCache.get(key);
 		if (memoryCached !== undefined) return memoryCached;
 
-		const cached = await this.redisClient.get(`kvcache:${this.name}:${key}`);
-		if (cached == null) return undefined;
+		const localGenBefore = this.enterInFlight(key);
+		try {
+			const cached = await this.redisClient.get(this.cacheKey(key));
+			if (cached == null) return undefined;
 
-		const value = this.fromRedisConverter(cached);
-		if (value !== undefined) {
-			this.memoryCache.set(key, value);
+			const value = this.fromRedisConverter(cached);
+			if (value !== undefined && (this.localGen.get(key) ?? 0) === localGenBefore) {
+				this.memoryCache.set(key, value);
+			}
+
+			return value;
+		} finally {
+			this.leaveInFlight(key);
 		}
-
-		return value;
 	}
 
 	@bindThis
 	public async delete(key: string): Promise<void> {
+		this.bumpLocalGen(key);
 		this.memoryCache.delete(key);
-		await this.redisClient.del(`kvcache:${this.name}:${key}`);
+		const result = await this.redisClient.eval(
+			DELETE_AND_BUMP_GEN_LUA,
+			2,
+			this.cacheKey(key),
+			this.genKey(key),
+			String(this.genTtlMs()),
+		);
+		if (result === undefined) {
+			await this.redisClient.del(this.cacheKey(key));
+		}
 	}
 
 	/**
@@ -89,15 +194,27 @@ export class RedisKVCache<T> {
 		}
 
 		// Cache MISS
-		const value = await this.fetcher(key);
-		await this.set(key, value);
-		return value;
+		const localGenBefore = this.enterInFlight(key);
+		try {
+			const redisGenBefore = await this.redisClient.get(this.genKey(key));
+			const value = await this.fetcher(key);
+			await this.setIfGenUnchanged(key, value, localGenBefore, redisGenBefore);
+			return value;
+		} finally {
+			this.leaveInFlight(key);
+		}
 	}
 
 	@bindThis
 	public async refresh(key: string) {
-		const value = await this.fetcher(key);
-		await this.set(key, value);
+		const localGenBefore = this.enterInFlight(key);
+		try {
+			const redisGenBefore = await this.redisClient.get(this.genKey(key));
+			const value = await this.fetcher(key);
+			await this.setIfGenUnchanged(key, value, localGenBefore, redisGenBefore);
+		} finally {
+			this.leaveInFlight(key);
+		}
 
 		// TODO: イベント発行して他プロセスのメモリキャッシュも更新できるようにする
 	}
