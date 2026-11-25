@@ -9,7 +9,7 @@ import { IsNull, In, MoreThan, Not } from 'typeorm';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { DI } from '@/di-symbols.js';
 import type { MiLocalUser, MiRemoteUser, MiUser } from '../models/User.js';
-import type { BlockingsRepository, FollowingsRepository, InstancesRepository, MiMeta, MutingsRepository, UserListMembershipsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
+import type { BlockingsRepository, FollowingsRepository, InstancesRepository, MiMeta, MutingsRepository, UsersRepository } from '@features/persistence/backend/repositories/models.js';
 import type { RelationshipJobData, ThinUser } from '@features/runtime/backend/queue/types.js';
 import type { NativeMeDetailed } from '../serializers/native-user.js';
 
@@ -24,6 +24,7 @@ import { UserEntityService } from '../serializers/UserEntityService.js';
 import { FederatedInstanceService } from '@features/federation/backend/services/FederatedInstanceService.js';
 import { InstanceChart } from '@features/statistics/backend/charts/instance.js';
 import { PerUserFollowingChart } from '@features/statistics/backend/charts/per-user-following.js';
+import { UserListService } from '@features/relationships/backend/services/UserListService.js';
 import { SystemAccountService } from './SystemAccountService.js';
 import { RoleService } from '@features/roles/backend/services/RoleService.js';
 import { AntennaService } from '@features/timelines/backend/services/AntennaService.js';
@@ -46,9 +47,6 @@ export class AccountMoveService {
 		@Inject(DI.mutingsRepository)
 		private mutingsRepository: MutingsRepository,
 
-		@Inject(DI.userListMembershipsRepository)
-		private userListMembershipsRepository: UserListMembershipsRepository,
-
 		@Inject(DI.instancesRepository)
 		private instancesRepository: InstancesRepository,
 
@@ -66,6 +64,7 @@ export class AccountMoveService {
 		private systemAccountService: SystemAccountService,
 		private roleService: RoleService,
 		private antennaService: AntennaService,
+		private userListService: UserListService,
 	) {
 	}
 
@@ -247,47 +246,7 @@ export class AccountMoveService {
 	 */
 	@bindThis
 	public async updateLists(src: ThinUser, dst: MiUser): Promise<void> {
-		// Return if there is no list to be updated.
-		const oldMemberships = await this.userListMembershipsRepository.find({
-			where: {
-				userId: src.id,
-			},
-		});
-		if (oldMemberships.length === 0) return;
-
-		const existingUserListIds = await this.userListMembershipsRepository.find({
-			where: {
-				userId: dst.id,
-			},
-		}).then(memberships => memberships.map(membership => membership.userListId));
-
-		const newMemberships: Map<string, { userId: string; userListId: string; userListUserId: string; }> = new Map();
-
-		// 重複しないようにIDを生成
-		const genId = (): string => {
-			let id: string;
-			do {
-				id = this.idService.gen();
-			} while (newMemberships.has(id));
-			return id;
-		};
-		for (const membership of oldMemberships) {
-			if (existingUserListIds.includes(membership.userListId)) continue; // skip if dst exists in this user's list
-			newMemberships.set(genId(), {
-				userId: dst.id,
-				userListId: membership.userListId,
-				userListUserId: membership.userListUserId,
-			});
-		}
-
-		const arrayToInsert = Array.from(newMemberships.entries()).map(entry => ({ ...entry[1], id: entry[0] }));
-		await this.userListMembershipsRepository.insert(arrayToInsert);
-
-		// Have the proxy account follow the new account in the same way as UserListService.push
-		if (this.userEntityService.isRemoteUser(dst)) {
-			const proxy = await this.systemAccountService.fetch('proxy');
-			this.queueService.createFollowJob([{ from: { id: proxy.id }, to: { id: dst.id } }]);
-		}
+		await this.userListService.copyMemberships(src, dst);
 	}
 
 	@bindThis

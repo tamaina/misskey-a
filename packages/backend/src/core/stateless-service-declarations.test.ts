@@ -133,6 +133,7 @@ describe('seven stateless feature declarations', () => {
 		const query = mockDeep<SelectQueryBuilder<MiRegistryItem>>();
 		query.where.mockReturnValue(query);
 		query.andWhere.mockReturnValue(query);
+		query.limit.mockReturnValue(query);
 		const createQueryBuilder = (): SelectQueryBuilder<MiRegistryItem> => query;
 		inputs.registryItemsRepository.createQueryBuilder.mockImplementation(createQueryBuilder);
 		inputs.idService.gen.mockReturnValue('item-id');
@@ -151,5 +152,6 @@ describe('seven stateless feature declarations', () => {
 			'UPDATE "registry_item" SET "updatedAt" = $1, "value" = $2 WHERE "id" = $3',
 			[expect.any(Date), 'false', 'existing-id']);
 		expect(inputs.globalEventService.publishMainStream).toHaveBeenCalledTimes(1);
+		expect(query.limit.mock.calls).toEqual([[1], [1]]);
 	});
 });

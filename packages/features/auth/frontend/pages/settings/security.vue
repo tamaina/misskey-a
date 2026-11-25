@@ -54,6 +54,8 @@ import { ownedConfirm, ownedInputText } from '@features/auth/frontend/utility/ow
 import { ensureSudo } from '@features/auth/frontend/utility/ensure-sudo.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
 import { isSameLiveCredential } from '@features/auth/frontend/utility/live-account.js';
+import { cloudBackup } from '@features/preferences/frontend/state/utility.js';
+import { store } from '@features/preferences/frontend/store.js';
 
 const ownerId = ensureSignin().id;
 const ownerToken = ensureSignin().token;
@@ -99,6 +101,12 @@ async function regenerateToken() {
 		const confirmation = await ownedConfirm({ type: 'warning', text: $locale.value.sfc.regenerateLoginTokenDescription }, sudoAbort?.signal);
 		if (!isCurrent() || confirmation.canceled) return;
 		if (!await ensureSudo(isCurrent, sudoAbort?.signal) || !isCurrent()) return;
+		if (store.s.enablePreferencesAutoCloudBackup) {
+			try { await cloudBackup(); } catch {
+				// A failed optional backup should not block credential renewal.
+			}
+			if (!isCurrent()) return;
+		}
 		await os.apiWithDialog('i/security/regenerate-token', {});
 		if (isCurrent()) await signout('credentials-changed');
 	} finally { changingPassword.value = false; }

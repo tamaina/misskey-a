@@ -27,6 +27,7 @@ function createFixture(overrides = {}) {
 	const deps = {
 		findOwnedList: async (...args) => { calls.push(['findOwnedList', ...args]); return list; },
 		deleteList: async (...args) => { calls.push(['deleteList', ...args]); },
+		notifyListDeleted: id => { calls.push(['notifyListDeleted', id]); },
 		findPublicList: async (...args) => { calls.push(['findPublicList', ...args]); return true; },
 		hasFavorite: async (...args) => { calls.push(['hasFavorite', ...args]); return false; },
 		generateFavoriteId: () => { calls.push(['generateFavoriteId']); return 'generated123'; },
@@ -50,7 +51,7 @@ getterService: { getUser: (...args) => deps.getUser(...args) },
 userFollowingService: { acceptFollowRequest: (...args) => deps.acceptFollowRequest(...args), rejectFollowRequest: (...args) => deps.rejectFollowRequest(...args) },
 userMutingService: { unmute: (...args) => deps.unmute(...args) },
 userRenoteMutingService: { mute: (...args) => deps.muteRenotes(...args), unmute: (...args) => deps.unmuteRenotes(...args) },
-userListService: { removeMember: (...args) => deps.removeMember(...args), addMember: (...args) => deps.addMember(...args), updateMembership: (...args) => deps.updateMembership(...args) },
+userListService: { notifyListDeleted: id => deps.notifyListDeleted(id), removeMember: (...args) => deps.removeMember(...args), addMember: (...args) => deps.addMember(...args), updateMembership: (...args) => deps.updateMembership(...args) },
 idService: { gen: () => deps.generateFavoriteId() },
 mutingsRepository: { findOneBy: query => deps.findMuting(query.muterId, query.muteeId) },
 renoteMutingsRepository: { exists: ({ where }) => deps.isRenoteMuting(where.muterId, where.muteeId), findOneBy: query => deps.findRenoteMuting(query.muterId, query.muteeId) },
@@ -75,7 +76,7 @@ test('all six commands preserve lookup order, trusted identity, full actor conte
 		assert.equal(result, undefined, route);
 	}
 	assert.deepEqual(calls, [
-		['findOwnedList', 'list123', actor.id], ['deleteList', list.id],
+		['findOwnedList', 'list123', actor.id], ['deleteList', list.id], ['notifyListDeleted', list.id],
 		['findPublicList', 'list123'], ['hasFavorite', actor.id, 'list123'], ['generateFavoriteId'],
 		['insertFavorite', { id: 'generated123', userId: actor.id, userListId: 'list123' }],
 		['findOwnedList', 'list123', actor.id], ['getUser', 'user123'], ['removeMember', user, list],
@@ -274,5 +275,5 @@ test('malformed identifiers are rejected before dependencies while extension fie
 		}
 	}
 	await invoke(feature, 'users/lists/delete', { listId: 'list123', ignored: { nested: true } });
-	assert.deepEqual(calls, [['findOwnedList', 'list123', actor.id], ['deleteList', list.id]]);
+	assert.deepEqual(calls, [['findOwnedList', 'list123', actor.id], ['deleteList', list.id], ['notifyListDeleted', list.id]]);
 });

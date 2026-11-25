@@ -313,7 +313,7 @@ definePage(() => ({
 	"mutualFollow": "Gegenseitig gefolgt",
 	"followingOrFollower": "Follow oder Follower",
 	"userList": "Liste",
-	"notifyUsers": "Users with post notifications enabled",
+	"notifyUsers": "Benutzer mit aktivierten Beitragsbenachrichtigungen",
 	"notificationSoundSettings": "Benachrichtigungston festlegen",
 	"markAsReadAllNotifications": "Alle Benachrichtigungen als gelesen markieren",
 	"notificationSendTestNotification": "Testbenachrichtigung senden",

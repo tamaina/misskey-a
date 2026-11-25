@@ -771,6 +771,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</MkPreferenceContainer>
 							</SearchMarker>
 
+							<SearchMarker :keywords="['url', 'preview', 'expand', 'player', 'embed']">
+								<MkPreferenceContainer k="expandUrlPreviewAutomatically">
+									<MkSwitch v-model="expandUrlPreviewAutomatically">
+										<template #label><SearchLabel>{{ $locale.sfc.expandUrlPreviewAutomatically }}</SearchLabel></template>
+									</MkSwitch>
+								</MkPreferenceContainer>
+							</SearchMarker>
+
 							<SearchMarker :keywords="['effect', 'show']">
 								<MkPreferenceContainer k="enableSeasonalScreenEffect">
 									<MkSwitch v-model="enableSeasonalScreenEffect">
@@ -949,6 +957,7 @@ const reactionsDisplaySize = prefer.model('reactionsDisplaySize');
 const limitWidthOfReaction = prefer.model('limitWidthOfReaction');
 const squareAvatars = prefer.model('squareAvatars');
 const autoplayEmbededPlayerOfUrlPreview = prefer.model('autoplayEmbededPlayerOfUrlPreview');
+const expandUrlPreviewAutomatically = prefer.model('expandUrlPreviewAutomatically');
 const enableSeasonalScreenEffect = prefer.model('enableSeasonalScreenEffect');
 const showAvatarDecorations = prefer.model('showAvatarDecorations');
 const nsfw = prefer.model('nsfw');
@@ -1465,7 +1474,9 @@ definePage(() => ({
 	"deck": "Escriptori",
 	"customCss": "CSS personalitzat",
 	"selectList": "Tria una llista",
-	"notifications": "Notificacions"
+	"notifications": "Notificacions",
+	"autoplayEmbededPlayerOfUrlPreview": "Reprodueix automàticament el reproductor incrustat per a les previsualitzacions d'URL",
+	"expandUrlPreviewAutomatically": "Expandir automàticament les previsualitzacions d'URL"
 }
 </locale>
 
@@ -2729,12 +2740,15 @@ definePage(() => ({
 	"deck": "Deck",
 	"customCss": "CSS personalizzato",
 	"selectList": "Seleziona una lista",
-	"notifications": "Notifiche"
+	"notifications": "Notifiche",
+	"autoplayEmbededPlayerOfUrlPreview": "Riproduci automaticamente le anteprime URL multimediali",
+	"expandUrlPreviewAutomatically": "Espansione automatica delle anteprime URL"
 }
 </locale>
 
 <locale lang="json" locale="ja-JP">
 {
+	"expandUrlPreviewAutomatically": "URLプレビューを自動展開",
 	"autoplayEmbededPlayerOfUrlPreview": "URLプレビューの埋め込みプレイヤーを自動再生",
 	"preferences": "環境設定",
 	"settingsPreferencesBanner": "好みに応じた、クライアントの全体的な動作の設定が行えます。",
@@ -3520,7 +3534,9 @@ definePage(() => ({
 	"deck": "덱",
 	"customCss": "CSS 사용자화",
 	"selectList": "리스트 선택",
-	"notifications": "알림"
+	"notifications": "알림",
+	"autoplayEmbededPlayerOfUrlPreview": "URL 미리보기의 임베드 플레이어 자동 재생",
+	"expandUrlPreviewAutomatically": "URL 미리보기 자동확장"
 }
 </locale>
 

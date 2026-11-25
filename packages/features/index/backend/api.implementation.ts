@@ -15,7 +15,7 @@ import { DriveManagementApiProvider, DriveApiProvider } from '@features/drive/ba
 import { IntegrationsApiProvider } from '@features/integrations/backend/api.implementation.js';
 import { OperationsApiProvider } from '@features/operations/backend/api.implementation.js';
 import { FederationApiProvider } from '@features/federation/backend/api.implementation.js';
-import { GamesApiProvider } from '@features/games/backend/api.implementation.js';
+import { GamesApiProvider } from '@features/games/index/backend/api.implementation.js';
 import { PlayApiProvider } from '@features/play/backend/api.implementation.js';
 import { PagesApiProvider } from '@features/pages/backend/api.implementation.js';
 import { ChannelsApiProvider } from '@features/channels/backend/api.implementation.js';
