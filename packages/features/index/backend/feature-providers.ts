@@ -4,6 +4,7 @@
  */
 
 import { ServiceBillingApiProvider } from '@features/billing/backend/service.provider.js';
+import { PeerPaymentApiProvider } from '@features/billing/backend/peer.provider.js';
 import { WalletApiProvider } from '@features/billing/backend/wallet.provider.js';
 import type { Provider } from '@nestjs/common';
 import { ApiRouterProvider } from './api.implementation.js';
@@ -39,6 +40,7 @@ export const featureProviders: Provider[] = [
 	ApiRouterProvider,
 	ServiceBillingApiProvider,
 	WalletApiProvider,
+	PeerPaymentApiProvider,
 	RolesApiProvider,
 	ModerationApiProvider,
 	AuthApiProvider,

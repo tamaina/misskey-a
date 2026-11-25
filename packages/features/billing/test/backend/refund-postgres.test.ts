@@ -4,12 +4,15 @@
  */
 import 'reflect-metadata';
 import { BillingCountryEligibility1792138000000 as CountryMigration } from '../../../../backend/migration/1792138000000-BillingCountryEligibility.js';
+import { PeerCountryEligibility1792138000001 as PeerCountryMigration } from '../../../../backend/migration/1792138000001-PeerCountryEligibility.js';
 
 import { randomUUID } from 'node:crypto';
 import { DataSource } from 'typeorm';
 import { expect, test } from 'vitest';
 import { createRouterClient } from '@orpc/server';
 import { entities } from '@features/persistence/backend/postgres.js';
+import { PeerPayments1791950000000 as PeerMigration } from '../../../../backend/migration/1791950000000-PeerPayments.js';
+import { PeerBroadcastStart1792101000000 as BroadcastMigration } from '../../../../backend/migration/1792101000000-PeerBroadcastStart.js';
 import { createServiceBillingStore } from '../../backend/service-store.js';
 import { createBillingPolicyStore } from '../../backend/policy-store.js';
 import { createRefundStore } from '../../backend/refund-store.js';
@@ -71,7 +74,7 @@ test.skipIf(!url)('native PostgreSQL refund API, claims, all-group atomic expiry
 		await qr.query('INSERT INTO "user" VALUES (\'alice\'),(\'bob\'),(\'admin\'),(\'carol\'),(\'dave\')');
 		await qr.query('CREATE TABLE role (id varchar(32) PRIMARY KEY, target varchar(16), "isAdministrator" boolean, "isModerator" boolean)');
 		await qr.query('INSERT INTO role VALUES (\'normal\',\'manual\',false,false)');
-		await new BillingWalletRegistration1791760200000().up(qr);
+		await new BillingWalletRegistration1791760200000().up(qr); await new PeerMigration().up(qr); await new BroadcastMigration().up(qr);
 		await new BillingServiceSubscriptions1791838800000().up(qr);
 		const funded = new BillingFundedTerms1792010000000(), migration = new BillingRefunds1792011000000();
 		await funded.up(qr); await migration.up(qr); await migration.down(qr); await funded.down(qr); await funded.up(qr); await migration.up(qr);
@@ -85,6 +88,7 @@ test.skipIf(!url)('native PostgreSQL refund API, claims, all-group atomic expiry
 		await qr.query('CREATE TABLE user_profile ("userId" varchar(32) PRIMARY KEY)');
 		await new AccountDeclaredResidence1792100000000().up(qr);
 		await new CountryMigration().up(qr); await new CountryMigration().down(qr); await new CountryMigration().up(qr);
+		await new PeerCountryMigration().up(qr); await new PeerCountryMigration().down(qr); await new PeerCountryMigration().up(qr);
 		await qr.query('INSERT INTO billing_policy (id, revision, policy, \"updatedAt\") VALUES ($1,0,$2::jsonb,$3)', ['server', JSON.stringify({ isEnabled: false, countryEligibility: { operatorCountry: 'JP', mode: 'allow', allowedCountries: ['JP', 'US'] } }), new Date(now)]);
 		await qr.query('INSERT INTO user_profile ("userId", "billingResidence") SELECT id, $1::jsonb FROM "user"', [JSON.stringify({ country: 'JP', subdivision: 'JP-13', revision: 1, declaredAt: now, kind: 'self_declared' })]);
 		await qr.query('CREATE TABLE moderation_log (id varchar(32) PRIMARY KEY, "userId" varchar(32) NOT NULL, type varchar(128) NOT NULL, info jsonb NOT NULL)');

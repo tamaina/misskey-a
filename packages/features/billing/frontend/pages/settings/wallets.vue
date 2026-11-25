@@ -6,6 +6,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <template>
 <SearchMarker path="/settings/wallets" :label="$locale.sfc.title" :keywords="['wallet', 'SIWE']" icon="ti ti-wallet">
+	<MkA to="/settings/peer-payments">{{ $locale.sfc.peer }}</MkA>
 	<MkA to="/settings/subscriptions">{{ $locale.sfc.billing }}</MkA>
 	<WalletSettings :residenceClient="nativeResidenceClient" :client="client" :connectors="connectors" :confirmUnlink="confirmUnlink" :authenticateWithPasskey="authenticateWithPasskey"/>
 </SearchMarker>
@@ -49,5 +50,5 @@ definePage(() => ({ title: $locale.value.sfc.title, icon: 'ti ti-wallet' }));
 </script>
 
 <locale lang="json" locale="ja-JP">
-{"billing":"サービス契約・送金の確認","title":"ウォレット","unlink":"ウォレットの登録を解除しますか？"}
+{"peer":"ユーザー間の送金","billing":"サービス契約・送金の確認","title":"ウォレット","unlink":"ウォレットの登録を解除しますか？"}
 </locale>
