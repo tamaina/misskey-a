@@ -265,6 +265,11 @@ function toPackedUserPolicies(policies: v.InferOutput<typeof __ref_RolePolicies>
 		noteDraftLimit: policies.noteDraftLimit,
 		scheduledNoteLimit: policies.scheduledNoteLimit,
 		watermarkAvailable: policies.watermarkAvailable,
+		canNote: policies.canNote,
+		renotePolicy: policies.renotePolicy,
+		canCreateSpecifiedNote: policies.canCreateSpecifiedNote,
+		canFederateNote: policies.canFederateNote,
+		noteFilesLimit: policies.noteFilesLimit,
 	};
 }
 

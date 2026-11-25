@@ -4,6 +4,7 @@
  */
 
 import * as v from 'valibot';
+import { MAX_NOTE_ATTACHMENTS } from '../../notes/shared/limits.schema.js';
 
 export const packedAnnouncementSchema = v.strictObject({
 	'id': v.pipe(v.string(), v.metadata({ 'format': 'id', 'example': 'xxxxxxxxxx' })),
@@ -70,5 +71,10 @@ export const packedRolePoliciesSchema = v.strictObject({
 	'noteDraftLimit': v.pipe(v.number(), v.integer()),
 	'scheduledNoteLimit': v.pipe(v.number(), v.integer()),
 	'watermarkAvailable': v.boolean(),
+	'canNote': v.boolean(),
+	'renotePolicy': v.picklist(['allow', 'renoteOnly', 'disallow']),
+	'canCreateSpecifiedNote': v.boolean(),
+	'canFederateNote': v.boolean(),
+	'noteFilesLimit': v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(MAX_NOTE_ATTACHMENTS)),
 });
 

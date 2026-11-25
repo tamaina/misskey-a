@@ -12,7 +12,7 @@ import { MAX_NOTE_TEXT_LENGTH } from '@features/notes/backend/request.schema.js'
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import type { SystemAccountService } from '@features/users/backend/services/SystemAccountService.js';
 import type { Config } from '@/config.js';
-import { DEFAULT_POLICIES } from '@features/roles/backend/services/RoleService.js';
+import { DEFAULT_POLICIES, normalizeNoteFilesLimit } from '@features/roles/backend/services/RoleService.js';
 
 export class MetaEntityService {
 	constructor(
@@ -121,7 +121,10 @@ export class MetaEntityService {
 
 			serverRules: instance.serverRules,
 
-			policies: { ...DEFAULT_POLICIES, ...instance.policies },
+			policies: {
+				...DEFAULT_POLICIES, ...instance.policies,
+				noteFilesLimit: normalizeNoteFilesLimit([Object.hasOwn(instance.policies, 'noteFilesLimit') ? instance.policies.noteFilesLimit : DEFAULT_POLICIES.noteFilesLimit]),
+			},
 
 			sentryForFrontend: this.config.sentryForFrontend ?? null,
 			mediaProxy: this.config.mediaProxy,

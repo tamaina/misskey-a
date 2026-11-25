@@ -2,6 +2,8 @@
  * SPDX-FileCopyrightText: misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import postingRebases from './posting-role-source-rebase.json';
+import { restorePostingRoleBaseline } from './posting-role-source-rebase.js';
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -28,14 +30,20 @@ const rebases = sourceRebases;
 if (new Set(rebases.map(entry => entry.file)).size !== rebases.length) throw new Error('Duplicate upstream source rebase');
 
 const sha256 = (source: string): string => createHash('sha256').update(source).digest('hex');
+/** Compose exact posting edits with upstream locale updates, including already-restored callers. */
+function withoutPostingRoleEdits(file: string, source: string): string {
+	return postingRebases.some(entry => entry.file === file && entry.currentSha256 === sha256(source))
+		? restorePostingRoleBaseline(file, source)
+		: source;
+}
 /** Restore only pinned source adaptations before replaying the unchanged historical proofs. */
 export function restoreUpstreamDevelopBaseline(file: string, source: string): string {
-	return restoreSourceRebase(rebases.find(entry => entry.file === file), source);
+	return restoreSourceRebase(rebases.find(entry => entry.file === file), withoutPostingRoleEdits(file, source));
 }
 
 /** #18171 follows the frozen source layers below; undo just those new translations first. */
 export function restoreCrowdin18171Baseline(file: string, source: string): string {
-	return restoreSourceRebase(crowdin18171.find(entry => entry.file === file), source);
+	return restoreSourceRebase(crowdin18171.find(entry => entry.file === file), withoutPostingRoleEdits(file, source));
 }
 
 function restoreSourceRebase(rebase: SourceRebase | undefined, source: string): string {
@@ -60,7 +68,7 @@ export function restoreUpstreamLocaleBundle(language: string, bundle: LocaleBund
 	for (const rebase of rebases.filter(entry => !entry.sourceOnly && entry.file.endsWith('.vue'))) {
 		const moduleId = rebase.file.replace('packages/', '/');
 		if (!Object.hasOwn(modules, moduleId)) continue;
-		const source = readFileSync(resolve(import.meta.dirname, '../../../..', rebase.file), 'utf8');
+		const source = withoutPostingRoleEdits(rebase.file, readFileSync(resolve(import.meta.dirname, '../../../..', rebase.file), 'utf8'));
 		const prior = restoreCrowdin18171Baseline(rebase.file, source);
 		if (sha256(prior) !== rebase.currentSha256) throw new Error(`Locale source differs from reviewed upstream develop: ${rebase.file}`);
 		let dictionaries = localeCache.get(rebase.file);

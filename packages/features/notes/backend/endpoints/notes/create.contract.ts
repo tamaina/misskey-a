@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { MAX_NOTE_ATTACHMENTS } from '../../../shared/limits.schema.js';
 import type { Meta } from '@orpc/contract';
 import type { ApiProcedureMetadata } from '../../../../api/backend/transport/policy.types.js';
 import { oc } from '@orpc/contract';
@@ -13,6 +14,42 @@ import { objectInput, misskeyId, jsonNumber, jsonString, uniqueStringArray, MAX_
 import type { OpenAPI } from '@orpc/contract';
 
 export const notesCreateErrors = {
+	cannotCreateNote: {
+		message: 'You are not allowed to create notes.',
+		code: 'CANNOT_CREATE_NOTE',
+		id: 'f35c0bd4-9dca-4998-ae4b-fa0e7c54d16a',
+	},
+
+	tooManyFilesAttachedToNote: {
+		message: 'Cannot post because too many files are attached.',
+		code: 'CONTAINS_TOO_MANY_FILES',
+		id: '8d28ca32-a244-4cf7-bc29-97895fdc3604',
+	},
+
+	renoteForbidden: {
+		message: 'You are not allowed to Renote.',
+		code: 'RENOTE_FORBIDDEN',
+		id: 'c5b0bcc1-9db1-4178-b130-920a4e150b58',
+	},
+
+	quoteForbidden: {
+		message: 'You are not allowed to quote.',
+		code: 'QUOTE_FORBIDDEN',
+		id: 'ae77a039-588a-40c3-8358-cc9c15ec7bbb',
+	},
+
+	directNoteCreationForbidden: {
+		message: 'You are not allowed to send specified notes.',
+		code: 'SPECIFIED_NOTE_CREATION_FORBIDDEN',
+		id: 'fe35a6b4-f595-4cbc-ab56-f31fa68be1f0',
+	},
+
+	remoteDirectNoteCreationForbidden: {
+		message: 'You are not allowed to send specified notes to remote users.',
+		code: 'REMOTE_SPECIFIED_NOTE_CREATION_FORBIDDEN',
+		id: 'dd9e27c6-7cba-4587-92c7-672c82d9cc46',
+	},
+
 	noSuchRenoteTarget: {
 		message: 'No such renote target.',
 		code: 'NO_SUCH_RENOTE_TARGET',
@@ -110,7 +147,7 @@ export const notesCreateContract = oc.$meta({
 },
 } as const satisfies Meta & ApiProcedureMetadata)
 	.route({ method: 'POST', path: '/notes/create', tags: ['notes'], spec: current => ({ ...current, security }) })
-	.errors({ ...commonErrors, NO_SUCH_RENOTE_TARGET: { status: 400, data: apiErrorData }, CANNOT_RENOTE_TO_A_PURE_RENOTE: { status: 400, data: apiErrorData }, CANNOT_RENOTE_DUE_TO_VISIBILITY: { status: 400, data: apiErrorData }, NO_SUCH_REPLY_TARGET: { status: 400, data: apiErrorData }, CANNOT_REPLY_TO_AN_INVISIBLE_NOTE: { status: 400, data: apiErrorData }, CANNOT_REPLY_TO_A_PURE_RENOTE: { status: 400, data: apiErrorData }, CANNOT_REPLY_TO_SPECIFIED_VISIBILITY_NOTE_WITH_EXTENDED_VISIBILITY: { status: 400, data: apiErrorData }, CANNOT_CREATE_ALREADY_EXPIRED_POLL: { status: 400, data: apiErrorData }, NO_SUCH_CHANNEL: { status: 400, data: apiErrorData }, YOU_HAVE_BEEN_BLOCKED: { status: 400, data: apiErrorData }, NO_SUCH_FILE: { status: 400, data: apiErrorData }, CANNOT_RENOTE_OUTSIDE_OF_CHANNEL: { status: 400, data: apiErrorData }, CONTAINS_PROHIBITED_WORDS: { status: 400, data: apiErrorData }, CONTAINS_TOO_MANY_MENTIONS: { status: 400, data: apiErrorData } })
+	.errors({ ...commonErrors, CANNOT_CREATE_NOTE: { status: 400, data: apiErrorData }, CONTAINS_TOO_MANY_FILES: { status: 400, data: apiErrorData }, RENOTE_FORBIDDEN: { status: 400, data: apiErrorData }, QUOTE_FORBIDDEN: { status: 400, data: apiErrorData }, SPECIFIED_NOTE_CREATION_FORBIDDEN: { status: 400, data: apiErrorData }, REMOTE_SPECIFIED_NOTE_CREATION_FORBIDDEN: { status: 400, data: apiErrorData }, NO_SUCH_RENOTE_TARGET: { status: 400, data: apiErrorData }, CANNOT_RENOTE_TO_A_PURE_RENOTE: { status: 400, data: apiErrorData }, CANNOT_RENOTE_DUE_TO_VISIBILITY: { status: 400, data: apiErrorData }, NO_SUCH_REPLY_TARGET: { status: 400, data: apiErrorData }, CANNOT_REPLY_TO_AN_INVISIBLE_NOTE: { status: 400, data: apiErrorData }, CANNOT_REPLY_TO_A_PURE_RENOTE: { status: 400, data: apiErrorData }, CANNOT_REPLY_TO_SPECIFIED_VISIBILITY_NOTE_WITH_EXTENDED_VISIBILITY: { status: 400, data: apiErrorData }, CANNOT_CREATE_ALREADY_EXPIRED_POLL: { status: 400, data: apiErrorData }, NO_SUCH_CHANNEL: { status: 400, data: apiErrorData }, YOU_HAVE_BEEN_BLOCKED: { status: 400, data: apiErrorData }, NO_SUCH_FILE: { status: 400, data: apiErrorData }, CANNOT_RENOTE_OUTSIDE_OF_CHANNEL: { status: 400, data: apiErrorData }, CONTAINS_PROHIBITED_WORDS: { status: 400, data: apiErrorData }, CONTAINS_TOO_MANY_MENTIONS: { status: 400, data: apiErrorData } })
 	.input(v.pipe(objectInput({
 	visibility: v.optional(v.picklist(['public', 'home', 'followers', 'specified']), 'public'),
 	visibleUserIds: v.exactOptional(uniqueStringArray(misskeyId)),
@@ -124,8 +161,8 @@ export const notesCreateContract = oc.$meta({
 	renoteId: v.exactOptional(v.nullable(misskeyId)),
 	channelId: v.exactOptional(v.nullable(misskeyId)),
 	text: v.exactOptional(v.nullable(jsonString({ minLength: 1, maxLength: MAX_NOTE_TEXT_LENGTH }))),
-	fileIds: v.exactOptional(v.pipe(uniqueStringArray(misskeyId), v.minLength(1), v.maxLength(16))),
-	mediaIds: v.exactOptional(v.pipe(uniqueStringArray(misskeyId), v.minLength(1), v.maxLength(16))),
+	fileIds: v.exactOptional(v.pipe(uniqueStringArray(misskeyId), v.minLength(1), v.maxLength(MAX_NOTE_ATTACHMENTS))),
+	mediaIds: v.exactOptional(v.pipe(uniqueStringArray(misskeyId), v.minLength(1), v.maxLength(MAX_NOTE_ATTACHMENTS))),
 	poll: v.exactOptional(v.nullable(objectInput({
 		choices: v.pipe(uniqueStringArray(jsonString({ minLength: 1, maxLength: 50 })), v.minLength(2), v.maxLength(10)),
 		multiple: v.exactOptional(v.boolean()),

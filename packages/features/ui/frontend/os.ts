@@ -43,7 +43,7 @@ function getGlobalLocale() {
 
 export const openingWindowsCount = ref(0);
 
-export type ApiWithDialogCustomErrors = Record<string, { title?: string; text: string; }>;
+export type ApiWithDialogCustomErrors = Record<string, { title?: string; text: string; }> | ((err: Misskey.api.APIError) => { title?: string; text: string; } | null);
 export const apiWithDialog = (<E extends keyof Misskey.Endpoints>(
 	endpoint: E,
 	data: Misskey.Endpoints[E]['req'] & { i?: string | null; },
@@ -90,9 +90,12 @@ export const apiWithDialog = (<E extends keyof Misskey.Endpoints>(
 		} else if (err.message.startsWith('Unexpected token')) {
 			title = FeatureLocaleMessages.$locale.gotInvalidResponseError;
 			text = FeatureLocaleMessages.$locale.gotInvalidResponseErrorDescription;
-		} else if (customErrors && customErrors[err.id] != null) {
-			title = customErrors[err.id].title;
-			text = customErrors[err.id].text;
+		} else if (customErrors != null) {
+			const result = typeof customErrors === 'function' ? customErrors(err) : customErrors[err.id];
+			if (result != null) {
+				title = result.title;
+				text = result.text;
+			}
 		}
 		alert({
 			type: 'error',

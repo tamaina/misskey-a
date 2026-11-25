@@ -4,6 +4,7 @@
  */
 
 import * as v from 'valibot';
+import { MAX_NOTE_ATTACHMENTS } from '../../../notes/shared/limits.schema.js';
 import { wireJson } from './wire-json.schema.js';
 
 export const rolePoliciesSchema = v.strictObject({
@@ -46,6 +47,11 @@ export const rolePoliciesSchema = v.strictObject({
 	'noteDraftLimit': v.pipe(v.pipe(v.number(), v.finite()), v.integer()),
 	'scheduledNoteLimit': v.pipe(v.pipe(v.number(), v.finite()), v.integer()),
 	'watermarkAvailable': v.boolean(),
+	'canNote': v.boolean(),
+	'renotePolicy': v.picklist(['allow', 'renoteOnly', 'disallow']),
+	'canCreateSpecifiedNote': v.boolean(),
+	'canFederateNote': v.boolean(),
+	'noteFilesLimit': v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(MAX_NOTE_ATTACHMENTS)),
 });
 
 // Public metadata includes persisted custom policies alongside the known policy fields.
