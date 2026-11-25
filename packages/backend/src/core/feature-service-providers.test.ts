@@ -18,6 +18,7 @@ import { galleryServices } from '@features/collections/backend/services/gallery.
 import { createPageEntityService, createPageLikeEntityService, createPageService, pageFactoryProviders } from '@features/pages/backend/services.js';
 import { playServices } from '@features/play/backend/services.js';
 import { LoggerService } from '@features/runtime/backend/services/LoggerService.js';
+import { ServiceBillingRoleProvider } from '@features/billing/backend/service-role.provider.js';
 import { TotpService } from '@features/auth/backend/services/TotpService.js';
 import { CoreModule } from '@features/boot/backend/assembly/CoreModule.js';
 import { featureServiceExports, featureServiceGroups, featureServiceProviders } from '@features/index/backend/feature-service-providers.js';
@@ -51,6 +52,8 @@ describe('feature service composition adapter', () => {
 	test('CoreModule installs and exports every canonical service and compatibility alias once', () => {
 		const providers = Reflect.getMetadata(MODULE_METADATA.PROVIDERS, CoreModule) as Provider[];
 		const exports = Reflect.getMetadata(MODULE_METADATA.EXPORTS, CoreModule) as (Provider | InjectionToken)[];
+		expect(featureServiceGroups.billing.providers).toEqual([ServiceBillingRoleProvider]);
+		expect(featureServiceGroups.billing.exports).toEqual([ServiceBillingRoleProvider]);
 		for (const provider of featureServiceProviders) {
 			expect(providers.filter(candidate => providerToken(candidate) === providerToken(provider))).toEqual([provider]);
 		}

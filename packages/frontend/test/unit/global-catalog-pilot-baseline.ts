@@ -9,6 +9,7 @@ import { resolve } from 'node:path';
 import { parse } from 'vue/compiler-sfc';
 import { locales } from 'i18n';
 import escapes from './shared-global-locale-escapes.json';
+import { restoreBillingCatalogBaseline } from './billing-catalog-source-rebase.js';
 import { restoreCrowdin18171Baseline } from './upstream-develop-source-rebase.js';
 import { restoreWalletSettingsBaseline } from './wallet-settings-source-rebase.js';
 import type { RuntimeLocaleDictionary } from 'vite-vue-internationalization/runtime';
@@ -17024,6 +17025,7 @@ const globalValue = (dictionary: unknown, key: string): unknown => {
 
 /** Replay the pre-pilot source only after verifying both complete source boundaries. */
 export function restoreGlobalCatalogPilotSource(file: string, source: string): string {
+	source = restoreBillingCatalogBaseline(file, source);
 	source = restoreWalletSettingsBaseline(file, source);
 	source = restoreCrowdin18171Baseline(file, source);
 	const owner = globalCatalogPilotOwners.find(owner => owner.file === file);
@@ -17073,7 +17075,7 @@ export function restoreGlobalCatalogPilotDictionary(file: string, language: stri
 	for (const key of owner.keys) {
 		if (JSON.stringify(globalValue(global, key)) !== JSON.stringify(globalValue(locales[language], key))) throw new Error(`Global catalog pilot shared label differs: ${language}:${key}`);
 	}
-	const beforeFollowup = collect(restoreCrowdin18171Baseline(file, restoreWalletSettingsBaseline(file, source)));
+	const beforeFollowup = collect(restoreCrowdin18171Baseline(file, restoreWalletSettingsBaseline(file, restoreBillingCatalogBaseline(file, source))));
 	if ('dictionaryEdits' in owner) {
 		for (const edit of owner.dictionaryEdits) {
 			if (edit.language !== language) continue;

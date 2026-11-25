@@ -107,6 +107,11 @@ const menuDef = computed<SuperMenuDef[]>(() => [{
 		to: '/settings/email',
 		active: currentPage.value?.route.name === 'email',
 	}, {
+		icon: 'ti ti-map-pin',
+		text: $locale.value.sfc.residence,
+		to: '/settings/residence',
+		active: currentPage.value?.route.name === 'residence',
+	}, {
 		icon: 'ti ti-wallet',
 		text: $locale.value.sfc.wallets,
 		to: '/settings/wallets',
@@ -581,6 +586,7 @@ definePage(() => INFO.value);
 
 <locale locale="ja-JP" lang="json">
 {
+	"residence": "支払い用の居住地",
 	"wallets": "ウォレット",
 	"profile": "プロフィール",
 	"privacy": "プライバシー",

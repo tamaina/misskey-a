@@ -21,10 +21,14 @@ export const transferEvidenceSchema = v.strictObject({
 	toAddress: address,
 	amountBaseUnits: positiveUint256,
 });
+const receiptIdentity = { chainId, txHash: hash, timestamp: safeInteger };
+const blockNumber = v.pipe(v.string(), v.regex(/^(0|[1-9][0-9]*)$/));
+/** A confirmed revert for this hash only; not proof that no other transaction paid. */
+export const canonicalRevertEvidenceSchema = v.strictObject({ ...receiptIdentity, blockHash: hash, blockNumber });
+export type CanonicalRevertEvidence = v.InferOutput<typeof canonicalRevertEvidenceSchema>;
 export const receiptEvidenceSchema = v.strictObject({
-	chainId,
-	txHash: hash,
-	timestamp: safeInteger,
+	...receiptIdentity,
+	blockHash: v.exactOptional(hash), blockNumber: v.exactOptional(blockNumber),
 	transfers: v.array(transferEvidenceSchema),
 });
 export const receiptRequestSchema = v.strictObject({

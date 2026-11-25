@@ -31,6 +31,7 @@ export const userExportableEntities = ['antenna', 'blocking', 'clip', 'customEmo
 export const userImportableEntities = ['antenna', 'blocking', 'customEmoji', 'following', 'muting', 'userList'] as const;
 
 export const moderationLogTypes = [
+	'billingCatalog',
 	'updateServerSettings',
 	'suspend',
 	'unsuspend',
@@ -89,6 +90,7 @@ export const moderationLogTypes = [
 ] as const;
 
 export type ModerationLogPayloads = {
+	billingCatalog: { action: string; resourceId: string; before: unknown; after: unknown };
 	updateServerSettings: {
 		before: any | null;
 		after: any | null;

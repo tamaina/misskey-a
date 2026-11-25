@@ -36,6 +36,8 @@ export interface ApiContext<Actor extends ApiActor = ApiActor> {
 	authorization?: ApiAuthorization<Actor>;
 	credential: string | null | undefined;
 	ip: string;
+	/** Actual socket peer, never forwarded/caller supplied geo metadata. */
+	transportPeerIp?: string;
 	headers: Record<string, string | string[] | undefined>;
 	/** Actual HTTP method before compatibility routing adapts a GET alias. */
 	httpMethod?: string;

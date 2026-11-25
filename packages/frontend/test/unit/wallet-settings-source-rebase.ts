@@ -9,7 +9,7 @@ const filePath = 'packages/features/navigation/frontend/pages/settings/index.vue
 const currentSha256 = '119c7e9aea68352c7c766f3245d219ed81af3b2cf87064846ebc8b90fef6a960';
 const baselineSha256 = '71aaf8a10d4f40f98f0d0635883d38742b05f0776d7645305a6c62d6f655c1cb';
 const sha256 = (source: string) => createHash('sha256').update(source).digest('hex');
-const menuAddition = "\t\ticon: 'ti ti-wallet',\n\t\ttext: $locale.value.sfc.wallets,\n\t\tto: '/settings/wallets',\n\t\tactive: currentPage.value?.route.name === 'wallets',\n\t}, {\n";
+const menuAddition = '\t\ticon: \'ti ti-wallet\',\n\t\ttext: $locale.value.sfc.wallets,\n\t\tto: \'/settings/wallets\',\n\t\tactive: currentPage.value?.route.name === \'wallets\',\n\t}, {\n';
 const labelAddition = '\t"wallets": "ウォレット",\n';
 
 /** Reverse only the reviewed wallet navigation/ja-JP addition. All historical
@@ -25,6 +25,10 @@ export function restoreWalletSettingsBaseline(file: string, source: string): str
 	}
 	if (file !== filePath) return source;
 	if (sha256(source) === baselineSha256) return source;
+	// Reverse the exact reviewed residence navigation/ja-JP addition.
+	if (sha256(source) === 'a684bbe9eec47614bbea7ac228f8e75c07bd2c99506717e96e980c1c3c1d09f2') {
+		source = source.replace("\t\ticon: 'ti ti-map-pin',\n\t\ttext: $locale.value.sfc.residence,\n\t\tto: '/settings/residence',\n\t\tactive: currentPage.value?.route.name === 'residence',\n\t}, {\n", '').replace('\t"residence": "支払い用の居住地",\n', '');
+	}
 	if (sha256(source) !== currentSha256) throw new Error(`Wallet settings source differs from reviewed edits: ${file}`);
 	const restored = source.replace(menuAddition, '').replace(labelAddition, '');
 	if (sha256(restored) !== baselineSha256) throw new Error(`Wallet settings baseline was not restored: ${file}`);

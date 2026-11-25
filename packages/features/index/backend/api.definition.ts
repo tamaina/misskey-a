@@ -3,7 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { walletContract } from '../../billing/backend/api.definition.js';
+import { billingReportsContract } from '../../billing/backend/reports.contract.js';
+import { billingPolicyContract } from '../../billing/backend/policy.contract.js';
+import { catalogAdminContract } from '../../billing/backend/catalog.contract.js';
+import { refundContract } from '../../billing/backend/refund.contract.js';
+import { serviceBillingContract, walletContract } from '../../billing/backend/api.definition.js';
 import { instanceApiContract } from '../../instance/backend/api.definition.js';
 import { statisticsContract } from '../../statistics/backend/endpoints/statistics.contract.js';
 import { discoveryContract } from '../../discovery/backend/endpoints/discovery.contract.js';
@@ -31,11 +35,13 @@ import { testContract } from '../../api/backend/endpoints/test.contract.js';
 import { driveManagementContract } from '../../drive/backend/api.definition.js';
 import { portabilityApiContract } from '../../portability/backend/api.definition.js';
 import { authContract } from '../../auth/backend/api.definition.js';
+import { residenceContract } from '../../billing/backend/residence.contract.js';
 import { moderationContract } from '../../moderation/backend/api.definition.js';
 import { rolesContract } from '../../roles/backend/api.definition.js';
 import { clearBrowserCacheContract, clearBrowserCacheGetContract } from '../../api/backend/endpoints/clear-browser-cache.contract.js';
 
 export const pilotContract: {
+	serviceBilling: typeof serviceBillingContract & typeof refundContract & typeof catalogAdminContract & typeof billingPolicyContract & typeof billingReportsContract & typeof residenceContract;
 	wallets: typeof walletContract;
 	clearBrowserCache: typeof clearBrowserCacheContract;
 	clearBrowserCacheGet: typeof clearBrowserCacheGetContract;
@@ -69,6 +75,7 @@ export const pilotContract: {
 	collections: typeof collectionsContract;
 	drive: typeof drivePilotContract;
 } = {
+	serviceBilling: { ...residenceContract, ...serviceBillingContract, ...refundContract, ...catalogAdminContract, ...billingPolicyContract, ...billingReportsContract },
 	wallets: walletContract,
 	clearBrowserCache: clearBrowserCacheContract,
 	clearBrowserCacheGet: clearBrowserCacheGetContract,

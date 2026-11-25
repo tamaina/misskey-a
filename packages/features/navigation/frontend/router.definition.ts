@@ -4,13 +4,13 @@
  */
 
 import { defineAsyncComponent } from 'vue';
-import type { AsyncComponentLoader } from 'vue';
 import { loadNotFoundPage } from '@features/index/frontend';
-import type { RouteDef } from '@features/navigation/frontend/lib/nirax.js';
 import { $i, iAmModerator } from '@features/auth/frontend/i.js';
 import MkLoading from '@features/web/frontend/pages/_loading_.vue';
 import MkError from '@features/web/frontend/pages/_error_.vue';
 import PageTimeline from '@features/timelines/frontend/pages/timeline.vue';
+import type { RouteDef } from '@features/navigation/frontend/lib/nirax.js';
+import type { AsyncComponentLoader } from 'vue';
 
 export const page = (loader: AsyncComponentLoader) => defineAsyncComponent({
 	loader: loader,
@@ -109,6 +109,14 @@ export const ROUTE_DEF = [{
 		path: '/email',
 		name: 'email',
 		component: page(() => import('@features/auth/frontend/pages/settings/email.vue')),
+	}, {
+		path: '/subscriptions',
+		name: 'subscriptions',
+		component: page(() => import('@features/billing/frontend/pages/settings/subscriptions.vue')),
+	}, {
+		path: '/residence',
+		name: 'residence',
+		component: page(() => import('@features/billing/frontend/pages/settings/residence.vue')),
 	}, {
 		path: '/wallets',
 		name: 'wallets',
@@ -463,6 +471,10 @@ export const ROUTE_DEF = [{
 		path: '/modlog',
 		name: 'modlog',
 		component: page(() => import('@features/moderation/frontend/pages/admin/modlog.vue')),
+	}, {
+		path: '/service-offers',
+		name: 'serviceOffers',
+		component: page(() => import('@features/billing/frontend/pages/admin/service-offers.vue')),
 	}, {
 		path: '/wallet-chains',
 		name: 'walletChains',
