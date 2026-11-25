@@ -11,6 +11,9 @@ on:
       - packages/features/auth/**
       - packages/features/mcp/**
       - packages/features/relationships/**
+      - packages/features/timelines/backend/**
+      - packages/features/timelines/test/backend/**
+      - packages/features/users/backend/**
       # for permissions
       - packages/misskey-js/**
       - .github/workflows/test-backend.yml
@@ -24,6 +27,9 @@ on:
       - packages/features/auth/**
       - packages/features/mcp/**
       - packages/features/relationships/**
+      - packages/features/timelines/backend/**
+      - packages/features/timelines/test/backend/**
+      - packages/features/users/backend/**
       # for permissions
       - packages/misskey-js/**
       - .github/workflows/test-backend.yml
@@ -96,6 +102,8 @@ jobs:
     - name: Test authentication progress with isolated Unix-socket Redis
       if: ${{ matrix.node-version-file == '.node-version' }}
       run: node packages/features/auth/test/run-authentication-progress-fixture.mjs
+    - name: Test home antenna across independent Redis workers
+      run: MISSKEY_REDIS_FIXTURE_CONFIG=packages/features/timelines/test/vitest.home-redis.config.mjs node packages/features/auth/test/run-oauth-fixture.mjs
     - name: Test antenna delivery identity with disposable Redis
       run: MISSKEY_REDIS_FIXTURE_CONFIG=packages/features/mcp/test/vitest.antenna-redis.config.mjs node packages/features/auth/test/run-oauth-fixture.mjs
     - name: Test recovery codes with isolated PostgreSQL

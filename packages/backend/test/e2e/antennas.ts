@@ -448,14 +448,16 @@ describe('アンテナ', () => {
 				],
 			},
 			{
-				// BUG e4144a1 以降home指定は壊れている(allと同じ)
-				label: 'ホーム指定はallと同じ',
+				label: 'ホーム指定はフォロー先のみ（本人・非フォロー先・フォロワーを含まない）',
 				parameters: () => ({ src: 'home' }),
 				posts: [
-					{ note: (): Promise<Note> => post(alice, { text: `${keyword}` }), included: true },
+					{ note: (): Promise<Note> => post(alice, { text: `${keyword}` }) },
 					{ note: (): Promise<Note> => post(userFollowedByAlice, { text: `${keyword}` }), included: true },
-					{ note: (): Promise<Note> => post(bob, { text: `test ${keyword}` }), included: true },
-					{ note: (): Promise<Note> => post(carol, { text: `test ${keyword}` }), included: true },
+					{ note: (): Promise<Note> => post(userFollowedByAlice, { text: `${keyword}`, visibility: 'home' }), included: true },
+					{ note: (): Promise<Note> => post(userFollowedByAlice, { text: `${keyword}`, visibility: 'followers' }), included: true },
+					{ note: (): Promise<Note> => post(bob, { text: `test ${keyword}` }) },
+					{ note: (): Promise<Note> => post(carol, { text: `test ${keyword}` }) },
+					{ note: (): Promise<Note> => post(userFollowingAlice, { text: `${keyword}` }) },
 				],
 			},
 			{

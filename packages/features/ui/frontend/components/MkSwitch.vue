@@ -8,6 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<input
 		ref="input"
 		type="checkbox"
+		:checked="unref(checked)"
 		:disabled="disabled"
 		:class="$style.input"
 		@click="toggle"
@@ -27,7 +28,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { toRefs } from 'vue';
+import { toRefs, unref } from 'vue';
 import type { Ref } from 'vue';
 import XButton from '@features/ui/frontend/components/MkSwitch.button.vue';
 import { haptic } from '@features/ui/frontend/utility/haptic.js';
