@@ -95,15 +95,17 @@ export class RedisKVCache<T> {
 		if ((this.localGen.get(key) ?? 0) !== localGenBefore) return;
 		const serialized = this.toRedisConverter(value);
 		const ttlSeconds = this.lifetime === Infinity ? '0' : String(Math.max(1, Math.round(this.lifetime / 1000)));
-		const written = await this.redisClient.eval(
-			SET_IF_GEN_UNCHANGED_LUA,
-			2,
-			this.cacheKey(key),
-			this.genKey(key),
-			redisGenBefore ?? '',
-			serialized,
-			ttlSeconds,
-		);
+		const written = typeof this.redisClient.eval === 'function'
+			? await this.redisClient.eval(
+				SET_IF_GEN_UNCHANGED_LUA,
+				2,
+				this.cacheKey(key),
+				this.genKey(key),
+				redisGenBefore ?? '',
+				serialized,
+				ttlSeconds,
+			)
+			: undefined;
 		if (written === undefined) {
 			// Fallback for unit-test mocks that stub get/set/del without eval.
 			if ((this.localGen.get(key) ?? 0) !== localGenBefore) return;
@@ -163,13 +165,15 @@ export class RedisKVCache<T> {
 	public async delete(key: string): Promise<void> {
 		this.bumpLocalGen(key);
 		this.memoryCache.delete(key);
-		const result = await this.redisClient.eval(
-			DELETE_AND_BUMP_GEN_LUA,
-			2,
-			this.cacheKey(key),
-			this.genKey(key),
-			String(this.genTtlMs()),
-		);
+		const result = typeof this.redisClient.eval === 'function'
+			? await this.redisClient.eval(
+				DELETE_AND_BUMP_GEN_LUA,
+				2,
+				this.cacheKey(key),
+				this.genKey(key),
+				String(this.genTtlMs()),
+			)
+			: undefined;
 		if (result === undefined) {
 			await this.redisClient.del(this.cacheKey(key));
 		}
