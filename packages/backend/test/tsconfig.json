@@ -42,6 +42,7 @@
 		"./**/*.ts",
 		"../src/**/*.test.ts",
 		"../src/@types/**/*.ts",
-		"../../features/*/test/backend/**/*.ts"
+		"../../features/*/test/backend/**/*.ts",
+		"../../features/games/*/test/backend/**/*.ts"
 	]
 }

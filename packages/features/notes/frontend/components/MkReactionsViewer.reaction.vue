@@ -18,12 +18,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, inject, onMounted, useTemplateRef, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import { getUnicodeEmojiOrNull } from '@features/emojis/frontend/shared/emojilist.js';
 import { getEmojiNameFromReaction, isLocalCustomEmojiReaction } from '@features/emojis/frontend/shared/emoji-name.js';
 import MkCustomEmojiDetailedDialog from '@features/emojis/frontend/components/MkCustomEmojiDetailedDialog.vue';
-import type { MenuItem } from '@features/navigation/frontend/types/menu';
 import XDetails from '@features/notes/frontend/components/MkReactionsViewer.details.vue';
 import MkReactionIcon from '@features/notes/frontend/components/MkReactionIcon.vue';
 import * as os from '@features/ui/frontend/os.js';
@@ -41,6 +41,10 @@ import { noteEvents } from '@features/notes/frontend/composables/use-note-captur
 import { mute as muteEmoji, unmute as unmuteEmoji, checkMuted as isEmojiMuted } from '@features/emojis/frontend/utility/emoji-mute.js';
 import { addToEmojiPalette } from '@features/emojis/frontend/utility/emoji-palette.js';
 import { haptic } from '@features/ui/frontend/utility/haptic.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	noteId: Misskey.entities.Note['id'];
@@ -164,7 +168,7 @@ async function menu(ev: PointerEvent) {
 
 	if (isLocalCustomEmoji.value) {
 		menuItems.push({
-			text: $locale.value.sfc.info,
+			text: globalLocale.value.env.info,
 			icon: 'ti ti-info-circle',
 			action: async () => {
 				const { dispose } = os.popup(MkCustomEmojiDetailedDialog, {
@@ -341,7 +345,6 @@ if (!mock) {
 	"changeReactionConfirm": "أتريد تعديل تفاعلك؟",
 	"cancelReactionConfirm": "أتريد حذف تفاعلك؟",
 	"reactAreYouSure": "Would you like to add a \"{emoji}\" reaction?",
-	"info": "عن",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}",
 	"emojiMute": "Mute emoji",
@@ -355,7 +358,6 @@ if (!mock) {
 	"changeReactionConfirm": "Vols canviar la teva reacció?",
 	"cancelReactionConfirm": "Vols esborrar la teva reacció?",
 	"reactAreYouSure": "Vols reaccionar amb \"{emoji}\"?",
-	"info": "Informació",
 	"emojiUnmute": "Deixar de silenciar emojis",
 	"unmuteX": "Deixar de silenciar {x}",
 	"emojiMute": "Silenciar emojis",
@@ -369,7 +371,6 @@ if (!mock) {
 	"changeReactionConfirm": "Opravdu chcete změnit vaši reakci?",
 	"cancelReactionConfirm": "Opravdu chcete odstranit vaší reakci?",
 	"reactAreYouSure": "Would you like to add a \"{emoji}\" reaction?",
-	"info": "Informace",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}",
 	"emojiMute": "Mute emoji",
@@ -383,7 +384,6 @@ if (!mock) {
 	"changeReactionConfirm": "Really change your reaction?",
 	"cancelReactionConfirm": "Really delete your reaction?",
 	"reactAreYouSure": "Would you like to add a \"{emoji}\" reaction?",
-	"info": "About",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}",
 	"emojiMute": "Mute emoji",
@@ -397,7 +397,6 @@ if (!mock) {
 	"changeReactionConfirm": "Möchtest du deine Reaktion wirklich ändern?",
 	"cancelReactionConfirm": "Möchtest du deine Reaktion wirklich löschen?",
 	"reactAreYouSure": "Willst du eine \"{emoji}\"-Reaktion hinzufügen?",
-	"info": "Über",
 	"emojiUnmute": "Emoji-Stummschaltung aufheben",
 	"unmuteX": "Stummschaltung von {x} aufheben",
 	"emojiMute": "Emoji stummschalten",
@@ -411,7 +410,6 @@ if (!mock) {
 	"changeReactionConfirm": "Really change your reaction?",
 	"cancelReactionConfirm": "Really delete your reaction?",
 	"reactAreYouSure": "Would you like to add a \"{emoji}\" reaction?",
-	"info": "About",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}",
 	"emojiMute": "Mute emoji",
@@ -425,7 +423,6 @@ if (!mock) {
 	"changeReactionConfirm": "¿Realmente quieres cambiar la reacción?",
 	"cancelReactionConfirm": "¿Realmente quieres eliminar la reacción?",
 	"reactAreYouSure": "¿Quieres añadir una reacción «{emoji}»?",
-	"info": "Información",
 	"emojiUnmute": "No silenciar emoji",
 	"unmuteX": "Dejar de silenciar {x}",
 	"emojiMute": "Silenciar emoji",
@@ -439,7 +436,6 @@ if (!mock) {
 	"changeReactionConfirm": "Changer la réaction ?",
 	"cancelReactionConfirm": "Supprimez la réaction ?",
 	"reactAreYouSure": "Would you like to add a \"{emoji}\" reaction?",
-	"info": "Informations",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}",
 	"emojiMute": "Mute emoji",
@@ -453,7 +449,6 @@ if (!mock) {
 	"changeReactionConfirm": "Yakin untuk mengganti reaksimu?",
 	"cancelReactionConfirm": "Yakin untuk menghapus reaksimu?",
 	"reactAreYouSure": "Would you like to add a \"{emoji}\" reaction?",
-	"info": "Informasi",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}",
 	"emojiMute": "Mute emoji",
@@ -467,7 +462,6 @@ if (!mock) {
 	"changeReactionConfirm": "Vuoi cambiare la tua reazione?",
 	"cancelReactionConfirm": "Vuoi annullare la tua reazione?",
 	"reactAreYouSure": "Vuoi davvero reagire con {emoji} ?",
-	"info": "Informazioni",
 	"emojiUnmute": "De silenzia emoji",
 	"unmuteX": "De silenzia {x}",
 	"emojiMute": "Silenzia emoji",
@@ -481,7 +475,6 @@ if (!mock) {
 	"changeReactionConfirm": "リアクションを変更しますか？",
 	"cancelReactionConfirm": "リアクションを取り消しますか？",
 	"reactAreYouSure": "\" {emoji} \" をリアクションしますか？",
-	"info": "情報",
 	"emojiUnmute": "絵文字ミュート解除",
 	"unmuteX": "{x}のミュートを解除",
 	"emojiMute": "絵文字ミュート",
@@ -495,7 +488,6 @@ if (!mock) {
 	"changeReactionConfirm": "ツッコミを別のに変えるか？",
 	"cancelReactionConfirm": "ツッコむんをやっぱやめるか？",
 	"reactAreYouSure": "\" {emoji} \" でツッコむ？",
-	"info": "情報",
 	"emojiUnmute": "絵文字ミュートやめたる",
 	"unmuteX": "{x}のミュートやめたる",
 	"emojiMute": "絵文字ミュート",
@@ -509,7 +501,6 @@ if (!mock) {
 	"changeReactionConfirm": "Really change your reaction?",
 	"cancelReactionConfirm": "Really delete your reaction?",
 	"reactAreYouSure": "Would you like to add a \"{emoji}\" reaction?",
-	"info": "About",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}",
 	"emojiMute": "Mute emoji",
@@ -523,7 +514,6 @@ if (!mock) {
 	"changeReactionConfirm": "Really change your reaction?",
 	"cancelReactionConfirm": "Really delete your reaction?",
 	"reactAreYouSure": "Would you like to add a \"{emoji}\" reaction?",
-	"info": "About",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}",
 	"emojiMute": "Mute emoji",
@@ -537,7 +527,6 @@ if (!mock) {
 	"changeReactionConfirm": "리액션을 변경하시겠습니까?",
 	"cancelReactionConfirm": "리액션을 취소하시겠습니까?",
 	"reactAreYouSure": "\" {emoji} \"로 리액션하시겠습니까?",
-	"info": "정보",
 	"emojiUnmute": "이모티콘 뮤트 해제",
 	"unmuteX": "{x}의 뮤트를 해제",
 	"emojiMute": "이모티콘 뮤트",
@@ -551,7 +540,6 @@ if (!mock) {
 	"changeReactionConfirm": "Really change your reaction?",
 	"cancelReactionConfirm": "Really delete your reaction?",
 	"reactAreYouSure": "Would you like to add a \"{emoji}\" reaction?",
-	"info": "Over",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}",
 	"emojiMute": "Mute emoji",
@@ -565,7 +553,6 @@ if (!mock) {
 	"changeReactionConfirm": "Really change your reaction?",
 	"cancelReactionConfirm": "Really delete your reaction?",
 	"reactAreYouSure": "Would you like to add a \"{emoji}\" reaction?",
-	"info": "Infomasjon",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}",
 	"emojiMute": "Mute emoji",
@@ -579,7 +566,6 @@ if (!mock) {
 	"changeReactionConfirm": "Really change your reaction?",
 	"cancelReactionConfirm": "Really delete your reaction?",
 	"reactAreYouSure": "Would you like to add a \"{emoji}\" reaction?",
-	"info": "Informacje",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}",
 	"emojiMute": "Mute emoji",
@@ -593,7 +579,6 @@ if (!mock) {
 	"changeReactionConfirm": "Realmente mudar a sua reação?",
 	"cancelReactionConfirm": "Realmente excluir a sua reação?",
 	"reactAreYouSure": "Você deseja adicionar uma reação \"{emoji}\"?",
-	"info": "Informações",
 	"emojiUnmute": "Reativar emoji",
 	"unmuteX": "Reativar {x}",
 	"emojiMute": "Silenciar emoji",
@@ -607,7 +592,6 @@ if (!mock) {
 	"changeReactionConfirm": "Вы действительно хотите удалить свою реакцию?",
 	"cancelReactionConfirm": "Вы действительно хотите удалить свою реакцию?",
 	"reactAreYouSure": "Добавить {emoji}?",
-	"info": "Описание",
 	"emojiUnmute": "Показать эмодзи",
 	"unmuteX": "Показать {x}",
 	"emojiMute": "Скрыть эмодзи",
@@ -621,7 +605,6 @@ if (!mock) {
 	"changeReactionConfirm": "Really change your reaction?",
 	"cancelReactionConfirm": "Really delete your reaction?",
 	"reactAreYouSure": "Would you like to add a \"{emoji}\" reaction?",
-	"info": "Informácie",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}",
 	"emojiMute": "Mute emoji",
@@ -635,7 +618,6 @@ if (!mock) {
 	"changeReactionConfirm": "ต้องการเปลี่ยนรีแอคชั่นใช่ไหม?",
 	"cancelReactionConfirm": "ต้องการลบรีแอคชั่นใช่ไหม?",
 	"reactAreYouSure": "ต้องการใส่รีแอคชั่นด้วย \"{emoji}\" หรือไม่?",
-	"info": "เกี่ยวกับ",
 	"emojiUnmute": "เลิกปิดเสียงเอโมจิ",
 	"unmuteX": "เลิกปิดเสียง {x}",
 	"emojiMute": "ปิดเสียงเอโมจิ",
@@ -649,7 +631,6 @@ if (!mock) {
 	"changeReactionConfirm": "Tepkini cidden değiştirmek istiyor musun?",
 	"cancelReactionConfirm": "Tepkini cidden silmek istiyor musun?",
 	"reactAreYouSure": "“{emoji}” tepkisini eklemek ister misin?",
-	"info": "Hakkında",
 	"emojiUnmute": "Emoji ses aç",
 	"unmuteX": "Sesi aç {x}",
 	"emojiMute": "Emoji ses kapat",
@@ -663,7 +644,6 @@ if (!mock) {
 	"changeReactionConfirm": "Really change your reaction?",
 	"cancelReactionConfirm": "Really delete your reaction?",
 	"reactAreYouSure": "Would you like to add a \"{emoji}\" reaction?",
-	"info": "About",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}",
 	"emojiMute": "Mute emoji",
@@ -677,7 +657,6 @@ if (!mock) {
 	"changeReactionConfirm": "Справді змінити вашу реакцію?",
 	"cancelReactionConfirm": "Справді видалити вашу реакцію?",
 	"reactAreYouSure": "Бажали б ви додати реакцію {emoji}?",
-	"info": "Інформація",
 	"emojiUnmute": "Показувати емодзі",
 	"unmuteX": "Показувати {x}",
 	"emojiMute": "Приховати емодзі",
@@ -691,7 +670,6 @@ if (!mock) {
 	"changeReactionConfirm": "Bạn có muốn thay đổi phản ứng của mình không?",
 	"cancelReactionConfirm": "Bạn có muốn hủy phản ứng của mình không?",
 	"reactAreYouSure": "Bạn có muốn phản hồi với \" {emoji} \" không?",
-	"info": "Giới thiệu",
 	"emojiUnmute": "Unmute emoji",
 	"unmuteX": "Unmute {x}",
 	"emojiMute": "Mute emoji",
@@ -705,7 +683,6 @@ if (!mock) {
 	"changeReactionConfirm": "要更改回应吗？",
 	"cancelReactionConfirm": "要取消回应吗？",
 	"reactAreYouSure": "要用 “{emoji}” 进行回应吗？",
-	"info": "关于",
 	"emojiUnmute": "取消屏蔽表情符号",
 	"unmuteX": "取消对{x}的隐藏",
 	"emojiMute": "屏蔽表情符号",
@@ -719,7 +696,6 @@ if (!mock) {
 	"changeReactionConfirm": "要更改反應嗎？",
 	"cancelReactionConfirm": "要取消此反應嗎？",
 	"reactAreYouSure": "用「 {emoji} 」反應嗎？",
-	"info": "資訊",
 	"emojiUnmute": "表情符號解除靜音",
 	"unmuteX": "將 {x} 解除靜音",
 	"emojiMute": "表情符號靜音",

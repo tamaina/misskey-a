@@ -31,10 +31,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { Locale } from 'i18n';
 import { ref, computed, watch } from 'vue';
-import type { SoundType } from '@features/preferences/frontend/utility/sound.js';
-import type { SoundStore } from '@features/preferences/frontend/state/def.js';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkRange from '@features/ui/frontend/components/MkRange.vue';
@@ -43,6 +40,9 @@ import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { playMisskeySfxFile, soundsTypes, getSoundDuration } from '@features/preferences/frontend/utility/sound.js';
 import { selectFile } from '@features/drive/frontend/utility/drive.js';
+import type { SoundStore } from '@features/preferences/frontend/state/def.js';
+import type { SoundType } from '@features/preferences/frontend/utility/sound.js';
+import type { Locale } from 'i18n';
 
 const globalLocale = useLocale<Locale>(import.meta.url);
 
@@ -123,7 +123,7 @@ function selectSound(ev: PointerEvent) {
 				type: 'warning',
 				title: $locale.value.sfc.driveFileDurationWarn,
 				text: $locale.value.sfc.driveFileDurationWarnDescription,
-				okText: $locale.value.sfc.continue,
+				okText: globalLocale.value.env.continue,
 				cancelText: globalLocale.value.env.cancel,
 			});
 			if (canceled) return;
@@ -229,7 +229,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "متابعة",
 	"sound": "الرنات",
 	"selectFile": "اختر ملفًا",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
@@ -246,7 +245,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Seleccionar un fitxer d'àudio ",
 	"driveFileDurationWarn": "L'àudio és massa llarg",
 	"driveFileDurationWarnDescription": "Els àudios molt llargs pot interrompre l'ús de Misskey. Vols continuar?",
-	"continue": "Continuar",
 	"sound": "So",
 	"selectFile": "Selecciona un fitxer",
 	"driveFileError": "El so no es pot carregar. Canvia la configuració",
@@ -263,7 +261,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Pokračovat",
 	"sound": "Zvuky",
 	"selectFile": "Vybrat soubor",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
@@ -280,7 +277,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Continue",
 	"sound": "Sounds",
 	"selectFile": "Select a file",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
@@ -297,7 +293,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Bitte wähle eine Audiodatei",
 	"driveFileDurationWarn": "Audio zu lang.",
 	"driveFileDurationWarnDescription": "Lange Töne kann die Verwendung von Misskey stören. Trotzdem fortfahren?",
-	"continue": "Fortfahren",
 	"sound": "Töne",
 	"selectFile": "Datei auswählen",
 	"driveFileError": "Audio konnte nicht geladen werden. Bitte ändere die Einstellung.",
@@ -314,7 +309,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Continue",
 	"sound": "Sounds",
 	"selectFile": "Select a file",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
@@ -331,7 +325,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Selecciona un archivo de audio",
 	"driveFileDurationWarn": "La duración del audio es demasiado larga.",
 	"driveFileDurationWarnDescription": "Usar un audio de larga duración puede llegar a molestar mientras usas Misskey. ¿Quieres continuar?",
-	"continue": "Continuar",
 	"sound": "Sonidos",
 	"selectFile": "Elegir archivo",
 	"driveFileError": "No puedo cargar el sonido. Por favor cambia la configuración.",
@@ -348,7 +341,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Veuillez sélectionner un fichier audio",
 	"driveFileDurationWarn": "L'effet sonore est trop long",
 	"driveFileDurationWarnDescription": "Utiliser un effet sonore long peut affecter l'utilisation de Misskey. Voulez-vous encore continuer ?",
-	"continue": "Continuer",
 	"sound": "Sons",
 	"selectFile": "Choisir le fichier",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
@@ -365,7 +357,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Pilih berkas audio",
 	"driveFileDurationWarn": "Audio ini terlalu panjang",
 	"driveFileDurationWarnDescription": "Audio panjang dapat mengganggu penggunaan Misskey. Masih ingin melanjutkan?",
-	"continue": "Lanjutkan",
 	"sound": "Bunyi",
 	"selectFile": "Pilih berkas",
 	"driveFileError": "Tak bisa memuat audio. Mohon ubah pengaturan",
@@ -382,7 +373,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Per favore, scegli un file di tipo audio",
 	"driveFileDurationWarn": "La durata dell'audio è troppo lunga",
 	"driveFileDurationWarnDescription": "Scegliere un audio lungo potrebbe interferire con l'uso di Misskey. Vuoi continuare lo stesso?",
-	"continue": "Continua",
 	"sound": "Suono",
 	"selectFile": "Scelta allegato",
 	"driveFileError": "Impossibile caricare l'audio. Si prega di modificare le impostazioni",
@@ -399,7 +389,6 @@ function save() {
 	"driveFileTypeWarnDescription": "音声ファイルを選択してください",
 	"driveFileDurationWarn": "音声が長すぎます",
 	"driveFileDurationWarnDescription": "長い音声を使用するとMisskeyの使用に支障をきたす可能性があります。それでも続行しますか？",
-	"continue": "続ける",
 	"sound": "サウンド",
 	"selectFile": "ファイルを選択",
 	"driveFileError": "音声が読み込めませんでした。設定を変更してください",
@@ -416,7 +405,6 @@ function save() {
 	"driveFileTypeWarnDescription": "音声ファイルを選びや",
 	"driveFileDurationWarn": "音が長すぎるわ",
 	"driveFileDurationWarnDescription": "長い音使うたらMisskey使うのに良うないかもしれへんで。それでもええか？",
-	"continue": "続けるで",
 	"sound": "音",
 	"selectFile": "ファイル選んでや",
 	"driveFileError": "音声が読み込めへんかったで。設定を変更せえや",
@@ -433,7 +421,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Continue",
 	"sound": "Sounds",
 	"selectFile": "Select a file",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
@@ -450,7 +437,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Continue",
 	"sound": "Sounds",
 	"selectFile": "Select a file",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
@@ -467,7 +453,6 @@ function save() {
 	"driveFileTypeWarnDescription": "오디오 파일을 선택하세요.",
 	"driveFileDurationWarn": "오디오가 너무 깁니다",
 	"driveFileDurationWarnDescription": "긴 오디오로 설정할 경우 미스키 사용에 지장이 갈 수도 있습니다. 그래도 괜찮습니까?",
-	"continue": "계속",
 	"sound": "소리",
 	"selectFile": "파일 선택",
 	"driveFileError": "오디오를 불러올 수 없습니다. 설정을 바꿔주세요.",
@@ -484,7 +469,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Continue",
 	"sound": "Geluid",
 	"selectFile": "Kies een bestand",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
@@ -501,7 +485,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Fortsett",
 	"sound": "Sounds",
 	"selectFile": "Velg en fil",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
@@ -518,7 +501,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Continue",
 	"sound": "Dźwięki",
 	"selectFile": "Wybierz plik",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
@@ -535,7 +517,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Selecione um arquivo de áudio",
 	"driveFileDurationWarn": "O áudio é muito longo.",
 	"driveFileDurationWarnDescription": "Áudios longos podem atrapalhar o funcionamento do Misskey. Deseja continuar?",
-	"continue": "Continuar",
 	"sound": "Sons",
 	"selectFile": "Selecione os arquivos",
 	"driveFileError": "Não foi possível carregar o som. Por favor, altere a configuração.",
@@ -552,7 +533,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Продолжить",
 	"sound": "Звуки",
 	"selectFile": "Выберите файл",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
@@ -569,7 +549,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Continue",
 	"sound": "Zvuky",
 	"selectFile": "Vyberte súbor",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
@@ -586,7 +565,6 @@ function save() {
 	"driveFileTypeWarnDescription": "กรุณาเลือกไฟล์เสียง",
 	"driveFileDurationWarn": "เสียงยาวเกินไป",
 	"driveFileDurationWarnDescription": "การใช้เสียงที่ยาว อาจรบกวนการใช้งาน Misskey, ต้องการดำเนินการต่อใช่ไหม?",
-	"continue": "ดำเนินการต่อ",
 	"sound": "เสียง",
 	"selectFile": "เลือกไฟล์",
 	"driveFileError": "ไม่สามารถโหลดไฟล์เสียงได้ กรุณาเปลี่ยนแปลงการตั้งค่า",
@@ -603,7 +581,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Bir ses dosyası seçin",
 	"driveFileDurationWarn": "Ses kaydı çok uzun.",
 	"driveFileDurationWarnDescription": "Uzun sesli mesajlar Misskey'in kullanımını engelleyebilir. Devam etmek istiyor musunuz?",
-	"continue": "Devam et",
 	"sound": "Ses",
 	"selectFile": "Dosya seçin",
 	"driveFileError": "Ses yüklenemedi. Lütfen ayarları değiştir.",
@@ -620,7 +597,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Continue",
 	"sound": "Sounds",
 	"selectFile": "Select a file",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
@@ -637,7 +613,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Продовжити",
 	"sound": "Звуки",
 	"selectFile": "Вибрати файл",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
@@ -654,7 +629,6 @@ function save() {
 	"driveFileTypeWarnDescription": "Select an audio file",
 	"driveFileDurationWarn": "The audio is too long.",
 	"driveFileDurationWarnDescription": "Long audio may disrupt using Misskey. Still continue?",
-	"continue": "Tiếp tục",
 	"sound": "Âm thanh",
 	"selectFile": "Chọn tập tin",
 	"driveFileError": "It couldn't load the sound. Please change the setting.",
@@ -671,7 +645,6 @@ function save() {
 	"driveFileTypeWarnDescription": "请选择音频文件",
 	"driveFileDurationWarn": "音频过长",
 	"driveFileDurationWarnDescription": "使用长音频可能会影响 Misskey 的使用。即使这样也要继续吗？",
-	"continue": "继续",
 	"sound": "提示音",
 	"selectFile": "选择文件",
 	"driveFileError": "无法读取声音。请更改设置。",
@@ -688,7 +661,6 @@ function save() {
 	"driveFileTypeWarnDescription": "請選擇音效檔案",
 	"driveFileDurationWarn": "音效太長了",
 	"driveFileDurationWarnDescription": "使用長音效檔可能會影響 Misskey 的使用體驗。仍要使用此檔案嗎？",
-	"continue": "繼續",
 	"sound": "音效",
 	"selectFile": "選擇檔案",
 	"driveFileError": "無法載入語音。請變更設定",

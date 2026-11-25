@@ -4,6 +4,7 @@
  */
 
 import { createApp } from 'vue';
+import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { useUploader } from '@features/drive/frontend/composables/use-uploader.js';
 import type { ImageFrameParams } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
@@ -56,9 +57,12 @@ let canvasCallbacks: BlobCallback[];
 let createUrl: ReturnType<typeof vi.fn<(object: Blob | MediaSource) => string>>;
 let consoleError: ReturnType<typeof vi.spyOn>;
 
-function uploader(watermark = true) {
+async function uploader(watermark = true) {
 	let instance!: ReturnType<typeof useUploader>;
 	const app = createApp({ setup() { instance = useUploader({ features: { watermark } }); return () => null; } });
+	const internationalization = createInternationalization({ initialLocale: 'en-US' });
+	await internationalization.ready;
+	app.use(internationalization);
 	app.mount(window.document.createElement('div'));
 	apps.push(app);
 	return instance;
@@ -109,7 +113,7 @@ afterEach(() => {
 
 describe('uploader image preprocessing resource lifetime', () => {
 	test('keeps borrowed bitmap/renderer alive through export, then releases them and uploads the resulting blob with metadata', async () => {
-		const instance = uploader();
+		const instance = await uploader();
 		instance.addFiles([file()]);
 		const item = instance.items.value[0];
 		await vi.waitFor(() => expect(canvasCallbacks).toHaveLength(1));
@@ -130,7 +134,7 @@ describe('uploader image preprocessing resource lifetime', () => {
 	});
 
 	test('null canvas export rejects the promise, releases resources and allows retry', async () => {
-		const instance = uploader(); instance.addFiles([file()]);
+		const instance = await uploader(); instance.addFiles([file()]);
 		const item = instance.items.value[0];
 		await vi.waitFor(() => expect(canvasCallbacks).toHaveLength(1));
 		expect(() => canvasCallbacks[0](null)).not.toThrow();
@@ -152,7 +156,7 @@ describe('uploader image preprocessing resource lifetime', () => {
 		const original = new Error('render failed');
 		actions.watermarkRender.mockRejectedValue(original);
 		actions.watermarkDestroy.mockImplementation(() => { throw new Error('cleanup failed'); });
-		const instance = uploader(); instance.addFiles([file()]);
+		const instance = await uploader(); instance.addFiles([file()]);
 		await settled(instance.items.value[0]);
 		expect(bitmaps[0].close).toHaveBeenCalledTimes(1);
 		expect(actions.watermarkDestroy).toHaveBeenCalledTimes(1);
@@ -162,7 +166,7 @@ describe('uploader image preprocessing resource lifetime', () => {
 	test('renderer construction failure closes the owned bitmap without claiming a renderer instance', async () => {
 		const original = new Error('WebGL unavailable');
 		actions.watermarkOptions.mockImplementationOnce(() => { throw original; });
-		const instance = uploader(); instance.addFiles([file()]);
+		const instance = await uploader(); instance.addFiles([file()]);
 		await settled(instance.items.value[0]);
 		expect(bitmaps[0].close).toHaveBeenCalledTimes(1);
 		expect(actions.watermarkDestroy).not.toHaveBeenCalled();
@@ -172,7 +176,7 @@ describe('uploader image preprocessing resource lifetime', () => {
 	test('synchronous canvas export failure settles with the original error and releases resources', async () => {
 		const original = new Error('canvas export failed');
 		vi.mocked(HTMLCanvasElement.prototype.toBlob).mockImplementationOnce(() => { throw original; });
-		const instance = uploader(); instance.addFiles([file()]);
+		const instance = await uploader(); instance.addFiles([file()]);
 		await settled(instance.items.value[0]);
 		expect(bitmaps[0].close).toHaveBeenCalledTimes(1);
 		expect(actions.watermarkDestroy).toHaveBeenCalledTimes(1);
@@ -180,7 +184,7 @@ describe('uploader image preprocessing resource lifetime', () => {
 	});
 
 	test.each(['reset', 'remove', 'unmount'])('%s during export releases only after consumption finishes and creates no late preview URL', async operation => {
-		const instance = uploader(); instance.addFiles([file()]);
+		const instance = await uploader(); instance.addFiles([file()]);
 		const item = instance.items.value[0];
 		await vi.waitFor(() => expect(canvasCallbacks).toHaveLength(1));
 		if (operation === 'reset') instance.reset();
@@ -198,7 +202,7 @@ describe('uploader image preprocessing resource lifetime', () => {
 	test('cancel and retry while old rendering is pending does not clear or replace the new attempt', async () => {
 		const rendering = deferred<void>();
 		actions.watermarkRender.mockReturnValueOnce(rendering.promise);
-		const instance = uploader(); instance.addFiles([file()]);
+		const instance = await uploader(); instance.addFiles([file()]);
 		const item = instance.items.value[0];
 		await vi.waitFor(() => expect(actions.watermarkRender).toHaveBeenCalledTimes(1));
 		const oldCancel = item.abortPreprocess!;
@@ -223,7 +227,7 @@ describe('uploader image preprocessing resource lifetime', () => {
 	test('cancellation while decoding waits for the owned bitmap and never starts rendering', async () => {
 		const decoding = deferred<ImageBitmap>();
 		vi.mocked(window.createImageBitmap).mockReturnValueOnce(decoding.promise);
-		const instance = uploader(); instance.addFiles([file()]);
+		const instance = await uploader(); instance.addFiles([file()]);
 		const item = instance.items.value[0];
 		instance.abortAll();
 		const bitmap = { width: 100, height: 80, close: vi.fn() };
@@ -238,7 +242,7 @@ describe('uploader image preprocessing resource lifetime', () => {
 	test('cancellation while compressing cannot commit the late blob or filename suffix', async () => {
 		const compression = deferred<Blob>();
 		actions.compress.mockReturnValueOnce(compression.promise);
-		const instance = uploader(false); instance.addFiles([file()]);
+		const instance = await uploader(false); instance.addFiles([file()]);
 		const item = instance.items.value[0]; await settled(item);
 		const original = item.preprocessedFile;
 		compressMenu(instance);
@@ -256,7 +260,7 @@ describe('uploader image preprocessing resource lifetime', () => {
 	test('decode failure settles and a new attempt succeeds', async () => {
 		const original = new Error('decode failed');
 		vi.mocked(window.createImageBitmap).mockRejectedValueOnce(original);
-		const instance = uploader(false); instance.addFiles([file()]);
+		const instance = await uploader(false); instance.addFiles([file()]);
 		const item = instance.items.value[0]; await settled(item);
 		expect(consoleError).toHaveBeenCalledWith('Failed to preprocess image', original);
 		expect(item.abortPreprocess).toBeNull();
@@ -270,7 +274,7 @@ describe('uploader image preprocessing resource lifetime', () => {
 		vi.mocked(window.createImageBitmap).mockReturnValueOnce(decoding.promise);
 		const original = new Error('frame failed');
 		if (failure === 'render') actions.frameRender.mockRejectedValueOnce(original);
-		const instance = uploader(false); instance.addFiles([file()]);
+		const instance = await uploader(false); instance.addFiles([file()]);
 		const item = instance.items.value[0]; item.imageFrameParams = frame;
 		const bitmap = { width: 100, height: 80, close: vi.fn() }; bitmaps.push(bitmap);
 		decoding.resolve(bitmap as unknown as ImageBitmap);
@@ -288,7 +292,7 @@ describe('uploader image preprocessing resource lifetime', () => {
 	test('frame preprocessing owns a separate bitmap and preserves EXIF/filename/caption parameters', async () => {
 		const decoding = deferred<{ width: number; height: number; close: ReturnType<typeof vi.fn> }>();
 		vi.mocked(window.createImageBitmap).mockReturnValueOnce(decoding.promise as unknown as Promise<ImageBitmap>);
-		const instance = uploader(false); instance.addFiles([file()]);
+		const instance = await uploader(false); instance.addFiles([file()]);
 		const item = instance.items.value[0]; item.imageFrameParams = frame; item.caption = 'label';
 		const original = { width: 100, height: 80, close: vi.fn() }; bitmaps.push(original); decoding.resolve(original);
 		await vi.waitFor(() => expect(canvasCallbacks).toHaveLength(1));

@@ -50,9 +50,13 @@
 		"./src/**/*.ts",
 		"./src/**/*.tsx",
 		"../features/*/backend/**/*.ts",
+		"../features/games/*/backend/**/*.ts",
 		"../features/*/backend/**/*.tsx",
+		"../features/games/*/backend/**/*.tsx",
 		"../features/*/backend/**/*.mts",
-		"../features/*/shared/**/*.ts"
+		"../features/games/*/backend/**/*.mts",
+		"../features/*/shared/**/*.ts",
+		"../features/games/*/shared/**/*.ts"
 	],
 	"exclude": [
 		"./src/**/*.test.ts"

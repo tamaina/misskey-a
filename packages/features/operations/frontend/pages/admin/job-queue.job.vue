@@ -163,10 +163,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import JSON5 from 'json5';
-import type { TlEvent } from '@features/ui/frontend/components/MkTl.vue';
 import * as os from '@features/ui/frontend/os.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkTabs from '@features/ui/frontend/components/MkTabs.vue';
@@ -176,6 +176,10 @@ import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 import MkCodeEditor from '@features/markup/frontend/components/MkCodeEditor.vue';
 import MkTl from '@features/ui/frontend/components/MkTl.vue';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
+import type { TlEvent } from '@features/ui/frontend/components/MkTl.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 function msSMH(v: number | null) {
 	if (v == null) return 'N/A';
@@ -255,7 +259,7 @@ const timeline = computed(() => {
 async function promoteJob() {
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		title: $locale.value.sfc.areYouSure,
+		title: globalLocale.value.env.areYouSure,
 	});
 	if (canceled) return;
 
@@ -265,7 +269,7 @@ async function promoteJob() {
 async function removeJob() {
 	const { canceled } = await os.confirm({
 		type: 'warning',
-		title: $locale.value.sfc.areYouSure,
+		title: globalLocale.value.env.areYouSure,
 	});
 	if (canceled) return;
 
@@ -296,169 +300,113 @@ function copyRaw() {
 </style>
 
 <locale locale="ar-SA" lang="json">
-{
-	"areYouSure": "Are you sure?"
-}
+{}
 </locale>
 
 <locale locale="ca-ES" lang="json">
-{
-	"areYouSure": "Estàs segur?"
-}
+{}
 </locale>
 
 <locale locale="cs-CZ" lang="json">
-{
-	"areYouSure": "Jste si jistí?"
-}
+{}
 </locale>
 
 <locale locale="da-DK" lang="json">
-{
-	"areYouSure": "Are you sure?"
-}
+{}
 </locale>
 
 <locale locale="de-DE" lang="json">
-{
-	"areYouSure": "Bist du sicher?"
-}
+{}
 </locale>
 
 <locale locale="en-US" lang="json">
-{
-	"areYouSure": "Are you sure?"
-}
+{}
 </locale>
 
 <locale locale="es-ES" lang="json">
-{
-	"areYouSure": "¿Estás conforme?"
-}
+{}
 </locale>
 
 <locale locale="fr-FR" lang="json">
-{
-	"areYouSure": "Êtes-vous sûr·e ?"
-}
+{}
 </locale>
 
 <locale locale="id-ID" lang="json">
-{
-	"areYouSure": "Apakah kamu yakin?"
-}
+{}
 </locale>
 
 <locale locale="it-IT" lang="json">
-{
-	"areYouSure": "Confermi?"
-}
+{}
 </locale>
 
 <locale locale="ja-JP" lang="json">
-{
-	"areYouSure": "よろしいですか？"
-}
+{}
 </locale>
 
 <locale locale="ja-KS" lang="json">
-{
-	"areYouSure": "いいん？"
-}
+{}
 </locale>
 
 <locale locale="kab-KAB" lang="json">
-{
-	"areYouSure": "Are you sure?"
-}
+{}
 </locale>
 
 <locale locale="kn-IN" lang="json">
-{
-	"areYouSure": "Are you sure?"
-}
+{}
 </locale>
 
 <locale locale="ko-KR" lang="json">
-{
-	"areYouSure": "계속 진행하시겠습니까?"
-}
+{}
 </locale>
 
 <locale locale="nl-NL" lang="json">
-{
-	"areYouSure": "Weet je het zeker?"
-}
+{}
 </locale>
 
 <locale locale="no-NO" lang="json">
-{
-	"areYouSure": "Are you sure?"
-}
+{}
 </locale>
 
 <locale locale="pl-PL" lang="json">
-{
-	"areYouSure": "Na pewno?"
-}
+{}
 </locale>
 
 <locale locale="pt-PT" lang="json">
-{
-	"areYouSure": "Tem certeza?"
-}
+{}
 </locale>
 
 <locale locale="ru-RU" lang="json">
-{
-	"areYouSure": "Вы уверены?"
-}
+{}
 </locale>
 
 <locale locale="sk-SK" lang="json">
-{
-	"areYouSure": "Are you sure?"
-}
+{}
 </locale>
 
 <locale locale="th-TH" lang="json">
-{
-	"areYouSure": "แน่ใจแล้วใช่ไหมคะ?"
-}
+{}
 </locale>
 
 <locale locale="tr-TR" lang="json">
-{
-	"areYouSure": "Emin misin?"
-}
+{}
 </locale>
 
 <locale locale="ug-CN" lang="json">
-{
-	"areYouSure": "Are you sure?"
-}
+{}
 </locale>
 
 <locale locale="uk-UA" lang="json">
-{
-	"areYouSure": "Ви впевнені?"
-}
+{}
 </locale>
 
 <locale locale="vi-VN" lang="json">
-{
-	"areYouSure": "Bạn chắc chứ?"
-}
+{}
 </locale>
 
 <locale locale="zh-CN" lang="json">
-{
-	"areYouSure": "你确定吗？"
-}
+{}
 </locale>
 
 <locale locale="zh-TW" lang="json">
-{
-	"areYouSure": "是否確定？"
-}
+{}
 </locale>

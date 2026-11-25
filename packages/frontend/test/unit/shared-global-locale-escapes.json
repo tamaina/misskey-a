@@ -197,5 +197,321 @@
 		"pl-PL": [
 			"\\u00a0"
 		]
+	},
+	"packages/features/auth/frontend/components/MkSignupDialog.rules.vue": {
+		"fr-FR": [
+			"\\u202f",
+			"\\u00a0"
+		]
+	},
+	"packages/features/auth/frontend/components/MkTokenGenerateWindow.vue": {
+		"fr-FR": [
+			"\\u00a0"
+		]
+	},
+	"packages/features/auth/frontend/pages/invite.vue": {
+		"fr-FR": [
+			"\\u00a0"
+		]
+	},
+	"packages/features/auth/frontend/pages/settings/2fa.vue": {
+		"fr-FR": [
+			"\\u00a0"
+		]
+	},
+	"packages/features/auth/frontend/pages/settings/apps.vue": {
+		"fr-FR": [
+			"\\u00a0"
+		]
+	},
+	"packages/features/avatar-decorations/frontend/pages/avatar-decoration-edit-dialog.vue": {
+		"fr-FR": [
+			"\\u202f"
+		]
+	},
+	"packages/features/drive/frontend/components/MkImageFrameEditorDialog.vue": {
+		"ar-SA": [
+			"\\u00a0"
+		],
+		"ca-ES": [
+			"\\u202f"
+		],
+		"cs-CZ": [
+			"\\u00a0"
+		],
+		"da-DK": [
+			"\\u00a0"
+		],
+		"en-US": [
+			"\\u00a0"
+		],
+		"fr-FR": [
+			"\\u00a0"
+		],
+		"id-ID": [
+			"\\u00a0"
+		],
+		"kab-KAB": [
+			"\\u00a0"
+		],
+		"kn-IN": [
+			"\\u00a0"
+		],
+		"nl-NL": [
+			"\\u00a0"
+		],
+		"no-NO": [
+			"\\u00a0"
+		],
+		"pl-PL": [
+			"\\u00a0"
+		],
+		"pt-PT": [
+			"\\u00a0"
+		],
+		"sk-SK": [
+			"\\u00a0"
+		],
+		"ug-CN": [
+			"\\u00a0"
+		],
+		"vi-VN": [
+			"\\u00a0"
+		]
+	},
+	"packages/features/drive/frontend/components/MkUploaderDialog.vue": {
+		"it-IT": [
+			"\\u200b"
+		]
+	},
+	"packages/features/drive/frontend/pages/admin-file.root.vue": {
+		"fr-FR": [
+			"\\u202f"
+		]
+	},
+	"packages/features/drive/frontend/pages/settings/drive.vue": {
+		"es-ES": [
+			"\\u00a0"
+		],
+		"fr-FR": [
+			"\\u00a0"
+		]
+	},
+	"packages/features/emojis/frontend/pages/emoji-edit-dialog.vue": {
+		"fr-FR": [
+			"\\u202f"
+		]
+	},
+	"packages/features/instance/frontend/pages/admin/ads.vue": {
+		"fr-FR": [
+			"\\u202f"
+		]
+	},
+	"packages/features/integrations/frontend/components/MkExtensionInstaller.vue": {
+		"fr-FR": [
+			"\\u00a0"
+		]
+	},
+	"packages/features/integrations/frontend/pages/settings/plugin.vue": {
+		"fr-FR": [
+			"\\u00a0",
+			"\\u202f"
+		]
+	},
+	"packages/features/moderation/frontend/components/MkAbuseReport.vue": {
+		"th-TH": [
+			"\\u200b"
+		]
+	},
+	"packages/features/moderation/frontend/pages/admin-user.vue": {
+		"fr-FR": [
+			"\\u00a0"
+		]
+	},
+	"packages/features/moderation/frontend/pages/admin/abuse-report/notification-recipient.vue": {
+		"fr-FR": [
+			"\\u00a0"
+		]
+	},
+	"packages/features/navigation/frontend/components/MkTutorialDialog.vue": {
+		"fr-FR": [
+			"\\u00a0"
+		]
+	},
+	"packages/features/navigation/frontend/pages/admin/index.vue": {
+		"th-TH": [
+			"\\u200b"
+		]
+	},
+	"packages/features/navigation/frontend/pages/settings/index.vue": {
+		"fr-FR": [
+			"\\u202f"
+		]
+	},
+	"packages/features/notes/frontend/components/MkPostForm.vue": {
+		"de-DE": [
+			"\\u202f"
+		]
+	},
+	"packages/features/notifications/frontend/components/MkNotification.vue": {
+		"fr-FR": [
+			"\\u00a0"
+		],
+		"ja-JP": [
+			"\\u3000"
+		],
+		"ja-KS": [
+			"\\u3000"
+		],
+		"ko-KR": [
+			"\\u3000"
+		],
+		"pt-PT": [
+			"\\u00a0"
+		],
+		"ru-RU": [
+			"\\u2009"
+		],
+		"th-TH": [
+			"\\u3000"
+		],
+		"zh-CN": [
+			"\\u3000"
+		],
+		"zh-TW": [
+			"\\u3000"
+		]
+	},
+	"packages/features/pages/frontend/pages/page-editor/page-editor.vue": {
+		"fr-FR": [
+			"\\u202f"
+		]
+	},
+	"packages/features/portability/frontend/pages/settings/account-data.vue": {
+		"pl-PL": [
+			"\\u00a0"
+		]
+	},
+	"packages/features/preferences/frontend/pages/settings/preferences.vue": {
+		"cs-CZ": [
+			"\\u00a0"
+		],
+		"th-TH": [
+			"\\u200b"
+		]
+	},
+	"packages/features/preferences/frontend/pages/settings/theme.vue": {
+		"pt-PT": [
+			"\\u200b"
+		]
+	},
+	"packages/features/relationships/frontend/pages/my-lists/list.vue": {
+		"fr-FR": [
+			"\\u202f"
+		]
+	},
+	"packages/features/roles/frontend/pages/admin/roles.editor.vue": {
+		"tr-TR": [
+			"\\u00a0"
+		]
+	},
+	"packages/features/timelines/frontend/components/MkAntennaEditor.vue": {
+		"fr-FR": [
+			"\\u202f"
+		]
+	},
+	"packages/features/ui/frontend/components/MkFormFooter.vue": {
+		"fr-FR": [
+			"\\u00a0"
+		]
+	},
+	"packages/features/ui/frontend/components/MkSpot.vue": {
+		"th-TH": [
+			"\\u200B"
+		]
+	},
+	"packages/features/users/frontend/components/MkUserAnnouncementEditDialog.vue": {
+		"fr-FR": [
+			"\\u202f"
+		]
+	},
+	"packages/features/users/frontend/pages/settings/migration.vue": {
+		"ar-SA": [
+			"\\u3000"
+		],
+		"ca-ES": [
+			"\\u3000"
+		],
+		"cs-CZ": [
+			"\\u3000"
+		],
+		"da-DK": [
+			"\\u3000"
+		],
+		"de-DE": [
+			"\\u3000"
+		],
+		"en-US": [
+			"\\u3000"
+		],
+		"fr-FR": [
+			"\\u3000"
+		],
+		"id-ID": [
+			"\\u3000"
+		],
+		"ja-JP": [
+			"\\u3000"
+		],
+		"ja-KS": [
+			"\\u3000"
+		],
+		"kab-KAB": [
+			"\\u3000"
+		],
+		"kn-IN": [
+			"\\u3000"
+		],
+		"ko-KR": [
+			"\\u3000"
+		],
+		"nl-NL": [
+			"\\u3000"
+		],
+		"no-NO": [
+			"\\u3000"
+		],
+		"pl-PL": [
+			"\\u3000"
+		],
+		"pt-PT": [
+			"\\u3000"
+		],
+		"ru-RU": [
+			"\\u3000"
+		],
+		"sk-SK": [
+			"\\u3000"
+		],
+		"ug-CN": [
+			"\\u3000"
+		],
+		"uk-UA": [
+			"\\u3000"
+		],
+		"vi-VN": [
+			"\\u3000"
+		],
+		"zh-CN": [
+			"\\u3000"
+		],
+		"zh-TW": [
+			"\\u3000"
+		]
+	},
+	"packages/features/users/frontend/ts-messages.vue": {
+		"fr-FR": [
+			"\\u202f"
+		]
 	}
 }

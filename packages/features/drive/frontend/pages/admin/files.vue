@@ -30,6 +30,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, markRaw, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
@@ -40,13 +41,16 @@ import { lookupFile } from '@features/moderation/frontend/utility/admin-lookup.j
 import { definePage } from '@features/navigation/frontend/page.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const {
 	model: origin,
 	def: originDef,
 } = useMkSelect({
 	items: [
-		{ label: $locale.value.sfc.all, value: 'combined' },
+		{ label: globalLocale.value.env.all, value: 'combined' },
 		{ label: $locale.value.sfc.local, value: 'local' },
 		{ label: $locale.value.sfc.remote, value: 'remote' },
 	],
@@ -97,7 +101,6 @@ definePage(() => ({
 
 <locale locale="ar-SA" lang="json">
 {
-	"all": "الكل",
 	"local": "المحلي",
 	"remote": "بُعدي",
 	"clearCachedFilesConfirm": "أتريد حذف التخزين المؤقت للملفات البعيدة؟",
@@ -111,7 +114,6 @@ definePage(() => ({
 
 <locale locale="ca-ES" lang="json">
 {
-	"all": "Tot",
 	"local": "Local",
 	"remote": "Remot",
 	"clearCachedFilesConfirm": "Segur que voleu eliminar tots els fitxers de la memòria cau?",
@@ -125,7 +127,6 @@ definePage(() => ({
 
 <locale locale="cs-CZ" lang="json">
 {
-	"all": "Vše",
 	"local": "Lokální",
 	"remote": "Vzdálené",
 	"clearCachedFilesConfirm": "Jste jistí že chcete smazat všechny vzdálené soubory v mezipaměti?",
@@ -139,7 +140,6 @@ definePage(() => ({
 
 <locale locale="da-DK" lang="json">
 {
-	"all": "All",
 	"local": "Local",
 	"remote": "Remote",
 	"clearCachedFilesConfirm": "Are you sure that you want to delete all cached remote files?",
@@ -153,7 +153,6 @@ definePage(() => ({
 
 <locale locale="de-DE" lang="json">
 {
-	"all": "Alle",
 	"local": "Lokal",
 	"remote": "Fremd",
 	"clearCachedFilesConfirm": "Sollen alle im Cache gespeicherten Dateien von anderen Instanzen wirklich gelöscht werden?",
@@ -167,7 +166,6 @@ definePage(() => ({
 
 <locale locale="en-US" lang="json">
 {
-	"all": "All",
 	"local": "Local",
 	"remote": "Remote",
 	"clearCachedFilesConfirm": "Are you sure that you want to delete all cached remote files?",
@@ -181,7 +179,6 @@ definePage(() => ({
 
 <locale locale="es-ES" lang="json">
 {
-	"all": "Todo",
 	"local": "Local",
 	"remote": "Remoto",
 	"clearCachedFilesConfirm": "¿Quieres borrar todos los archivos remotos en caché?",
@@ -195,7 +192,6 @@ definePage(() => ({
 
 <locale locale="fr-FR" lang="json">
 {
-	"all": "Tous",
 	"local": "Local",
 	"remote": "Distant",
 	"clearCachedFilesConfirm": "Êtes-vous sûr·e de vouloir vider tout le cache de fichiers distants ?",
@@ -209,7 +205,6 @@ definePage(() => ({
 
 <locale locale="id-ID" lang="json">
 {
-	"all": "Semua",
 	"local": "Lokal",
 	"remote": "Remote",
 	"clearCachedFilesConfirm": "Apakah kamu yakin ingin menghapus seluruh tembolok berkas instansi luar?",
@@ -223,7 +218,6 @@ definePage(() => ({
 
 <locale locale="it-IT" lang="json">
 {
-	"all": "Tutte",
 	"local": "Locale",
 	"remote": "Remota",
 	"clearCachedFilesConfirm": "Vuoi davvero svuotare la cache da tutti i file remoti?",
@@ -237,7 +231,6 @@ definePage(() => ({
 
 <locale locale="ja-JP" lang="json">
 {
-	"all": "全て",
 	"local": "ローカル",
 	"remote": "リモート",
 	"clearCachedFilesConfirm": "キャッシュされたリモートファイルをすべて削除しますか？",
@@ -251,7 +244,6 @@ definePage(() => ({
 
 <locale locale="ja-KS" lang="json">
 {
-	"all": "みんな",
 	"local": "ローカル",
 	"remote": "リモート",
 	"clearCachedFilesConfirm": "キャッシュされとるリモートファイルを全部ほかしてええか？",
@@ -265,7 +257,6 @@ definePage(() => ({
 
 <locale locale="kab-KAB" lang="json">
 {
-	"all": "All",
 	"local": "Local",
 	"remote": "Remote",
 	"clearCachedFilesConfirm": "Are you sure that you want to delete all cached remote files?",
@@ -279,7 +270,6 @@ definePage(() => ({
 
 <locale locale="kn-IN" lang="json">
 {
-	"all": "All",
 	"local": "Local",
 	"remote": "Remote",
 	"clearCachedFilesConfirm": "Are you sure that you want to delete all cached remote files?",
@@ -293,7 +283,6 @@ definePage(() => ({
 
 <locale locale="ko-KR" lang="json">
 {
-	"all": "전체",
 	"local": "로컬",
 	"remote": "리모트",
 	"clearCachedFilesConfirm": "캐시된 리모트 파일을 모두 삭제하시겠습니까?",
@@ -307,7 +296,6 @@ definePage(() => ({
 
 <locale locale="nl-NL" lang="json">
 {
-	"all": "Alle",
 	"local": "Lokaal",
 	"remote": "Remote",
 	"clearCachedFilesConfirm": "Weet je zeker dat je alle externe bestanden in de cache wilt verwijderen?",
@@ -321,7 +309,6 @@ definePage(() => ({
 
 <locale locale="no-NO" lang="json">
 {
-	"all": "Alle",
 	"local": "Local",
 	"remote": "Remote",
 	"clearCachedFilesConfirm": "Are you sure that you want to delete all cached remote files?",
@@ -335,7 +322,6 @@ definePage(() => ({
 
 <locale locale="pl-PL" lang="json">
 {
-	"all": "Wszystkie",
 	"local": "Lokalne",
 	"remote": "Zdalny",
 	"clearCachedFilesConfirm": "Czy na pewno chcesz usunąć wszystkie zdalne pliki z pamięci podręcznej?",
@@ -349,7 +335,6 @@ definePage(() => ({
 
 <locale locale="pt-PT" lang="json">
 {
-	"all": "Todos",
 	"local": "Local",
 	"remote": "Remoto",
 	"clearCachedFilesConfirm": "Deseja excluir todos os arquivos remotos em cache?",
@@ -363,7 +348,6 @@ definePage(() => ({
 
 <locale locale="ru-RU" lang="json">
 {
-	"all": "Все",
 	"local": "С этого сайта",
 	"remote": "С других сайтов",
 	"clearCachedFilesConfirm": "Удалить все закэшированные файлы с других сайтов?",
@@ -377,7 +361,6 @@ definePage(() => ({
 
 <locale locale="sk-SK" lang="json">
 {
-	"all": "Všetko",
 	"local": "Lokálne",
 	"remote": "Vzdialené",
 	"clearCachedFilesConfirm": "Naozaj chcete odstrániť všetky nacachované vzdialené súbory?",
@@ -391,7 +374,6 @@ definePage(() => ({
 
 <locale locale="th-TH" lang="json">
 {
-	"all": "ทั้งหมด",
 	"local": "ท้องถิ่น",
 	"remote": "ระยะไกล",
 	"clearCachedFilesConfirm": "ต้องการลบไฟล์ระยะไกลที่แคชไว้ทั้งหมดใช่ไหม?",
@@ -405,7 +387,6 @@ definePage(() => ({
 
 <locale locale="tr-TR" lang="json">
 {
-	"all": "Tümü",
 	"local": "Yerel",
 	"remote": "Uzak",
 	"clearCachedFilesConfirm": "Tüm önbelleğe alınmış uzak dosyaları silmek istediğinden emin misin?",
@@ -419,7 +400,6 @@ definePage(() => ({
 
 <locale locale="ug-CN" lang="json">
 {
-	"all": "All",
 	"local": "Local",
 	"remote": "Remote",
 	"clearCachedFilesConfirm": "Are you sure that you want to delete all cached remote files?",
@@ -433,7 +413,6 @@ definePage(() => ({
 
 <locale locale="uk-UA" lang="json">
 {
-	"all": "Всі",
 	"local": "Локальні",
 	"remote": "Віддалені",
 	"clearCachedFilesConfirm": "Ви впевнені, що хочете видалити всі кешовані файли?",
@@ -447,7 +426,6 @@ definePage(() => ({
 
 <locale locale="vi-VN" lang="json">
 {
-	"all": "Tất cả",
 	"local": "Máy chủ này",
 	"remote": "Máy chủ khác",
 	"clearCachedFilesConfirm": "Bạn có chắc muốn xóa sạch bộ nhớ đệm?",
@@ -461,7 +439,6 @@ definePage(() => ({
 
 <locale locale="zh-CN" lang="json">
 {
-	"all": "全部",
 	"local": "本地",
 	"remote": "远程",
 	"clearCachedFilesConfirm": "确定要清除所有缓存的远程文件吗？",
@@ -475,7 +452,6 @@ definePage(() => ({
 
 <locale locale="zh-TW" lang="json">
 {
-	"all": "全部",
 	"local": "本地",
 	"remote": "遠端",
 	"clearCachedFilesConfirm": "確定要刪除所有快取的遠端資料嗎？",

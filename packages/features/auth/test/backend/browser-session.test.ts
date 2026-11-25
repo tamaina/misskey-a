@@ -5,10 +5,12 @@
 
 import 'reflect-metadata';
 import { createHash } from 'node:crypto';
-import { FindOperator, IsNull } from 'typeorm';
+import { FindOperator, IsNull, type SelectQueryBuilder } from 'typeorm';
 import { describe, expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
 import { BrowserSessionService } from '../../backend/services/BrowserSessionService.js';
+import { MiSignin } from '../../backend/models/Signin.js';
+import type { MiUserIp } from '../../backend/models/UserIp.js';
 import type { BrowserSessionsRepository, MiBrowserSession, MiUser } from '@features/persistence/backend/repositories/models.js';
 
 function matches(row: object, criteria: unknown): boolean {
@@ -16,6 +18,7 @@ function matches(row: object, criteria: unknown): boolean {
 	return Object.entries(criteria).every(([key, value]) => {
 		const actual = Reflect.get(row, key);
 		if (!(value instanceof FindOperator)) return value && typeof value === 'object' ? actual !== null && typeof actual === 'object' && matches(actual, value) : actual === value;
+		if (value.type === 'in') return value.value.includes(actual);
 		if (value.type === 'isNull') return actual === null;
 		if (value.type === 'lessThanOrEqual') return actual <= value.value;
 		throw new Error('unsupported synthetic operator');
@@ -25,6 +28,13 @@ function matches(row: object, criteria: unknown): boolean {
 function fixture() {
 	const repository = mockDeep<BrowserSessionsRepository>();
 	const rows = new Map<string, MiBrowserSession>();
+	const ips = mockDeep<SelectQueryBuilder<MiUserIp>>();
+	const signins = mockDeep<SelectQueryBuilder<MiSignin>>();
+	repository.manager.getRepository.mockImplementation(entity => ({ createQueryBuilder: () => entity === MiSignin ? signins : ips }) as never);
+	signins.select.mockReturnValue(signins); signins.distinctOn.mockReturnValue(signins); signins.where.mockReturnValue(signins); signins.andWhere.mockReturnValue(signins);
+	signins.orderBy.mockReturnValue(signins); signins.addOrderBy.mockReturnValue(signins); signins.getMany.mockResolvedValue([]);
+	ips.select.mockReturnValue(ips); ips.distinctOn.mockReturnValue(ips); ips.where.mockReturnValue(ips); ips.andWhere.mockReturnValue(ips);
+	ips.orderBy.mockReturnValue(ips); ips.addOrderBy.mockReturnValue(ips); ips.getMany.mockResolvedValue([]);
 	let sequence = 0;
 	repository.insert.mockImplementation(async entity => {
 		const row = entity as MiBrowserSession;
@@ -50,7 +60,7 @@ function fixture() {
 		});
 	});
 	const service = new BrowserSessionService(repository, { gen: () => `session-${++sequence}` });
-	return { service, repository, rows };
+	return { service, repository, rows, ips, signins };
 }
 
 describe('individual browser session foundation (synthetic persistence only)', () => {
@@ -178,4 +188,57 @@ describe('individual browser session foundation (synthetic persistence only)', (
 		repository.insert.mockRejectedValueOnce(new Error('synthetic DB failure'));
 		await expect(service.issue('alice')).rejects.toThrow('synthetic DB failure');
 	});
+});
+
+test('records latest HTTP UA without merging sessions or touching a revoked session', async () => {
+	const { service, rows } = fixture();
+	const first = await service.issue('alice');
+	const second = await service.issue('alice');
+	await service.verify(first.token, { ip: '192.0.2.1', userAgent: 'First browser' });
+	await service.verify(second.token, { ip: '192.0.2.1', userAgent: 'Second browser' });
+	await service.verify(first.token, { ip: '192.0.2.2', userAgent: 'Updated browser' });
+	expect(rows.get(first.session.id)).toMatchObject({ lastUserAgent: 'Updated browser' });
+	expect(rows.get(second.session.id)).toMatchObject({ lastUserAgent: 'Second browser' });
+	await service.revokeOwned('alice', first.session.id);
+	expect(await service.verify(first.token, { ip: '192.0.2.3', userAgent: 'Rejected' })).toBeNull();
+	expect(rows.get(first.session.id)?.lastUserAgent).toBe('Updated browser');
+	expect(rows.get(first.session.id)).not.toHaveProperty('lastIp');
+});
+
+test('list derives lastIp from the latest owned user_ip per session, with null for no history', async () => {
+	const { service, ips } = fixture();
+	const first = await service.issue('alice');
+	await service.issue('alice');
+	ips.getMany.mockResolvedValue([{ browserSessionId: first.session.id, ip: '192.0.2.4' }] as MiUserIp[]);
+	const rows = await service.listOwned('alice');
+	expect(rows.map(row => row.lastIp)).toEqual(['192.0.2.4', null]);
+	expect(ips.where).toHaveBeenCalledWith('ip.userId = :userId', { userId: 'alice' });
+	expect(ips.distinctOn).toHaveBeenCalledWith(['ip.browserSessionId']);
+	expect(ips.addOrderBy).toHaveBeenCalledWith('ip.lastSeenAt', 'DESC');
+});
+
+test('history payload fetch selects only the requested owned sessions', async () => {
+	const { service, rows } = fixture();
+	const first = await service.issue('alice');
+	await service.issue('alice');
+	const other = await service.issue('bob');
+	const selected = await service.listOwned('alice', 2, 0, [first.session.id, other.session.id]);
+	expect(selected.map(row => row.id)).toEqual([first.session.id]);
+	expect(selected[0]).not.toHaveProperty('tokenHash');
+	expect(rows.size).toBe(3);
+});
+
+test('missing user_ip falls back to the latest linked owned signin, preserving logged IPs and null without either', async () => {
+	const { service, ips, signins } = fixture();
+	const logged = await service.issue('alice');
+	const fallback = await service.issue('alice');
+	const empty = await service.issue('alice');
+	ips.getMany.mockResolvedValue([{ browserSessionId: logged.session.id, ip: '192.0.2.4' }] as MiUserIp[]);
+	signins.getMany.mockResolvedValue([{ browserSessionId: fallback.session.id, ip: '192.0.2.5' }] as MiSignin[]);
+	expect((await service.listOwned('alice')).map(row => row.lastIp)).toEqual(['192.0.2.4', '192.0.2.5', null]);
+	expect(signins.where).toHaveBeenCalledWith('signin.userId = :userId', { userId: 'alice' });
+	expect(signins.andWhere).toHaveBeenCalledWith('signin.browserSessionId IN (:...ids)', { ids: [fallback.session.id, empty.session.id] });
+	expect(signins.distinctOn).toHaveBeenCalledWith(['signin.browserSessionId']);
+	expect(signins.orderBy).toHaveBeenCalledWith('signin.browserSessionId');
+	expect(signins.addOrderBy).toHaveBeenCalledWith('signin.id', 'DESC');
 });

@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { accessTokenExpired, scheduleTokenExpiry } from '@features/auth/backend/access-token-expiry.js';
 import * as WebSocket from 'ws';
 import promiseLimit from 'promise-limit';
 import { ContextIdFactory, ModuleRef, REQUEST } from '@nestjs/core';
@@ -39,8 +40,8 @@ import { QueueStatsChannel } from '@features/operations/backend/stream/queue-sta
 import { AdminChannel } from '@features/operations/backend/stream/admin.js';
 import { ChatUserChannel } from '@features/chat/backend/stream/chat-user.js';
 import { ChatRoomChannel } from '@features/chat/backend/stream/chat-room.js';
-import { ReversiChannel } from '@features/games/backend/stream/reversi.js';
-import { ReversiGameChannel } from '@features/games/backend/stream/reversi-game.js';
+import { ReversiChannel } from '@features/games/reversi/backend/stream/reversi.js';
+import { ReversiGameChannel } from '@features/games/reversi/backend/stream/reversi-game.js';
 import type { BrowserSessionIdentity } from '../context.js';
 import type { ChannelRequest } from './channel.js';
 import type { ChannelConstructor } from './channel.js';
@@ -54,6 +55,7 @@ const MAX_PENDING_BROWSER_SESSION_OUTPUTS = 64;
 const MAX_PENDING_BROWSER_SESSION_OUTPUT_BYTES = 1024 * 1024;
 const MAX_PENDING_BROWSER_SESSION_INPUTS = 64;
 const MAX_PENDING_BROWSER_SESSION_INPUT_BYTES = 1024 * 1024;
+const MAX_BUFFERED_AMOUNT_PER_CONNECTION = 1024 * 1024 * 8; // 8MiB
 
 /**
  * Main stream connection
@@ -69,6 +71,7 @@ export default class Connection {
 	private listeningBroadcast = false;
 	public get isNativeOutput() { return !!this.output; }
 	private disposed = false;
+	private cancelTokenExpiry: (() => void) | undefined;
 	private browserSession: ConnectionRequest['browserSession'];
 	private listeningSessionRevocation = false;
 	private browserSessionOutputs: { wire: string; bytes: number }[] = [];
@@ -111,6 +114,7 @@ export default class Connection {
 	/** No positive validity cache and no credential retained on the connection. */
 	public async checkBrowserSession(): Promise<boolean> {
 		if (this.disposed) return false;
+		if (this.token && accessTokenExpired(this.token)) { this.closeRevokedSession('Access token expired'); return false; }
 		if (!this.browserSession) return true;
 		try {
 			if (this.user?.id === this.browserSession.userId && await this.browserSessionService?.isActive(this.browserSession.id, this.browserSession.userId)) return !this.disposed;
@@ -191,6 +195,8 @@ export default class Connection {
 
 		this.wsConnection = wsConnection;
 		this.listenSessionRevocation();
+		if (this.token) this.cancelTokenExpiry = scheduleTokenExpiry(this.token, () => this.closeRevokedSession('Access token expired'));
+		if (this.disposed) return;
 		this.wsConnection.on('message', data => this.browserSession
 			? this.enqueueBrowserSessionInput(data)
 			: this.messageQueue(() => this.onWsConnectionMessage(data)));
@@ -206,6 +212,8 @@ export default class Connection {
 		this.subscriber = subscriber;
 		this.output = output;
 		this.listenSessionRevocation();
+		if (this.token) this.cancelTokenExpiry = scheduleTokenExpiry(this.token, () => this.closeRevokedSession('Access token expired'));
+		if (this.disposed) return;
 		this.outputChannels = new Set(routes.channels);
 		if (routes.broadcast) {
 			this.subscriber.on('broadcast', this.onBroadcastMessage);
@@ -431,6 +439,7 @@ export default class Connection {
 	@bindThis
 	public sendMessageToWs(type: string, payload: JsonObject) {
 		if (this.disposed) return;
+		if (this.token && accessTokenExpired(this.token)) { this.closeRevokedSession('Access token expired'); return; }
 		if (this.browserSession) {
 			// The first queued frame remains owned by the array while validation waits.
 			if (this.browserSessionOutputs.length >= MAX_PENDING_BROWSER_SESSION_OUTPUTS) {
@@ -472,6 +481,7 @@ export default class Connection {
 
 	private sendValidatedMessage(type: string, payload: JsonObject): void | Promise<void> {
 		if (this.disposed) return;
+		if (this.token && accessTokenExpired(this.token)) { this.closeRevokedSession('Access token expired'); return; }
 		if (this.output) {
 			const output = this.output;
 			try {
@@ -480,10 +490,18 @@ export default class Connection {
 			return;
 		}
 		if (this.wsConnection.readyState !== WebSocket.WebSocket.OPEN) return;
-		this.wsConnection.send(JSON.stringify({
+		const message = JSON.stringify({
 			type: type,
 			body: payload,
-		}));
+		});
+
+		// 受信が追いつかないクライアントのために送信バッファを溜め続けないよう、閾値を超えたら切断して再接続させる
+		if (this.wsConnection.bufferedAmount + Buffer.byteLength(message) > MAX_BUFFERED_AMOUNT_PER_CONNECTION) {
+			this.wsConnection.terminate();
+			return;
+		}
+
+		this.wsConnection.send(message);
 		return;
 	}
 
@@ -620,6 +638,7 @@ export default class Connection {
 	@bindThis
 	public dispose() {
 		this.disposed = true;
+		this.cancelTokenExpiry?.(); this.cancelTokenExpiry = undefined;
 		this.browserSessionOutputs.length = 0;
 		this.browserSessionOutputBytes = 0;
 		this.browserSessionInputs.length = 0;

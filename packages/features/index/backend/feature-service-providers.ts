@@ -7,7 +7,7 @@ import { authSecurityServices, authServices } from '@features/auth/backend/servi
 import { integrationServices } from '@features/integrations/backend/services.js';
 import { channelServices } from '@features/channels/backend/services.js';
 import { timelineServices } from '@features/timelines/backend/services.js';
-import { gameServices } from '@features/games/backend/services.js';
+import { gameServices } from '@features/games/reversi/backend/services.js';
 import { driveServices } from '@features/drive/backend/services.js';
 import { relationshipServices } from '@features/relationships/backend/services.js';
 import { discoveryServices, rankingServices, userSearchServices } from '@features/discovery/backend/services.js';

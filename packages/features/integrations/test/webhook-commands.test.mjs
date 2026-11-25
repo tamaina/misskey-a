@@ -12,8 +12,10 @@ const actor = { id: 'owner', isSuspended: false, movedToUri: null };
 
 function fixture({ principal = actor, token = null, exists = true } = {}) {
 	const calls = [];
-	const webhook = { id: 'webhook1', name: 'old name' };
+	const webhook = { id: 'webhook1', name: 'old name', on: [] };
 	const repository = {
+		manager: { transaction: async callback => callback({ getRepository: () => repository }) },
+		findOne: async query => { calls.push(['find', query.where]); assert.equal(query.lock.mode, 'pessimistic_write'); return exists ? webhook : null; },
 		findOneBy: async query => { calls.push(['find', query]); return exists ? webhook : null; },
 		update: async (id, values) => { calls.push(['update', id, values]); },
 		findOneByOrFail: async query => { calls.push(['reload', query]); return webhook; },
@@ -32,7 +34,7 @@ test('native update scopes ownership, strips undeclared input and clears null se
 	const { calls, webhook, client } = fixture();
 	await client.iWebhooksUpdate({ webhookId: webhook.id, name: 'new', secret: null, future: true });
 	assert.deepEqual(calls[0], ['find', { id: webhook.id, userId: actor.id, mode: 'legacy' }]);
-	assert.deepEqual(calls[1], ['update', webhook.id, { name: 'new', url: undefined, secret: '', on: undefined, active: undefined }]);
+	assert.deepEqual(calls[1], ['update', webhook.id, { name: 'new', url: undefined, secret: '', on: undefined, active: undefined, chatTokenId: null }]);
 	assert.deepEqual(calls[2], ['reload', { id: webhook.id }]);
 	assert.deepEqual(calls[3], ['webhookUpdated', webhook]);
 });

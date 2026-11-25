@@ -34,7 +34,8 @@ const setMetadata = (v: Ref<PageMetadata | null>): void => {
 };
 
 export const definePage = (maybeRefOrGetterMetadata: MaybeRefOrGetter<PageMetadata>): void => {
-	const metadataRef = ref(toValue(maybeRefOrGetterMetadata));
+	// Keep the public metadata type instead of recursively unwrapping packed users.
+	const metadataRef = ref(toValue(maybeRefOrGetterMetadata)) as Ref<PageMetadata>;
 	const metadataGetter = () => metadataRef.value;
 	const receiver = getReceiver();
 

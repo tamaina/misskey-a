@@ -36,14 +36,16 @@ export function createVerifyEmailProcedure(deps: VerifyEmailDependencies) {
 				emailVerifyCode: ps.code,
 			});
 
-			if (profile == null) {
+			if (profile == null || profile.email == null) {
 				throw apiError(meta.errors.noSuchCode);
 			}
 
-			await deps.userProfilesRepository.update({ userId: profile.userId }, {
+			const verified = await deps.userProfilesRepository.update({ userId: profile.userId, email: profile.email, emailVerifyCode: ps.code }, {
 				emailVerified: true,
 				emailVerifyCode: null,
 			});
+
+			if (verified.affected !== 1) throw apiError(meta.errors.noSuchCode);
 
 			deps.globalEventService.publishMainStream(profile.userId, 'meUpdated', await deps.userEntityService.packSelf(profile.userId, {
 				includeSecrets: true,

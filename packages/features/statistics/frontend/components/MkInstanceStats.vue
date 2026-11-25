@@ -55,10 +55,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { onMounted, onUnmounted, computed, useTemplateRef } from 'vue';
 import { Chart } from 'chart.js';
-import type { MkSelectItem, ItemOption } from '@features/ui/frontend/components/MkSelect.vue';
-import type { ChartSrc } from '@features/statistics/frontend/components/MkChart.vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkChart from '@features/statistics/frontend/components/MkChart.vue';
 import { useChartTooltip } from '@features/statistics/frontend/composables/use-chart-tooltip.js';
@@ -73,6 +72,11 @@ import MkRetentionLineChart from '@features/statistics/frontend/components/MkRet
 import { initChart } from '@features/statistics/frontend/utility/init-chart.js';
 import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import { themeManager } from '@features/preferences/frontend/theme.js';
+import type { ChartSrc } from '@features/statistics/frontend/components/MkChart.vue';
+import type { MkSelectItem, ItemOption } from '@features/ui/frontend/components/MkSelect.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 initChart();
 
@@ -109,7 +113,7 @@ const {
 
 		items.push({
 			type: 'group',
-			label: $locale.value.sfc.users,
+			label: globalLocale.value.env.users,
 			items: [
 				{ value: 'users', label: $locale.value.sfc.chartsUsersIncDec },
 				{ value: 'users-total', label: $locale.value.sfc.chartsUsersTotal },
@@ -130,13 +134,13 @@ const {
 
 		items.push({
 			type: 'group',
-			label: $locale.value.sfc.notes,
+			label: globalLocale.value.env.notes,
 			items: notesItems,
 		});
 
 		items.push({
 			type: 'group',
-			label: $locale.value.sfc.drive,
+			label: globalLocale.value.env.drive,
 			items: [
 				{ value: 'drive-files', label: $locale.value.sfc.chartsFilesIncDec },
 				{ value: 'drive', label: $locale.value.sfc.chartsStorageUsageIncDec },
@@ -354,7 +358,6 @@ onUnmounted(() => {
 	"federation": "الفديرالية",
 	"chartsFederation": "الفديرالية",
 	"chartsApRequest": "الطلبات",
-	"users": "المستخدمون",
 	"chartsUsersIncDec": "تباين عدد المستخدمين",
 	"chartsUsersTotal": "مجموع عدد المستخدمين والمستخدمات",
 	"chartsActiveUsers": "المستخدمون النشطون",
@@ -362,8 +365,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "تباين عدد الملاحظات المحلية",
 	"chartsRemoteNotesIncDec": "تباين عدد الملاحظات البعيدة",
 	"chartsNotesTotal": "إجمالي الملاحظات",
-	"notes": "الملاحظات",
-	"drive": "قرص التخرين",
 	"chartsFilesIncDec": "تباين عدد الملفات",
 	"chartsStorageUsageIncDec": "التباين في استغلال مساحة التخزين"
 }
@@ -376,7 +377,6 @@ onUnmounted(() => {
 	"federation": "Federació",
 	"chartsFederation": "Federació",
 	"chartsApRequest": "Peticions",
-	"users": "Usuaris",
 	"chartsUsersIncDec": "Diferència entre el nombre d'usuaris",
 	"chartsUsersTotal": "Nombre total d'usuaris",
 	"chartsActiveUsers": "Usuaris actius",
@@ -384,8 +384,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Diferencia en el nombre de notes locals",
 	"chartsRemoteNotesIncDec": "Diferencia en el nombre de notes remotes",
 	"chartsNotesTotal": "Nombre total de notes",
-	"notes": "Notes",
-	"drive": "Disc",
 	"chartsFilesIncDec": "Diferencia en el nombre de fitxers",
 	"chartsStorageUsageIncDec": "Diferencia en l'emmagatzematge usat"
 }
@@ -398,7 +396,6 @@ onUnmounted(() => {
 	"federation": "Federace",
 	"chartsFederation": "Federace",
 	"chartsApRequest": "Požadavek",
-	"users": "Uživatelé",
 	"chartsUsersIncDec": "Rozdíl v počtech uživatelů",
 	"chartsUsersTotal": "Celkem uživatelů",
 	"chartsActiveUsers": "Aktivní uživatelé",
@@ -406,8 +403,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Rozdíl v počtu místních poznámek",
 	"chartsRemoteNotesIncDec": "Rozdíl v počtu vzdálených poznámek",
 	"chartsNotesTotal": "Celkový počet poznámek",
-	"notes": "Poznámky",
-	"drive": "Úložiště",
 	"chartsFilesIncDec": "Rozdíl v počtu souborů",
 	"chartsStorageUsageIncDec": "Rozdíl ve využití úložiště"
 }
@@ -420,7 +415,6 @@ onUnmounted(() => {
 	"federation": "Federation",
 	"chartsFederation": "Federation",
 	"chartsApRequest": "Requests",
-	"users": "Users",
 	"chartsUsersIncDec": "Difference in the number of users",
 	"chartsUsersTotal": "Total number of users",
 	"chartsActiveUsers": "Active users",
@@ -428,8 +422,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Difference in the number of local notes",
 	"chartsRemoteNotesIncDec": "Difference in the number of remote notes",
 	"chartsNotesTotal": "Total number of notes",
-	"notes": "Notes",
-	"drive": "Drive",
 	"chartsFilesIncDec": "Difference in the number of files",
 	"chartsStorageUsageIncDec": "Difference in storage usage"
 }
@@ -442,7 +434,6 @@ onUnmounted(() => {
 	"federation": "Föderation",
 	"chartsFederation": "Föderation",
 	"chartsApRequest": "Anfragen",
-	"users": "Benutzer",
 	"chartsUsersIncDec": "Unterschied in der Anzahl von Benutzern",
 	"chartsUsersTotal": "Anzahl aller Benutzer",
 	"chartsActiveUsers": "Aktive Benutzer",
@@ -450,8 +441,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Unterschied in der Anzahl an lokalen Notizen",
 	"chartsRemoteNotesIncDec": "Unterschied in der Anzahl an Notizen von fremden Instanzen",
 	"chartsNotesTotal": "Anzahl aller Notizen",
-	"notes": "Notizen",
-	"drive": "Drive",
 	"chartsFilesIncDec": "Unterschied in der Anzahl an Dateien",
 	"chartsStorageUsageIncDec": "Unterschied in der Höhe der Speichernutzung"
 }
@@ -464,7 +453,6 @@ onUnmounted(() => {
 	"federation": "Federation",
 	"chartsFederation": "Federation",
 	"chartsApRequest": "Requests",
-	"users": "Users",
 	"chartsUsersIncDec": "Difference in the number of users",
 	"chartsUsersTotal": "Total number of users",
 	"chartsActiveUsers": "Active users",
@@ -472,8 +460,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Difference in the number of local notes",
 	"chartsRemoteNotesIncDec": "Difference in the number of remote notes",
 	"chartsNotesTotal": "Total number of notes",
-	"notes": "Notes",
-	"drive": "Drive",
 	"chartsFilesIncDec": "Difference in the number of files",
 	"chartsStorageUsageIncDec": "Difference in storage usage"
 }
@@ -486,7 +472,6 @@ onUnmounted(() => {
 	"federation": "Federación",
 	"chartsFederation": "Federación",
 	"chartsApRequest": "Pedidos",
-	"users": "Usuarios",
 	"chartsUsersIncDec": "Variación de usuarios",
 	"chartsUsersTotal": "Total de usuarios",
 	"chartsActiveUsers": "Cantidad de usuarios activos",
@@ -494,8 +479,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Variación de la cantidad de notas locales",
 	"chartsRemoteNotesIncDec": "Variación de la cantidad de notas remotas",
 	"chartsNotesTotal": "Total de notas",
-	"notes": "Notas",
-	"drive": "Drive",
 	"chartsFilesIncDec": "Variación de cantidad de archivos",
 	"chartsStorageUsageIncDec": "Variación de uso del almacenamiento"
 }
@@ -508,7 +491,6 @@ onUnmounted(() => {
 	"federation": "Fédération",
 	"chartsFederation": "Fédération",
 	"chartsApRequest": "Requêtes",
-	"users": "Utilisateur·rice·s",
 	"chartsUsersIncDec": "Variation du nombre d'utilisateur·rice·s",
 	"chartsUsersTotal": "Nombre des utilisateur·rice·s au total",
 	"chartsActiveUsers": "Nombre d'utilisateurices actif·ve·s",
@@ -516,8 +498,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Variation du nombre de notes locales",
 	"chartsRemoteNotesIncDec": "Variation du nombre de notes distantes",
 	"chartsNotesTotal": "Nombre total des notes",
-	"notes": "Notes",
-	"drive": "Disque",
 	"chartsFilesIncDec": "Variation du nombre de fichiers",
 	"chartsStorageUsageIncDec": "Variation de l'utilisation du stockage"
 }
@@ -530,7 +510,6 @@ onUnmounted(() => {
 	"federation": "Federasi",
 	"chartsFederation": "Federasi",
 	"chartsApRequest": "Permintaan",
-	"users": "Pengguna",
 	"chartsUsersIncDec": "Perbedaan dalam # pengguna",
 	"chartsUsersTotal": "Jumlah # pengguna",
 	"chartsActiveUsers": "Pengguna aktif",
@@ -538,8 +517,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Perbedaan # dalam catatan lokal",
 	"chartsRemoteNotesIncDec": "Perbedaan # dalam catatan instansi luar",
 	"chartsNotesTotal": "Total # catatan",
-	"notes": "Catatan",
-	"drive": "Drive",
 	"chartsFilesIncDec": "Perbedaan # dalam berkas",
 	"chartsStorageUsageIncDec": "Perbedaan dalam penggunaan penyimpanan"
 }
@@ -552,7 +529,6 @@ onUnmounted(() => {
 	"federation": "Federazione",
 	"chartsFederation": "Federazione",
 	"chartsApRequest": "Richieste",
-	"users": "Profili",
 	"chartsUsersIncDec": "Variazione del numero di utenti",
 	"chartsUsersTotal": "Numero totale di utenti",
 	"chartsActiveUsers": "Numero di utenti attivi",
@@ -560,8 +536,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Variazione del numero di note locali",
 	"chartsRemoteNotesIncDec": "Variazione del numero di note distanti",
 	"chartsNotesTotal": "Numero di note in totale",
-	"notes": "Note",
-	"drive": "Drive",
 	"chartsFilesIncDec": "Variazione del numero dei file",
 	"chartsStorageUsageIncDec": "Variazione dell'utilizzo dell'immagazzinamento"
 }
@@ -574,7 +548,6 @@ onUnmounted(() => {
 	"federation": "連合",
 	"chartsFederation": "連合",
 	"chartsApRequest": "リクエスト",
-	"users": "ユーザー",
 	"chartsUsersIncDec": "ユーザーの増減",
 	"chartsUsersTotal": "ユーザーの合計",
 	"chartsActiveUsers": "アクティブユーザー数",
@@ -582,8 +555,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "ローカルのノートの増減",
 	"chartsRemoteNotesIncDec": "リモートのノートの増減",
 	"chartsNotesTotal": "ノートの合計",
-	"notes": "ノート",
-	"drive": "ドライブ",
 	"chartsFilesIncDec": "ファイルの増減",
 	"chartsStorageUsageIncDec": "ストレージ使用量の増減"
 }
@@ -596,7 +567,6 @@ onUnmounted(() => {
 	"federation": "連合",
 	"chartsFederation": "連合",
 	"chartsApRequest": "リクエスト",
-	"users": "ユーザー",
 	"chartsUsersIncDec": "ユーザーの増減",
 	"chartsUsersTotal": "ユーザーの合計",
 	"chartsActiveUsers": "いまおるユーザー数",
@@ -604,8 +574,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "ローカルのノートの増減",
 	"chartsRemoteNotesIncDec": "リモートのノートの増減",
 	"chartsNotesTotal": "ノートの合計",
-	"notes": "ノート",
-	"drive": "ドライブ",
 	"chartsFilesIncDec": "ファイルの増減",
 	"chartsStorageUsageIncDec": "ストレージ使用量の増減"
 }
@@ -618,7 +586,6 @@ onUnmounted(() => {
 	"federation": "Federation",
 	"chartsFederation": "Federation",
 	"chartsApRequest": "Requests",
-	"users": "Users",
 	"chartsUsersIncDec": "Difference in the number of users",
 	"chartsUsersTotal": "Total number of users",
 	"chartsActiveUsers": "Active users",
@@ -626,8 +593,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Difference in the number of local notes",
 	"chartsRemoteNotesIncDec": "Difference in the number of remote notes",
 	"chartsNotesTotal": "Total number of notes",
-	"notes": "Notes",
-	"drive": "Drive",
 	"chartsFilesIncDec": "Difference in the number of files",
 	"chartsStorageUsageIncDec": "Difference in storage usage"
 }
@@ -640,7 +605,6 @@ onUnmounted(() => {
 	"federation": "Federation",
 	"chartsFederation": "Federation",
 	"chartsApRequest": "Requests",
-	"users": "ಬಳಕೆದಾರ",
 	"chartsUsersIncDec": "Difference in the number of users",
 	"chartsUsersTotal": "Total number of users",
 	"chartsActiveUsers": "Active users",
@@ -648,8 +612,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Difference in the number of local notes",
 	"chartsRemoteNotesIncDec": "Difference in the number of remote notes",
 	"chartsNotesTotal": "Total number of notes",
-	"notes": "Notes",
-	"drive": "Drive",
 	"chartsFilesIncDec": "Difference in the number of files",
 	"chartsStorageUsageIncDec": "Difference in storage usage"
 }
@@ -662,7 +624,6 @@ onUnmounted(() => {
 	"federation": "연합",
 	"chartsFederation": "연합",
 	"chartsApRequest": "요청",
-	"users": "유저",
 	"chartsUsersIncDec": "유저 수 증감",
 	"chartsUsersTotal": "유저 수 합계",
 	"chartsActiveUsers": "활동 유저 수",
@@ -670,8 +631,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "로컬 노트 수 증감",
 	"chartsRemoteNotesIncDec": "리모트 노트 수 증감",
 	"chartsNotesTotal": "노트 수 합계",
-	"notes": "노트",
-	"drive": "드라이브",
 	"chartsFilesIncDec": "파일 수 증감",
 	"chartsStorageUsageIncDec": "스토리지 사용량 증감"
 }
@@ -684,7 +643,6 @@ onUnmounted(() => {
 	"federation": "Federatie",
 	"chartsFederation": "Federatie",
 	"chartsApRequest": "Requests",
-	"users": "Gebruikers",
 	"chartsUsersIncDec": "Difference in the number of users",
 	"chartsUsersTotal": "Total number of users",
 	"chartsActiveUsers": "Active users",
@@ -692,8 +650,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Difference in the number of local notes",
 	"chartsRemoteNotesIncDec": "Difference in the number of remote notes",
 	"chartsNotesTotal": "Total number of notes",
-	"notes": "Notities",
-	"drive": "Schijf",
 	"chartsFilesIncDec": "Difference in the number of files",
 	"chartsStorageUsageIncDec": "Difference in storage usage"
 }
@@ -706,7 +662,6 @@ onUnmounted(() => {
 	"federation": "Føderasjon",
 	"chartsFederation": "Føderasjon",
 	"chartsApRequest": "Requests",
-	"users": "Brukere",
 	"chartsUsersIncDec": "Difference in the number of users",
 	"chartsUsersTotal": "Total number of users",
 	"chartsActiveUsers": "Active users",
@@ -714,8 +669,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Difference in the number of local notes",
 	"chartsRemoteNotesIncDec": "Difference in the number of remote notes",
 	"chartsNotesTotal": "Total number of notes",
-	"notes": "Notes",
-	"drive": "Drive",
 	"chartsFilesIncDec": "Forskjell på antall filer",
 	"chartsStorageUsageIncDec": "Difference in storage usage"
 }
@@ -728,7 +681,6 @@ onUnmounted(() => {
 	"federation": "Federacja",
 	"chartsFederation": "Federacja",
 	"chartsApRequest": "Żądania",
-	"users": "Użytkownicy",
 	"chartsUsersIncDec": "Różnica w liczbie użytkowników",
 	"chartsUsersTotal": "Łącznie # użytkowników",
 	"chartsActiveUsers": "Aktywni użytkownicy",
@@ -736,8 +688,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Difference in the number of local notes",
 	"chartsRemoteNotesIncDec": "Difference in the number of remote notes",
 	"chartsNotesTotal": "Całkowita liczba wpisów",
-	"notes": "Wpisy",
-	"drive": "Dysk",
 	"chartsFilesIncDec": "Różnica w liczbie plików",
 	"chartsStorageUsageIncDec": "Różnica w wykorzystaniu pamięci"
 }
@@ -750,7 +700,6 @@ onUnmounted(() => {
 	"federation": "Federação",
 	"chartsFederation": "União",
 	"chartsApRequest": "Solicitações",
-	"users": "Usuários",
 	"chartsUsersIncDec": "Diferença no número de usuários",
 	"chartsUsersTotal": "Número total de usuários",
 	"chartsActiveUsers": "Usuários ativos",
@@ -758,8 +707,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Diferença no número de notas locais",
 	"chartsRemoteNotesIncDec": "Diferença no número de notas remotas",
 	"chartsNotesTotal": "Número total de notas",
-	"notes": "Posts",
-	"drive": "Drive",
 	"chartsFilesIncDec": "Diferença no número de arquivos",
 	"chartsStorageUsageIncDec": "Diferença no uso de armazenamento"
 }
@@ -772,7 +719,6 @@ onUnmounted(() => {
 	"federation": "Федерация",
 	"chartsFederation": "Федерация",
 	"chartsApRequest": "Запросы",
-	"users": "Пользователи",
 	"chartsUsersIncDec": "Изменение числа пользователей",
 	"chartsUsersTotal": "Количество пользователей",
 	"chartsActiveUsers": "Активные пользователи",
@@ -780,8 +726,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Изменения числа локальных заметок",
 	"chartsRemoteNotesIncDec": "Изменения числа заметок с других сайтов",
 	"chartsNotesTotal": "Общее количество заметок",
-	"notes": "Заметки",
-	"drive": "Диск",
 	"chartsFilesIncDec": "Изменения числа файлов",
 	"chartsStorageUsageIncDec": "Изменения заполнения хранилища"
 }
@@ -794,7 +738,6 @@ onUnmounted(() => {
 	"federation": "Federácia",
 	"chartsFederation": "Federácia",
 	"chartsApRequest": "Žiadosti",
-	"users": "Používatelia",
 	"chartsUsersIncDec": "Rozdiel v počte používateľov",
 	"chartsUsersTotal": "Celkový počet používateľov",
 	"chartsActiveUsers": "Aktívni používatelia",
@@ -802,8 +745,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Rozdiel v počte lokálnych poznámok",
 	"chartsRemoteNotesIncDec": "Rozdiel v počte vzdialených poznámok",
 	"chartsNotesTotal": "Celkový počet poznámok",
-	"notes": "Poznámky",
-	"drive": "Disk",
 	"chartsFilesIncDec": "Rozdiel v počte súborov",
 	"chartsStorageUsageIncDec": "Rozdiel využitého úložiska"
 }
@@ -816,7 +757,6 @@ onUnmounted(() => {
 	"federation": "สหพันธ์",
 	"chartsFederation": "สหพันธ์",
 	"chartsApRequest": "คำขอ",
-	"users": "ผู้ใช้",
 	"chartsUsersIncDec": "การเพิ่มลดของจำนวนผู้ใช้",
 	"chartsUsersTotal": "จำนวนผู้ใช้งานทั้งหมด",
 	"chartsActiveUsers": "จำนวนผู้ใช้งานที่ยังมีความเคลื่อนไหวอยู่",
@@ -824,8 +764,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "การเพิ่มลดของจำนวนโน้ตท้องถิ่น",
 	"chartsRemoteNotesIncDec": "การเพิ่มลดของจำนวนโน้ตระยะไกล",
 	"chartsNotesTotal": "จำนวนโน้ตทั้งหมด",
-	"notes": " โน้ต",
-	"drive": "ไดรฟ์",
 	"chartsFilesIncDec": "การเพิ่มลดของจำนวนไฟล์",
 	"chartsStorageUsageIncDec": "การเพิ่มลดในการใช้พื้นที่เก็บข้อมูล"
 }
@@ -838,7 +776,6 @@ onUnmounted(() => {
 	"federation": "Federasyon",
 	"chartsFederation": "Federasyon",
 	"chartsApRequest": "Talepler",
-	"users": "Kullanıcılar",
 	"chartsUsersIncDec": "Kullanıcı sayısındaki fark",
 	"chartsUsersTotal": "Toplam kullanıcı sayısı",
 	"chartsActiveUsers": "Aktif kullanıcılar",
@@ -846,8 +783,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Yerel notaların sayısındaki fark",
 	"chartsRemoteNotesIncDec": "Uzak notların sayısındaki fark",
 	"chartsNotesTotal": "Toplam not sayısı",
-	"notes": "Notlar",
-	"drive": "Drive",
 	"chartsFilesIncDec": "Dosya sayısındaki fark",
 	"chartsStorageUsageIncDec": "Depolama kullanımı farkı"
 }
@@ -860,7 +795,6 @@ onUnmounted(() => {
 	"federation": "Federation",
 	"chartsFederation": "Federation",
 	"chartsApRequest": "Requests",
-	"users": "Users",
 	"chartsUsersIncDec": "Difference in the number of users",
 	"chartsUsersTotal": "Total number of users",
 	"chartsActiveUsers": "Active users",
@@ -868,8 +802,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Difference in the number of local notes",
 	"chartsRemoteNotesIncDec": "Difference in the number of remote notes",
 	"chartsNotesTotal": "Total number of notes",
-	"notes": "Notes",
-	"drive": "Drive",
 	"chartsFilesIncDec": "Difference in the number of files",
 	"chartsStorageUsageIncDec": "Difference in storage usage"
 }
@@ -882,7 +814,6 @@ onUnmounted(() => {
 	"federation": "Федіверс",
 	"chartsFederation": "Федіверс",
 	"chartsApRequest": "Запити",
-	"users": "Користувачі",
 	"chartsUsersIncDec": "Зміни кількості користувачів",
 	"chartsUsersTotal": "Загальна кількість користувачів",
 	"chartsActiveUsers": "Активні користувачі",
@@ -890,8 +821,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Зміни кількості локальних нотаток",
 	"chartsRemoteNotesIncDec": "Зміни кількості віддалених нотаток",
 	"chartsNotesTotal": "Загальна кількість нотаток",
-	"notes": "Записи",
-	"drive": "Диск",
 	"chartsFilesIncDec": "Зміни кількості файлів",
 	"chartsStorageUsageIncDec": "Difference in storage usage"
 }
@@ -904,7 +833,6 @@ onUnmounted(() => {
 	"federation": "Liên hợp",
 	"chartsFederation": "Liên hợp",
 	"chartsApRequest": "Yêu cầu",
-	"users": "Người dùng",
 	"chartsUsersIncDec": "Sự khác biệt về số lượng người dùng",
 	"chartsUsersTotal": "Tổng số người dùng",
 	"chartsActiveUsers": "Số người đang hoạt động",
@@ -912,8 +840,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "Sự khác biệt về số lượng tút máy chủ này",
 	"chartsRemoteNotesIncDec": "Sự khác biệt về số lượng tút từ máy chủ khác",
 	"chartsNotesTotal": "Tổng số sút",
-	"notes": "Bài Viết",
-	"drive": "Ổ đĩa",
 	"chartsFilesIncDec": "Sự khác biệt về số lượng tập tin",
 	"chartsStorageUsageIncDec": "Sự khác biệt về dung lượng lưu trữ"
 }
@@ -926,7 +852,6 @@ onUnmounted(() => {
 	"federation": "联邦",
 	"chartsFederation": "联邦",
 	"chartsApRequest": "请求",
-	"users": "用户",
 	"chartsUsersIncDec": "用户数量：增加/减少",
 	"chartsUsersTotal": "用户总数",
 	"chartsActiveUsers": "活跃用户数",
@@ -934,8 +859,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "本地帖子量增减",
 	"chartsRemoteNotesIncDec": "远程帖子量增减",
 	"chartsNotesTotal": "帖子总数",
-	"notes": "帖子",
-	"drive": "网盘",
 	"chartsFilesIncDec": "文件总数增减",
 	"chartsStorageUsageIncDec": "存储空间用量增减"
 }
@@ -948,7 +871,6 @@ onUnmounted(() => {
 	"federation": "站台聯邦",
 	"chartsFederation": "聯邦宇宙",
 	"chartsApRequest": "請求",
-	"users": "使用者",
 	"chartsUsersIncDec": "使用者增減",
 	"chartsUsersTotal": "使用者合計",
 	"chartsActiveUsers": "活躍使用者",
@@ -956,8 +878,6 @@ onUnmounted(() => {
 	"chartsLocalNotesIncDec": "本地貼文増減",
 	"chartsRemoteNotesIncDec": "遠端貼文數目增减",
 	"chartsNotesTotal": "貼文總數",
-	"notes": "貼文",
-	"drive": "雲端硬碟",
 	"chartsFilesIncDec": "檔案增減",
 	"chartsStorageUsageIncDec": "儲存空間增減"
 }

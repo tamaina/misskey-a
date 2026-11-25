@@ -29,7 +29,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<button v-if="$i && $i.id === post.user.id" v-tooltip="globalLocale.env.edit" v-click-anime class="_button" @click="edit"><i class="ti ti-pencil ti-fw"></i></button>
 								<button v-tooltip="$locale.sfc.shareWithNote" v-click-anime class="_button" @click="shareWithNote"><i class="ti ti-repeat ti-fw"></i></button>
 								<button v-tooltip="$locale.sfc.copyLink" v-click-anime class="_button" @click="copyLink"><i class="ti ti-link ti-fw"></i></button>
-								<button v-if="isSupportShare()" v-tooltip="$locale.sfc.share" v-click-anime class="_button" @click="share"><i class="ti ti-share ti-fw"></i></button>
+								<button v-if="isSupportShare()" v-tooltip="globalLocale.env.share" v-click-anime class="_button" @click="share"><i class="ti ti-share ti-fw"></i></button>
 								<button v-if="$i && $i.id !== post.user.id" v-click-anime class="_button" @click="showMenu"><i class="ti ti-dots ti-fw"></i></button>
 							</div>
 						</div>
@@ -63,11 +63,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { Locale } from 'i18n';
 import { computed, watch, ref, defineAsyncComponent, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
 import { url } from '@features/boot/frontend/shared/config.js';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
@@ -82,6 +80,8 @@ import { isSupportShare } from '@features/navigation/frontend/utility/navigator.
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Locale } from 'i18n';
 
 const globalLocale = useLocale<Locale>(import.meta.url);
 
@@ -350,7 +350,6 @@ definePage(() => ({
 	"like": "أعجبني",
 	"shareWithNote": "شاركه في ملاحظة",
 	"copyLink": "انسخ الرابط",
-	"share": "شارِك",
 	"recentPosts": "المشاركات الحديثة"
 }
 </locale>
@@ -365,7 +364,6 @@ definePage(() => ({
 	"like": "M'agrada ",
 	"shareWithNote": "Comparteix amb una nota",
 	"copyLink": "Copia l'enllaç",
-	"share": "Comparteix",
 	"recentPosts": "Articles recents"
 }
 </locale>
@@ -380,7 +378,6 @@ definePage(() => ({
 	"like": "To se mi líbí",
 	"shareWithNote": "Sdílet s poznámkou",
 	"copyLink": "Kopírovat odkaz",
-	"share": "Sdílet",
 	"recentPosts": "Poslední příspěvky"
 }
 </locale>
@@ -395,7 +392,6 @@ definePage(() => ({
 	"like": "Like",
 	"shareWithNote": "Share with note",
 	"copyLink": "Copy link",
-	"share": "Share",
 	"recentPosts": "Recent posts"
 }
 </locale>
@@ -410,7 +406,6 @@ definePage(() => ({
 	"like": "Gefällt mir",
 	"shareWithNote": "Mit Notiz teilen",
 	"copyLink": "Link kopieren",
-	"share": "Teilen",
 	"recentPosts": "Neue Beiträge"
 }
 </locale>
@@ -425,7 +420,6 @@ definePage(() => ({
 	"like": "Like",
 	"shareWithNote": "Share with note",
 	"copyLink": "Copy link",
-	"share": "Share",
 	"recentPosts": "Recent posts"
 }
 </locale>
@@ -440,7 +434,6 @@ definePage(() => ({
 	"like": "¡Muy bien!",
 	"shareWithNote": "Compartir con una nota",
 	"copyLink": "Copiar enlace",
-	"share": "Compartir",
 	"recentPosts": "Publicaciones recientes"
 }
 </locale>
@@ -455,7 +448,6 @@ definePage(() => ({
 	"like": "J'aime",
 	"shareWithNote": "Partager dans une note",
 	"copyLink": "Copier le lien",
-	"share": "Partager",
 	"recentPosts": "Les plus récentes"
 }
 </locale>
@@ -470,7 +462,6 @@ definePage(() => ({
 	"like": "Suka",
 	"shareWithNote": "Bagikan dengan catatan",
 	"copyLink": "Salin tautan",
-	"share": "Bagikan",
 	"recentPosts": "Postingan terbaru"
 }
 </locale>
@@ -485,7 +476,6 @@ definePage(() => ({
 	"like": "Mi piace!",
 	"shareWithNote": "Condividere in nota",
 	"copyLink": "Copia il link",
-	"share": "Condividi",
 	"recentPosts": "Pubblicazioni recenti"
 }
 </locale>
@@ -500,7 +490,6 @@ definePage(() => ({
 	"like": "いいね！",
 	"shareWithNote": "ノートで共有",
 	"copyLink": "リンクをコピー",
-	"share": "共有",
 	"recentPosts": "最近の投稿"
 }
 </locale>
@@ -515,7 +504,6 @@ definePage(() => ({
 	"like": "ええやん！",
 	"shareWithNote": "ノートで共有",
 	"copyLink": "リンクをコピー",
-	"share": "わけわけ",
 	"recentPosts": "最近の投稿"
 }
 </locale>
@@ -530,7 +518,6 @@ definePage(() => ({
 	"like": "Like",
 	"shareWithNote": "Share with note",
 	"copyLink": "Copy link",
-	"share": "Share",
 	"recentPosts": "Recent posts"
 }
 </locale>
@@ -545,7 +532,6 @@ definePage(() => ({
 	"like": "Like",
 	"shareWithNote": "Share with note",
 	"copyLink": "ಲಿಂಕನ್ನು ನಕಲಿಸು",
-	"share": "Share",
 	"recentPosts": "Recent posts"
 }
 </locale>
@@ -560,7 +546,6 @@ definePage(() => ({
 	"like": "좋아요!",
 	"shareWithNote": "노트로 공유",
 	"copyLink": "링크 복사",
-	"share": "공유",
 	"recentPosts": "최근 게시물"
 }
 </locale>
@@ -575,7 +560,6 @@ definePage(() => ({
 	"like": "Like",
 	"shareWithNote": "Delen met notitie",
 	"copyLink": "Kopiëren link",
-	"share": "Delen",
 	"recentPosts": "Recente berichten"
 }
 </locale>
@@ -590,7 +574,6 @@ definePage(() => ({
 	"like": "Liker!",
 	"shareWithNote": "Share with note",
 	"copyLink": "Kopier lenke",
-	"share": "Del",
 	"recentPosts": "Recent posts"
 }
 </locale>
@@ -605,7 +588,6 @@ definePage(() => ({
 	"like": "Polub",
 	"shareWithNote": "Udostępnij z wpisem",
 	"copyLink": "Skopiuj odnośnik",
-	"share": "Udostępnij",
 	"recentPosts": "Ostatnie wpisy"
 }
 </locale>
@@ -620,7 +602,6 @@ definePage(() => ({
 	"like": "Curtir",
 	"shareWithNote": "Compartilhar em Notas",
 	"copyLink": "Copiar link",
-	"share": "Compartilhar",
 	"recentPosts": "Notas recentes"
 }
 </locale>
@@ -635,7 +616,6 @@ definePage(() => ({
 	"like": "Нравится!",
 	"shareWithNote": "Поделиться заметкой",
 	"copyLink": "Скопировать ссылку",
-	"share": "Поделиться",
 	"recentPosts": "Недавние публикации"
 }
 </locale>
@@ -650,7 +630,6 @@ definePage(() => ({
 	"like": "Páči sa mi",
 	"shareWithNote": "Zdieľať s poznámkou",
 	"copyLink": "Kopírovať odkaz",
-	"share": "Zdieľať",
 	"recentPosts": "Najnovšie príspevky"
 }
 </locale>
@@ -665,7 +644,6 @@ definePage(() => ({
 	"like": "ถูกใจ!",
 	"shareWithNote": "แบ่งปันด้วยโน้ต",
 	"copyLink": "คัดลอกลิงก์",
-	"share": "แบ่งปัน",
 	"recentPosts": "โพสต์ล่าสุด"
 }
 </locale>
@@ -680,7 +658,6 @@ definePage(() => ({
 	"like": "Beğen",
 	"shareWithNote": "Notla paylaş",
 	"copyLink": "Link kopyala",
-	"share": "Paylaş",
 	"recentPosts": "Son gönderiler"
 }
 </locale>
@@ -695,7 +672,6 @@ definePage(() => ({
 	"like": "Like",
 	"shareWithNote": "Share with note",
 	"copyLink": "Copy link",
-	"share": "Share",
 	"recentPosts": "Recent posts"
 }
 </locale>
@@ -710,7 +686,6 @@ definePage(() => ({
 	"like": "Вподобати",
 	"shareWithNote": "Поділитися нотаткою",
 	"copyLink": "Скопіювати посилання",
-	"share": "Поділитись",
 	"recentPosts": "Нещодавні дописи"
 }
 </locale>
@@ -725,7 +700,6 @@ definePage(() => ({
 	"like": "Thích",
 	"shareWithNote": "Chia sẻ kèm với tút",
 	"copyLink": "Chép liên kết",
-	"share": "Chia sẻ",
 	"recentPosts": "Tút gần đây"
 }
 </locale>
@@ -740,7 +714,6 @@ definePage(() => ({
 	"like": "喜欢！",
 	"shareWithNote": "分享到帖文",
 	"copyLink": "复制链接",
-	"share": "分享",
 	"recentPosts": "最新发布"
 }
 </locale>
@@ -755,7 +728,6 @@ definePage(() => ({
 	"like": "讚好",
 	"shareWithNote": "在貼文中分享",
 	"copyLink": "複製連結",
-	"share": "分享",
 	"recentPosts": "最新貼文"
 }
 </locale>

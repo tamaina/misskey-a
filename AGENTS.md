@@ -9,6 +9,7 @@
 - 共有ブランチ (`main` / `develop` / `master`) へ force-push しない。プッシュ済み・マージ済みの履歴や他人のブランチを破壊せず、hook をスキップしない。ユーザーの Git 設定を無断変更しない。
 - secrets / 認証情報をコミットしない。脆弱性の報告は通常の Issue / PR ではなく [非公開の報告窓口](https://github.com/misskey-dev/misskey/security/policy) を案内する。
 - リリースには既存の [Release Manager Action](.github/workflows/release-with-dispatch.yml) を使う。
+- バージョンを上げる (Release Manager の dispatch など) 前に、必ず `CHANGELOG.md` を同期する。前回リリース以降にマージされた利用者向け変更がすべて記載されているかを確認し、不足があれば先に追記してマージしておく。この同期はバージョン更新の依頼に含まれる。
 - `CHANGELOG.md` は明示依頼時だけ編集する。利用者に影響する変更では候補を引き継ぎに一行示す。
 
 ## プロジェクト固有の注意

@@ -16,7 +16,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<i v-else class="ti ti-clock" :class="$style.icon"></i>
 						<span>{{ copyLocaleDictionary($locale.sfc.relayStatusLabels)[relay.status] }}</span>
 					</div>
-					<MkButton class="button" inline danger @click="remove(relay.inbox)"><i class="ti ti-trash"></i> {{ $locale.sfc.remove }}</MkButton>
+					<MkButton class="button" inline danger @click="remove(relay.inbox)"><i class="ti ti-trash"></i> {{ globalLocale.env.remove }}</MkButton>
 				</div>
 			</div>
 		</SearchMarker>
@@ -25,6 +25,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
@@ -32,6 +33,9 @@ import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 import { definePage } from '@features/navigation/frontend/page.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const relays = ref<Misskey.entities.AdminRelaysListResponse>([]);
 
@@ -105,7 +109,6 @@ definePage(() => ({
 		"accepted": "مقبول",
 		"rejected": "مرفوض"
 	},
-	"remove": "حذف",
 	"addRelay": "إضافة مُرحّل",
 	"inboxUrl": "رابط صندوق الوارد"
 }
@@ -119,7 +122,6 @@ definePage(() => ({
 		"accepted": "Acceptat",
 		"rejected": "Rebutjat"
 	},
-	"remove": "Eliminar",
 	"addRelay": "Afegeix relés",
 	"inboxUrl": "Enllaç de la safata d'entrada"
 }
@@ -133,7 +135,6 @@ definePage(() => ({
 		"accepted": "Schváleno",
 		"rejected": "Odmítnuto"
 	},
-	"remove": "Smazat",
 	"addRelay": "Přidat Relay",
 	"inboxUrl": "Inbox URL"
 }
@@ -147,7 +148,6 @@ definePage(() => ({
 		"accepted": "Accepted",
 		"rejected": "Rejected"
 	},
-	"remove": "Delete",
 	"addRelay": "Add Relay",
 	"inboxUrl": "Inbox URL"
 }
@@ -161,7 +161,6 @@ definePage(() => ({
 		"accepted": "Akzeptiert",
 		"rejected": "Abgelehnt"
 	},
-	"remove": "Löschen",
 	"addRelay": "Relay hinzufügen",
 	"inboxUrl": "inbox-URL"
 }
@@ -175,7 +174,6 @@ definePage(() => ({
 		"accepted": "Accepted",
 		"rejected": "Rejected"
 	},
-	"remove": "Delete",
 	"addRelay": "Add Relay",
 	"inboxUrl": "Inbox URL"
 }
@@ -189,7 +187,6 @@ definePage(() => ({
 		"accepted": "Aceptar",
 		"rejected": "Rechazada"
 	},
-	"remove": "Borrar",
 	"addRelay": "Agregar relé",
 	"inboxUrl": "Inbox URL"
 }
@@ -203,7 +200,6 @@ definePage(() => ({
 		"accepted": "Accepté",
 		"rejected": "Refusée"
 	},
-	"remove": "Supprimer",
 	"addRelay": "Ajouter un relais",
 	"inboxUrl": "Inbox URL"
 }
@@ -217,7 +213,6 @@ definePage(() => ({
 		"accepted": "Disetujui",
 		"rejected": "Ditolak"
 	},
-	"remove": "Hapus",
 	"addRelay": "Tambahkan relay",
 	"inboxUrl": "URL Kotak masuk"
 }
@@ -231,7 +226,6 @@ definePage(() => ({
 		"accepted": "Approvato",
 		"rejected": "Respinto"
 	},
-	"remove": "Elimina",
 	"addRelay": "Aggiungi ripetitore",
 	"inboxUrl": "Inbox URL"
 }
@@ -245,7 +239,6 @@ definePage(() => ({
 		"accepted": "承認済み",
 		"rejected": "拒否済み"
 	},
-	"remove": "削除",
 	"addRelay": "リレーの追加",
 	"inboxUrl": "inboxのURL"
 }
@@ -259,7 +252,6 @@ definePage(() => ({
 		"accepted": "承認済み",
 		"rejected": "拒否済み"
 	},
-	"remove": "ほかす",
 	"addRelay": "リレーの追加",
 	"inboxUrl": "inboxのURL"
 }
@@ -273,7 +265,6 @@ definePage(() => ({
 		"accepted": "Accepted",
 		"rejected": "Rejected"
 	},
-	"remove": "Kkes",
 	"addRelay": "Add Relay",
 	"inboxUrl": "Inbox URL"
 }
@@ -287,7 +278,6 @@ definePage(() => ({
 		"accepted": "Accepted",
 		"rejected": "Rejected"
 	},
-	"remove": "ಅಳಿಸು",
 	"addRelay": "Add Relay",
 	"inboxUrl": "Inbox URL"
 }
@@ -301,7 +291,6 @@ definePage(() => ({
 		"accepted": "승인됨",
 		"rejected": "거절됨"
 	},
-	"remove": "삭제",
 	"addRelay": "릴레이 추가",
 	"inboxUrl": "Inbox 주소"
 }
@@ -315,7 +304,6 @@ definePage(() => ({
 		"accepted": "Accepted",
 		"rejected": "Rejected"
 	},
-	"remove": "Verwijderen",
 	"addRelay": "Relay toevoegen",
 	"inboxUrl": "Inbox-URL"
 }
@@ -329,7 +317,6 @@ definePage(() => ({
 		"accepted": "Accepted",
 		"rejected": "Rejected"
 	},
-	"remove": "Slett",
 	"addRelay": "Add Relay",
 	"inboxUrl": "Inbox URL"
 }
@@ -343,7 +330,6 @@ definePage(() => ({
 		"accepted": "Zaakceptowano",
 		"rejected": "Odrzucono"
 	},
-	"remove": "Usuń",
 	"addRelay": "Dodaj przekaźnik",
 	"inboxUrl": "Adres URL skrzynki nadawczej"
 }
@@ -357,7 +343,6 @@ definePage(() => ({
 		"accepted": "Aprovado",
 		"rejected": "Recusado"
 	},
-	"remove": "Remover",
 	"addRelay": "Adicionar relay",
 	"inboxUrl": "Inbox URL"
 }
@@ -371,7 +356,6 @@ definePage(() => ({
 		"accepted": "Одобрено.",
 		"rejected": "Отказано."
 	},
-	"remove": "Удалить",
 	"addRelay": "Добавить ретранслятор",
 	"inboxUrl": "URL ящика входящих сообщений"
 }
@@ -385,7 +369,6 @@ definePage(() => ({
 		"accepted": "Akceptované",
 		"rejected": "Odmietnuté"
 	},
-	"remove": "Odstrániť",
 	"addRelay": "Pridať prenos",
 	"inboxUrl": "Inbox URL"
 }
@@ -399,7 +382,6 @@ definePage(() => ({
 		"accepted": "ได้รับการอนุมัติ",
 		"rejected": "ถูกปฏิเสธ"
 	},
-	"remove": "ลบ",
 	"addRelay": "เพิ่มรีเลย์",
 	"inboxUrl": "URL ของอินบ็อกซ์"
 }
@@ -413,7 +395,6 @@ definePage(() => ({
 		"accepted": "Accepted",
 		"rejected": "Reddedildi"
 	},
-	"remove": "Sil",
 	"addRelay": "Röle ekle",
 	"inboxUrl": "Gelen Kutusu URL"
 }
@@ -427,7 +408,6 @@ definePage(() => ({
 		"accepted": "Accepted",
 		"rejected": "Rejected"
 	},
-	"remove": "ئۆچۈرۈش",
 	"addRelay": "Add Relay",
 	"inboxUrl": "Inbox URL"
 }
@@ -441,7 +421,6 @@ definePage(() => ({
 		"accepted": "Затверджено",
 		"rejected": "Відхилено"
 	},
-	"remove": "Видалити",
 	"addRelay": "Додати ретранслятор",
 	"inboxUrl": "Inbox URL"
 }
@@ -455,7 +434,6 @@ definePage(() => ({
 		"accepted": "Đã duyệt",
 		"rejected": "Đã từ chối"
 	},
-	"remove": "Xóa",
 	"addRelay": "Thêm chuyển tiếp",
 	"inboxUrl": "URL Hộp thư đến"
 }
@@ -469,7 +447,6 @@ definePage(() => ({
 		"accepted": "已批准",
 		"rejected": "已拒绝"
 	},
-	"remove": "删除",
 	"addRelay": "添加中继",
 	"inboxUrl": "Inbox URL"
 }
@@ -483,7 +460,6 @@ definePage(() => ({
 		"accepted": "已通過核准",
 		"rejected": "已拒絕"
 	},
-	"remove": "刪除",
 	"addRelay": "新增中繼器",
 	"inboxUrl": "收件夾 URL"
 }

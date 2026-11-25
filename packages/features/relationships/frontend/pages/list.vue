@@ -27,6 +27,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { watch, computed, ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import * as os from '@features/ui/frontend/os.js';
@@ -35,6 +36,9 @@ import { userPage } from '@features/users/frontend/shared/user.js';
 import MkUserCardMini from '@features/users/frontend/components/MkUserCardMini.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { definePage } from '@features/navigation/frontend/page.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	listId: string;
@@ -99,7 +103,7 @@ const headerActions = computed(() => []);
 const headerTabs = computed(() => []);
 
 definePage(() => ({
-	title: list.value ? list.value.name : $locale.value.sfc.lists,
+	title: list.value ? list.value.name : globalLocale.value.env.lists,
 	icon: 'ti ti-list',
 }));
 </script>
@@ -155,8 +159,7 @@ definePage(() => ({
 	"unlike": "ألغِ الإعجاب",
 	"like": "أعجبني",
 	"import": "استيراد",
-	"enterListName": "اسم القائمة",
-	"lists": "القوائم"
+	"enterListName": "اسم القائمة"
 }
 </locale>
 
@@ -166,8 +169,7 @@ definePage(() => ({
 	"unlike": "Treure m'agrada ",
 	"like": "M'agrada ",
 	"import": "Importar",
-	"enterListName": "Introdueix un nom per a la llista",
-	"lists": "Llistes"
+	"enterListName": "Introdueix un nom per a la llista"
 }
 </locale>
 
@@ -177,8 +179,7 @@ definePage(() => ({
 	"unlike": "Už se mi to nelíbí",
 	"like": "To se mi líbí",
 	"import": "Importovat",
-	"enterListName": "Jméno seznamu",
-	"lists": "Seznamy"
+	"enterListName": "Jméno seznamu"
 }
 </locale>
 
@@ -188,8 +189,7 @@ definePage(() => ({
 	"unlike": "Unlike",
 	"like": "Like",
 	"import": "Import",
-	"enterListName": "Enter a name for the list",
-	"lists": "Lists"
+	"enterListName": "Enter a name for the list"
 }
 </locale>
 
@@ -199,8 +199,7 @@ definePage(() => ({
 	"unlike": "\"Gefällt mir\" entfernen",
 	"like": "Gefällt mir",
 	"import": "Import",
-	"enterListName": "Listennamen eingeben",
-	"lists": "Listen"
+	"enterListName": "Listennamen eingeben"
 }
 </locale>
 
@@ -210,8 +209,7 @@ definePage(() => ({
 	"unlike": "Unlike",
 	"like": "Like",
 	"import": "Import",
-	"enterListName": "Enter a name for the list",
-	"lists": "Lists"
+	"enterListName": "Enter a name for the list"
 }
 </locale>
 
@@ -221,8 +219,7 @@ definePage(() => ({
 	"unlike": "Quitar 'me gusta'",
 	"like": "¡Muy bien!",
 	"import": "Importar",
-	"enterListName": "Introduce un nombre para la lista",
-	"lists": "Listas"
+	"enterListName": "Introduce un nombre para la lista"
 }
 </locale>
 
@@ -232,8 +229,7 @@ definePage(() => ({
 	"unlike": "Ne plus aimer",
 	"like": "J'aime",
 	"import": "Importer",
-	"enterListName": "Nom de la liste",
-	"lists": "Listes"
+	"enterListName": "Nom de la liste"
 }
 </locale>
 
@@ -243,8 +239,7 @@ definePage(() => ({
 	"unlike": "Tidak Suka",
 	"like": "Suka",
 	"import": "Impor",
-	"enterListName": "Masukkan nama daftar",
-	"lists": "Daftar"
+	"enterListName": "Masukkan nama daftar"
 }
 </locale>
 
@@ -254,8 +249,7 @@ definePage(() => ({
 	"unlike": "Non mi piace",
 	"like": "Mi piace!",
 	"import": "Importa",
-	"enterListName": "Nome della lista",
-	"lists": "Liste"
+	"enterListName": "Nome della lista"
 }
 </locale>
 
@@ -265,8 +259,7 @@ definePage(() => ({
 	"unlike": "いいねを解除",
 	"like": "いいね！",
 	"import": "インポート",
-	"enterListName": "リスト名を入力",
-	"lists": "リスト"
+	"enterListName": "リスト名を入力"
 }
 </locale>
 
@@ -276,8 +269,7 @@ definePage(() => ({
 	"unlike": "いいねやめる",
 	"like": "ええやん！",
 	"import": "インポート",
-	"enterListName": "リスト名を入れてや",
-	"lists": "リスト"
+	"enterListName": "リスト名を入れてや"
 }
 </locale>
 
@@ -287,8 +279,7 @@ definePage(() => ({
 	"unlike": "Unlike",
 	"like": "Like",
 	"import": "Kter",
-	"enterListName": "Isem n tebdart",
-	"lists": "Tibdarin"
+	"enterListName": "Isem n tebdart"
 }
 </locale>
 
@@ -298,8 +289,7 @@ definePage(() => ({
 	"unlike": "Unlike",
 	"like": "Like",
 	"import": "ಆಮದು",
-	"enterListName": "Enter a name for the list",
-	"lists": "Lists"
+	"enterListName": "Enter a name for the list"
 }
 </locale>
 
@@ -309,8 +299,7 @@ definePage(() => ({
 	"unlike": "좋아요 취소",
 	"like": "좋아요!",
 	"import": "가져오기",
-	"enterListName": "리스트 이름을 입력",
-	"lists": "리스트"
+	"enterListName": "리스트 이름을 입력"
 }
 </locale>
 
@@ -320,8 +309,7 @@ definePage(() => ({
 	"unlike": "Unlike",
 	"like": "Like",
 	"import": "Import",
-	"enterListName": "Voer de naam van de lijst in",
-	"lists": "Lijsten"
+	"enterListName": "Voer de naam van de lijst in"
 }
 </locale>
 
@@ -331,8 +319,7 @@ definePage(() => ({
 	"unlike": "Liker ikke",
 	"like": "Liker!",
 	"import": "Importer",
-	"enterListName": "Skriv inn et navn på listen",
-	"lists": "Lister"
+	"enterListName": "Skriv inn et navn på listen"
 }
 </locale>
 
@@ -342,8 +329,7 @@ definePage(() => ({
 	"unlike": "Usuń polubienie",
 	"like": "Polub",
 	"import": "Importuj",
-	"enterListName": "Nazwa listy",
-	"lists": "Listy"
+	"enterListName": "Nazwa listy"
 }
 </locale>
 
@@ -353,8 +339,7 @@ definePage(() => ({
 	"unlike": "Remover curtida",
 	"like": "Curtir",
 	"import": "Importar",
-	"enterListName": "Insira um nome para a lista",
-	"lists": "Listas"
+	"enterListName": "Insira um nome para a lista"
 }
 </locale>
 
@@ -364,8 +349,7 @@ definePage(() => ({
 	"unlike": "Отменить «нравится»",
 	"like": "Нравится!",
 	"import": "Импорт",
-	"enterListName": "Название списка",
-	"lists": "Списки"
+	"enterListName": "Название списка"
 }
 </locale>
 
@@ -375,8 +359,7 @@ definePage(() => ({
 	"unlike": "Unlike",
 	"like": "Páči sa mi",
 	"import": "Importovať",
-	"enterListName": "Zadajte názov zoznamu",
-	"lists": "Zoznamy"
+	"enterListName": "Zadajte názov zoznamu"
 }
 </locale>
 
@@ -386,8 +369,7 @@ definePage(() => ({
 	"unlike": "เลิกถูกใจ",
 	"like": "ถูกใจ!",
 	"import": "นำเข้า",
-	"enterListName": "ป้อนนามเรียกของรายชื่อชุดนี้",
-	"lists": "รายชื่อ"
+	"enterListName": "ป้อนนามเรียกของรายชื่อชุดนี้"
 }
 </locale>
 
@@ -397,8 +379,7 @@ definePage(() => ({
 	"unlike": "Beğenme",
 	"like": "Beğen",
 	"import": "İçeri aktar",
-	"enterListName": "Listeye bir ad girin",
-	"lists": "Listeler"
+	"enterListName": "Listeye bir ad girin"
 }
 </locale>
 
@@ -408,8 +389,7 @@ definePage(() => ({
 	"unlike": "Unlike",
 	"like": "Like",
 	"import": "Import",
-	"enterListName": "Enter a name for the list",
-	"lists": "Lists"
+	"enterListName": "Enter a name for the list"
 }
 </locale>
 
@@ -419,8 +399,7 @@ definePage(() => ({
 	"unlike": "Не вподобати",
 	"like": "Вподобати",
 	"import": "Імпорт",
-	"enterListName": "Введіть назву списку",
-	"lists": "Списки"
+	"enterListName": "Введіть назву списку"
 }
 </locale>
 
@@ -430,8 +409,7 @@ definePage(() => ({
 	"unlike": "Bỏ lượt thích",
 	"like": "Thích",
 	"import": "Nhập dữ liệu",
-	"enterListName": "Đặt tên cho danh sách",
-	"lists": "Danh sách"
+	"enterListName": "Đặt tên cho danh sách"
 }
 </locale>
 
@@ -441,8 +419,7 @@ definePage(() => ({
 	"unlike": "取消喜欢",
 	"like": "点赞！",
 	"import": "导入",
-	"enterListName": "输入列表名称",
-	"lists": "列表"
+	"enterListName": "输入列表名称"
 }
 </locale>
 
@@ -452,7 +429,6 @@ definePage(() => ({
 	"unlike": "收回讚",
 	"like": "讚",
 	"import": "匯入",
-	"enterListName": "輸入清單名稱",
-	"lists": "清單"
+	"enterListName": "輸入清單名稱"
 }
 </locale>

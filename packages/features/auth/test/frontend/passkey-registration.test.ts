@@ -4,19 +4,22 @@
  */
 
 import { afterEach, beforeAll, beforeEach, describe, expect, test, vi } from 'vitest';
-import { createApp, defineComponent, h } from 'vue';
+import { createApp, defineComponent, h, nextTick } from 'vue';
 import { createInternationalization } from 'virtual:vite-vue-internationalization';
 import { startRegistration } from '@simplewebauthn/browser';
 import type { RegistrationResponseJSON } from '@simplewebauthn/browser';
 import Settings from '../../frontend/pages/settings/2fa.vue';
-import * as os from '@features/ui/frontend/os.js';
+import { ensureSudo } from '../../frontend/utility/ensure-sudo.js';
+import { ownedInputText } from '../../frontend/utility/owned-dialog.js';
+import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 
-const account = vi.hoisted(() => ({ twoFactorEnabled: true, securityKeysList: [], usePasswordLessLogin: false }));
-vi.mock('@features/auth/frontend/i.js', () => ({ ensureSignin: () => account }));
-vi.mock('@features/auth/frontend/accounts.js', () => ({ updateCurrentAccountPartial: vi.fn() }));
-vi.mock('@simplewebauthn/browser', () => ({ browserSupportsWebAuthn: () => true, startRegistration: vi.fn() }));
-vi.mock('@features/ui/frontend/os.js', () => ({ authenticateDialog: vi.fn(), apiWithDialog: vi.fn(), inputText: vi.fn(), promiseDialog: vi.fn() }));
-vi.mock('@features/ui/frontend/components/MkButton.vue', () => ({ default: defineComponent({ setup: (_, { slots }) => () => h('button', slots.default?.()) }) }));
+vi.mock('@features/auth/frontend/i.js', () => ({ ensureSignin: () => ({ id: 'synthetic-owner', token: 'bs_synthetic' }) }));
+vi.mock('@features/auth/frontend/utility/ensure-sudo.js', () => ({ ensureSudo: vi.fn() }));
+vi.mock('@features/auth/frontend/utility/owned-dialog.js', () => ({ ownedInputText: vi.fn() }));
+vi.mock('@features/api/frontend/utility/misskey-api.js', () => ({ misskeyApi: vi.fn() }));
+vi.mock('@simplewebauthn/browser', () => ({ browserSupportsWebAuthn: () => true, startRegistration: vi.fn(), WebAuthnAbortService: { cancelCeremony: vi.fn() } }));
+vi.mock('@features/ui/frontend/os.js', () => ({ popup: vi.fn(), inputText: vi.fn(), confirm: vi.fn() }));
+vi.mock('@features/ui/frontend/components/MkButton.vue', () => ({ default: defineComponent({ props: ['disabled'], setup: (props, { slots }) => () => h('button', { disabled: props.disabled }, slots.default?.()) }) }));
 vi.mock('@features/ui/frontend/components/MkInfo.vue', () => ({ default: defineComponent({ setup: (_, { slots }) => () => h('div', slots.default?.()) }) }));
 vi.mock('@features/ui/frontend/components/MkSwitch.vue', () => ({ default: defineComponent({ render: () => null }) }));
 vi.mock('@features/ui/frontend/components/MkFolder.vue', () => ({ default: defineComponent({ setup: (_, { slots }) => () => h('section', [slots.label?.(), slots.default?.()]) }) }));
@@ -33,27 +36,30 @@ const credential: RegistrationResponseJSON = {
 	response: { clientDataJSON: 'synthetic-client-data', attestationObject: 'synthetic-attestation' },
 	clientExtensionResults: {},
 };
+const state = { totpEnabled: true, passkeyMfaEnabled: false, passkeyCount: 0, passwordlessEnabled: false, passwordLoginDisabled: false, hasVerifiedRecoveryEmail: true, recoveryCodesRemaining: 5 };
 const internationalization = createInternationalization({ initialLocale: 'en-US' });
 let app: ReturnType<typeof createApp>;
 let element: HTMLDivElement;
 const errors: unknown[] = [];
-let expectedError: unknown;
+const calls = (route: string) => vi.mocked(misskeyApi).mock.calls.filter(([name]) => name === route);
 
 beforeAll(async () => {
 	await internationalization.ready;
 	await internationalization.loadLocale('en-US');
 });
-beforeEach(() => {
+beforeEach(async () => {
 	vi.resetAllMocks();
 	errors.length = 0;
-	expectedError = undefined;
-	vi.mocked(os.authenticateDialog)
-		.mockResolvedValueOnce({ canceled: false, result: { password: 'synthetic-current', token: '111111' } })
-		.mockResolvedValue({ canceled: false, result: { password: 'synthetic-current', token: '222222' } });
-	vi.mocked(os.apiWithDialog).mockResolvedValueOnce(options as never).mockResolvedValue({ id: credential.id, name: 'Synthetic key' } as never);
-	vi.mocked(os.inputText).mockResolvedValue({ canceled: false, result: 'Synthetic key' });
+	vi.mocked(ensureSudo).mockResolvedValue(true);
+	vi.mocked(ownedInputText).mockResolvedValue({ canceled: false, result: 'Synthetic key' });
 	vi.mocked(startRegistration).mockResolvedValue(credential);
-	vi.mocked(os.promiseDialog).mockImplementation(promise => promise);
+	vi.mocked(misskeyApi).mockImplementation(async route => {
+		if (route === 'i/security/state') return state as never;
+		if (route === 'i/security/keys/list') return [] as never;
+		if (route === 'i/security/passkey/register/start') return { ticket: 'synthetic-ticket', options } as never;
+		if (route === 'i/security/passkey/register/complete') return { id: credential.id, name: 'Synthetic key', backupCodes: [] } as never;
+		throw new Error(`Unexpected API route: ${route}`);
+	});
 	element = window.document.createElement('div');
 	app = createApp(Settings);
 	app.config.errorHandler = error => { errors.push(error); };
@@ -61,103 +67,80 @@ beforeEach(() => {
 	const slot = defineComponent({ inheritAttrs: false, setup: (_, { slots }) => () => h('div', slots.default?.()) });
 	for (const name of ['SearchMarker', 'SearchLabel', 'SearchText', 'I18n', 'MkTime']) app.component(name, slot);
 	app.mount(element);
+	await vi.waitFor(() => expect(registerButton()).toBeDefined());
 });
 afterEach(() => {
-	expect(errors).toEqual(expectedError === undefined ? [] : [expectedError]);
+	expect(errors).toEqual([]);
 	vi.useRealTimers();
 	app.unmount();
 	element.remove();
 });
 
-function start() {
-	const button = [...element.querySelectorAll('button')].find(button => button.textContent === 'Register a security or pass key');
-	expect(button).toBeDefined();
-	button!.click();
+function registerButton() {
+	return [...element.querySelectorAll('button')].find(button => button.textContent === 'Register a security or pass key');
 }
 
-async function settle() {
-	for (let i = 0; i < 15; i++) await Promise.resolve();
+function start() { registerButton()!.click(); }
+
+async function settled() {
+	await nextTick();
+	await vi.waitFor(() => expect(registerButton()!.disabled).toBe(false));
 }
 
-function expectCompletion(token = '222222') {
-	expect(os.apiWithDialog).toHaveBeenNthCalledWith(2, 'i/2fa/passkey/done', {
-		password: 'synthetic-current', token, name: 'Synthetic key', credential,
-	});
+function expectCompletion(ticket = 'synthetic-ticket') {
+	expect(calls('i/security/passkey/register/complete')).toEqual([['i/security/passkey/register/complete', { ticket, credential }]]);
 }
 
-describe('passkey registration', () => {
-	test('collects the password first and reuses it in the final MFA-only dialog', async () => {
+describe('passkey registration through session sudo', () => {
+	test('reauthenticates before naming and binds completion to the issued ticket', async () => {
 		start();
-		await vi.waitFor(() => expect(os.apiWithDialog).toHaveBeenCalledTimes(2));
-		expect(os.authenticateDialog).toHaveBeenNthCalledWith(1);
-		expect(os.authenticateDialog).toHaveBeenNthCalledWith(2, { currentPassword: 'synthetic-current' });
-		expect(os.apiWithDialog).toHaveBeenNthCalledWith(1, 'i/2fa/passkey/register', { password: 'synthetic-current', token: '111111' });
+		await vi.waitFor(() => expect(calls('i/security/passkey/register/complete')).toHaveLength(1));
+		expect(ensureSudo).toHaveBeenCalledOnce();
+		expect(vi.mocked(ensureSudo).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(ownedInputText).mock.invocationCallOrder[0]);
+		expect(calls('i/security/passkey/register/start')).toEqual([['i/security/passkey/register/start', { name: 'Synthetic key' }]]);
 		expect(startRegistration).toHaveBeenCalledWith({ optionsJSON: options });
 		expectCompletion();
 	});
-	test('requests a fresh final token only after a two-minute browser operation', async () => {
+	test('a two-minute browser ceremony completes with its ticket without replaying a password or MFA code', async () => {
 		vi.useFakeTimers();
-		const startedAt = Date.now();
 		let finish!: (value: RegistrationResponseJSON) => void;
 		vi.mocked(startRegistration).mockReturnValue(new Promise(resolve => { finish = resolve; }));
-		let finalRequestedAt: number | null = null;
-		vi.mocked(os.authenticateDialog).mockReset()
-			.mockResolvedValueOnce({ canceled: false, result: { password: 'synthetic-current', token: '111111' } })
-			.mockImplementation(async () => {
-				finalRequestedAt = Date.now();
-				return { canceled: false, result: { password: 'synthetic-current', token: '222222' } };
-			});
 		start();
 		await vi.advanceTimersByTimeAsync(0);
 		expect(startRegistration).toHaveBeenCalledOnce();
 		await vi.advanceTimersByTimeAsync(120000);
-		expect(os.authenticateDialog).toHaveBeenCalledOnce();
-		expect(os.apiWithDialog).toHaveBeenCalledOnce();
+		expect(ensureSudo).toHaveBeenCalledOnce();
+		expect(calls('i/security/passkey/register/complete')).toHaveLength(0);
 		finish(credential);
 		await vi.advanceTimersByTimeAsync(0);
-		expect(finalRequestedAt).toBe(startedAt + 120000);
-		expect(os.authenticateDialog).toHaveBeenNthCalledWith(2, { currentPassword: 'synthetic-current' });
+		expectCompletion();
+		expect(ensureSudo).toHaveBeenCalledOnce();
+	});
+	test.each(['sudo', 'name', 'browser'] as const)('%s cancellation does not complete registration and allows retry', async stage => {
+		if (stage === 'sudo') vi.mocked(ensureSudo).mockResolvedValueOnce(false);
+		if (stage === 'name') vi.mocked(ownedInputText).mockResolvedValueOnce({ canceled: true, result: undefined });
+		if (stage === 'browser') vi.mocked(startRegistration).mockRejectedValueOnce(new DOMException('Synthetic cancellation', 'NotAllowedError'));
+		start();
+		await settled();
+		expect(calls('i/security/passkey/register/complete')).toHaveLength(0);
+		if (stage === 'sudo') expect(ownedInputText).not.toHaveBeenCalled();
+		if (stage !== 'browser') {
+			expect(calls('i/security/passkey/register/start')).toHaveLength(0);
+			expect(startRegistration).not.toHaveBeenCalled();
+		}
+		start();
+		await vi.waitFor(() => expect(calls('i/security/passkey/register/complete')).toHaveLength(1));
 		expectCompletion();
 	});
-	test('uses a different backup code for completion instead of replaying the first', async () => {
-		vi.mocked(os.authenticateDialog).mockReset()
-			.mockResolvedValueOnce({ canceled: false, result: { password: 'synthetic-current', token: 'A'.repeat(32) } })
-			.mockResolvedValueOnce({ canceled: false, result: { password: 'synthetic-current', token: 'B'.repeat(32) } });
+	test('a rejected or expired ticket is not silently retried', async () => {
+		vi.mocked(misskeyApi).mockImplementation(async route => {
+			if (route === 'i/security/passkey/register/start') return { ticket: 'expired-ticket', options } as never;
+			throw new Error('Synthetic expired ticket');
+		});
 		start();
-		await vi.waitFor(() => expect(os.apiWithDialog).toHaveBeenCalledTimes(2));
-		expectCompletion('B'.repeat(32));
-	});
-	test('initial cancellation does not issue a challenge or access the authenticator', async () => {
-		vi.mocked(os.authenticateDialog).mockReset().mockResolvedValue({ canceled: true, result: undefined });
-		start();
-		await settle();
-		expect(os.apiWithDialog).not.toHaveBeenCalled();
-		expect(os.inputText).not.toHaveBeenCalled();
-		expect(startRegistration).not.toHaveBeenCalled();
-	});
-	test('name cancellation does not access the authenticator or complete registration', async () => {
-		vi.mocked(os.inputText).mockResolvedValue({ canceled: true, result: undefined });
-		start();
-		await settle();
-		expect(os.apiWithDialog).toHaveBeenCalledOnce();
-		expect(startRegistration).not.toHaveBeenCalled();
-		expect(os.authenticateDialog).toHaveBeenCalledOnce();
-	});
-	test('browser cancellation does not request final MFA or complete registration', async () => {
-		expectedError = new DOMException('Synthetic cancellation', 'NotAllowedError');
-		vi.mocked(startRegistration).mockRejectedValue(expectedError);
-		start();
-		await settle();
-		expect(os.apiWithDialog).toHaveBeenCalledOnce();
-		expect(os.authenticateDialog).toHaveBeenCalledOnce();
-	});
-	test('final MFA cancellation does not complete registration', async () => {
-		vi.mocked(os.authenticateDialog).mockReset()
-			.mockResolvedValueOnce({ canceled: false, result: { password: 'synthetic-current', token: '111111' } })
-			.mockResolvedValueOnce({ canceled: true, result: undefined });
-		start();
-		await settle();
-		expect(os.authenticateDialog).toHaveBeenCalledTimes(2);
-		expect(os.apiWithDialog).toHaveBeenCalledOnce();
+		await settled();
+		expectCompletion('expired-ticket');
+		expect(element.querySelector('[role=alert]')).not.toBeNull();
+		expect(ensureSudo).toHaveBeenCalledOnce();
 	});
 });

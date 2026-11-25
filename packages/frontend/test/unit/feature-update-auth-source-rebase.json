@@ -1,0 +1,15 @@
+[
+  {
+    "file": "packages/features/auth/frontend/ts-messages.vue",
+    "currentSha256": "677cba90d89ee1e418d1ed6c56287bb156f8aa8cfcb0d75a010a4511b8f25fe8",
+    "baselineSha256": "871c21f7fba8e4256937958040181f4feca7b00ba581dd8c2a5ef1825d2f9f6e",
+    "edits": [
+      {
+        "start": 7677,
+        "end": 7803,
+        "current": "\t\"tokenRevoked\": \"ログインが無効にされました\",\n\t\"tokenRevokedDescription\": \"このログインは失効しました。このアカウントを端末からサインアウトします。ほかの保存済みアカウントは引き続き利用できます。\",\n",
+        "baseline": "\t\"tokenRevoked\": \"トークンが無効です\",\n\t\"tokenRevokedDescription\": \"ログイントークンが失効しています。ログインし直してください。\",\n"
+      }
+    ]
+  }
+]

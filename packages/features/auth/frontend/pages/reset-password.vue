@@ -12,19 +12,24 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label>{{ $locale.sfc.newPassword }}</template>
 			</MkInput>
 
-			<MkButton primary @click="save">{{ $locale.sfc.save }}</MkButton>
+			<p>{{ $locale.sfc.resetSessionsWarning }}</p>
+			<MkButton primary @click="save">{{ globalLocale.env.save }}</MkButton>
 		</div>
 	</div>
 </PageWithHeader>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { defineAsyncComponent, onMounted, ref, computed } from 'vue';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { definePage } from '@features/navigation/frontend/page.js';
 import { mainRouter } from '@features/navigation/frontend/router.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	token?: string;
@@ -63,7 +68,6 @@ definePage(() => ({
 <locale locale="ar-SA" lang="json">
 {
 	"newPassword": "كلمة المرور الجديدة",
-	"save": "حفظ",
 	"resetPassword": "أعد تعيين كلمتك السرية"
 }
 </locale>
@@ -71,7 +75,6 @@ definePage(() => ({
 <locale locale="ca-ES" lang="json">
 {
 	"newPassword": "Contrasenya nova",
-	"save": "Desa",
 	"resetPassword": "Restableix la contrasenya"
 }
 </locale>
@@ -79,7 +82,6 @@ definePage(() => ({
 <locale locale="cs-CZ" lang="json">
 {
 	"newPassword": "Nové heslo",
-	"save": "Uložit",
 	"resetPassword": "Resetovat heslo"
 }
 </locale>
@@ -87,7 +89,6 @@ definePage(() => ({
 <locale locale="da-DK" lang="json">
 {
 	"newPassword": "New password",
-	"save": "Save",
 	"resetPassword": "Reset password"
 }
 </locale>
@@ -95,7 +96,6 @@ definePage(() => ({
 <locale locale="de-DE" lang="json">
 {
 	"newPassword": "Neues Passwort",
-	"save": "Speichern",
 	"resetPassword": "Passwort zurücksetzen"
 }
 </locale>
@@ -103,7 +103,6 @@ definePage(() => ({
 <locale locale="en-US" lang="json">
 {
 	"newPassword": "New password",
-	"save": "Save",
 	"resetPassword": "Reset password"
 }
 </locale>
@@ -111,7 +110,6 @@ definePage(() => ({
 <locale locale="es-ES" lang="json">
 {
 	"newPassword": "Contraseña nueva",
-	"save": "Guardar",
 	"resetPassword": "Resetear contraseña"
 }
 </locale>
@@ -119,7 +117,6 @@ definePage(() => ({
 <locale locale="fr-FR" lang="json">
 {
 	"newPassword": "Nouveau mot de passe",
-	"save": "Enregistrer",
 	"resetPassword": "Réinitialiser le mot de passe"
 }
 </locale>
@@ -127,7 +124,6 @@ definePage(() => ({
 <locale locale="id-ID" lang="json">
 {
 	"newPassword": "Kata sandi baru",
-	"save": "Simpan",
 	"resetPassword": "Atur ulang kata sandi"
 }
 </locale>
@@ -135,7 +131,6 @@ definePage(() => ({
 <locale locale="it-IT" lang="json">
 {
 	"newPassword": "Nuova Password",
-	"save": "Salva",
 	"resetPassword": "Ripristina la password"
 }
 </locale>
@@ -143,15 +138,14 @@ definePage(() => ({
 <locale locale="ja-JP" lang="json">
 {
 	"newPassword": "新しいパスワード",
-	"save": "保存",
-	"resetPassword": "パスワードをリセット"
+	"resetPassword": "パスワードをリセット",
+	"resetSessionsWarning": "パスワードを再設定すると、すべての端末のログインが無効になります。"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
 	"newPassword": "今度のパスワード",
-	"save": "とっとく",
 	"resetPassword": "パスワードをリセット"
 }
 </locale>
@@ -159,7 +153,6 @@ definePage(() => ({
 <locale locale="kab-KAB" lang="json">
 {
 	"newPassword": "New password",
-	"save": "Sekles",
 	"resetPassword": "Reset password"
 }
 </locale>
@@ -167,7 +160,6 @@ definePage(() => ({
 <locale locale="kn-IN" lang="json">
 {
 	"newPassword": "New password",
-	"save": "ಉಳಿಸಿ",
 	"resetPassword": "Reset password"
 }
 </locale>
@@ -175,7 +167,6 @@ definePage(() => ({
 <locale locale="ko-KR" lang="json">
 {
 	"newPassword": "새 비밀번호",
-	"save": "저장",
 	"resetPassword": "비밀번호 재설정"
 }
 </locale>
@@ -183,7 +174,6 @@ definePage(() => ({
 <locale locale="nl-NL" lang="json">
 {
 	"newPassword": "Nieuwe wachtwoord",
-	"save": "Opslaan",
 	"resetPassword": "Wachtwoord terugzetten"
 }
 </locale>
@@ -191,7 +181,6 @@ definePage(() => ({
 <locale locale="no-NO" lang="json">
 {
 	"newPassword": "Nytt passord",
-	"save": "Lagre",
 	"resetPassword": "Reset password"
 }
 </locale>
@@ -199,7 +188,6 @@ definePage(() => ({
 <locale locale="pl-PL" lang="json">
 {
 	"newPassword": "Nowe hasło",
-	"save": "Zapisz",
 	"resetPassword": "Zresetuj hasło"
 }
 </locale>
@@ -207,7 +195,6 @@ definePage(() => ({
 <locale locale="pt-PT" lang="json">
 {
 	"newPassword": "Nova senha",
-	"save": "Salvar",
 	"resetPassword": "Redefinir senha"
 }
 </locale>
@@ -215,7 +202,6 @@ definePage(() => ({
 <locale locale="ru-RU" lang="json">
 {
 	"newPassword": "Новый пароль",
-	"save": "Сохранить",
 	"resetPassword": "Сброс пароля:"
 }
 </locale>
@@ -223,7 +209,6 @@ definePage(() => ({
 <locale locale="sk-SK" lang="json">
 {
 	"newPassword": "Nové heslo",
-	"save": "Uložiť",
 	"resetPassword": "Resetovať heslo"
 }
 </locale>
@@ -231,7 +216,6 @@ definePage(() => ({
 <locale locale="th-TH" lang="json">
 {
 	"newPassword": "รหัสผ่านใหม่",
-	"save": "บันทึก",
 	"resetPassword": "รีเซ็ตรหัสผ่าน"
 }
 </locale>
@@ -239,7 +223,6 @@ definePage(() => ({
 <locale locale="tr-TR" lang="json">
 {
 	"newPassword": "Yeni şifre",
-	"save": "Kaydet",
 	"resetPassword": "Şifreyi sıfırla"
 }
 </locale>
@@ -247,7 +230,6 @@ definePage(() => ({
 <locale locale="ug-CN" lang="json">
 {
 	"newPassword": "New password",
-	"save": "Save",
 	"resetPassword": "Reset password"
 }
 </locale>
@@ -255,7 +237,6 @@ definePage(() => ({
 <locale locale="uk-UA" lang="json">
 {
 	"newPassword": "Новий пароль",
-	"save": "Зберегти",
 	"resetPassword": "Скинути пароль"
 }
 </locale>
@@ -263,7 +244,6 @@ definePage(() => ({
 <locale locale="vi-VN" lang="json">
 {
 	"newPassword": "Mật khẩu mới",
-	"save": "Lưu",
 	"resetPassword": "Đặt lại mật khẩu"
 }
 </locale>
@@ -271,7 +251,6 @@ definePage(() => ({
 <locale locale="zh-CN" lang="json">
 {
 	"newPassword": "新密码",
-	"save": "保存",
 	"resetPassword": "重置密码"
 }
 </locale>
@@ -279,7 +258,6 @@ definePage(() => ({
 <locale locale="zh-TW" lang="json">
 {
 	"newPassword": "新密碼",
-	"save": "儲存",
 	"resetPassword": "重設密碼"
 }
 </locale>

@@ -7,7 +7,6 @@ import { Inject, Injectable, Scope } from '@nestjs/common';
 import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { bindThis } from '@features/runtime/backend/decorators.js';
 import { NoteStreamingHidingService } from '@features/api/backend/transport/stream/NoteStreamingHidingService.js';
-import { isRenotePacked, isQuotePacked } from '@features/notes/backend/utility/is-renote.js';
 import { DI } from '@/di-symbols.js';
 import type { RolesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { GlobalEvents } from '@features/runtime/backend/services/GlobalEventService.js';
@@ -72,16 +71,7 @@ export class RoleTimelineChannel extends Channel {
 			if (!filtered) return;
 			note = filtered;
 
-			if (this.user) {
-				if (isRenotePacked(note) && !isQuotePacked(note)) {
-					if (note.renote && Object.keys(note.renote.reactions).length > 0) {
-						const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
-						note.renote.myReaction = myRenoteReaction;
-					}
-				}
-			}
-
-			this.send('note', note);
+			this.send('note', await this.noteEntityService.withMyRenoteReaction(note, this.user?.id ?? null));
 		} else {
 			this.send(data.type, data.body);
 		}

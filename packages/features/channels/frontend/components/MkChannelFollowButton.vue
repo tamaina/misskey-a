@@ -15,19 +15,23 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<span v-if="full" :class="$style.text">{{ $locale.sfc.unfollow }}</span><i class="ti ti-minus"></i>
 		</template>
 		<template v-else>
-			<span v-if="full" :class="$style.text">{{ $locale.sfc.follow }}</span><i class="ti ti-plus"></i>
+			<span v-if="full" :class="$style.text">{{ globalLocale.env.follow }}</span><i class="ti ti-plus"></i>
 		</template>
 	</template>
 	<template v-else>
-		<span v-if="full" :class="$style.text">{{ $locale.sfc.processing }}</span><MkLoading :em="true"/>
+		<span v-if="full" :class="$style.text">{{ globalLocale.env.processing }}</span><MkLoading :em="true"/>
 	</template>
 </button>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	channel: Misskey.entities.Channel;
@@ -125,224 +129,168 @@ async function onClick() {
 
 <locale locale="ar-SA" lang="json">
 {
-  "unfollow": "إلغاء الاشتراك",
-  "follow": "تابِع",
-  "processing": "المعالجة جارية"
+  "unfollow": "إلغاء الاشتراك"
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
-  "unfollow": "Deixar de seguir",
-  "follow": "Segueix",
-  "processing": "S'està processant..."
+  "unfollow": "Deixar de seguir"
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
-  "unfollow": "Přestat sledovat",
-  "follow": "Sledovaní",
-  "processing": "Zpracovávám"
+  "unfollow": "Přestat sledovat"
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
-  "unfollow": "Unfollow",
-  "follow": "Follow",
-  "processing": "Processing..."
+  "unfollow": "Unfollow"
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
-  "unfollow": "Entfolgen",
-  "follow": "Folgen",
-  "processing": "In Bearbeitung …"
+  "unfollow": "Entfolgen"
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
-  "unfollow": "Unfollow",
-  "follow": "Follow",
-  "processing": "Processing..."
+  "unfollow": "Unfollow"
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
-  "unfollow": "Dejar de seguir",
-  "follow": "Seguir",
-  "processing": "Procesando..."
+  "unfollow": "Dejar de seguir"
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
-  "unfollow": "Se désabonner",
-  "follow": "S’abonner",
-  "processing": "Traitement en cours"
+  "unfollow": "Se désabonner"
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
-  "unfollow": "Berhenti mengikuti",
-  "follow": "Ikuti",
-  "processing": "Memproses"
+  "unfollow": "Berhenti mengikuti"
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
-  "unfollow": "Togli Following",
-  "follow": "Segui",
-  "processing": "In elaborazione"
+  "unfollow": "Togli Following"
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
-  "unfollow": "フォロー解除",
-  "follow": "フォロー",
-  "processing": "処理中"
+  "unfollow": "フォロー解除"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
-  "unfollow": "フォローやめる",
-  "follow": "フォロー",
-  "processing": "処理しとる"
+  "unfollow": "フォローやめる"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
-  "unfollow": "Unfollow",
-  "follow": "Ḍfeṛ",
-  "processing": "Processing..."
+  "unfollow": "Unfollow"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
-  "unfollow": "Unfollow",
-  "follow": "Follow",
-  "processing": "Processing..."
+  "unfollow": "Unfollow"
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
-  "unfollow": "팔로우 해제",
-  "follow": "팔로우",
-  "processing": "처리중"
+  "unfollow": "팔로우 해제"
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
-  "unfollow": "Ontvolgen",
-  "follow": "Volgen",
-  "processing": "Bezig met verwerken"
+  "unfollow": "Ontvolgen"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
-  "unfollow": "Avfølg",
-  "follow": "Følg",
-  "processing": "Processing..."
+  "unfollow": "Avfølg"
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
-  "unfollow": "Przestań obserwować",
-  "follow": "Obserwuj",
-  "processing": "Przetwarzanie"
+  "unfollow": "Przestań obserwować"
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
-  "unfollow": "Deixar de seguir",
-  "follow": "Seguir",
-  "processing": "Em Progresso"
+  "unfollow": "Deixar de seguir"
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
-  "unfollow": "Отписаться",
-  "follow": "Подписка",
-  "processing": "Обработка"
+  "unfollow": "Отписаться"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
-  "unfollow": "Nesledovať",
-  "follow": "Sledovať",
-  "processing": "Pracujem..."
+  "unfollow": "Nesledovať"
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
-  "unfollow": "เลิกติดตาม",
-  "follow": "ติดตาม",
-  "processing": "กำลังประมวลผล..."
+  "unfollow": "เลิกติดตาม"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
-  "unfollow": "Takibi bırak",
-  "follow": "Takip et",
-  "processing": "İşleniyor..."
+  "unfollow": "Takibi bırak"
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
-  "unfollow": "Unfollow",
-  "follow": "Follow",
-  "processing": "Processing..."
+  "unfollow": "Unfollow"
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
-  "unfollow": "Відписатись",
-  "follow": "Підписатись",
-  "processing": "Обробка"
+  "unfollow": "Відписатись"
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
-  "unfollow": "Ngưng theo dõi",
-  "follow": "Theo dõi",
-  "processing": "Đang xử lý"
+  "unfollow": "Ngưng theo dõi"
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
-  "unfollow": "取消关注",
-  "follow": "关注",
-  "processing": "正在处理"
+  "unfollow": "取消关注"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
-  "unfollow": "取消追隨",
-  "follow": "追隨",
-  "processing": "處理中"
+  "unfollow": "取消追隨"
 }
 </locale>

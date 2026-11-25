@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { accessTokenExpired } from '../../../access-token-expiry.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import type { AppsRepository, AccessTokensRepository, AuthSessionsRepository } from '@features/persistence/backend/repositories/models.js';
 import { UserEntityService } from '@features/users/backend/serializers/UserEntityService.js';
@@ -71,6 +72,8 @@ export function createAuthSessionUserkeyProcedure(deps: AuthSessionUserkeyDepend
 				appId: app.id,
 				userId: session.userId,
 			});
+
+			if (accessTokenExpired(accessToken)) throw apiError(meta.errors.pendingSession);
 
 			// Delete session
 			deps.authSessionsRepository.delete(session.id);

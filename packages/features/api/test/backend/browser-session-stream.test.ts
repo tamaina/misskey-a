@@ -320,3 +320,14 @@ it('acknowledges same-ID reconnect only after ordered channel initialization and
 	expect(client.listenerCount('connected')).toBe(0);
 	f.connection.dispose();
 });
+
+it.each(['socket', 'native'] as const)('an idle %s connection closes at delegated token expiry', async outputKind => {
+	vi.useFakeTimers(); vi.setSystemTime(1000);
+	const f = fixture(); f.connection.token = { expiresAt: new Date(1100) } as never; const output = { isOpen: () => true, send: vi.fn(), failed: vi.fn() };
+	try {
+		if (outputKind === 'socket') await f.attach(); else f.connection.attachNativeOutput(f.events, output, { channels: ['main'], broadcast: true });
+		await vi.advanceTimersByTimeAsync(100); f.connection.sendMessageToWs('synthetic', {});
+		if (outputKind === 'socket') expect(f.socket.close).toHaveBeenCalledWith(1008, 'Access token expired'); else expect(output.failed).toHaveBeenCalledOnce();
+		expect(f.socket.send).not.toHaveBeenCalled(); expect(output.send).not.toHaveBeenCalled(); expect(f.events.eventNames()).toEqual([]);
+	} finally { f.connection.dispose(); vi.useRealTimers(); }
+});

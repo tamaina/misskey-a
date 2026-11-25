@@ -9,7 +9,7 @@ import bcrypt from 'bcryptjs';
 import type { EntityManager } from 'typeorm';
 import { expect, test } from 'vitest';
 import { mockDeep } from 'vitest-mock-extended';
-import type { MiUserProfile } from '../../../persistence/backend/repositories/models.js';
+import { MiUserProfile } from '../../../persistence/backend/repositories/models.js';
 import { MiUser, MiBrowserSession } from '../../../persistence/backend/repositories/models.js';
 import type { MiLocalUser } from '../../../users/backend/models/User.js';
 import { createIRegenerateTokenProcedure } from '../../backend/endpoints/i/regenerate-token.js';
@@ -18,13 +18,16 @@ import { testContext } from './native-context.js';
 
 function fixture() {
 	const deps = mockDeep<IRegenerateTokenDependencies>();
-	const user = mockDeep<MiLocalUser>({ id: 'alice', token: 'old-master', isSuspended: false, movedToUri: null });
+	const user = mockDeep<MiLocalUser>({ id: 'alice', host: null, isDeleted: false, token: 'old-master', isSuspended: false, movedToUri: null });
 	deps.usersRepository.findOneByOrFail.mockResolvedValue(user);
-	deps.userProfilesRepository.findOneByOrFail.mockResolvedValue(mockDeep<MiUserProfile>({ userId: 'alice', password: bcrypt.hashSync('synthetic-password', 4), twoFactorEnabled: true }));
+	deps.userProfilesRepository.findOneByOrFail.mockResolvedValue(mockDeep<MiUserProfile>({ userId: 'alice', password: bcrypt.hashSync('synthetic-password', 4), twoFactorEnabled: true, twoFactorSecret: 'synthetic-secret', passkeyMfaEnabled: false }));
+	deps.usersRepository.findOne.mockResolvedValue(user);
+	deps.userProfilesRepository.findOneOrFail.mockImplementation(async () => await deps.userProfilesRepository.findOneByOrFail({ userId: user.id }));
 	const manager = mockDeep<EntityManager>();
-	const browserRows = mockDeep<NonNullable<Parameters<IRegenerateTokenDependencies['browserSessionService']['revokeAllOwned']>[1]>>();
+	const browserRows = mockDeep<ReturnType<EntityManager['getRepository']>>();
 	manager.getRepository.mockImplementation(entity => {
 		if (entity === MiUser) return deps.usersRepository as unknown as ReturnType<EntityManager['getRepository']>;
+		if (entity === MiUserProfile) return deps.userProfilesRepository as unknown as ReturnType<EntityManager['getRepository']>;
 		if (entity === MiBrowserSession) return browserRows as unknown as ReturnType<EntityManager['getRepository']>;
 		throw new Error('unsupported synthetic repository');
 	});
@@ -36,8 +39,9 @@ function fixture() {
 		committed = true;
 		return result;
 	});
-	const invoke = (token?: string) => call(createIRegenerateTokenProcedure(deps), { password: 'synthetic-password', ...(token === undefined ? {} : { token }) }, { context: testContext(user) });
-	return { deps, manager, browserRows, user, invoke, committed: () => committed };
+	const context = testContext(user); context.credential = user.token;
+	const invoke = (token?: string) => call(createIRegenerateTokenProcedure(deps), { password: 'synthetic-password', ...(token === undefined ? {} : { token }) }, { context });
+	return { deps, manager, browserRows, user, context, invoke, committed: () => committed };
 }
 
 test('missing fresh MFA never rotates either credential class', async () => {
@@ -67,4 +71,13 @@ test('browser invalidation failure aborts the transaction and never publishes su
 	expect(h.committed()).toBe(false);
 	expect(h.deps.globalEventService.publishInternalEvent).not.toHaveBeenCalled();
 	expect(h.deps.globalEventService.publishMainStream).not.toHaveBeenCalled();
+});
+
+test.each(['native-token', 'policy', 'session'] as const)('stale legacy %s proof cannot mutate or publish', async kind => {
+	const h = fixture();
+	if (kind === 'native-token') h.deps.usersRepository.findOne.mockResolvedValue({ ...h.user, token: 'replaced-token' });
+	if (kind === 'policy') { const profile = await h.deps.userProfilesRepository.findOneByOrFail({ userId: h.user.id }); h.deps.userProfilesRepository.findOneOrFail.mockResolvedValue({ ...profile, passkeyMfaEnabled: true }); }
+	if (kind === 'session') { h.context.services.authenticate = async () => [h.user, null, { id: 'revoked', userId: h.user.id }]; h.browserRows.findOne.mockResolvedValue(null); }
+	await expect(h.invoke('synthetic-fresh-code')).rejects.toThrow('authentication failed');
+	expect(h.deps.usersRepository.update).not.toHaveBeenCalled(); expect(h.deps.browserSessionService.revokeAllOwned).not.toHaveBeenCalled(); expect(h.deps.globalEventService.publishInternalEvent).not.toHaveBeenCalled();
 });

@@ -50,7 +50,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			</MkPagination>
 		</div>
 		<div v-else-if="tab === 'owned'" class="_gaps">
-			<MkButton v-if="$i?.policies.canCreateChannel" type="routerLink" primary rounded to="/channels/new"><i class="ti ti-plus"></i> {{ $locale.sfc.createNew }}</MkButton>
+			<MkButton v-if="$i?.policies.canCreateChannel" type="routerLink" primary rounded to="/channels/new"><i class="ti ti-plus"></i> {{ globalLocale.env.createNew }}</MkButton>
 			<MkPagination v-slot="{items}" :paginator="ownedPaginator">
 				<div :class="$style.root">
 					<MkChannelPreview v-for="channel in items" :key="channel.id" :channel="channel"/>
@@ -63,7 +63,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { Locale } from 'i18n';
 import { computed, markRaw, onMounted, ref, shallowRef } from 'vue';
 import MkChannelPreview from '@features/channels/frontend/components/MkChannelPreview.vue';
 import MkChannelList from '@features/channels/frontend/components/MkChannelList.vue';
@@ -76,6 +75,7 @@ import { definePage } from '@features/navigation/frontend/page.js';
 import { useRouter } from '@features/navigation/frontend/router.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
 import { $i } from '@features/auth/frontend/i.js';
+import type { Locale } from 'i18n';
 
 const globalLocale = useLocale<Locale>(import.meta.url);
 
@@ -162,7 +162,7 @@ const headerTabs = computed(() => [{
 }]);
 
 definePage(() => ({
-	title: $locale.value.sfc.channel,
+	title: globalLocale.value.env.channel,
 	icon: 'ti ti-device-tv',
 }));
 </script>
@@ -186,11 +186,9 @@ definePage(() => ({
 	"featured": "المتداوَلة",
 	"following": "متابَع",
 	"owned": "قنواتي",
-	"channel": "القنوات",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "نتائج البحث",
-	"createNew": "أنشِئ جديد"
+	"searchResult": "نتائج البحث"
 }
 </locale>
 
@@ -199,11 +197,9 @@ definePage(() => ({
 	"featured": "Popular",
 	"following": "Seguin",
 	"owned": "Propietat",
-	"channel": "Canals",
 	"nameAndDescription": "Nom i descripció ",
 	"nameOnly": "Nom només ",
-	"searchResult": "Resultats de la cerca",
-	"createNew": "Crear"
+	"searchResult": "Resultats de la cerca"
 }
 </locale>
 
@@ -212,11 +208,9 @@ definePage(() => ({
 	"featured": "Trendy",
 	"following": "Sledovaný",
 	"owned": "Vlastněný",
-	"channel": "Kanály",
 	"nameAndDescription": "Název a popis",
 	"nameOnly": "Pouze název",
-	"searchResult": "Výsledky hledání",
-	"createNew": "Vytvořit nový"
+	"searchResult": "Výsledky hledání"
 }
 </locale>
 
@@ -225,11 +219,9 @@ definePage(() => ({
 	"featured": "Trending",
 	"following": "Followed",
 	"owned": "Owned",
-	"channel": "Channels",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Search results",
-	"createNew": "Create new"
+	"searchResult": "Search results"
 }
 </locale>
 
@@ -238,11 +230,9 @@ definePage(() => ({
 	"featured": "Trends",
 	"following": "Gefolgt",
 	"owned": "In Besitz",
-	"channel": "Kanäle",
 	"nameAndDescription": "Name und Beschreibung",
 	"nameOnly": "Nur Name",
-	"searchResult": "Suchergebnisse",
-	"createNew": "Neu erstellen"
+	"searchResult": "Suchergebnisse"
 }
 </locale>
 
@@ -251,11 +241,9 @@ definePage(() => ({
 	"featured": "Trending",
 	"following": "Followed",
 	"owned": "Owned",
-	"channel": "Channels",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Search results",
-	"createNew": "Create new"
+	"searchResult": "Search results"
 }
 </locale>
 
@@ -264,11 +252,9 @@ definePage(() => ({
 	"featured": "Tendencias",
 	"following": "Siguiendo",
 	"owned": "Dueño",
-	"channel": "Canal",
 	"nameAndDescription": "Nombre y descripción",
 	"nameOnly": "Sólo nombre",
-	"searchResult": "Resultados de búsqueda",
-	"createNew": "Crear Nuevo"
+	"searchResult": "Resultados de búsqueda"
 }
 </locale>
 
@@ -277,11 +263,9 @@ definePage(() => ({
 	"featured": "Tendances",
 	"following": "Abonné·e",
 	"owned": "Mes canaux",
-	"channel": "Canaux",
 	"nameAndDescription": "Nom et description",
 	"nameOnly": "Nom seulement",
-	"searchResult": "Résultats de la recherche",
-	"createNew": "Créer"
+	"searchResult": "Résultats de la recherche"
 }
 </locale>
 
@@ -290,11 +274,9 @@ definePage(() => ({
 	"featured": "Tren",
 	"following": "Mengikuti",
 	"owned": "Dimiliki",
-	"channel": "Kanal",
 	"nameAndDescription": "Nama dan deskripsi",
 	"nameOnly": "Hanya nama",
-	"searchResult": "Hasil Penelusuran",
-	"createNew": "Buat baru"
+	"searchResult": "Hasil Penelusuran"
 }
 </locale>
 
@@ -303,11 +285,9 @@ definePage(() => ({
 	"featured": "Popolari nel canale",
 	"following": "Following",
 	"owned": "I miei canali",
-	"channel": "Canale",
 	"nameAndDescription": "Nome e descrizione",
 	"nameOnly": "Solo il nome",
-	"searchResult": "Risultati della Ricerca",
-	"createNew": "Crea"
+	"searchResult": "Risultati della Ricerca"
 }
 </locale>
 
@@ -316,11 +296,9 @@ definePage(() => ({
 	"featured": "トレンド",
 	"following": "フォロー中",
 	"owned": "管理中",
-	"channel": "チャンネル",
 	"nameAndDescription": "名前と説明",
 	"nameOnly": "名前のみ",
-	"searchResult": "検索結果",
-	"createNew": "新規作成"
+	"searchResult": "検索結果"
 }
 </locale>
 
@@ -329,11 +307,9 @@ definePage(() => ({
 	"featured": "トレンド",
 	"following": "フォロー中やで",
 	"owned": "管理しとる",
-	"channel": "チャンネル",
 	"nameAndDescription": "名前と説明",
 	"nameOnly": "名前だけ",
-	"searchResult": "検索結果やで",
-	"createNew": "新しく作るで"
+	"searchResult": "検索結果やで"
 }
 </locale>
 
@@ -342,11 +318,9 @@ definePage(() => ({
 	"featured": "Trending",
 	"following": "Followed",
 	"owned": "Owned",
-	"channel": "Channels",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Search results",
-	"createNew": "Create new"
+	"searchResult": "Search results"
 }
 </locale>
 
@@ -355,11 +329,9 @@ definePage(() => ({
 	"featured": "Trending",
 	"following": "Followed",
 	"owned": "Owned",
-	"channel": "Channels",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Search results",
-	"createNew": "Create new"
+	"searchResult": "Search results"
 }
 </locale>
 
@@ -368,11 +340,9 @@ definePage(() => ({
 	"featured": "트렌드",
 	"following": "팔로잉",
 	"owned": "관리중",
-	"channel": "채널",
 	"nameAndDescription": "이름과 설명",
 	"nameOnly": "이름만",
-	"searchResult": "검색 결과",
-	"createNew": "새로 만들기"
+	"searchResult": "검색 결과"
 }
 </locale>
 
@@ -381,11 +351,9 @@ definePage(() => ({
 	"featured": "Trending",
 	"following": "Followed",
 	"owned": "Owned",
-	"channel": "Kanalen",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Zoekresultaten",
-	"createNew": "Nieuwe aanmaken"
+	"searchResult": "Zoekresultaten"
 }
 </locale>
 
@@ -394,11 +362,9 @@ definePage(() => ({
 	"featured": "Populært",
 	"following": "Følger",
 	"owned": "Owned",
-	"channel": "Kanaler",
 	"nameAndDescription": "Navn og beskrivelse",
 	"nameOnly": "Name only",
-	"searchResult": "Search results",
-	"createNew": "Create new"
+	"searchResult": "Search results"
 }
 </locale>
 
@@ -407,11 +373,9 @@ definePage(() => ({
 	"featured": "Na czasie",
 	"following": "Śledzeni",
 	"owned": "Własny",
-	"channel": "Kanały",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Wyniki wyszukiwania",
-	"createNew": "Utwórz nowy"
+	"searchResult": "Wyniki wyszukiwania"
 }
 </locale>
 
@@ -420,11 +384,9 @@ definePage(() => ({
 	"featured": "Destaques",
 	"following": "Seguindo",
 	"owned": "Autoral",
-	"channel": "Canais",
 	"nameAndDescription": "Nome e descrição",
 	"nameOnly": "Apenas o nome",
-	"searchResult": "Pesquisar",
-	"createNew": "Criar novo"
+	"searchResult": "Pesquisar"
 }
 </locale>
 
@@ -433,11 +395,9 @@ definePage(() => ({
 	"featured": "Актуальные",
 	"following": "Подписки",
 	"owned": "Собственные",
-	"channel": "Каналы",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Результаты поиска",
-	"createNew": "Новый документ"
+	"searchResult": "Результаты поиска"
 }
 </locale>
 
@@ -446,11 +406,9 @@ definePage(() => ({
 	"featured": "Trendy",
 	"following": "Sledované",
 	"owned": "Vlastnené",
-	"channel": "Kanály",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Výsledky hľadania",
-	"createNew": "Vytvoriť nový"
+	"searchResult": "Výsledky hľadania"
 }
 </locale>
 
@@ -459,11 +417,9 @@ definePage(() => ({
 	"featured": "เทรนด์",
 	"following": "ติดตามแล้ว",
 	"owned": "เจ้าของ",
-	"channel": "ช่อง",
 	"nameAndDescription": "ชื่อและคำอธิบาย",
 	"nameOnly": "ชื่อเท่านั้น",
-	"searchResult": "ผลการค้นหา",
-	"createNew": "สร้างใหม่"
+	"searchResult": "ผลการค้นหา"
 }
 </locale>
 
@@ -472,11 +428,9 @@ definePage(() => ({
 	"featured": "Trend olan",
 	"following": "Takip edildi",
 	"owned": "Sahip olunan",
-	"channel": "Kanallar",
 	"nameAndDescription": "Adı ve açıklaması",
 	"nameOnly": "Sadece isim",
-	"searchResult": "Arama sonuçları",
-	"createNew": "Yeni oluştur"
+	"searchResult": "Arama sonuçları"
 }
 </locale>
 
@@ -485,11 +439,9 @@ definePage(() => ({
 	"featured": "Trending",
 	"following": "Followed",
 	"owned": "Owned",
-	"channel": "Channels",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Search results",
-	"createNew": "Create new"
+	"searchResult": "Search results"
 }
 </locale>
 
@@ -498,11 +450,9 @@ definePage(() => ({
 	"featured": "Тренди",
 	"following": "Підписки",
 	"owned": "Owned",
-	"channel": "Канали",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Результати пошуку",
-	"createNew": "Створити новий"
+	"searchResult": "Результати пошуку"
 }
 </locale>
 
@@ -511,11 +461,9 @@ definePage(() => ({
 	"featured": "Xu hướng",
 	"following": "Đang theo dõi",
 	"owned": "Do tôi quản lý",
-	"channel": "Kênh",
 	"nameAndDescription": "Name and description",
 	"nameOnly": "Name only",
-	"searchResult": "Kết quả tìm kiếm",
-	"createNew": "Tạo mới"
+	"searchResult": "Kết quả tìm kiếm"
 }
 </locale>
 
@@ -524,11 +472,9 @@ definePage(() => ({
 	"featured": "热门",
 	"following": "正在关注",
 	"owned": "我的频道",
-	"channel": "频道",
 	"nameAndDescription": "名称与描述",
 	"nameOnly": "仅名称",
-	"searchResult": "搜索结果",
-	"createNew": "新建"
+	"searchResult": "搜索结果"
 }
 </locale>
 
@@ -537,10 +483,8 @@ definePage(() => ({
 	"featured": "熱門貼文",
 	"following": "追隨中",
 	"owned": "管理中",
-	"channel": "頻道",
 	"nameAndDescription": "名稱",
 	"nameOnly": "僅名稱",
-	"searchResult": "搜尋結果",
-	"createNew": "新建"
+	"searchResult": "搜尋結果"
 }
 </locale>

@@ -3,12 +3,11 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { toUnicode } from 'punycode.js';
 import { defineAsyncComponent, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import { host, url } from '@features/boot/frontend/shared/config.js';
-import type { Router } from '@features/navigation/frontend/router.js';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import FeatureLocaleMessages from '@features/users/frontend/ts-messages.vue';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import * as os from '@features/ui/frontend/os.js';
@@ -20,6 +19,13 @@ import { mainRouter } from '@features/navigation/frontend/router.js';
 import { genEmbedCode } from '@features/web/frontend/utility/get-embed-code.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { getPluginHandlers } from '@features/integrations/frontend/plugin.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Router } from '@features/navigation/frontend/router.js';
+import type { Locale } from 'i18n';
+
+function getGlobalLocale() {
+	return useLocale<Locale>(import.meta.url).value.env;
+}
 
 export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router = mainRouter) {
 	const meId = $i ? $i.id : null;
@@ -37,15 +43,15 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 			const { canceled, result: period } = await os.select({
 				title: FeatureLocaleMessages.$locale.mutePeriod,
 				items: [{
-					value: 'indefinitely', label: FeatureLocaleMessages.$locale.indefinitely,
+					value: 'indefinitely', label: getGlobalLocale().indefinitely,
 				}, {
 					value: 'tenMinutes', label: FeatureLocaleMessages.$locale.tenMinutes,
 				}, {
-					value: 'oneHour', label: FeatureLocaleMessages.$locale.oneHour,
+					value: 'oneHour', label: getGlobalLocale().oneHour,
 				}, {
-					value: 'oneDay', label: FeatureLocaleMessages.$locale.oneDay,
+					value: 'oneDay', label: getGlobalLocale().oneDay,
 				}, {
-					value: 'oneWeek', label: FeatureLocaleMessages.$locale.oneWeek,
+					value: 'oneWeek', label: getGlobalLocale().oneWeek,
 				}],
 				default: 'indefinitely',
 			});
@@ -138,7 +144,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 				type: 'string',
 				required: true,
 				multiline: true,
-				label: FeatureLocaleMessages.$locale.memo,
+				label: getGlobalLocale().memo,
 				default: userDetailed.memo,
 			},
 		});
@@ -204,7 +210,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 	} else {
 		menuItems.push({
 			icon: 'ti ti-code',
-			text: FeatureLocaleMessages.$locale.embed,
+			text: getGlobalLocale().embed,
 			type: 'parent',
 			children: [{
 				text: FeatureLocaleMessages.$locale.noteOfThisUser,
@@ -231,15 +237,15 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 			text: FeatureLocaleMessages.$locale.searchThisUsersNotes,
 			action: () => {
 				const query = {
-						username: user.username,
-					} as { username: string, host?: string };
+					username: user.username,
+				} as { username: string, host?: string };
 
 				if (user.host !== null) {
 					query.host = user.host;
 				}
 
 				router.push('/search', {
-					query
+					query,
 				});
 			},
 		});
@@ -325,17 +331,17 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 						text: r.name,
 						action: async () => {
 							const { canceled, result: period } = await os.select({
-								title: FeatureLocaleMessages.$locale.period + ': ' + r.name,
+								title: getGlobalLocale().period + ': ' + r.name,
 								items: [{
-									value: 'indefinitely', label: FeatureLocaleMessages.$locale.indefinitely,
+									value: 'indefinitely', label: getGlobalLocale().indefinitely,
 								}, {
-									value: 'oneHour', label: FeatureLocaleMessages.$locale.oneHour,
+									value: 'oneHour', label: getGlobalLocale().oneHour,
 								}, {
-									value: 'oneDay', label: FeatureLocaleMessages.$locale.oneDay,
+									value: 'oneDay', label: getGlobalLocale().oneDay,
 								}, {
-									value: 'oneWeek', label: FeatureLocaleMessages.$locale.oneWeek,
+									value: 'oneWeek', label: getGlobalLocale().oneWeek,
 								}, {
-									value: 'oneMonth', label: FeatureLocaleMessages.$locale.oneMonth,
+									value: 'oneMonth', label: getGlobalLocale().oneMonth,
 								}],
 								default: 'indefinitely',
 							});
@@ -362,7 +368,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 		menuItems.push({
 			type: 'switch',
 			icon: 'ti ti-messages',
-			text: FeatureLocaleMessages.$locale.showRepliesToOthersInTimeline,
+			text: getGlobalLocale().showRepliesToOthersInTimeline,
 			ref: withRepliesRef,
 		}, {
 			icon: user.notify === 'none' ? 'ti ti-bell' : 'ti ti-bell-off',
@@ -400,7 +406,7 @@ export function getUserMenu(user: Misskey.entities.UserDetailed, router: Router 
 
 		menuItems.push({ type: 'divider' }, {
 			icon: user.isMuted ? 'ti ti-eye' : 'ti ti-eye-off',
-			text: user.isMuted ? FeatureLocaleMessages.$locale.unmute : FeatureLocaleMessages.$locale.mute,
+			text: user.isMuted ? FeatureLocaleMessages.$locale.unmute : getGlobalLocale().mute,
 			action: toggleMute,
 		}, {
 			icon: user.isRenoteMuted ? 'ti ti-repeat' : 'ti ti-repeat-off',

@@ -24,7 +24,6 @@ import { searchIndexes } from './lib/search-index-options.js';
 export { searchIndexes } from './lib/search-index-options.js';
 import pluginCreateSearchIndex from './lib/vite-plugin-create-search-index.js';
 import pluginWatchLocales from './lib/vite-plugin-watch-locales.js';
-import { pluginRemoveUnrefI18n } from '../frontend-builder/rollup-plugin-remove-unref-i18n.js';
 import { Features } from 'lightningcss';
 
 const fluentEmojiDirectory = path.dirname(createRequire(import.meta.url).resolve('@misskey-dev/emoji-assets/fluent-emoji/1f3c6.png'));
@@ -120,7 +119,6 @@ export function getConfig(): UserConfig {
 				componentLocaleRoot: path.resolve(__dirname, '..'),
 			})),
 			pluginVue(),
-			pluginRemoveUnrefI18n(),
 			pluginNoLegacyLabels(),
 			pluginUnwindCssModuleClassName(),
 			pluginJson5(),

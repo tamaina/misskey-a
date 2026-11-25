@@ -13,16 +13,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<img v-if="type === 'error' && instance.serverErrorImageUrl" :src="instance.serverErrorImageUrl" draggable="false" :class="$style.img"/>
 		<MkSystemIcon v-else-if="type === 'error'" type="error" :class="$style.icon"/>
 
-		<div style="opacity: 0.7;">{{ props.text ?? (type === 'empty' ? $locale.sfc.nothing : type === 'notFound' ? $locale.sfc.notFound : type === 'error' ? $locale.sfc.somethingHappened : null) }}</div>
+		<div style="opacity: 0.7;">{{ props.text ?? (type === 'empty' ? $locale.sfc.nothing : type === 'notFound' ? $locale.sfc.notFound : type === 'error' ? globalLocale.env.somethingHappened : null) }}</div>
 		<slot></slot>
 	</div>
 </Transition>
 </template>
 
 <script lang="ts" setup>
+import type { Locale } from 'i18n';
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import {} from 'vue';
 import { instance } from '@features/instance/frontend/instance.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	type: 'empty' | 'notFound' | 'error';
@@ -54,223 +58,195 @@ const props = defineProps<{
 <locale locale="ar-SA" lang="json">
 {
 	"nothing": "لا يوجد شيء هنا",
-	"notFound": "غير موجود",
-	"somethingHappened": "حدث خطأ"
+	"notFound": "غير موجود"
 }
 </locale>
 
 <locale locale="ca-ES" lang="json">
 {
 	"nothing": "No hi ha res per veure aquí ",
-	"notFound": "No s'ha trobat",
-	"somethingHappened": "S'ha produït un error"
+	"notFound": "No s'ha trobat"
 }
 </locale>
 
 <locale locale="cs-CZ" lang="json">
 {
 	"nothing": "Nic nebylo nalezeno",
-	"notFound": "Nenalezeno",
-	"somethingHappened": "Jejda. Něco se nepovedlo."
+	"notFound": "Nenalezeno"
 }
 </locale>
 
 <locale locale="da-DK" lang="json">
 {
 	"nothing": "There's nothing to see here",
-	"notFound": "Not found",
-	"somethingHappened": "An error has occurred"
+	"notFound": "Not found"
 }
 </locale>
 
 <locale locale="de-DE" lang="json">
 {
 	"nothing": "Hier gibt es nichts zu sehen",
-	"notFound": "Nicht gefunden",
-	"somethingHappened": "Ein Fehler ist aufgetreten"
+	"notFound": "Nicht gefunden"
 }
 </locale>
 
 <locale locale="en-US" lang="json">
 {
 	"nothing": "There's nothing to see here",
-	"notFound": "Not found",
-	"somethingHappened": "An error has occurred"
+	"notFound": "Not found"
 }
 </locale>
 
 <locale locale="es-ES" lang="json">
 {
 	"nothing": "No hay nada que ver aqui",
-	"notFound": "No se encuentra",
-	"somethingHappened": "Ocurrió un error"
+	"notFound": "No se encuentra"
 }
 </locale>
 
 <locale locale="fr-FR" lang="json">
 {
 	"nothing": "Il n'y a rien à voir ici",
-	"notFound": "Non trouvé",
-	"somethingHappened": "Une erreur est survenue"
+	"notFound": "Non trouvé"
 }
 </locale>
 
 <locale locale="id-ID" lang="json">
 {
 	"nothing": "Tidak ada sama sekali disini",
-	"notFound": "Tidak dapat ditemukan",
-	"somethingHappened": "Terjadi kesalahan"
+	"notFound": "Tidak dapat ditemukan"
 }
 </locale>
 
 <locale locale="it-IT" lang="json">
 {
 	"nothing": "Niente da visualizzare",
-	"notFound": "Non trovato",
-	"somethingHappened": "Si è verificato un problema"
+	"notFound": "Non trovato"
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
 	"nothing": "ありません",
-	"notFound": "見つかりません",
-	"somethingHappened": "問題が発生しました"
+	"notFound": "見つかりません"
 }
 </locale>
 
 <locale locale="ja-KS" lang="json">
 {
 	"nothing": "あらへん",
-	"notFound": "見つからへんね",
-	"somethingHappened": "なんかあかんわ"
+	"notFound": "見つからへんね"
 }
 </locale>
 
 <locale locale="kab-KAB" lang="json">
 {
 	"nothing": "There's nothing to see here",
-	"notFound": "Not found",
-	"somethingHappened": "An error has occurred"
+	"notFound": "Not found"
 }
 </locale>
 
 <locale locale="kn-IN" lang="json">
 {
 	"nothing": "There's nothing to see here",
-	"notFound": "Not found",
-	"somethingHappened": "An error has occurred"
+	"notFound": "Not found"
 }
 </locale>
 
 <locale locale="ko-KR" lang="json">
 {
 	"nothing": "아무것도 없습니다",
-	"notFound": "찾을 수 없습니다",
-	"somethingHappened": "오류가 발생했습니다"
+	"notFound": "찾을 수 없습니다"
 }
 </locale>
 
 <locale locale="nl-NL" lang="json">
 {
 	"nothing": "Niets te zien hier",
-	"notFound": "Niet gevonden",
-	"somethingHappened": "Er is iets misgegaan."
+	"notFound": "Niet gevonden"
 }
 </locale>
 
 <locale locale="no-NO" lang="json">
 {
 	"nothing": "Ingenting",
-	"notFound": "Ikke funnet",
-	"somethingHappened": "En feil har oppstått"
+	"notFound": "Ikke funnet"
 }
 </locale>
 
 <locale locale="pl-PL" lang="json">
 {
 	"nothing": "Nie ma tu niczego",
-	"notFound": "Nie znaleziono",
-	"somethingHappened": "Coś poszło nie tak"
+	"notFound": "Nie znaleziono"
 }
 </locale>
 
 <locale locale="pt-PT" lang="json">
 {
 	"nothing": "Não há nada aqui",
-	"notFound": "Não encontrado",
-	"somethingHappened": "Ocorreu um erro"
+	"notFound": "Não encontrado"
 }
 </locale>
 
 <locale locale="ru-RU" lang="json">
 {
 	"nothing": "Ничего нет",
-	"notFound": "Не найдено",
-	"somethingHappened": "Что-то пошло не так"
+	"notFound": "Не найдено"
 }
 </locale>
 
 <locale locale="sk-SK" lang="json">
 {
 	"nothing": "Nič tu nie je",
-	"notFound": "Nenájdené",
-	"somethingHappened": "Ups. Niečo sa nepodarilo."
+	"notFound": "Nenájdené"
 }
 </locale>
 
 <locale locale="th-TH" lang="json">
 {
 	"nothing": "ไม่พบผลลัพธ์",
-	"notFound": "ไม่พบหน้าที่ต้องการ",
-	"somethingHappened": "อุ๊ย ! มีอะไรบางอย่างผิดพลาด"
+	"notFound": "ไม่พบหน้าที่ต้องการ"
 }
 </locale>
 
 <locale locale="tr-TR" lang="json">
 {
 	"nothing": "Burada görülecek bir şey yok.",
-	"notFound": "Bulunamadı",
-	"somethingHappened": "Bir hata oluştu"
+	"notFound": "Bulunamadı"
 }
 </locale>
 
 <locale locale="ug-CN" lang="json">
 {
 	"nothing": "There's nothing to see here",
-	"notFound": "Not found",
-	"somethingHappened": "An error has occurred"
+	"notFound": "Not found"
 }
 </locale>
 
 <locale locale="uk-UA" lang="json">
 {
 	"nothing": "Тут нічого немає",
-	"notFound": "Не знайдено",
-	"somethingHappened": "Щось пішло не так"
+	"notFound": "Не знайдено"
 }
 </locale>
 
 <locale locale="vi-VN" lang="json">
 {
 	"nothing": "Không có gì ở đây",
-	"notFound": "Không tìm thấy",
-	"somethingHappened": "Xảy ra lỗi"
+	"notFound": "Không tìm thấy"
 }
 </locale>
 
 <locale locale="zh-CN" lang="json">
 {
 	"nothing": "无",
-	"notFound": "未找到",
-	"somethingHappened": "出错了"
+	"notFound": "未找到"
 }
 </locale>
 
 <locale locale="zh-TW" lang="json">
 {
 	"nothing": "查無項目",
-	"notFound": "查無項目",
-	"somethingHappened": "發生錯誤"
+	"notFound": "查無項目"
 }
 </locale>

@@ -5,7 +5,7 @@
 
 import { toPackedHashtag } from '../hashtag.schema.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
-import { normalizeForSearch } from '../../utility/normalize-for-search.js';
+import { normalizeTag } from '../../utility/normalize-tag.js';
 import { HashtagEntityService } from '../../serializers/HashtagEntityService.js';
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { HashtagsRepository } from '@features/persistence/backend/repositories/models.js';
@@ -26,7 +26,7 @@ export interface HashtagsShowDependencies {
 }
 export function createHashtagsShowProcedure<Actor extends MiLocalUser>(deps: HashtagsShowDependencies) {
 	const handler = async ({ input: ps, }: { input: DiscoveryInputs['hashtags/show']; context: ApiContext<Actor> & { principal: Actor | null } }) => {
-		const hashtag = await deps.hashtagsRepository.findOneBy({ name: normalizeForSearch(ps.tag) });
+		const hashtag = await deps.hashtagsRepository.findOneBy({ name: normalizeTag(ps.tag) });
 		if (hashtag == null) {
 			throw apiError(errors.noSuchHashtag);
 		}

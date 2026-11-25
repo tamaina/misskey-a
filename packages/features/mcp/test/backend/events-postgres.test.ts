@@ -14,6 +14,8 @@ import { entities } from '@features/persistence/backend/postgres.js';
 import { createRepositorySet } from '@features/persistence/backend/repositories/factory.js';
 import { MiWebhook } from '@features/integrations/backend/models/Webhook.js';
 import { MiUser } from '@features/users/backend/models/User.js';
+import { MiAccessToken } from '@features/auth/backend/models/AccessToken.js';
+import { LegacyChatWebhookAuthorization1794787200000 } from '../../../../backend/migration/1794787200000-LegacyChatWebhookAuthorization.js';
 import { McpEventsWebhook1791763200000 } from '../../../../backend/migration/1791763200000-McpEventsWebhook.js';
 import { McpAntennaEvents1791763200001 } from '../../../../backend/migration/1791763200001-McpAntennaEvents.js';
 import { McpStreamSubscriptions1791786439355 } from '../../../../backend/migration/1791786439355-McpStreamSubscriptions.js';
@@ -23,6 +25,9 @@ import type { QueueService } from '@features/runtime/backend/services/QueueServi
 import type { IdService } from '@features/runtime/backend/services/IdService.js';
 import type * as Redis from 'ioredis';
 import { McpEventsService } from '../../backend/McpEventsService.js';
+import { call } from '@orpc/server';
+import { createIWebhooksCreateProcedure } from '@features/integrations/backend/endpoints/i/webhooks/create.js';
+import { testContext } from '@features/integrations/test/backend/native-context.js';
 import type { HttpRequestService } from '@features/runtime/backend/services/HttpRequestService.js';
 import type { RoleService } from '@features/roles/backend/services/RoleService.js';
 import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
@@ -37,6 +42,50 @@ describe.skipIf(!socket)('isolated MCP Events PostgreSQL fixture', () => {
 		await db.initialize();
 	}, 30000);
 	afterAll(async () => { if (db?.isInitialized) await db.destroy(); });
+	it('grandfathers existing chat subscriptions without changing settings and preserves the policy on rollback', async () => {
+		const runner = db.createQueryRunner();
+		await runner.startTransaction();
+		try {
+			const user = await runner.manager.getRepository(MiUser).save(new MiUser({ id: 'legacy_chat_owner', host: null, username: 'legacy_chat_owner', usernameLower: 'legacy_chat_owner' }));
+			const tokens = runner.manager.getRepository(MiAccessToken);
+			const oldGrant = await tokens.save({ id: 'legacy_chat_old_grant', userId: user.id, token: 'SYNTHETIC_OLD_CHAT', hash: 'SYNTHETIC_OLD_CHAT', permission: ['write:account'] });
+			const newGrant = await tokens.save({ id: 'legacy_chat_new_grant', userId: user.id, token: 'SYNTHETIC_NEW_CHAT', hash: 'SYNTHETIC_NEW_CHAT', permission: ['write:account', 'read:chat'] });
+			const migration = new LegacyChatWebhookAuthorization1794787200000();
+			await migration.down(runner);
+			for (const [id, mode, on, active] of [
+				['legacy_chat_active', 'legacy', ['chatMessage', 'note'], true],
+				['legacy_chat_inactive', 'legacy', ['chatMessage'], false],
+				['legacy_nonchat', 'legacy', ['note'], true],
+				['mcp_chat', 'mcp', ['chatMessage'], true],
+			] as const) {
+				await runner.query('INSERT INTO "webhook" ("id", "userId", "name", "url", "secret", "mode", "on", "active") VALUES ($1, $2, $1, $3, $4, $5, $6, $7)',
+					[id, user.id, `https://callback.example/${id}`, `secret-${id}`, mode, on, active]);
+			}
+			const settings = () => runner.query('SELECT "id", "name", "url", "secret", "mode", "on", "active" FROM "webhook" WHERE "userId" = $1 ORDER BY "id"', [user.id]);
+			const before = await settings();
+			await migration.up(runner);
+			expect(await settings()).toEqual(before);
+			const webhooks = runner.manager.getRepository(MiWebhook);
+			const active = await webhooks.findOneByOrFail({ id: 'legacy_chat_active' });
+			const inactive = await webhooks.findOneByOrFail({ id: 'legacy_chat_inactive' });
+			expect(active.chatTokenId).toBeNull(); expect(inactive.chatTokenId).toBeNull();
+			for (const id of ['legacy_nonchat', 'mcp_chat']) {
+				expect(await webhooks.findOneByOrFail({ id })).toMatchObject({ chatTokenId: null });
+			}
+			await tokens.delete(oldGrant.id);
+			expect(await settings()).toEqual(before); // historical grants cannot revoke grandfathered hooks
+			await webhooks.update(active.id, { chatTokenId: newGrant.id });
+			await tokens.delete(newGrant.id);
+			expect(await webhooks.findOneBy({ id: active.id })).toBeNull(); // newly bound grants still cascade
+			expect(await settings()).toEqual(before.filter((row: { id: string }) => row.id !== active.id));
+			const beforeRollback = await settings();
+			await migration.down(runner);
+			expect(await settings()).toEqual(beforeRollback);
+		} finally {
+			await runner.rollbackTransaction();
+			await runner.release();
+		}
+	});
 	it('persists native parameters/generation, restores future observation and round-trips the stream migration without pending DDL', async () => {
 		const repos = createRepositorySet(db);
 		const user = await repos.usersRepository.save(new MiUser({ id: 'stream_account', host: null, username: 'synthetic_stream', usernameLower: 'synthetic_stream' }));
@@ -101,6 +150,39 @@ describe.skipIf(!socket)('isolated MCP Events PostgreSQL fixture', () => {
 			expect((await repos.webhooksRepository.findOneByOrFail({ id })).mcpGeneration).not.toBe(original.mcpGeneration);
 			expect(await service.authorizeDelivery(id, user.id, original.mcpGeneration!, 'note', 'mention')).toBeNull();
 		} finally { release(); await Promise.allSettled([refresh, unsubscribe]); spy.mockRestore(); await repos.usersRepository.delete(user.id); }
+	});
+	it('reclaims unsubscribed/expired rows for MCP and legacy quota without accepting old generations', async () => {
+		const repos = createRepositorySet(db);
+		const user = await repos.usersRepository.save(new MiUser({ id: 'quota_account', host: null, username: 'synthetic_quota', usernameLower: 'synthetic_quota' }));
+		const grant = await repos.accessTokensRepository.save({ id: 'quota_grant', userId: user.id, token: 'SYNTHETIC_QUOTA', hash: 'SYNTHETIC_QUOTA', permission: ['access:mcp', 'read:notifications'] });
+		const http = mockDeep<HttpRequestService>(); const roles = mockDeep<RoleService>();
+		http.sendMcpWebhook.mockImplementation(async (_url, body) => ({ status: 200, ok: true, text: JSON.stringify({ challenge: JSON.parse(body).challenge }) })); roles.getUserPolicies.mockResolvedValue({ webhookLimit: 2 } as never);
+		const service = new McpEventsService(repos.webhooksRepository, repos.accessTokensRepository, repos.appsRepository, repos.usersRepository, repos.notesRepository, http, roles, mockDeep(), mockDeep(), mockDeep());
+		const context: ApiContext<MiLocalUser> = { credential: 'SYNTHETIC_QUOTA', ip: '127.0.0.1', headers: {}, services: { authenticate: async () => [user as MiLocalUser, grant], limitActor: () => user.id, rateLimitFactor: async () => 1, limit: async () => null } };
+		const delivery = (path: string) => ({ mode: 'webhook', url: `https://callback.example/${path}`, secret: 'whsec_' + Buffer.alloc(32, 42).toString('base64') });
+		const subscribe = (path: string) => service.invoke('events/subscribe', { name: 'note.mentioned', arguments: {}, delivery: delivery(path) }, context) as Promise<{ id: string }>;
+		const unsubscribe = (path: string) => service.invoke('events/unsubscribe', { name: 'note.mentioned', arguments: {}, delivery: { mode: 'webhook', url: delivery(path).url } }, context);
+		const create = createIWebhooksCreateProcedure({ webhooksRepository: repos.webhooksRepository, idService: { gen: () => 'quota_created' }, globalEventService: mockDeep(), roleService: roles });
+		const legacy = () => call(create, { name: 'legacy', url: 'https://legacy.example/created', on: ['mention'] }, { context: testContext(user as MiLocalUser) });
+		try {
+			// A disabled legacy webhook still occupies quota.
+			await repos.webhooksRepository.save({ id: 'quota_legacy', userId: user.id, name: 'legacy', url: 'https://legacy.example', secret: '', on: ['mention'], active: false });
+			const first = await subscribe('first'); const generation = (await repos.webhooksRepository.findOneByOrFail({ id: first.id })).mcpGeneration!;
+			await expect(subscribe('blocked')).rejects.toMatchObject({ message: 'Webhook limit reached' });
+			let current = 'first';
+			for (const next of ['cycle1', 'cycle2', 'cycle3']) { await unsubscribe(current); await subscribe(next); current = next; }
+			await repos.webhooksRepository.update({ userId: user.id, mode: 'mcp' }, { mcpExpiresAt: new Date(0) });
+			await unsubscribe(current); await subscribe('first');
+			expect(await repos.webhooksRepository.countBy({ userId: user.id })).toBe(2);
+			const recreated = await repos.webhooksRepository.findOneByOrFail({ id: first.id }); expect(recreated.mcpGeneration).not.toBe(generation);
+			expect(await service.authorizeDelivery(first.id, user.id, generation, 'note', 'mention')).toBeNull();
+			// Stale job write-backs are generation-guarded and cannot disable the recreated row.
+			expect((await repos.webhooksRepository.update({ id: first.id, mode: 'mcp', mcpGeneration: generation }, { active: false })).affected).toBe(0);
+			await unsubscribe('first'); await legacy(); expect(await repos.webhooksRepository.findOneBy({ id: first.id })).toBeNull();
+			await expect(legacy()).rejects.toMatchObject({ code: 'TOO_MANY_WEBHOOKS' });
+			await expect(subscribe('after')).rejects.toMatchObject({ message: 'Webhook limit reached' });
+			expect((await repos.webhooksRepository.findBy({ userId: user.id })).map(row => row.id).sort()).toEqual(['quota_created', 'quota_legacy']);
+		} finally { await repos.usersRepository.delete(user.id); }
 	});
 	it('persists grant-bound subscriptions, refreshes idempotently and cascades grant revocation', async () => {
 		const repos = createRepositorySet(db);

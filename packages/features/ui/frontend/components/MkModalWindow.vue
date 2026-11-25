@@ -12,7 +12,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<slot name="header"></slot>
 			</span>
 			<div v-if="withOkButton" style="padding: 0 16px; place-content: center;">
-				<MkButton primary gradate small rounded :disabled="okButtonDisabled" @click="emit('ok')">{{ $locale.sfc.done }} <i class="ti ti-check"></i></MkButton>
+				<MkButton primary gradate small rounded :disabled="okButtonDisabled" @click="emit('ok')">{{ globalLocale.env.done }} <i class="ti ti-check"></i></MkButton>
 			</div>
 		</div>
 		<div :class="$style.body">
@@ -26,10 +26,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { onMounted, onUnmounted, useTemplateRef, ref } from 'vue';
 import MkModal from '@features/ui/frontend/components/MkModal.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { deviceKind } from '@features/ui/frontend/utility/device-kind.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	withOkButton?: boolean;
@@ -154,169 +158,113 @@ defineExpose({
 </style>
 
 <locale locale="ar-SA" lang="json">
-{
-  "done": "تمّ"
-}
+{}
 </locale>
 
 <locale locale="ca-ES" lang="json">
-{
-  "done": "Fet"
-}
+{}
 </locale>
 
 <locale locale="cs-CZ" lang="json">
-{
-  "done": "Hotovo"
-}
+{}
 </locale>
 
 <locale locale="da-DK" lang="json">
-{
-  "done": "Done"
-}
+{}
 </locale>
 
 <locale locale="de-DE" lang="json">
-{
-  "done": "Fertig"
-}
+{}
 </locale>
 
 <locale locale="en-US" lang="json">
-{
-  "done": "Done"
-}
+{}
 </locale>
 
 <locale locale="es-ES" lang="json">
-{
-  "done": "Hecho"
-}
+{}
 </locale>
 
 <locale locale="fr-FR" lang="json">
-{
-  "done": "Terminé"
-}
+{}
 </locale>
 
 <locale locale="id-ID" lang="json">
-{
-  "done": "Selesai"
-}
+{}
 </locale>
 
 <locale locale="it-IT" lang="json">
-{
-  "done": "Fine"
-}
+{}
 </locale>
 
 <locale locale="ja-JP" lang="json">
-{
-  "done": "完了"
-}
+{}
 </locale>
 
 <locale locale="ja-KS" lang="json">
-{
-  "done": "でけた"
-}
+{}
 </locale>
 
 <locale locale="kab-KAB" lang="json">
-{
-  "done": "Done"
-}
+{}
 </locale>
 
 <locale locale="kn-IN" lang="json">
-{
-  "done": "Done"
-}
+{}
 </locale>
 
 <locale locale="ko-KR" lang="json">
-{
-  "done": "완료"
-}
+{}
 </locale>
 
 <locale locale="nl-NL" lang="json">
-{
-  "done": "Klaar"
-}
+{}
 </locale>
 
 <locale locale="no-NO" lang="json">
-{
-  "done": "Ferdig"
-}
+{}
 </locale>
 
 <locale locale="pl-PL" lang="json">
-{
-  "done": "Gotowe"
-}
+{}
 </locale>
 
 <locale locale="pt-PT" lang="json">
-{
-  "done": "Concluído"
-}
+{}
 </locale>
 
 <locale locale="ru-RU" lang="json">
-{
-  "done": "Готово"
-}
+{}
 </locale>
 
 <locale locale="sk-SK" lang="json">
-{
-  "done": "Hotovo"
-}
+{}
 </locale>
 
 <locale locale="th-TH" lang="json">
-{
-  "done": "เสร็จสิ้น"
-}
+{}
 </locale>
 
 <locale locale="tr-TR" lang="json">
-{
-  "done": "Tamam"
-}
+{}
 </locale>
 
 <locale locale="ug-CN" lang="json">
-{
-  "done": "Done"
-}
+{}
 </locale>
 
 <locale locale="uk-UA" lang="json">
-{
-  "done": "Готово"
-}
+{}
 </locale>
 
 <locale locale="vi-VN" lang="json">
-{
-  "done": "Xong"
-}
+{}
 </locale>
 
 <locale locale="zh-CN" lang="json">
-{
-  "done": "完成"
-}
+{}
 </locale>
 
 <locale locale="zh-TW" lang="json">
-{
-  "done": "完成"
-}
+{}
 </locale>

@@ -22,24 +22,27 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #label>{{ $locale.sfc.trigger }}</template>
 
 		<div class="_gaps_s">
-			<MkSwitch v-model="event_follow">{{ $locale.sfc.follow }}</MkSwitch>
-			<MkSwitch v-model="event_followed">{{ $locale.sfc.followed }}</MkSwitch>
-			<MkSwitch v-model="event_note">{{ $locale.sfc.note }}</MkSwitch>
-			<MkSwitch v-model="event_reply">{{ $locale.sfc.reply }}</MkSwitch>
-			<MkSwitch v-model="event_renote">{{ $locale.sfc.renote }}</MkSwitch>
-			<MkSwitch v-model="event_reaction" :disabled="true">{{ $locale.sfc.reaction }}</MkSwitch>
-			<MkSwitch v-model="event_mention">{{ $locale.sfc.mention }}</MkSwitch>
+			<MkSwitch v-model="selectedEvents.follow">{{ $locale.sfc.follow }} (follow)</MkSwitch>
+			<MkSwitch v-model="selectedEvents.followed">{{ $locale.sfc.followed }} (followed)</MkSwitch>
+			<MkSwitch v-model="selectedEvents.note">{{ $locale.sfc.note }} (note)</MkSwitch>
+			<MkSwitch v-model="selectedEvents.reply">{{ $locale.sfc.reply }} (reply)</MkSwitch>
+			<MkSwitch v-model="selectedEvents.renote">{{ $locale.sfc.renote }} (renote)</MkSwitch>
+			<MkSwitch v-model="selectedEvents.reaction">{{ $locale.sfc.reaction }} (reaction)</MkSwitch>
+			<MkSwitch v-model="selectedEvents.mention">{{ $locale.sfc.mention }} (mention)</MkSwitch>
+			<MkSwitch v-for="event in additionalEvents" :key="event" v-model="selectedEvents[event]">{{ $locale.sfc[event] }} ({{ event }})</MkSwitch>
+			<div>{{ $locale.sfc.eventsDescription }}</div>
 		</div>
 	</FormSection>
 
 	<div class="_buttons">
-		<MkButton primary inline @click="create"><i class="ti ti-check"></i> {{ $locale.sfc.create }}</MkButton>
+		<MkButton primary inline @click="create"><i class="ti ti-check"></i> {{ globalLocale.env.create }}</MkButton>
 	</div>
 </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { useLocale } from 'virtual:vite-vue-internationalization';
+import { ref, reactive, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import FormSection from '@features/ui/frontend/components/form/section.vue';
@@ -47,28 +50,21 @@ import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { definePage } from '@features/navigation/frontend/page.js';
+import { webhookEventTypes } from '../../../backend/webhook-events.schema.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const name = ref('');
 const url = ref('');
 const secret = ref('');
 
-const event_follow = ref(true);
-const event_followed = ref(true);
-const event_note = ref(true);
-const event_reply = ref(true);
-const event_renote = ref(true);
-const event_reaction = ref(true);
-const event_mention = ref(true);
+const existingEvents = ['follow', 'followed', 'note', 'reply', 'renote', 'reaction', 'mention'] as const;
+const additionalEvents = webhookEventTypes.filter((event): event is Exclude<typeof event, typeof existingEvents[number]> => !existingEvents.some(existing => existing === event));
+const selectedEvents = reactive(Object.fromEntries(webhookEventTypes.map(event => [event, existingEvents.some(existing => existing === event)])) as Record<typeof webhookEventTypes[number], boolean>);
 
 async function create(): Promise<void> {
-	const events = [] as Misskey.entities.UserWebhook['on'];
-	if (event_follow.value) events.push('follow');
-	if (event_followed.value) events.push('followed');
-	if (event_note.value) events.push('note');
-	if (event_reply.value) events.push('reply');
-	if (event_renote.value) events.push('renote');
-	if (event_reaction.value) events.push('reaction');
-	if (event_mention.value) events.push('mention');
+	const events: Misskey.entities.UserWebhook['on'] = webhookEventTypes.filter(event => selectedEvents[event]);
 
 	os.apiWithDialog('i/webhooks/create', {
 		name: name.value,
@@ -99,8 +95,7 @@ definePage(() => ({
   "reply": "When receiving a reply",
   "renote": "When renoted",
   "reaction": "عند التفاعل",
-  "mention": "When being mentioned",
-  "create": "أنشئ"
+  "mention": "When being mentioned"
 }
 </locale>
 
@@ -115,8 +110,7 @@ definePage(() => ({
   "reply": "Quan es rep una resposta",
   "renote": "Quan es renoti",
   "reaction": "Quan es rep una reacció ",
-  "mention": "Quan et mencionen",
-  "create": "Crear"
+  "mention": "Quan et mencionen"
 }
 </locale>
 
@@ -131,8 +125,7 @@ definePage(() => ({
   "reply": "Při obdržení odpovědi",
   "renote": "Při renotaci poznámky",
   "reaction": "Při obdržení reakce",
-  "mention": "Při zmínce",
-  "create": "Vytvořit"
+  "mention": "Při zmínce"
 }
 </locale>
 
@@ -147,8 +140,7 @@ definePage(() => ({
   "reply": "When receiving a reply",
   "renote": "When renoted",
   "reaction": "When receiving a reaction",
-  "mention": "When being mentioned",
-  "create": "Create"
+  "mention": "When being mentioned"
 }
 </locale>
 
@@ -163,8 +155,7 @@ definePage(() => ({
   "reply": "Wenn du eine Antwort erhältst",
   "renote": "Wenn du ein Renote erhältst",
   "reaction": "Wenn du eine Reaktion erhältst",
-  "mention": "Wenn du erwähnt wirst",
-  "create": "Erstellen"
+  "mention": "Wenn du erwähnt wirst"
 }
 </locale>
 
@@ -179,8 +170,7 @@ definePage(() => ({
   "reply": "When receiving a reply",
   "renote": "When renoted",
   "reaction": "When receiving a reaction",
-  "mention": "When being mentioned",
-  "create": "Create"
+  "mention": "When being mentioned"
 }
 </locale>
 
@@ -195,8 +185,7 @@ definePage(() => ({
   "reply": "Cuando se recibe una respuesta",
   "renote": "Cuando reciba un \"re-note\"",
   "reaction": "Cuando se recibe una reacción",
-  "mention": "Cuando hay una mención",
-  "create": "Crear"
+  "mention": "Cuando hay una mención"
 }
 </locale>
 
@@ -211,8 +200,7 @@ definePage(() => ({
   "reply": "When receiving a reply",
   "renote": "When renoted",
   "reaction": "When receiving a reaction",
-  "mention": "When being mentioned",
-  "create": "Créer"
+  "mention": "When being mentioned"
 }
 </locale>
 
@@ -227,8 +215,7 @@ definePage(() => ({
   "reply": "Ketika menerima balasan",
   "renote": "Ketika direnote",
   "reaction": "Ketika menerima reaksi",
-  "mention": "Ketika sedang disebut",
-  "create": "Buat"
+  "mention": "Ketika sedang disebut"
 }
 </locale>
 
@@ -243,8 +230,7 @@ definePage(() => ({
   "reply": "Quando rispondono ad una Nota",
   "renote": "Quando la Nota è Rinotata",
   "reaction": "Quando ricevo una reazione",
-  "mention": "Quando mi menzionano",
-  "create": "Crea"
+  "mention": "Quando mi menzionano"
 }
 </locale>
 
@@ -260,7 +246,24 @@ definePage(() => ({
   "renote": "Renoteされたとき",
   "reaction": "リアクションがあったとき",
   "mention": "メンションされたとき",
-  "create": "作成"
+  "eventsDescription": "通知に由来するイベントには通知の受信設定やミュートが適用されます。MCPで mention / reply と旧名 note.mentioned / note.replied の両方を購読すると、同じイベントが2回届くことがあります。",
+  "unfollow": "フォローを解除したとき",
+  "subscribedNote": "通知をオンにしたユーザーが投稿したとき",
+  "quote": "引用Renoteされたとき",
+  "pollEnded": "アンケートが終了したとき",
+  "scheduledNotePosted": "予約ノートが投稿されたとき",
+  "scheduledNotePostFailed": "予約ノートの投稿に失敗したとき",
+  "receiveFollowRequest": "フォローリクエストを受け取ったとき",
+  "followRequestAccepted": "フォローリクエストが承認されたとき",
+  "roleAssigned": "ロールを付与されたとき",
+  "chatRoomInvitationReceived": "チャットルームに招待されたとき",
+  "achievementEarned": "実績を獲得したとき",
+  "exportCompleted": "エクスポートが完了したとき",
+  "login": "ログインしたとき",
+  "createToken": "トークンが作成されたとき",
+  "app": "アプリ通知を受け取ったとき",
+  "test": "テスト通知を受け取ったとき",
+  "chatMessage": "チャットメッセージを受け取ったとき"
 }
 </locale>
 
@@ -275,8 +278,7 @@ definePage(() => ({
   "reply": "返信があるとき～！",
   "renote": "リノートされるとき～！",
   "reaction": "ツッコまれたとき～！",
-  "mention": "メンションがあるとき～！",
-  "create": "作成"
+  "mention": "メンションがあるとき～！"
 }
 </locale>
 
@@ -291,8 +293,7 @@ definePage(() => ({
   "reply": "When receiving a reply",
   "renote": "When renoted",
   "reaction": "When receiving a reaction",
-  "mention": "When being mentioned",
-  "create": "Create"
+  "mention": "When being mentioned"
 }
 </locale>
 
@@ -307,8 +308,7 @@ definePage(() => ({
   "reply": "When receiving a reply",
   "renote": "When renoted",
   "reaction": "When receiving a reaction",
-  "mention": "When being mentioned",
-  "create": "Create"
+  "mention": "When being mentioned"
 }
 </locale>
 
@@ -323,8 +323,7 @@ definePage(() => ({
   "reply": "답글을 받았을 때",
   "renote": "누군가 내 글을 리노트했을 때",
   "reaction": "누군가 내 노트에 리액션했을 때",
-  "mention": "누군가 나를 멘션했을 때",
-  "create": "생성"
+  "mention": "누군가 나를 멘션했을 때"
 }
 </locale>
 
@@ -339,8 +338,7 @@ definePage(() => ({
   "reply": "When receiving a reply",
   "renote": "When renoted",
   "reaction": "When receiving a reaction",
-  "mention": "When being mentioned",
-  "create": "Creëer"
+  "mention": "When being mentioned"
 }
 </locale>
 
@@ -355,8 +353,7 @@ definePage(() => ({
   "reply": "When receiving a reply",
   "renote": "When renoted",
   "reaction": "When receiving a reaction",
-  "mention": "When being mentioned",
-  "create": "Opprett"
+  "mention": "When being mentioned"
 }
 </locale>
 
@@ -371,8 +368,7 @@ definePage(() => ({
   "reply": "Po otrzymaniu odpowiedzi",
   "renote": "Po udostępnieniu wpisu",
   "reaction": "Po otrzymaniu reakcji",
-  "mention": "Po zostaniu wspomnianym",
-  "create": "Utwórz"
+  "mention": "Po zostaniu wspomnianym"
 }
 </locale>
 
@@ -387,8 +383,7 @@ definePage(() => ({
   "reply": "Quando receber uma resposta",
   "renote": "Quando repostado",
   "reaction": "Quando receber uma reação",
-  "mention": "Quando for mencionado",
-  "create": "Criar"
+  "mention": "Quando for mencionado"
 }
 </locale>
 
@@ -403,8 +398,7 @@ definePage(() => ({
   "reply": "Когда получили ответ на заметку",
   "renote": "Когда вас репостнули",
   "reaction": "Когда получили реакцию",
-  "mention": "Когда вас упоминают",
-  "create": "Создать"
+  "mention": "Когда вас упоминают"
 }
 </locale>
 
@@ -419,8 +413,7 @@ definePage(() => ({
   "reply": "When receiving a reply",
   "renote": "When renoted",
   "reaction": "When receiving a reaction",
-  "mention": "When being mentioned",
-  "create": "Vytvoriť"
+  "mention": "When being mentioned"
 }
 </locale>
 
@@ -435,8 +428,7 @@ definePage(() => ({
   "reply": "เมื่อได้รับการตอบกลับ",
   "renote": "รีโน้ตแล้วเมื่อ",
   "reaction": "เมื่อได้รับรีแอคชั่น",
-  "mention": "เมื่อกำลังถูกกล่าวถึง",
-  "create": "สร้าง"
+  "mention": "เมื่อกำลังถูกกล่าวถึง"
 }
 </locale>
 
@@ -451,8 +443,7 @@ definePage(() => ({
   "reply": "Yanıt alındığında",
   "renote": "Yeniden not edildiğinde",
   "reaction": "Tepki aldığınızda",
-  "mention": "Bahsedildiğinde",
-  "create": "Oluştur"
+  "mention": "Bahsedildiğinde"
 }
 </locale>
 
@@ -467,8 +458,7 @@ definePage(() => ({
   "reply": "When receiving a reply",
   "renote": "When renoted",
   "reaction": "When receiving a reaction",
-  "mention": "When being mentioned",
-  "create": "Create"
+  "mention": "When being mentioned"
 }
 </locale>
 
@@ -483,8 +473,7 @@ definePage(() => ({
   "reply": "When receiving a reply",
   "renote": "When renoted",
   "reaction": "When receiving a reaction",
-  "mention": "When being mentioned",
-  "create": "Створити"
+  "mention": "When being mentioned"
 }
 </locale>
 
@@ -499,8 +488,7 @@ definePage(() => ({
   "reply": "When receiving a reply",
   "renote": "When renoted",
   "reaction": "Khi nhận được sự kiện",
-  "mention": "Khi có người nhắc tới bạn",
-  "create": "Tạo"
+  "mention": "Khi có người nhắc tới bạn"
 }
 </locale>
 
@@ -515,8 +503,7 @@ definePage(() => ({
   "reply": "收到回复时",
   "renote": "被转发时",
   "reaction": "被回应时",
-  "mention": "被提及时",
-  "create": "创建"
+  "mention": "被提及时"
 }
 </locale>
 
@@ -531,7 +518,6 @@ definePage(() => ({
   "reply": "當收到回覆時",
   "renote": "當被轉發時",
   "reaction": "當獲得反應時",
-  "mention": "當被提到時",
-  "create": "新增"
+  "mention": "當被提到時"
 }
 </locale>

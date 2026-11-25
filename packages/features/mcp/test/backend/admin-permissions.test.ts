@@ -29,16 +29,16 @@ it('requires both current account role and native scope for administrative disco
 	const discover = async () => (await prepared.invoke('list_api_endpoints', {}) as { endpoints: string[] }).endpoints;
 	f.grant.permission.push('read:admin:ad', 'write:admin:ad', 'read:admin:meta');
 	expect(await discover()).not.toContain('admin/ad/list');
-	await expect(prepared.invoke('call_api', { endpoint: 'admin/ad/list', arguments: {} })).rejects.toMatchObject({ code: 'ROLE_PERMISSION_DENIED' });
+	await expect(prepared.invoke('call_api_read_admin_ad', { endpoint: 'admin/ad/list', arguments: {} })).rejects.toMatchObject({ code: 'ROLE_PERMISSION_DENIED' });
 	f.roles.getUserRoles.mockResolvedValue([role(true)]); f.grant.permission = ['access:mcp'];
 	expect(await discover()).not.toContain('admin/ad/list');
-	await expect(prepared.invoke('call_api', { endpoint: 'admin/ad/list', arguments: {} })).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
+	await expect(prepared.invoke('call_api_read_admin_ad', { endpoint: 'admin/ad/list', arguments: {} })).rejects.toMatchObject({ code: 'PERMISSION_DENIED' });
 	expect(f.ads.queryService.makePaginationQuery).not.toHaveBeenCalled();
 	f.grant.permission.push('read:admin:ad');
 	expect(await discover()).toContain('admin/ad/list');
-	expect(await prepared.invoke('call_api', { endpoint: 'admin/ad/list', arguments: {} })).toEqual([]);
+	expect(await prepared.invoke('call_api_read_admin_ad', { endpoint: 'admin/ad/list', arguments: {} })).toEqual([]);
 	expect(f.roles.getUserRoles).toHaveBeenCalledWith(f.own.id, true);
-	await expect(prepared.invoke('call_api', { endpoint: 'admin/ad/list', arguments: { limit: '1' } })).rejects.toMatchObject({ code: 'INVALID_PARAM' });
+	await expect(prepared.invoke('call_api_read_admin_ad', { endpoint: 'admin/ad/list', arguments: { limit: '1' } })).rejects.toMatchObject({ code: 'INVALID_PARAM' });
 });
 
 it('honors moderator versus administrator and required role policies on discovery', async () => {
@@ -59,20 +59,20 @@ it('preserves native write validation, audit attribution and sensitive target gu
 	const f = await fixture(); const prepared = await f.module.get(McpApiService).prepare(f.request());
 	f.roles.getUserRoles.mockResolvedValue([role()]);
 	f.grant.permission.push('write:admin:ad', 'write:admin:suspend-user');
-	await expect(prepared.invoke('call_api', { endpoint: 'admin/ad/create', arguments: { ...adInput, ratio: '1' } })).rejects.toMatchObject({ code: 'INVALID_PARAM' });
+	await expect(prepared.invoke('call_api_write_admin_ad', { endpoint: 'admin/ad/create', arguments: { ...adInput, ratio: '1' } })).rejects.toMatchObject({ code: 'INVALID_PARAM' });
 	expect(f.ads.adsRepository.insertOne).not.toHaveBeenCalled(); expect(f.ads.moderationLogService.log).not.toHaveBeenCalled();
-	const result = await prepared.invoke('call_api', { endpoint: 'admin/ad/create', arguments: adInput });
+	const result = await prepared.invoke('call_api_write_admin_ad', { endpoint: 'admin/ad/create', arguments: adInput });
 	expect(result).toMatchObject({ id: 'ffffffffffffffff', memo: 'synthetic' });
 	expect(f.ads.moderationLogService.log).toHaveBeenCalledWith(f.own, 'createAd', expect.objectContaining({ adId: 'ffffffffffffffff' }));
 	f.moderation.roleService.isModerator.mockResolvedValue(true);
-	await expect(prepared.invoke('call_api', { endpoint: 'admin/suspend-user', arguments: { userId: f.otherId } })).rejects.toMatchObject({ code: 'INTERNAL_ERROR' });
+	await expect(prepared.invoke('call_api_write_admin_suspend_user', { endpoint: 'admin/suspend-user', arguments: { userId: f.otherId } })).rejects.toMatchObject({ code: 'INTERNAL_ERROR' });
 	expect(f.moderation.userSuspendService.suspend).not.toHaveBeenCalled();
 });
 
 it('rechecks role downgrade, fresh account suspension/deletion, scope removal and grant revocation on a prepared connection', async () => {
 	const f = await fixture(); const prepared = await f.module.get(McpApiService).prepare(f.request());
 	f.grant.permission.push('read:admin:ad'); f.roles.getUserRoles.mockResolvedValue([role(true)]);
-	const read = () => prepared.invoke('call_api', { endpoint: 'admin/ad/list', arguments: {} });
+	const read = () => prepared.invoke('call_api_read_admin_ad', { endpoint: 'admin/ad/list', arguments: {} });
 	await read(); f.roles.getUserRoles.mockResolvedValue([]);
 	await expect(read()).rejects.toMatchObject({ code: 'ROLE_PERMISSION_DENIED' });
 	f.roles.getUserRoles.mockResolvedValue([role(true)]);

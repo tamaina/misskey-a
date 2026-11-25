@@ -18,11 +18,15 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, watch, ref, useTemplateRef } from 'vue';
 import XFeatured from '@features/discovery/frontend/pages/explore.featured.vue';
 import XUsers from '@features/discovery/frontend/pages/explore.users.vue';
 import XRoles from '@features/roles/frontend/pages/explore.roles.vue';
 import { definePage } from '@features/navigation/frontend/page.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	initialTab?: string;
@@ -41,7 +45,7 @@ const headerTabs = computed(() => [{
 }, {
 	key: 'users',
 	icon: 'ti ti-users',
-	title: $locale.value.sfc.users,
+	title: globalLocale.value.env.users,
 }, {
 	key: 'roles',
 	icon: 'ti ti-badges',
@@ -57,7 +61,6 @@ definePage(() => ({
 <locale locale="ar-SA" lang="json">
 {
 	"featured": "المتداولة",
-	"users": "المستخدمون",
 	"roles": "الأدوار",
 	"explore": "استكشاف"
 }
@@ -66,7 +69,6 @@ definePage(() => ({
 <locale locale="ca-ES" lang="json">
 {
 	"featured": "Destacat",
-	"users": "Usuaris",
 	"roles": "Rols",
 	"explore": "Explora"
 }
@@ -75,7 +77,6 @@ definePage(() => ({
 <locale locale="cs-CZ" lang="json">
 {
 	"featured": "Oblíbené poznámky",
-	"users": "Uživatelé",
 	"roles": "Role",
 	"explore": "Objevovat"
 }
@@ -84,7 +85,6 @@ definePage(() => ({
 <locale locale="da-DK" lang="json">
 {
 	"featured": "Featured",
-	"users": "Users",
 	"roles": "Roles",
 	"explore": "Explore"
 }
@@ -93,7 +93,6 @@ definePage(() => ({
 <locale locale="de-DE" lang="json">
 {
 	"featured": "Beliebt",
-	"users": "Benutzer",
 	"roles": "Rollen",
 	"explore": "Erkunden"
 }
@@ -102,7 +101,6 @@ definePage(() => ({
 <locale locale="en-US" lang="json">
 {
 	"featured": "Featured",
-	"users": "Users",
 	"roles": "Roles",
 	"explore": "Explore"
 }
@@ -111,7 +109,6 @@ definePage(() => ({
 <locale locale="es-ES" lang="json">
 {
 	"featured": "Destacados",
-	"users": "Usuarios",
 	"roles": "Roles",
 	"explore": "Explorar"
 }
@@ -120,7 +117,6 @@ definePage(() => ({
 <locale locale="fr-FR" lang="json">
 {
 	"featured": "Tendances",
-	"users": "Utilisateur·rice·s",
 	"roles": "Rôles",
 	"explore": "Découvrir"
 }
@@ -129,7 +125,6 @@ definePage(() => ({
 <locale locale="id-ID" lang="json">
 {
 	"featured": "Sorotan",
-	"users": "Pengguna",
 	"roles": "Peran",
 	"explore": "Jelajahi"
 }
@@ -138,7 +133,6 @@ definePage(() => ({
 <locale locale="it-IT" lang="json">
 {
 	"featured": "In evidenza",
-	"users": "Profili",
 	"roles": "Ruoli",
 	"explore": "Esplora"
 }
@@ -147,7 +141,6 @@ definePage(() => ({
 <locale locale="ja-JP" lang="json">
 {
 	"featured": "ハイライト",
-	"users": "ユーザー",
 	"roles": "ロール",
 	"explore": "みつける"
 }
@@ -156,7 +149,6 @@ definePage(() => ({
 <locale locale="ja-KS" lang="json">
 {
 	"featured": "ハイライト",
-	"users": "ユーザー",
 	"roles": "ロール",
 	"explore": "みつける"
 }
@@ -165,7 +157,6 @@ definePage(() => ({
 <locale locale="kab-KAB" lang="json">
 {
 	"featured": "Featured",
-	"users": "Users",
 	"roles": "Roles",
 	"explore": "Explore"
 }
@@ -174,7 +165,6 @@ definePage(() => ({
 <locale locale="kn-IN" lang="json">
 {
 	"featured": "Featured",
-	"users": "ಬಳಕೆದಾರ",
 	"roles": "Roles",
 	"explore": "Explore"
 }
@@ -183,7 +173,6 @@ definePage(() => ({
 <locale locale="ko-KR" lang="json">
 {
 	"featured": "유행",
-	"users": "유저",
 	"roles": "역할",
 	"explore": "둘러보기"
 }
@@ -192,7 +181,6 @@ definePage(() => ({
 <locale locale="nl-NL" lang="json">
 {
 	"featured": "Uitgelicht",
-	"users": "Gebruikers",
 	"roles": "Roles",
 	"explore": "Verkennen"
 }
@@ -201,7 +189,6 @@ definePage(() => ({
 <locale locale="no-NO" lang="json">
 {
 	"featured": "Featured",
-	"users": "Brukere",
 	"roles": "Roller",
 	"explore": "Utforsk"
 }
@@ -210,7 +197,6 @@ definePage(() => ({
 <locale locale="pl-PL" lang="json">
 {
 	"featured": "Wyróżnione",
-	"users": "Użytkownicy",
 	"roles": "Role",
 	"explore": "Eksploruj"
 }
@@ -219,7 +205,6 @@ definePage(() => ({
 <locale locale="pt-PT" lang="json">
 {
 	"featured": "Destaques",
-	"users": "Usuários",
 	"roles": "Cargos",
 	"explore": "Explorar"
 }
@@ -228,7 +213,6 @@ definePage(() => ({
 <locale locale="ru-RU" lang="json">
 {
 	"featured": "Горячее",
-	"users": "Пользователи",
 	"roles": "Роли",
 	"explore": "Обзор"
 }
@@ -237,7 +221,6 @@ definePage(() => ({
 <locale locale="sk-SK" lang="json">
 {
 	"featured": "Obľúbené poznámky",
-	"users": "Používatelia",
 	"roles": "Roles",
 	"explore": "Objavovať"
 }
@@ -246,7 +229,6 @@ definePage(() => ({
 <locale locale="th-TH" lang="json">
 {
 	"featured": "ไฮไลท์",
-	"users": "ผู้ใช้",
 	"roles": "บทบาท",
 	"explore": "สำรวจ"
 }
@@ -255,7 +237,6 @@ definePage(() => ({
 <locale locale="tr-TR" lang="json">
 {
 	"featured": "Öne çıkan",
-	"users": "Kullanıcılar",
 	"roles": "Roller",
 	"explore": "Keşfet"
 }
@@ -264,7 +245,6 @@ definePage(() => ({
 <locale locale="ug-CN" lang="json">
 {
 	"featured": "Featured",
-	"users": "Users",
 	"roles": "Roles",
 	"explore": "Explore"
 }
@@ -273,7 +253,6 @@ definePage(() => ({
 <locale locale="uk-UA" lang="json">
 {
 	"featured": "Популярні",
-	"users": "Користувачі",
 	"roles": "Ролі",
 	"explore": "Огляд"
 }
@@ -282,7 +261,6 @@ definePage(() => ({
 <locale locale="vi-VN" lang="json">
 {
 	"featured": "Nổi bật",
-	"users": "Người dùng",
 	"roles": "Vai trò",
 	"explore": "Khám phá"
 }
@@ -291,7 +269,6 @@ definePage(() => ({
 <locale locale="zh-CN" lang="json">
 {
 	"featured": "热门",
-	"users": "用户",
 	"roles": "角色",
 	"explore": "发现"
 }
@@ -300,7 +277,6 @@ definePage(() => ({
 <locale locale="zh-TW" lang="json">
 {
 	"featured": "精選",
-	"users": "使用者",
 	"roles": "角色",
 	"explore": "探索"
 }

@@ -47,7 +47,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 								</div>
 								<div :class="$style.pageBannerTitleSubActions">
 									<MkA v-if="page.userId === $i?.id" v-tooltip="$locale.sfc.editThisPage" :to="`/pages/edit/${page.id}`" class="_button" :class="$style.generalActionButton"><i class="ti ti-pencil ti-fw"></i></MkA>
-									<button v-tooltip="$locale.sfc.share" class="_button" :class="$style.generalActionButton" @click="share"><i class="ti ti-share ti-fw"></i></button>
+									<button v-tooltip="globalLocale.env.share" class="_button" :class="$style.generalActionButton" @click="share"><i class="ti ti-share ti-fw"></i></button>
 								</div>
 							</div>
 						</div>
@@ -63,7 +63,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<div :class="$style.other">
 							<MkA v-if="page.userId === $i?.id" v-tooltip="$locale.sfc.editThisPage" :to="`/pages/edit/${page.id}`" class="_button" :class="$style.generalActionButton"><i class="ti ti-pencil ti-fw"></i></MkA>
 							<button v-tooltip="$locale.sfc.copyLink" class="_button" :class="$style.generalActionButton" @click="copyLink"><i class="ti ti-link ti-fw"></i></button>
-							<button v-tooltip="$locale.sfc.share" class="_button" :class="$style.generalActionButton" @click="share"><i class="ti ti-share ti-fw"></i></button>
+							<button v-tooltip="globalLocale.env.share" class="_button" :class="$style.generalActionButton" @click="share"><i class="ti ti-share ti-fw"></i></button>
 							<button v-if="$i" v-click-anime class="_button" :class="$style.generalActionButton" @click="showMenu"><i class="ti ti-dots ti-fw"></i></button>
 						</div>
 					</div>
@@ -76,8 +76,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<!--<MkFollowButton v-if="!$i || $i.id != page.user.id" :user="page.user!" :inline="true" :transparent="false" :full="true" :class="$style.follow"/>-->
 					</div>
 					<div :class="$style.pageDate">
-						<div><i class="ti ti-clock"></i> {{ $locale.sfc.createdAt }}: <MkTime :time="page.createdAt" mode="detail"/></div>
-						<div v-if="page.createdAt != page.updatedAt"><i class="ti ti-clock-edit"></i> {{ $locale.sfc.updatedAt }}: <MkTime :time="page.updatedAt" mode="detail"/></div>
+						<div><i class="ti ti-clock"></i> {{ globalLocale.env.createdAt }}: <MkTime :time="page.createdAt" mode="detail"/></div>
+						<div v-if="page.createdAt != page.updatedAt"><i class="ti ti-clock-edit"></i> {{ globalLocale.env.updatedAt }}: <MkTime :time="page.updatedAt" mode="detail"/></div>
 					</div>
 				</div>
 				<MkAd :preferForms="['horizontal', 'horizontal-big']"/>
@@ -98,11 +98,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { useLocale } from 'virtual:vite-vue-internationalization';
-import type { Locale } from 'i18n';
 import { computed, watch, ref, defineAsyncComponent, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
 import { url } from '@features/boot/frontend/shared/config.js';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import XPage from '@features/pages/frontend/components/page/page.vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import * as os from '@features/ui/frontend/os.js';
@@ -124,6 +122,8 @@ import { useRouter } from '@features/navigation/frontend/router.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { getPluginHandlers } from '@features/integrations/frontend/plugin.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Locale } from 'i18n';
 
 const globalLocale = useLocale<Locale>(import.meta.url);
 
@@ -179,7 +179,7 @@ function share(ev: PointerEvent) {
 
 	if (isSupportShare()) {
 		menuItems.push({
-			text: $locale.value.sfc.share,
+			text: globalLocale.value.env.share,
 			icon: 'ti ti-share',
 			action: shareWithNavigator,
 		});
@@ -545,7 +545,6 @@ definePage(() => ({
 <locale locale="ar-SA" lang="json">
 {
 	"shareWithNote": "شاركه في ملاحظة",
-	"share": "شارِك",
 	"unlikeConfirm": "أتريد إلغاء إعجابك؟",
 	"unpin": "فكها من ملفك الشخصي",
 	"pin": "ثبتها على الصفحة الشخصية",
@@ -556,8 +555,6 @@ definePage(() => ({
 	"unlike": "أزل الإعجاب",
 	"like": "أعجبني",
 	"copyLink": "انسخ الرابط",
-	"createdAt": "أُنشئ في",
-	"updatedAt": "حُدّث في",
 	"recentPosts": "المشاركات الحديثة"
 }
 </locale>
@@ -565,7 +562,6 @@ definePage(() => ({
 <locale locale="ca-ES" lang="json">
 {
 	"shareWithNote": "Comparteix amb una nota",
-	"share": "Comparteix",
 	"unlikeConfirm": "Vols esborrar el teu m'agrada?",
 	"unpin": "Para de fixar del perfil",
 	"pin": "Fixa al perfil",
@@ -576,8 +572,6 @@ definePage(() => ({
 	"unlike": "Treure m'agrada ",
 	"like": "M'agrada ",
 	"copyLink": "Copia l'enllaç",
-	"createdAt": "Creat el",
-	"updatedAt": "Actualitzat el",
 	"recentPosts": "Articles recents"
 }
 </locale>
@@ -585,7 +579,6 @@ definePage(() => ({
 <locale locale="cs-CZ" lang="json">
 {
 	"shareWithNote": "Sdílet s poznámkou",
-	"share": "Sdílet",
 	"unlikeConfirm": "Opravdu chcete odstranit like?",
 	"unpin": "Odepnout",
 	"pin": "Připnout",
@@ -596,8 +589,6 @@ definePage(() => ({
 	"unlike": "Už se mi to nelíbí",
 	"like": "To se mi líbí",
 	"copyLink": "Kopírovat odkaz",
-	"createdAt": "Vytvořeno",
-	"updatedAt": "Upraveno",
 	"recentPosts": "Poslední příspěvky"
 }
 </locale>
@@ -605,7 +596,6 @@ definePage(() => ({
 <locale locale="da-DK" lang="json">
 {
 	"shareWithNote": "Share with note",
-	"share": "Share",
 	"unlikeConfirm": "Really remove your like?",
 	"unpin": "Unpin from profile",
 	"pin": "Pin to profile",
@@ -616,8 +606,6 @@ definePage(() => ({
 	"unlike": "Remove like",
 	"like": "Like",
 	"copyLink": "Copy link",
-	"createdAt": "Created at",
-	"updatedAt": "Updated at",
 	"recentPosts": "Recent posts"
 }
 </locale>
@@ -625,7 +613,6 @@ definePage(() => ({
 <locale locale="de-DE" lang="json">
 {
 	"shareWithNote": "Mit Notiz teilen",
-	"share": "Teilen",
 	"unlikeConfirm": "\"Gefällt mir\" wirklich entfernen?",
 	"unpin": "Von deinem Profil lösen",
 	"pin": "An dein Profil anheften",
@@ -636,8 +623,6 @@ definePage(() => ({
 	"unlike": "\"Gefällt mir\" entfernen",
 	"like": "Gefällt mir",
 	"copyLink": "Link kopieren",
-	"createdAt": "Erstellt am",
-	"updatedAt": "Zuletzt geändert am",
 	"recentPosts": "Neue Beiträge"
 }
 </locale>
@@ -645,7 +630,6 @@ definePage(() => ({
 <locale locale="en-US" lang="json">
 {
 	"shareWithNote": "Share with note",
-	"share": "Share",
 	"unlikeConfirm": "Really remove your like?",
 	"unpin": "Unpin from profile",
 	"pin": "Pin to profile",
@@ -656,8 +640,6 @@ definePage(() => ({
 	"unlike": "Remove like",
 	"like": "Like",
 	"copyLink": "Copy link",
-	"createdAt": "Created at",
-	"updatedAt": "Updated at",
 	"recentPosts": "Recent posts"
 }
 </locale>
@@ -665,7 +647,6 @@ definePage(() => ({
 <locale locale="es-ES" lang="json">
 {
 	"shareWithNote": "Compartir con una nota",
-	"share": "Compartir",
 	"unlikeConfirm": "¿Quitar como favorito?",
 	"unpin": "Desfijar",
 	"pin": "Fijar al perfil",
@@ -676,8 +657,6 @@ definePage(() => ({
 	"unlike": "Quitar me gusta",
 	"like": "Me gusta",
 	"copyLink": "Copiar enlace",
-	"createdAt": "Fecha de creación",
-	"updatedAt": "Actualizado",
 	"recentPosts": "Publicaciones recientes"
 }
 </locale>
@@ -685,7 +664,6 @@ definePage(() => ({
 <locale locale="fr-FR" lang="json">
 {
 	"shareWithNote": "Partager dans une note",
-	"share": "Partager",
 	"unlikeConfirm": "Êtes-vous sûr·e de ne plus vouloir aimer cette publication ?",
 	"unpin": "Désépingler",
 	"pin": "Épingler sur le profil",
@@ -696,8 +674,6 @@ definePage(() => ({
 	"unlike": "Je n’aime pas",
 	"like": "Favori",
 	"copyLink": "Copier le lien",
-	"createdAt": "Date de création",
-	"updatedAt": "Mis à jour le",
 	"recentPosts": "Les plus récentes"
 }
 </locale>
@@ -705,7 +681,6 @@ definePage(() => ({
 <locale locale="id-ID" lang="json">
 {
 	"shareWithNote": "Bagikan dengan catatan",
-	"share": "Bagikan",
 	"unlikeConfirm": "Yakin ingin hapus sukamu?",
 	"unpin": "Lepas sematan",
 	"pin": "Sematkan",
@@ -716,8 +691,6 @@ definePage(() => ({
 	"unlike": "Hapus suka",
 	"like": "Suka",
 	"copyLink": "Salin tautan",
-	"createdAt": "Dibuat pada",
-	"updatedAt": "Diperbarui pada",
 	"recentPosts": "Postingan terbaru"
 }
 </locale>
@@ -725,7 +698,6 @@ definePage(() => ({
 <locale locale="it-IT" lang="json">
 {
 	"shareWithNote": "Condividere in nota",
-	"share": "Condividi",
 	"unlikeConfirm": "Non ti piace più?",
 	"unpin": "Non fissare sul profilo",
 	"pin": "Fissa sul profilo",
@@ -736,8 +708,6 @@ definePage(() => ({
 	"unlike": "Togli Mi piace",
 	"like": "Mi piace",
 	"copyLink": "Copia il link",
-	"createdAt": "Data di creazione",
-	"updatedAt": "Aggiornato il",
 	"recentPosts": "Pubblicazioni recenti"
 }
 </locale>
@@ -745,7 +715,6 @@ definePage(() => ({
 <locale locale="ja-JP" lang="json">
 {
 	"shareWithNote": "ノートで共有",
-	"share": "共有",
 	"unlikeConfirm": "いいね解除しますか？",
 	"unpin": "ピン留め解除",
 	"pin": "ピン留め",
@@ -756,8 +725,6 @@ definePage(() => ({
 	"unlike": "いいね解除",
 	"like": "いいね",
 	"copyLink": "リンクをコピー",
-	"createdAt": "作成日時",
-	"updatedAt": "更新日時",
 	"recentPosts": "最近の投稿"
 }
 </locale>
@@ -765,7 +732,6 @@ definePage(() => ({
 <locale locale="ja-KS" lang="json">
 {
 	"shareWithNote": "ノートで共有",
-	"share": "わけわけ",
 	"unlikeConfirm": "いいね解除するんか？",
 	"unpin": "ピン留めやめる",
 	"pin": "ピン留めしとく",
@@ -776,8 +742,6 @@ definePage(() => ({
 	"unlike": "良くないわ",
 	"like": "ええやん",
 	"copyLink": "リンクをコピー",
-	"createdAt": "作成した日",
-	"updatedAt": "更新日時",
 	"recentPosts": "最近の投稿"
 }
 </locale>
@@ -785,7 +749,6 @@ definePage(() => ({
 <locale locale="kab-KAB" lang="json">
 {
 	"shareWithNote": "Share with note",
-	"share": "Share",
 	"unlikeConfirm": "Really remove your like?",
 	"unpin": "Unpin from profile",
 	"pin": "Pin to profile",
@@ -796,8 +759,6 @@ definePage(() => ({
 	"unlike": "Remove like",
 	"like": "Like",
 	"copyLink": "Copy link",
-	"createdAt": "Created at",
-	"updatedAt": "Updated at",
 	"recentPosts": "Recent posts"
 }
 </locale>
@@ -805,7 +766,6 @@ definePage(() => ({
 <locale locale="kn-IN" lang="json">
 {
 	"shareWithNote": "Share with note",
-	"share": "Share",
 	"unlikeConfirm": "Really remove your like?",
 	"unpin": "ಪ್ರೊಫ಼ೈಲಿಂದ ಅಂಟುತೆಗೆ",
 	"pin": "ಪ್ರೊಫ಼ೈಲಿಗೆ ಅಂಟಿಸು",
@@ -816,8 +776,6 @@ definePage(() => ({
 	"unlike": "Remove like",
 	"like": "Like",
 	"copyLink": "ಲಿಂಕನ್ನು ನಕಲಿಸು",
-	"createdAt": "Created at",
-	"updatedAt": "Updated at",
 	"recentPosts": "Recent posts"
 }
 </locale>
@@ -825,7 +783,6 @@ definePage(() => ({
 <locale locale="ko-KR" lang="json">
 {
 	"shareWithNote": "노트로 공유",
-	"share": "공유",
 	"unlikeConfirm": "좋아요를 취소할까요?",
 	"unpin": "프로필에서 고정 해제",
 	"pin": "프로필에 고정",
@@ -836,8 +793,6 @@ definePage(() => ({
 	"unlike": "좋아요 해제",
 	"like": "좋아요",
 	"copyLink": "링크 복사",
-	"createdAt": "생성된 날짜",
-	"updatedAt": "수정한 날짜",
 	"recentPosts": "최근 게시물"
 }
 </locale>
@@ -845,7 +800,6 @@ definePage(() => ({
 <locale locale="nl-NL" lang="json">
 {
 	"shareWithNote": "Delen met notitie",
-	"share": "Delen",
 	"unlikeConfirm": "Wil je echt je like verwijderen?",
 	"unpin": "Losmaken van profielpagina",
 	"pin": "Vastmaken aan profielpagina",
@@ -856,8 +810,6 @@ definePage(() => ({
 	"unlike": "Remove like",
 	"like": "Like",
 	"copyLink": "Kopiëren link",
-	"createdAt": "Aangemaakt at",
-	"updatedAt": "Laatst gewijzigd at",
 	"recentPosts": "Recente berichten"
 }
 </locale>
@@ -865,7 +817,6 @@ definePage(() => ({
 <locale locale="no-NO" lang="json">
 {
 	"shareWithNote": "Share with note",
-	"share": "Del",
 	"unlikeConfirm": "Really remove your like?",
 	"unpin": "Fjern fra profil",
 	"pin": "Fest til profil",
@@ -876,8 +827,6 @@ definePage(() => ({
 	"unlike": "Liker ikke",
 	"like": "Liker",
 	"copyLink": "Kopier lenke",
-	"createdAt": "Created at",
-	"updatedAt": "Updated at",
 	"recentPosts": "Recent posts"
 }
 </locale>
@@ -885,7 +834,6 @@ definePage(() => ({
 <locale locale="pl-PL" lang="json">
 {
 	"shareWithNote": "Udostępnij z wpisem",
-	"share": "Udostępnij",
 	"unlikeConfirm": "Na pewno chcesz usunąć\u00a0polubienie?",
 	"unpin": "Odepnij z profilu",
 	"pin": "Przypnij do profilu",
@@ -896,8 +844,6 @@ definePage(() => ({
 	"unlike": "Cofnij polubienie",
 	"like": "Lubię",
 	"copyLink": "Skopiuj odnośnik",
-	"createdAt": "Utworzono",
-	"updatedAt": "Zaktualizowano",
 	"recentPosts": "Ostatnie wpisy"
 }
 </locale>
@@ -905,7 +851,6 @@ definePage(() => ({
 <locale locale="pt-PT" lang="json">
 {
 	"shareWithNote": "Compartilhar em Notas",
-	"share": "Compartilhar",
 	"unlikeConfirm": "Deseja realmente deixar de curtir?",
 	"unpin": "Desafixar do perfil",
 	"pin": "Fixar no perfil",
@@ -916,8 +861,6 @@ definePage(() => ({
 	"unlike": "Remover curtida",
 	"like": "Curtir",
 	"copyLink": "Copiar link",
-	"createdAt": "Data de criação",
-	"updatedAt": "Última atualização",
 	"recentPosts": "Notas recentes"
 }
 </locale>
@@ -925,7 +868,6 @@ definePage(() => ({
 <locale locale="ru-RU" lang="json">
 {
 	"shareWithNote": "Поделиться заметкой",
-	"share": "Поделиться",
 	"unlikeConfirm": "В самом деле убрать «нравится»?",
 	"unpin": "Открепить от профиля",
 	"pin": "Закрепить в профиле",
@@ -936,8 +878,6 @@ definePage(() => ({
 	"unlike": "Отменить «нравится»",
 	"like": "Нравится",
 	"copyLink": "Скопировать ссылку",
-	"createdAt": "Создано",
-	"updatedAt": "Обновлено",
 	"recentPosts": "Недавние публикации"
 }
 </locale>
@@ -945,7 +885,6 @@ definePage(() => ({
 <locale locale="sk-SK" lang="json">
 {
 	"shareWithNote": "Zdieľať s poznámkou",
-	"share": "Zdieľať",
 	"unlikeConfirm": "Naozaj odstrániť váš like?",
 	"unpin": "Odopnúť",
 	"pin": "Pripnúť",
@@ -956,8 +895,6 @@ definePage(() => ({
 	"unlike": "Nepáči sa mi",
 	"like": "Páči sa mi",
 	"copyLink": "Kopírovať odkaz",
-	"createdAt": "Vytvorené",
-	"updatedAt": "Upravené",
 	"recentPosts": "Najnovšie príspevky"
 }
 </locale>
@@ -965,7 +902,6 @@ definePage(() => ({
 <locale locale="th-TH" lang="json">
 {
 	"shareWithNote": "แบ่งปันด้วยโน้ต",
-	"share": "แบ่งปัน",
 	"unlikeConfirm": "ต้องการเลิกถูกใจใช่ไหม?",
 	"unpin": "เลิกปักหมุด",
 	"pin": "ปักหมุด",
@@ -976,8 +912,6 @@ definePage(() => ({
 	"unlike": "เลิกถูกใจ",
 	"like": "ถูกใจ",
 	"copyLink": "คัดลอกลิงก์",
-	"createdAt": "สร้างเมื่อ",
-	"updatedAt": "อัปเดตล่าสุด",
 	"recentPosts": "โพสต์ล่าสุด"
 }
 </locale>
@@ -985,7 +919,6 @@ definePage(() => ({
 <locale locale="tr-TR" lang="json">
 {
 	"shareWithNote": "Notla paylaş",
-	"share": "Paylaş",
 	"unlikeConfirm": "Cidden beğenini kaldırmak mı istiyorsun?",
 	"unpin": "Profilden sabitlemeyi kaldır",
 	"pin": "Profiline sabitle",
@@ -996,8 +929,6 @@ definePage(() => ({
 	"unlike": "Benzerlerini kaldır",
 	"like": "Beğen",
 	"copyLink": "Link kopyala",
-	"createdAt": "Oluşturuldu",
-	"updatedAt": "Güncellendi",
 	"recentPosts": "Son gönderiler"
 }
 </locale>
@@ -1005,7 +936,6 @@ definePage(() => ({
 <locale locale="ug-CN" lang="json">
 {
 	"shareWithNote": "Share with note",
-	"share": "Share",
 	"unlikeConfirm": "Really remove your like?",
 	"unpin": "Unpin from profile",
 	"pin": "pinned",
@@ -1016,8 +946,6 @@ definePage(() => ({
 	"unlike": "Remove like",
 	"like": "Like",
 	"copyLink": "Copy link",
-	"createdAt": "Created at",
-	"updatedAt": "Updated at",
 	"recentPosts": "Recent posts"
 }
 </locale>
@@ -1025,7 +953,6 @@ definePage(() => ({
 <locale locale="uk-UA" lang="json">
 {
 	"shareWithNote": "Поділитися нотаткою",
-	"share": "Поділитись",
 	"unlikeConfirm": "Бажаєте відписатися від подібних?",
 	"unpin": "Відкріпити",
 	"pin": "Закріпити",
@@ -1036,8 +963,6 @@ definePage(() => ({
 	"unlike": "Не вподобати",
 	"like": "Вподобати",
 	"copyLink": "Скопіювати посилання",
-	"createdAt": "Створено",
-	"updatedAt": "Останнє оновлення",
 	"recentPosts": "Нещодавні дописи"
 }
 </locale>
@@ -1045,7 +970,6 @@ definePage(() => ({
 <locale locale="vi-VN" lang="json">
 {
 	"shareWithNote": "Chia sẻ kèm với tút",
-	"share": "Chia sẻ",
 	"unlikeConfirm": "Bạn có chắc muốn bỏ thích ?",
 	"unpin": "Bỏ ghim",
 	"pin": "Ghim",
@@ -1056,8 +980,6 @@ definePage(() => ({
 	"unlike": "Bỏ thích",
 	"like": "Thích",
 	"copyLink": "Chép liên kết",
-	"createdAt": "Ngày tạo",
-	"updatedAt": "Cập nhật lúc",
 	"recentPosts": "Tút gần đây"
 }
 </locale>
@@ -1065,7 +987,6 @@ definePage(() => ({
 <locale locale="zh-CN" lang="json">
 {
 	"shareWithNote": "分享到帖文",
-	"share": "分享",
 	"unlikeConfirm": "取消赞？",
 	"unpin": "取消置顶",
 	"pin": "置顶",
@@ -1076,8 +997,6 @@ definePage(() => ({
 	"unlike": "取消喜欢",
 	"like": "喜欢",
 	"copyLink": "复制链接",
-	"createdAt": "创建日期",
-	"updatedAt": "更新日期",
 	"recentPosts": "最新发布"
 }
 </locale>
@@ -1085,7 +1004,6 @@ definePage(() => ({
 <locale locale="zh-TW" lang="json">
 {
 	"shareWithNote": "在貼文中分享",
-	"share": "分享",
 	"unlikeConfirm": "要取消按讚嗎？",
 	"unpin": "取消置頂",
 	"pin": "置頂",
@@ -1096,8 +1014,6 @@ definePage(() => ({
 	"unlike": "收回讚好",
 	"like": "讚好",
 	"copyLink": "複製連結",
-	"createdAt": "建立於",
-	"updatedAt": "最後更新",
 	"recentPosts": "最新貼文"
 }
 </locale>

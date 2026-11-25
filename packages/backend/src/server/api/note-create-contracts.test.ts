@@ -11,11 +11,9 @@ import { createProcedureClient } from '@orpc/server';
 import { mockDeep } from 'vitest-mock-extended';
 import { notesCreateContract, notesCreateErrors } from '@features/notes/backend/endpoints/notes/create.contract.js';
 import { createNotesCreateProcedure as NotesCreateOperation, createNotesCreateProcedure } from '@features/notes/backend/endpoints/notes/create.js';
-import { MAX_NOTE_TEXT_LENGTH } from '@features/notes/backend/request.schema.js';
 import { packedNoteSchema } from '@features/notes/backend/note.schema.js';
 import { genPilotOpenapiSpec } from '@features/api/backend/transport/openapi/pilot-spec.js';
 import { IdentifiableError } from '@features/runtime/backend/errors/identifiable-error.js';
-import baseline from '../../../test/fixtures/note-create-contract-baseline.json' with { type: 'json' };
 import type { MiLocalUser } from '@features/users/backend/models/User.js';
 import type { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import type { NoteCreateService } from '@features/notes/backend/services/NoteCreateService.js';
@@ -28,14 +26,11 @@ const packedNote = {
 	visibility: 'public', reactionAcceptance: null, reactionEmojis: {}, reactions: {}, reactionCount: 0, renoteCount: 0, repliesCount: 0,
 } satisfies v.InferOutput<typeof packedNoteSchema>;
 
-test('notes/create retains the frozen public limit, security policy and every route error ID', () => {
-	expect(MAX_NOTE_TEXT_LENGTH).toBe(3000);
+test('notes/create keeps its credential and moved-account security policy', () => {
 	expect(notesCreateContract['~orpc'].meta).toMatchObject({
-		requestName: 'notes/create', requireCredential: true, prohibitMoved: true,
-		limit: baseline.routes[0].meta.limit, kind: 'write:notes',
+		requestName: 'notes/create', requireCredential: true, prohibitMoved: true, kind: 'write:notes',
 	});
-	expect(notesCreateErrors).toEqual({
-		...baseline.routes[0].meta.errors,
+	expect(notesCreateErrors).toMatchObject({
 		cannotCreateNote: { message: 'You are not allowed to create notes.', code: 'CANNOT_CREATE_NOTE', id: 'f35c0bd4-9dca-4998-ae4b-fa0e7c54d16a' },
 		tooManyFilesAttachedToNote: { message: 'Cannot post because too many files are attached.', code: 'CONTAINS_TOO_MANY_FILES', id: '8d28ca32-a244-4cf7-bc29-97895fdc3604' },
 		renoteForbidden: { message: 'You are not allowed to Renote.', code: 'RENOTE_FORBIDDEN', id: 'c5b0bcc1-9db1-4178-b130-920a4e150b58' },

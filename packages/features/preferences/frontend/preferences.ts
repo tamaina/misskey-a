@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { BroadcastChannel } from 'broadcast-channel';
+import { TypedBroadcastChannel as BroadcastChannel } from '@features/runtime/frontend/utility/typed-broadcast-channel.js';
 import { createVisibilityAwareInterval } from '@features/ui/frontend/shared/interval.js';
 import type { StorageProvider } from '@features/preferences/frontend/state/manager.js';
 import { cloudBackup } from '@features/preferences/frontend/state/utility.js';
@@ -125,7 +125,8 @@ prefer.on('committed', () => {
 	});
 });
 
-preferencesChannel.addEventListener('message', (msg) => {
+preferencesChannel.addEventListener('message', (ev) => {
+	const msg = ev.data;
 	if (msg.type === 'preferencesUpdate') {
 		if (msg.tabId === TAB_ID) return;
 		if (latestPreferencesUpdate != null) {

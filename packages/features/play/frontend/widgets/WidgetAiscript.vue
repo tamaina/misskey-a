@@ -19,7 +19,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { onUnmounted, ref } from 'vue';
 import { Interpreter, Parser, utils } from '@syuilo/aiscript';
 import { useWidgetPropsManager } from '../../../ui/frontend/widgets/widget.js';
 import type { WidgetComponentEmits, WidgetComponentExpose, WidgetComponentProps } from '../../../ui/frontend/widgets/widget.js';
@@ -60,7 +60,7 @@ const { widgetProps, configure } = useWidgetPropsManager(name,
 );
 
 const parser = new Parser();
-let aiscript: Interpreter;
+let aiscript: Interpreter | null = null;
 
 const logs = ref<{
 	id: string;
@@ -79,9 +79,10 @@ function processError(title: string, err: unknown): void {
 }
 
 const run = async () => {
+	if (aiscript) aiscript.abort();
 	logs.value = [];
 
-	const aiscript = new Interpreter(createAiScriptEnv({
+	aiscript = new Interpreter(createAiScriptEnv({
 		storageKey: 'widget',
 		token: $i?.token,
 	}), {
@@ -112,6 +113,10 @@ const run = async () => {
 		processError('AiScript Internal Error', err);
 	}
 };
+
+onUnmounted(() => {
+	if (aiscript) aiscript.abort();
+});
 
 defineExpose<WidgetComponentExpose>({
 	name,

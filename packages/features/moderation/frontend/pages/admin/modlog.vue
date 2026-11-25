@@ -13,7 +13,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				</MkSelect>
 
 				<MkInput v-model="moderatorId" style="margin: 0; flex: 1;">
-					<template #label>{{ $locale.sfc.moderator }}(ID)</template>
+					<template #label>{{ globalLocale.env.moderator }}(ID)</template>
 				</MkInput>
 			</MkPaginationControl>
 
@@ -43,6 +43,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref, markRaw, onMounted } from 'vue';
 import * as Misskey from 'misskey-js';
 import XModLog from '@features/moderation/frontend/pages/admin/modlog.ModLog.vue';
@@ -57,13 +58,16 @@ import MkPullToRefresh from '@features/ui/frontend/components/MkPullToRefresh.vu
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkPaginationControl from '@features/ui/frontend/components/MkPaginationControl.vue';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const {
 	model: type,
 	def: typeDef,
 } = useMkSelect({
 	items: [
-		{ label: $locale.value.sfc.all, value: null },
+		{ label: globalLocale.value.env.all, value: null },
 		...Misskey.moderationLogTypes.map(t => ({ label: copyLocaleDictionary($locale.value.sfc.moderationLogTypesLabels)[t] ?? t, value: t })),
 	],
 	initialValue: null,
@@ -111,9 +115,7 @@ definePage(() => ({
 <locale lang="json" locale="ar-SA">
 {
 	"type": "نوع",
-	"moderator": "مشرِف",
 	"loadMore": "عرض المزيد",
-	"all": "الكل",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Clear queue",
 		"promoteQueue": "Promote queue",
@@ -176,9 +178,7 @@ definePage(() => ({
 <locale lang="json" locale="ca-ES">
 {
 	"type": "Tipus",
-	"moderator": "Moderador/a",
 	"loadMore": "Carregar més",
-	"all": "Tot",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Esborra la cua de feina",
 		"promoteQueue": "Tornar a intentar la feina de la cua",
@@ -241,9 +241,7 @@ definePage(() => ({
 <locale lang="json" locale="cs-CZ">
 {
 	"type": "Typ",
-	"moderator": "Moderátor",
 	"loadMore": "Zobrazit více",
-	"all": "Vše",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Clear queue",
 		"promoteQueue": "Promote queue",
@@ -306,9 +304,7 @@ definePage(() => ({
 <locale lang="json" locale="da-DK">
 {
 	"type": "Type",
-	"moderator": "Moderator",
 	"loadMore": "Load more",
-	"all": "All",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Clear queue",
 		"promoteQueue": "Promote queue",
@@ -371,9 +367,7 @@ definePage(() => ({
 <locale lang="json" locale="de-DE">
 {
 	"type": "Art",
-	"moderator": "Moderator",
 	"loadMore": "Mehr laden",
-	"all": "Alle",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Warteschlange leeren",
 		"promoteQueue": "Warteschlange erneut ausführen",
@@ -436,9 +430,7 @@ definePage(() => ({
 <locale lang="json" locale="en-US">
 {
 	"type": "Type",
-	"moderator": "Moderator",
 	"loadMore": "Load more",
-	"all": "All",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Clear queue",
 		"promoteQueue": "Promote queue",
@@ -501,9 +493,7 @@ definePage(() => ({
 <locale lang="json" locale="es-ES">
 {
 	"type": "Tipo",
-	"moderator": "Moderador",
 	"loadMore": "Ver más",
-	"all": "Todo",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Borrar la cola de trabajos",
 		"promoteQueue": "Reintentar el trabajo en la cola",
@@ -566,9 +556,7 @@ definePage(() => ({
 <locale lang="json" locale="fr-FR">
 {
 	"type": "Type",
-	"moderator": "Modérateur·rice·s",
 	"loadMore": "Afficher plus …",
-	"all": "Tous",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Clear queue",
 		"promoteQueue": "Promote queue",
@@ -631,9 +619,7 @@ definePage(() => ({
 <locale lang="json" locale="id-ID">
 {
 	"type": "Tipe",
-	"moderator": "Moderator",
 	"loadMore": "Selebihnya",
-	"all": "Semua",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Clear queue",
 		"promoteQueue": "Promote queue",
@@ -696,9 +682,7 @@ definePage(() => ({
 <locale lang="json" locale="it-IT">
 {
 	"type": "Tipo",
-	"moderator": "Moderatore",
 	"loadMore": "Mostra di più",
-	"all": "Tutte",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Ha cancellato la coda di Attività",
 		"promoteQueue": "Ripeti le attività in coda",
@@ -761,9 +745,7 @@ definePage(() => ({
 <locale lang="json" locale="ja-JP">
 {
 	"type": "タイプ",
-	"moderator": "モデレーター",
 	"loadMore": "もっと見る",
-	"all": "全て",
 	"moderationLogTypesLabels": {
 		"clearQueue": "ジョブキューをクリア",
 		"promoteQueue": "キューのジョブを再試行",
@@ -826,9 +808,7 @@ definePage(() => ({
 <locale lang="json" locale="ja-KS">
 {
 	"type": "タイプ",
-	"moderator": "モデレーター",
 	"loadMore": "まだまだあるで！",
-	"all": "みんな",
 	"moderationLogTypesLabels": {
 		"clearQueue": "ジョブキューをクリア",
 		"promoteQueue": "キューのジョブを再試行",
@@ -891,9 +871,7 @@ definePage(() => ({
 <locale lang="json" locale="kab-KAB">
 {
 	"type": "Type",
-	"moderator": "Moderator",
 	"loadMore": "Wali ugar",
-	"all": "All",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Clear queue",
 		"promoteQueue": "Promote queue",
@@ -956,9 +934,7 @@ definePage(() => ({
 <locale lang="json" locale="kn-IN">
 {
 	"type": "Type",
-	"moderator": "Moderator",
 	"loadMore": "ಇನ್ನಷ್ಟು ನೋಡು",
-	"all": "All",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Clear queue",
 		"promoteQueue": "Promote queue",
@@ -1021,9 +997,7 @@ definePage(() => ({
 <locale lang="json" locale="ko-KR">
 {
 	"type": "종류",
-	"moderator": "모더레이터",
 	"loadMore": "더 보기",
-	"all": "전체",
 	"moderationLogTypesLabels": {
 		"clearQueue": "작업 대기열 비우기",
 		"promoteQueue": "큐의 작업을 재시도",
@@ -1086,9 +1060,7 @@ definePage(() => ({
 <locale lang="json" locale="nl-NL">
 {
 	"type": "Type",
-	"moderator": "Moderator",
 	"loadMore": "Laad meer",
-	"all": "Alle",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Clear queue",
 		"promoteQueue": "Promote queue",
@@ -1151,9 +1123,7 @@ definePage(() => ({
 <locale lang="json" locale="no-NO">
 {
 	"type": "Type",
-	"moderator": "Moderator",
 	"loadMore": "Vis mer",
-	"all": "Alle",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Clear queue",
 		"promoteQueue": "Promote queue",
@@ -1216,9 +1186,7 @@ definePage(() => ({
 <locale lang="json" locale="pl-PL">
 {
 	"type": "Typ",
-	"moderator": "Moderator",
 	"loadMore": "Załaduj więcej",
-	"all": "Wszystkie",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Clear queue",
 		"promoteQueue": "Promote queue",
@@ -1281,9 +1249,7 @@ definePage(() => ({
 <locale lang="json" locale="pt-PT">
 {
 	"type": "Tipo",
-	"moderator": "Moderador",
 	"loadMore": "Carregar mais",
-	"all": "Todos",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Clear queue",
 		"promoteQueue": "Promote queue",
@@ -1346,9 +1312,7 @@ definePage(() => ({
 <locale lang="json" locale="ru-RU">
 {
 	"type": "Тип",
-	"moderator": "Модератор",
 	"loadMore": "Загрузить ещё",
-	"all": "Все",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Clear queue",
 		"promoteQueue": "Promote queue",
@@ -1411,9 +1375,7 @@ definePage(() => ({
 <locale lang="json" locale="sk-SK">
 {
 	"type": "Typ",
-	"moderator": "Moderátor",
 	"loadMore": "Zobraziť viac",
-	"all": "Všetko",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Clear queue",
 		"promoteQueue": "Promote queue",
@@ -1476,9 +1438,7 @@ definePage(() => ({
 <locale lang="json" locale="th-TH">
 {
 	"type": "รูปแบบ",
-	"moderator": "ผู้ควบคุม",
 	"loadMore": "แสดงเพิ่มเติม",
-	"all": "ทั้งหมด",
 	"moderationLogTypesLabels": {
 		"clearQueue": "ล้างคิว",
 		"promoteQueue": "ดันงานในคิวอีกครั้ง",
@@ -1541,9 +1501,7 @@ definePage(() => ({
 <locale lang="json" locale="tr-TR">
 {
 	"type": "Tür",
-	"moderator": "Moderatör",
 	"loadMore": "Daha fazla yükle",
-	"all": "Tümü",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Kuyruğu temizle",
 		"promoteQueue": "Sıraya alınmış işi yeniden deneyin.",
@@ -1606,9 +1564,7 @@ definePage(() => ({
 <locale lang="json" locale="ug-CN">
 {
 	"type": "Type",
-	"moderator": "Moderator",
 	"loadMore": "Load more",
-	"all": "All",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Clear queue",
 		"promoteQueue": "Promote queue",
@@ -1671,9 +1627,7 @@ definePage(() => ({
 <locale lang="json" locale="uk-UA">
 {
 	"type": "Тип",
-	"moderator": "Модератор",
 	"loadMore": "Показати більше",
-	"all": "Всі",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Clear queue",
 		"promoteQueue": "Promote queue",
@@ -1736,9 +1690,7 @@ definePage(() => ({
 <locale lang="json" locale="vi-VN">
 {
 	"type": "Loại",
-	"moderator": "Kiểm duyệt viên",
 	"loadMore": "Tải thêm",
-	"all": "Tất cả",
 	"moderationLogTypesLabels": {
 		"clearQueue": "Clear queue",
 		"promoteQueue": "Promote queue",
@@ -1801,9 +1753,7 @@ definePage(() => ({
 <locale lang="json" locale="zh-CN">
 {
 	"type": "类型",
-	"moderator": "监察员",
 	"loadMore": "查看更多",
-	"all": "全部",
 	"moderationLogTypesLabels": {
 		"clearQueue": "清除队列",
 		"promoteQueue": "重新执行队列中的任务",
@@ -1866,9 +1816,7 @@ definePage(() => ({
 <locale lang="json" locale="zh-TW">
 {
 	"type": "類型",
-	"moderator": "審查員",
 	"loadMore": "載入更多",
-	"all": "全部",
 	"moderationLogTypesLabels": {
 		"clearQueue": "清除佇列",
 		"promoteQueue": "重新嘗試排程中的工作",

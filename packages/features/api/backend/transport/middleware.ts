@@ -70,10 +70,16 @@ export async function assertApiAuthorization<Actor extends ApiActor>(policy: Api
 		id: '56f20ec9-fd06-4fa5-841b-edd6d7d4fa31', kind: 'permission',
 	});
 	if (policy.requireModerator || policy.requireAdmin || policy.requiredRolePolicy !== undefined) {
-		if (principal === null) throw credentialRequired();
+		if (principal === null && (policy.requireModerator || policy.requireAdmin)) throw credentialRequired();
 		const authorization = context.authorization;
 		if (!authorization) throw apiError(internalError);
-		if (authorization.rootUserId() !== principal.id) {
+		if (principal === null) {
+			// 未ログイン時は既定ポリシーで判定
+			if (policy.requiredRolePolicy !== undefined && !(await authorization.policyAllowed(null, policy.requiredRolePolicy))) throw apiError({
+				code: 'ROLE_PERMISSION_DENIED', message: 'You are not assigned to a required role.',
+				id: '7f86f06f-7e15-4057-8561-f4b6d4ac755a', kind: 'permission',
+			});
+		} else if (authorization.rootUserId() !== principal.id) {
 			const roles = await authorization.roles(principal);
 			if (policy.requireModerator && !roles.some(role => role.isModerator || role.isAdministrator)) throw apiError({
 				code: 'ROLE_PERMISSION_DENIED', message: 'You are not assigned to a moderator role.',

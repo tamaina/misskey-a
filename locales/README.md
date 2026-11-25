@@ -7,13 +7,13 @@ Please see [Contribution guide](../CONTRIBUTING.md) for more information.
 
 The main VVI global dictionary is the existing `locales` export from `i18n`.
 Consumers use its generated `Locale` type directly with `useLocale<Locale>()`;
-the runtime dictionary and type cover the same complete 135-key catalog.
+the runtime dictionary and type cover the same complete global catalog.
 There is no separate key selection or custom shared-locale type. Screen-specific
 messages stay in their owning Vue `<locale>` blocks. Match meaning and all
 28 effective translations before replacing an owner label with a global label.
 
 The catalog pruning in PR #204 was explicitly authorized across languages.
-The Japanese catalog now has 135 leaves: 26 frontend-shared labels, one language-name
+The initial pruned Japanese catalog had 135 leaves: 26 frontend-shared labels, one language-name
 field, 78 dynamically selected achievement titles, 18 notification labels,
 two offline messages and 10 other SW labels. Every retained path has a concrete
 caller in `packages/i18n/catalog-retention.json`; no unconfirmed category remains.
@@ -31,3 +31,11 @@ checks independent pre-pruning raw/effective hashes and the unchanged older
 migration hashes. Historical frontend tests also reconstruct the earlier
 1,391 migrated messages from Vue owners. The production loader/fallback policy
 is unchanged, and no test history is imported by production code.
+
+The core-label promotion restores permission kinds as `_permissions`, shared auth
+controls, application actions and vocabulary, and the historical `_visibility`,
+`_timelines`, `_notification._types`, `_deck._columns` and `_cw` paths. The catalog
+now has 363 leaves. Owners switch only when all 28 current SFC translations match;
+other meanings and screen-specific messages remain local. The 42 YAML catalogs
+are updated together for this explicitly authorized promotion. Languages outside
+the production 28 use their historical raw value when available, then Japanese.

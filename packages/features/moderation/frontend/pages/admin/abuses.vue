@@ -49,6 +49,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref, markRaw } from 'vue';
 import MkSelect from '@features/ui/frontend/components/MkSelect.vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
@@ -58,13 +59,16 @@ import { useMkSelect } from '@features/ui/frontend/composables/use-mkselect.js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { store } from '@features/preferences/frontend/store.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const {
 	model: state,
 	def: stateDef,
 } = useMkSelect({
 	items: [
-		{ label: $locale.value.sfc.all, value: 'all' },
+		{ label: globalLocale.value.env.all, value: 'all' },
 		{ label: $locale.value.sfc.unresolved, value: 'unresolved' },
 		{ label: $locale.value.sfc.resolved, value: 'resolved' },
 	],
@@ -75,7 +79,7 @@ const {
 	def: reporterOriginDef,
 } = useMkSelect({
 	items: [
-		{ label: $locale.value.sfc.all, value: 'combined' },
+		{ label: globalLocale.value.env.all, value: 'combined' },
 		{ label: $locale.value.sfc.local, value: 'local' },
 		{ label: $locale.value.sfc.remote, value: 'remote' },
 	],
@@ -86,7 +90,7 @@ const {
 	def: targetUserOriginDef,
 } = useMkSelect({
 	items: [
-		{ label: $locale.value.sfc.all, value: 'combined' },
+		{ label: globalLocale.value.env.all, value: 'combined' },
 		{ label: $locale.value.sfc.local, value: 'local' },
 		{ label: $locale.value.sfc.remote, value: 'remote' },
 	],
@@ -143,7 +147,6 @@ definePage(() => ({
 
 <locale locale="ar-SA" lang="json">
 {
-	"all": "الكل",
 	"unresolved": "لم يعالج",
 	"resolved": "عولج",
 	"local": "المحلي",
@@ -159,7 +162,6 @@ definePage(() => ({
 
 <locale locale="ca-ES" lang="json">
 {
-	"all": "Tot",
 	"unresolved": "Sense resoldre",
 	"resolved": "Resolt",
 	"local": "Local",
@@ -175,7 +177,6 @@ definePage(() => ({
 
 <locale locale="cs-CZ" lang="json">
 {
-	"all": "Vše",
 	"unresolved": "Nevyřešené",
 	"resolved": "Vyřešeno",
 	"local": "Lokální",
@@ -191,7 +192,6 @@ definePage(() => ({
 
 <locale locale="da-DK" lang="json">
 {
-	"all": "All",
 	"unresolved": "Unresolved",
 	"resolved": "Resolved",
 	"local": "Local",
@@ -207,7 +207,6 @@ definePage(() => ({
 
 <locale locale="de-DE" lang="json">
 {
-	"all": "Alle",
 	"unresolved": "Ungelöst",
 	"resolved": "Gelöst",
 	"local": "Lokal",
@@ -223,7 +222,6 @@ definePage(() => ({
 
 <locale locale="en-US" lang="json">
 {
-	"all": "All",
 	"unresolved": "Unresolved",
 	"resolved": "Resolved",
 	"local": "Local",
@@ -239,7 +237,6 @@ definePage(() => ({
 
 <locale locale="es-ES" lang="json">
 {
-	"all": "Todo",
 	"unresolved": "Sin resolver",
 	"resolved": "Resuelto",
 	"local": "Local",
@@ -255,7 +252,6 @@ definePage(() => ({
 
 <locale locale="fr-FR" lang="json">
 {
-	"all": "Tous",
 	"unresolved": "En attente",
 	"resolved": "Résolu",
 	"local": "Local",
@@ -271,7 +267,6 @@ definePage(() => ({
 
 <locale locale="id-ID" lang="json">
 {
-	"all": "Semua",
 	"unresolved": "Belum selesai",
 	"resolved": "Selesai",
 	"local": "Lokal",
@@ -287,7 +282,6 @@ definePage(() => ({
 
 <locale locale="it-IT" lang="json">
 {
-	"all": "Tutte",
 	"unresolved": "Non risolto",
 	"resolved": "Risolto",
 	"local": "Locale",
@@ -303,7 +297,6 @@ definePage(() => ({
 
 <locale locale="ja-JP" lang="json">
 {
-	"all": "全て",
 	"unresolved": "未解決",
 	"resolved": "解決済み",
 	"local": "ローカル",
@@ -319,7 +312,6 @@ definePage(() => ({
 
 <locale locale="ja-KS" lang="json">
 {
-	"all": "みんな",
 	"unresolved": "まだ解決してないで",
 	"resolved": "解決したで",
 	"local": "ローカル",
@@ -335,7 +327,6 @@ definePage(() => ({
 
 <locale locale="kab-KAB" lang="json">
 {
-	"all": "All",
 	"unresolved": "Unresolved",
 	"resolved": "Resolved",
 	"local": "Local",
@@ -351,7 +342,6 @@ definePage(() => ({
 
 <locale locale="kn-IN" lang="json">
 {
-	"all": "All",
 	"unresolved": "Unresolved",
 	"resolved": "Resolved",
 	"local": "Local",
@@ -367,7 +357,6 @@ definePage(() => ({
 
 <locale locale="ko-KR" lang="json">
 {
-	"all": "전체",
 	"unresolved": "처리되지 않음",
 	"resolved": "처리함",
 	"local": "로컬",
@@ -383,7 +372,6 @@ definePage(() => ({
 
 <locale locale="nl-NL" lang="json">
 {
-	"all": "Alle",
 	"unresolved": "Onopgelost",
 	"resolved": "Opgelost",
 	"local": "Lokaal",
@@ -399,7 +387,6 @@ definePage(() => ({
 
 <locale locale="no-NO" lang="json">
 {
-	"all": "Alle",
 	"unresolved": "Unresolved",
 	"resolved": "Resolved",
 	"local": "Local",
@@ -415,7 +402,6 @@ definePage(() => ({
 
 <locale locale="pl-PL" lang="json">
 {
-	"all": "Wszystkie",
 	"unresolved": "Nierozwiązane",
 	"resolved": "Rozwiązane",
 	"local": "Lokalne",
@@ -431,7 +417,6 @@ definePage(() => ({
 
 <locale locale="pt-PT" lang="json">
 {
-	"all": "Todos",
 	"unresolved": "Não resolvido",
 	"resolved": "Resolvido",
 	"local": "Local",
@@ -447,7 +432,6 @@ definePage(() => ({
 
 <locale locale="ru-RU" lang="json">
 {
-	"all": "Все",
 	"unresolved": "Без решения",
 	"resolved": "Решено",
 	"local": "С этого сайта",
@@ -463,7 +447,6 @@ definePage(() => ({
 
 <locale locale="sk-SK" lang="json">
 {
-	"all": "Všetko",
 	"unresolved": "Nevyriešené",
 	"resolved": "Vyriešené",
 	"local": "Lokálne",
@@ -479,7 +462,6 @@ definePage(() => ({
 
 <locale locale="th-TH" lang="json">
 {
-	"all": "ทั้งหมด",
 	"unresolved": "ยังไม่ได้รับการแก้ไข",
 	"resolved": "คลี่คลายแล้ว",
 	"local": "ท้องถิ่น",
@@ -495,7 +477,6 @@ definePage(() => ({
 
 <locale locale="tr-TR" lang="json">
 {
-	"all": "Tümü",
 	"unresolved": "Çözülmemiş",
 	"resolved": "Çözülmüş",
 	"local": "Yerel",
@@ -511,7 +492,6 @@ definePage(() => ({
 
 <locale locale="ug-CN" lang="json">
 {
-	"all": "All",
 	"unresolved": "Unresolved",
 	"resolved": "Resolved",
 	"local": "Local",
@@ -527,7 +507,6 @@ definePage(() => ({
 
 <locale locale="uk-UA" lang="json">
 {
-	"all": "Всі",
 	"unresolved": "Не вирішено",
 	"resolved": "Вирішено",
 	"local": "Локальні",
@@ -543,7 +522,6 @@ definePage(() => ({
 
 <locale locale="vi-VN" lang="json">
 {
-	"all": "Tất cả",
 	"unresolved": "Chờ xử lý",
 	"resolved": "Đã xử lý",
 	"local": "Máy chủ này",
@@ -559,7 +537,6 @@ definePage(() => ({
 
 <locale locale="zh-CN" lang="json">
 {
-	"all": "全部",
 	"unresolved": "未解决",
 	"resolved": "已解决",
 	"local": "本地",
@@ -575,7 +552,6 @@ definePage(() => ({
 
 <locale locale="zh-TW" lang="json">
 {
-	"all": "全部",
 	"unresolved": "未解決",
 	"resolved": "已解決",
 	"local": "本地",
