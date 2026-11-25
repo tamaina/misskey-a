@@ -23,4 +23,11 @@ A billing account state holds independent terms, original-purchase funding lots,
 
 This slice delivers funding provenance, prorated plan transitions and refunds above#81. It does not claim Issue171's broader scheduled price catalog/deal display, geographic tax/residency settings or completion-email migration is finished. The existing#81 order has no original tax/seller statement fields to recover; this document preserves its actual offer/payment snapshot without fabricating them. Printable HTML can be saved as PDF through the browser; it is not the cfw-fileup PDF renderer and no tax-document legal classification is claimed.
 
-Processing transfers cannot be cancelled/rebroadcast automatically. Completion-time reorg is detected; automatic post-completion re-send or entitlement reactivation is not implemented. No internal balance/custody, real test transfer/signature, credentials, production migration or shared9000 server/state changes.
+Processing transfers cannot be rebroadcast automatically. Unknown outcomes (pending/reorg/RPC
+uncertainty or unsubmitted broadcast_pending transfers) retain the account lock. Only when every
+broadcast transfer is proven canonically reverted across two confirmation passes and no transfer is
+confirmed or unknown does `check` release the account lock, transition the request to `cancelled`,
+and append a `reverted_failed` audit event with the revert block evidence. Completion-time reorg is
+detected; automatic post-completion re-send or entitlement reactivation is not implemented. No
+internal balance/custody, real test transfer/signature, credentials, production migration or
+shared9000 server/state changes.

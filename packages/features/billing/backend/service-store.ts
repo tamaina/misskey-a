@@ -68,15 +68,26 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 				return { revision: state.revision, quote: quoteServiceTerm(state, await managedOffer(manager, offer.terms, true), now()) };
 			});
 		},
-		async cancelOrder(userId: string, orderId: string) {
+		async cancelOrder(userId: string, orderId: string, options?: { allowExpiredTxHash?: string }) {
 			return db.transaction(async manager => {
 				const state = await lockBillingState(manager, userId);
-				const row = await manager.findOneBy(MiBillingServiceOrder, { id: orderId, userId });
+				const row = await manager.getRepository(MiBillingServiceOrder).findOne({ where: { id: orderId, userId }, lock: { mode: 'pessimistic_write' } });
 				if (!row) throw new ORPCError('BILLING_NOT_FOUND');
-				if (state.lockRequestId || row.status !== 'pending' || row.txHash) conflict();
+				if (state.lockRequestId || row.status !== 'pending') conflict();
+				if (row.txHash) {
+					if (options?.allowExpiredTxHash !== row.txHash || row.expiresAt > now()) conflict();
+					await manager.update(MiBillingServiceOrder, row.id, { status: 'expired' });
+					await recordCatalogAudit(manager, userId, id(now()), 'cancelExpiredServiceOrder', row.id, { status: 'pending', txHash: row.txHash }, { status: 'expired', txHash: row.txHash });
+					return { ok: true as const };
+				}
 				await manager.update(MiBillingServiceOrder, row.id, { status: 'expired' });
 				return { ok: true as const };
 			});
+		},
+		async findOrder(userId: string, orderId: string) {
+			const row = await orders.findOneBy({ id: orderId, userId });
+			if (!row) throw new ORPCError('BILLING_NOT_FOUND');
+			return row;
 		},
 		async listOffers() { return (await offers.find({ order: { id: 'ASC' }, take: 1000 })).map(row => row.terms); },
 		async listCatalog() {
@@ -178,6 +189,22 @@ export function createServiceBillingStore(db: DataSource, id: (now: number) => s
 					}
 					await manager.update(MiBillingServiceOrder, row.id, { status: row.status, txHash: row.txHash });
 				}
+				return row;
+			});
+		},
+		/** Replaces an unconfirmed retry hint with an auditable new transaction hash while still valid. */
+		async replaceTransaction(userId: string, orderId: string, expectedTxHash: string, nextTxHash: string) {
+			return db.transaction(async manager => {
+				const state = await lockBillingState(manager, userId);
+				const row = await manager.getRepository(MiBillingServiceOrder).findOne({ where: { id: orderId, userId }, lock: { mode: 'pessimistic_write' } });
+				if (!row) throw new ORPCError('BILLING_NOT_FOUND');
+				if (state.lockRequestId || row.status !== 'pending' || row.txHash !== expectedTxHash || row.expiresAt <= now()) conflict();
+				if (expectedTxHash === nextTxHash) return row;
+				await manager.query('SELECT pg_advisory_xact_lock(hashtextextended($1, 0))', [`${row.chainId}:${nextTxHash}`]);
+				if (await manager.existsBy(MiBillingTransactionClaim, { chainId: String(row.chainId), txHash: nextTxHash })) conflict();
+				row.txHash = nextTxHash;
+				await manager.update(MiBillingServiceOrder, row.id, { txHash: row.txHash });
+				await recordCatalogAudit(manager, userId, id(now()), 'replaceServiceOrderTransaction', row.id, { txHash: expectedTxHash }, { txHash: nextTxHash });
 				return row;
 			});
 		},

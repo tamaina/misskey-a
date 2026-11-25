@@ -43,9 +43,12 @@ test('actual viem receipt decoding and confirmation through bounded native trans
 	expect(send.mock.calls[0][1]).toMatchObject({ timeout: 10000, size: 262144, follow: 0, redirect: 'error' });
 });
 
-test('RPC chain mismatch is retryable; only confirmed canonical revert is invalid', async () => {
-	expect(await fixture({ chain: 9 }).read(123456, hash, 1)).toEqual({ status: 'pending' });
-	expect(await fixture({ status: '0x0' }).read(123456, hash, 1)).toEqual({ status: 'invalid' });
+test('a confirmed canonical revert identifies only the observed failed transaction', async () => {
+	expect(await fixture({ chain: 9, status: '0x0' }).read(123456, hash, 3)).toEqual({ status: 'pending' });
+	expect(await fixture({ status: '0x0' }).read(123456, hash, 3)).toEqual({
+		status: 'invalid', canonicalRevert: { chainId: 123456, txHash: hash, timestamp: 1000000, blockHash, blockNumber: '10' },
+	});
+	expect(await fixture({ status: '0x2' }).read(123456, hash, 3)).not.toHaveProperty('canonicalRevert');
 });
 
 test('missing receipt, insufficient confirmations, replaced block or RPC failure remain pending', async () => {

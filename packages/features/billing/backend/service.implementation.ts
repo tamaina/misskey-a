@@ -39,7 +39,24 @@ export function createServiceBillingRouter<Actor extends ApiActor>(deps: Service
 			for (const item of await deps.store.listCatalog()) if (await deps.rpcUrl(item.offer.chainId)) items.push(item);
 			return v.parse(v.array(catalogOffer), items);
 		}),
-		cancelOrder: procedure(serviceBillingContract.cancelOrder).use(account).handler(({ input, context }) => deps.store.cancelOrder(context.principal.id, input.orderId)),
+		cancelOrder: procedure(serviceBillingContract.cancelOrder).use(account).handler(async ({ input, context }) => {
+			const existing = await deps.store.findOrder(context.principal.id, input.orderId);
+			if (existing.status === 'pending' && existing.txHash) {
+				const receipt = await deps.readReceipt(existing.chainId, existing.txHash, existing.offer.confirmationsRequired);
+				if (receipt.status === 'confirmed') {
+					const settled = await deps.store.applyReceipt(context.principal.id, existing.id, existing.txHash, receipt);
+					notify(settled);
+					if (settled.status === 'paid') throw new ORPCError('BILLING_CONFLICT');
+					return { ok: true as const };
+				}
+				if (receipt.status === 'invalid') {
+					await deps.store.applyReceipt(context.principal.id, existing.id, existing.txHash, receipt);
+					return { ok: true as const };
+				}
+				return deps.store.cancelOrder(context.principal.id, input.orderId, { allowExpiredTxHash: existing.txHash });
+			}
+			return deps.store.cancelOrder(context.principal.id, input.orderId);
+		}),
 		quoteOrder: procedure(serviceBillingContract.quoteOrder).use(account).handler(({ input, context }) => deps.store.quoteOrder(context.principal.id, input.offerId)),
 		listOfferSettings: procedure(serviceBillingContract.listOfferSettings).handler(async () => v.parse(v.array(serviceOffer), await deps.store.listOffers())),
 		upsertOffer: procedure(serviceBillingContract.upsertOffer).use(account).handler(async ({ input, context }) => {
@@ -59,7 +76,19 @@ export function createServiceBillingRouter<Actor extends ApiActor>(deps: Service
 			notify(row); return publicOrder(row);
 		}),
 		checkOrder: procedure(serviceBillingContract.checkOrder).use(account).handler(async ({ input, context }) => {
-			const row = await deps.store.submitTransaction(context.principal.id, input.orderId, input.txHash?.toLowerCase());
+			const requestedHash = input.txHash?.toLowerCase();
+			if (requestedHash) {
+				const existing = await deps.store.findOrder(context.principal.id, input.orderId);
+				if (existing.status === 'pending' && existing.txHash && existing.txHash !== requestedHash) {
+					const priorReceipt = await deps.readReceipt(existing.chainId, existing.txHash, existing.offer.confirmationsRequired);
+					if (priorReceipt.status === 'confirmed') {
+						const settled = await deps.store.applyReceipt(context.principal.id, existing.id, existing.txHash, priorReceipt);
+						notify(settled); return publicOrder(settled);
+					}
+					await deps.store.replaceTransaction(context.principal.id, existing.id, existing.txHash, requestedHash);
+				}
+			}
+			const row = await deps.store.submitTransaction(context.principal.id, input.orderId, requestedHash);
 			if (row.status !== 'pending' || !row.txHash) { notify(row); return publicOrder(row); }
 			const receipt = await deps.readReceipt(row.chainId, row.txHash, row.offer.confirmationsRequired);
 			const checked = await deps.store.applyReceipt(context.principal.id, row.id, row.txHash, receipt);

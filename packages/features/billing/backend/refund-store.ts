@@ -15,7 +15,7 @@ import { MiBillingTransactionClaim } from './models/BillingTransactionClaim.js';
 import { lockBillingState, saveBillingState, billingConflict } from './billing-state.js';
 import type { BillingState } from './billing-state.js';
 import type { DataSource, EntityManager } from 'typeorm';
-import type { ReceiptEvidence, ReceiptReader } from './transfer-confirmation.js';
+import type { CanonicalRevertEvidence, ReceiptEvidence, ReceiptReader } from './transfer-confirmation.js';
 import type { RefundData, RefundDocument, RefundQuote, RefundTransfer } from '../shared/refund-types.js';
 import type { BillingRefundLine } from '../shared/billing-refund-groups.js';
 
@@ -145,15 +145,48 @@ export function createRefundStore(db: DataSource, id: () => string, readReceipt:
 			if (hint.data.status === 'completed') return hint.data;
 			if (!['prepared', 'processing'].includes(hint.data.status) || !hint.data.quote) billingConflict();
 			const proofs: RefundDocument['proofs'] = [];
+			const reverts = new Map<string, CanonicalRevertEvidence>();
+			let allConfirmed = true;
+			let hasUnknownOrConfirmed = false;
 			for (let pass = 0; pass < 2; pass++) {
 				for (const group of hint.data.quote.groups) {
 					const transfer = hint.data.transfers.find(item => item.id === group.id)!;
-					if (!transfer.txHash || !transfer.senderAddress) return hint.data;
+					if (!transfer.txHash || !transfer.senderAddress) {
+						allConfirmed = false;
+						if (transfer.status !== 'prepared') hasUnknownOrConfirmed = true;
+						continue;
+					}
 					const result = await readReceipt(group.chainId, transfer.txHash, group.confirmations);
-					if (result.status !== 'confirmed' || !matchesRefund(group, transfer, result.evidence)) return hint.data;
-					if (pass === 0) proofs.push({ transferId: transfer.id, senderAddress: transfer.senderAddress, evidence: result.evidence });
-					else if (!isDeepStrictEqual(proofs.find(proof => proof.transferId === transfer.id)!.evidence, result.evidence)) return hint.data;
+					if (result.status === 'confirmed' && matchesRefund(group, transfer, result.evidence)) {
+						hasUnknownOrConfirmed = true;
+						if (pass === 0) proofs.push({ transferId: transfer.id, senderAddress: transfer.senderAddress, evidence: result.evidence });
+						else if (!isDeepStrictEqual(proofs.find(proof => proof.transferId === transfer.id)?.evidence, result.evidence)) return hint.data;
+						continue;
+					}
+					allConfirmed = false;
+					if (result.status === 'invalid' && result.canonicalRevert && result.canonicalRevert.chainId === group.chainId && result.canonicalRevert.txHash === transfer.txHash) {
+						if (pass === 0) reverts.set(transfer.id, result.canonicalRevert);
+						else if (!isDeepStrictEqual(reverts.get(transfer.id), result.canonicalRevert)) return hint.data;
+						continue;
+					}
+					hasUnknownOrConfirmed = true;
 				}
+			}
+			if (!allConfirmed) {
+				// Release the account lock only when every broadcast transfer is proven canonically
+				// reverted across both passes and no transfer is confirmed or in an unknown state.
+				if (!reverts.size || hasUnknownOrConfirmed) return hint.data;
+				const auditSummary = [...reverts.entries()]
+					.map(([transferId, ev]) => `transfer=${transferId} tx=${ev.txHash} block=${ev.blockNumber} (${ev.blockHash})`)
+					.join('; ');
+				return withRequest(requestId, async (manager, row, state) => {
+					if (row.data.status === 'cancelled') return row.data;
+					if (row.data.version !== hint.data.version || state.lockRequestId !== row.id || !isDeepStrictEqual(row.data, hint.data)) billingConflict();
+					state.lockRequestId = null;
+					row.data.status = 'cancelled';
+					row.data.reason = `Confirmed canonical revert: ${auditSummary}`.slice(0, 2000);
+					return save(manager, row, state, actorId, 'reverted_failed');
+				});
 			}
 			return withRequest(requestId, async (manager, row, state) => {
 				if (row.data.status === 'completed') return row.data;
