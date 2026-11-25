@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { isInvalidCredential } from './credential-rejection.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { signoutChoice } from '@features/auth/frontend/signout-choice.js';
 import { apiUrl } from '@features/boot/frontend/shared/config.js';
@@ -16,15 +17,26 @@ import { $i } from '@features/auth/frontend/i.js';
 import { encodePushSubscriptionKey } from '@features/notifications/frontend/utility/encode-push-subscription-key.js';
 
 // Internal cleanup reasons follow a confirmed server rejection or accepted account deletion.
-export async function signout(reason?: 'server-rejected-credential' | 'account-deletion-accepted') {
+export async function signout(reason?: 'server-rejected-credential' | 'account-deletion-accepted' | 'credentials-changed') {
 	if (!$i) return;
+
+	if (reason === 'credentials-changed') {
+		const finishWaiting = waiting();
+		try { await (await import('./accounts.js')).leaveCurrentAccountAfterCredentialChange(); } finally { finishWaiting(); }
+		return;
+	}
 
 	const cleanupOnly = reason === 'server-rejected-credential' || reason === 'account-deletion-accepted';
 	let finishWaiting = waiting();
 
 	try {
 		if (!cleanupOnly && store.s.enablePreferencesAutoCloudBackup) {
-			await cloudBackup();
+			try { await cloudBackup(); } catch (error) {
+				if (!isInvalidCredential(error)) throw error;
+				finishWaiting();
+				await (await import('./accounts.js')).rejectCurrentAccount();
+				return;
+			}
 		}
 
 		for (; !cleanupOnly;) {
@@ -32,6 +44,11 @@ export async function signout(reason?: 'server-rejected-credential' | 'account-d
 				await misskeyApi('i/signout');
 				break;
 			} catch (error) {
+				if (isInvalidCredential(error)) {
+					finishWaiting();
+					await (await import('./accounts.js')).rejectCurrentAccount();
+					return;
+				}
 				finishWaiting();
 				const legacy = (error as { code?: string } | null)?.code === 'SESSION_NOT_REVOCABLE';
 				const choice = await signoutChoice({ legacy });

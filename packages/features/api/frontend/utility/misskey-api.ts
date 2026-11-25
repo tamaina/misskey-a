@@ -6,6 +6,7 @@
 import * as Misskey from 'misskey-js';
 import { ref } from 'vue';
 import { apiUrl } from '@features/boot/frontend/shared/config.js';
+import { isInvalidCredential } from '@features/auth/frontend/credential-rejection.js';
 import { $i } from '@features/auth/frontend/i.js';
 export const pendingApiRequestsCount = ref(0);
 
@@ -33,6 +34,7 @@ export function misskeyApi<
 		if ($i) data.i = $i.token;
 		if (token !== undefined) data.i = token;
 
+		const requestToken = data.i;
 		// Send request
 		window.fetch(`${apiUrl}/${endpoint}`, {
 			method: 'POST',
@@ -51,6 +53,9 @@ export function misskeyApi<
 			} else if (res.status === 204) {
 				resolve(undefined as _ResT); // void -> undefined
 			} else {
+				if (endpoint !== 'i/signout' && res.status === 401 && $i && requestToken === $i.token && isInvalidCredential(body?.error)) {
+					void import('@features/auth/frontend/accounts.js').then(({ refreshCurrentAccount }) => refreshCurrentAccount()).catch(() => {});
+				}
 				reject(body.error);
 			}
 		}).catch(reject);

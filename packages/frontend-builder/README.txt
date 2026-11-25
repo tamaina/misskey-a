@@ -1,7 +1,8 @@
-This package contains the common scripts that are used to build the frontend and frontend-embed packages.
+This package contains shared build-time validation helpers for the frontend and frontend-embed packages.
 
-現在は main / embed の旧翻訳処理を支えるビルド専用パッケージです。
-LocaleInliner、unref(i18n) の除去、そのログと検証補助を Node / Vite / Rolldown 上で実行します。
-main と embed の VVI 移行、loader の言語別ディレクトリ書き換えの廃止が完了したら削除します。
-旧 inliner を使う一致検証には凍結した証拠かテスト専用の参照を残し、通常の Vite build は各アプリの package 側に保持します。
-Service Worker 向けの i18n JSON 出力は別の役割として扱います。
+collectModifications は旧 i18n ラベル参照を解析し、facade 検出と logger とともに
+main / embed の Vite build で旧ラベルを拒否するガードを支えます。
+ファイルの読み書き、翻訳の埋め込み、言語別 JavaScript の生成は行いません。
+通常の Vite build と host locale entry map は各アプリの package 側に保持します。
+YAML / fallback / 型生成と Service Worker 向けの versioned locale JSON 出力は
+packages/i18n が担当し、現在の SW と起動 loader が利用します。

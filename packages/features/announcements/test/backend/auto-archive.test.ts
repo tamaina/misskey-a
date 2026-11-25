@@ -14,8 +14,21 @@ function fixture() {
 	vi.useFakeTimers();
 	vi.setSystemTime(now);
 	let row = new MiAnnouncement({ id: 'announcement123', isActive: true, autoArchiveAt: future, userId: null });
-	const query = { update: vi.fn(), set: vi.fn(), where: vi.fn(), andWhere: vi.fn(), execute: vi.fn().mockResolvedValue({ affected: 1 }) };
-	for (const method of ['update', 'set', 'where', 'andWhere'] as const) query[method].mockReturnValue(query);
+	// update() uses UPDATE ... RETURNING (upstream #18045); archive keeps the plain conditional UPDATE.
+	let returningValues: Partial<MiAnnouncement> | undefined;
+	let pendingValues: Partial<MiAnnouncement> | undefined;
+	const query = {
+		update: vi.fn(), set: vi.fn(), where: vi.fn(), andWhere: vi.fn(), returning: vi.fn(),
+		execute: vi.fn(async () => {
+			if (returningValues === undefined) return { affected: 1 };
+			row = new MiAnnouncement({ ...row, ...Object.fromEntries(Object.entries(returningValues).filter(([, value]) => value !== undefined)) });
+			returningValues = undefined;
+			return { affected: 1, raw: [row] };
+		}),
+	};
+	for (const method of ['update', 'where', 'andWhere'] as const) query[method].mockReturnValue(query);
+	query.set.mockImplementation((values: Partial<MiAnnouncement>) => { pendingValues = values; return query; });
+	query.returning.mockImplementation(() => { returningValues = pendingValues; return query; });
 	const repository = {
 		insertOne: vi.fn(async (values: Partial<MiAnnouncement>) => { row = new MiAnnouncement({ ...row, ...values }); return row; }),
 		update: vi.fn(async (_id: string, values: Partial<MiAnnouncement>) => { row = new MiAnnouncement({ ...row, ...Object.fromEntries(Object.entries(values).filter(([, value]) => value !== undefined)) }); }),

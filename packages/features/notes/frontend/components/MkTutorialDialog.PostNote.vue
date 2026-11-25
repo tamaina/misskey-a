@@ -8,7 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div style="text-align: center; padding: 0 16px;">{{ $locale.sfc.initialTutorialPostNoteDescription1 }}</div>
 	<MkPostForm :class="$style.exampleRoot" :mock="true" :autofocus="false"/>
 	<MkFormSection>
-		<template #label>{{ $locale.sfc.visibility }}</template>
+		<template #label>{{ globalLocale.env.visibility }}</template>
 		<div class="_gaps">
 			<div>{{ $locale.sfc.initialTutorialPostNoteVisibilityDescription }}</div>
 			<div><i class="ti ti-world"></i> <b>{{ $locale.sfc.visibilityPublic }}</b> … {{ $locale.sfc.initialTutorialPostNoteVisibilityPublic }}</div>
@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<b>{{ $locale.sfc.initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1 }}</b> {{ $locale.sfc.initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2 }}
 				</MkInfo>
 			</div>
-			<div><i class="ti ti-rocket-off"></i> <b>{{ $locale.sfc.visibilityDisableFederation }}</b> … {{ $locale.sfc.initialTutorialPostNoteVisibilityLocalOnly }}</div>
+			<div><i class="ti ti-rocket-off"></i> <b>{{ globalLocale.env.visibilityDisableFederation }}</b> … {{ $locale.sfc.initialTutorialPostNoteVisibilityLocalOnly }}</div>
 		</div>
 	</MkFormSection>
 	<MkFormSection>
@@ -35,12 +35,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script setup lang="ts">
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
 import { reactive } from 'vue';
 import MkNote from '@features/notes/frontend/components/MkNote.vue';
 import MkPostForm from '@features/notes/frontend/components/MkPostForm.vue';
 import MkFormSection from '@features/ui/frontend/components/form/section.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const exampleCWNote = reactive<Misskey.entities.Note>({
 	id: '0000000000',
@@ -137,7 +141,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="ar-SA">
 {
 	"initialTutorialPostNoteDescription1": "When posting a note on Misskey, various options are available. The posting form looks like this.",
-	"visibility": "الظهور",
 	"initialTutorialPostNoteVisibilityDescription": "You can limit who can view your note.",
 	"visibilityPublic": "علني",
 	"initialTutorialPostNoteVisibilityPublic": "Your note will be visible for all users.",
@@ -149,7 +152,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Visible only to specified users, and the recipient will be notified. It can be used as an alternative to direct messaging.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Be careful when sending sensitive information!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Administrators of the server can see what you write. Be careful with sensitive information when sending direct notes to users on untrusted servers.",
-	"visibilityDisableFederation": "Defederate",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Posting with this flag will not federate the note to other servers. Users on other servers will not be able to view these notes directly, regardless of the display settings above.",
 	"initialTutorialPostNoteCwTitle": "Content Warning",
 	"initialTutorialPostNoteCwDescription": "Instead of the body, the content written in 'comments' field will be displayed. Pressing \"read more\" will reveal the body.",
@@ -162,7 +164,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="ca-ES">
 {
 	"initialTutorialPostNoteDescription1": "Quan públiques una nota a Misskey hi ha diferents opcions disponibles. El formulari de publicació es veu així",
-	"visibility": "Visibilitat",
 	"initialTutorialPostNoteVisibilityDescription": "Pots limitar qui pot veure les teves notes.",
 	"visibilityPublic": "Públic ",
 	"initialTutorialPostNoteVisibilityPublic": "La teva nota serà visible per a tots els usuaris.",
@@ -174,7 +175,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Només visible per a alguns seguidors, el destinatari rebre una notificació. Es pot fer servir com una alternativa als missatges directes.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Tingues cura quan enviïs informació sensible.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Els administradors del servidor poden veure tot el que escrius. Ves compte quan enviïs informació sensible en enviar notes directes a altres usuaris en servidors de poca confiança.",
-	"visibilityDisableFederation": "Sense federar",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Publicar amb aquesta opció activada farà que la nota no federi amb altres servidors. Els usuaris d'altres servidors no podran veure la nota directament, sense importar les opcions de visualització.",
 	"initialTutorialPostNoteCwTitle": "Avís de Contingut (CW)",
 	"initialTutorialPostNoteCwDescription": "En comptes del cos de la nota es mostrarà el que s'escrigui al camp de 'comentaris'. Fent clic a 'Llegir més' es mostrarà el cos.",
@@ -187,7 +187,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="cs-CZ">
 {
 	"initialTutorialPostNoteDescription1": "When posting a note on Misskey, various options are available. The posting form looks like this.",
-	"visibility": "Viditelnost",
 	"initialTutorialPostNoteVisibilityDescription": "You can limit who can view your note.",
 	"visibilityPublic": "Veřejný",
 	"initialTutorialPostNoteVisibilityPublic": "Your note will be visible for all users.",
@@ -199,7 +198,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Visible only to specified users, and the recipient will be notified. It can be used as an alternative to direct messaging.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Be careful when sending sensitive information!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Administrators of the server can see what you write. Be careful with sensitive information when sending direct notes to users on untrusted servers.",
-	"visibilityDisableFederation": "Defederace",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Posting with this flag will not federate the note to other servers. Users on other servers will not be able to view these notes directly, regardless of the display settings above.",
 	"initialTutorialPostNoteCwTitle": "Content Warning",
 	"initialTutorialPostNoteCwDescription": "Instead of the body, the content written in 'comments' field will be displayed. Pressing \"read more\" will reveal the body.",
@@ -212,7 +210,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="da-DK">
 {
 	"initialTutorialPostNoteDescription1": "When posting a note on Misskey, various options are available. The posting form looks like this.",
-	"visibility": "Visibility",
 	"initialTutorialPostNoteVisibilityDescription": "You can limit who can view your note.",
 	"visibilityPublic": "Public",
 	"initialTutorialPostNoteVisibilityPublic": "Your note will be visible for all users.",
@@ -224,7 +221,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Visible only to specified users, and the recipient will be notified. It can be used as an alternative to direct messaging.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Be careful when sending sensitive information!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Administrators of the server can see what you write. Be careful with sensitive information when sending direct notes to users on untrusted servers.",
-	"visibilityDisableFederation": "Defederate",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Posting with this flag will not federate the note to other servers. Users on other servers will not be able to view these notes directly, regardless of the display settings above.",
 	"initialTutorialPostNoteCwTitle": "Content Warning",
 	"initialTutorialPostNoteCwDescription": "Instead of the body, the content written in 'comments' field will be displayed. Pressing \"read more\" will reveal the body.",
@@ -237,7 +233,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="de-DE">
 {
 	"initialTutorialPostNoteDescription1": "Wenn du eine Notiz auf Misskey veröffentlichst, stehen dir verschiedene Optionen zur Verfügung. Die Oberfläche sieht folgendermaßen aus.",
-	"visibility": "Sichtbarkeit",
 	"initialTutorialPostNoteVisibilityDescription": "Du kannst einschränken, wer deine Notiz sehen kann.",
 	"visibilityPublic": "Öffentlich",
 	"initialTutorialPostNoteVisibilityPublic": "Deine Notiz wird für alle Nutzer sichtbar sein.",
@@ -249,7 +244,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Die Notiz wird nur für den angegebenen Benutzer veröffentlicht und der Empfänger wird benachrichtigt. Kann anstelle von Direktnachrichten verwendet werden.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Sei vorsichtig, wenn du sensible Informationen verschickst!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Die Administratoren des Servers können den Inhalt der Notiz sehen. Sei vorsichtig mit sensiblen Informationen, wenn du Direktnachrichten an Benutzer auf nicht vertrauenswürdigen Servern sendest.",
-	"visibilityDisableFederation": "Deföderieren",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Wenn du eine Notiz mit dieser Einstellung veröffentlichst, wird sie nicht an andere Server weitergeleitet. Benutzer auf anderen Servern können diese Notizen nicht direkt sehen, unabhängig von den obigen Anzeigeeinstellungen.",
 	"initialTutorialPostNoteCwTitle": "Inhaltswarnung",
 	"initialTutorialPostNoteCwDescription": "Anstelle des Textes wird das angezeigt, was du im Abschnitt „Anmerkungen“ angibst. Drücke auf „Inhalt anzeigen“, um den vollständigen Text zu sehen.",
@@ -262,7 +256,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="en-US">
 {
 	"initialTutorialPostNoteDescription1": "When posting a note on Misskey, various options are available. The posting form looks like this.",
-	"visibility": "Visibility",
 	"initialTutorialPostNoteVisibilityDescription": "You can limit who can view your note.",
 	"visibilityPublic": "Public",
 	"initialTutorialPostNoteVisibilityPublic": "Your note will be visible for all users.",
@@ -274,7 +267,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Visible only to specified users, and the recipient will be notified. It can be used as an alternative to direct messaging.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Be careful when sending sensitive information!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Administrators of the server can see what you write. Be careful with sensitive information when sending direct notes to users on untrusted servers.",
-	"visibilityDisableFederation": "Defederate",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Posting with this flag will not federate the note to other servers. Users on other servers will not be able to view these notes directly, regardless of the display settings above.",
 	"initialTutorialPostNoteCwTitle": "Content Warning",
 	"initialTutorialPostNoteCwDescription": "Instead of the body, the content written in 'comments' field will be displayed. Pressing \"read more\" will reveal the body.",
@@ -287,7 +279,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="es-ES">
 {
 	"initialTutorialPostNoteDescription1": "Cuando publicas una nota en Misskey, hay varias opciones disponibles. El formulario tiene este aspecto.",
-	"visibility": "Visibilidad",
 	"initialTutorialPostNoteVisibilityDescription": "Puedes limitar quién puede ver tu nota.",
 	"visibilityPublic": "Público",
 	"initialTutorialPostNoteVisibilityPublic": "Tu nota será visible para todos los usuarios.",
@@ -299,7 +290,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Visible sólo para usuarios específicos, y el destinatario será notificado. Puede usarse como alternativa a la mensajería directa.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "¡Ten cuidado cuando vayas a enviar información sensible!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Los administradores del servidor, también llamado instancia, pueden leer lo que escribes. Ten cuidado cuando envíes información sensible en notas directas en servidores o instancias no confiables.",
-	"visibilityDisableFederation": "No federado",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Publicando con esta opción seleccionada, la nota no se federará hacia otros servidores. Los usuarios de otros servidores no podrán ver estas notas directamente, sin importar los ajustes seleccionados más arriba.",
 	"initialTutorialPostNoteCwTitle": "Alerta de contenido (CW)",
 	"initialTutorialPostNoteCwDescription": "En lugar de mostrarse el contenido de la nota, se mostrará lo que escribas en el campo \"comentarios\". Pulsando en \"Ver más\" desplegará el contenido de la nota.",
@@ -312,7 +302,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="fr-FR">
 {
 	"initialTutorialPostNoteDescription1": "Lorsque vous publiez des notes sur Misskey, diverses options sont disponibles. Voici le formulaire de publication.",
-	"visibility": "Visibilité",
 	"initialTutorialPostNoteVisibilityDescription": "Vous pouvez choisir qui peut voir vos notes.",
 	"visibilityPublic": "Public",
 	"initialTutorialPostNoteVisibilityPublic": "Visible à tous les utilisateurs.",
@@ -324,7 +313,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Uniquement visible aux utilisateurs de votre choix. Les récipients seront notifiés. Cette option peut être utilisée comme alternative aux messages directs.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Faites attention quand vous envoyez vos informations sensibles !",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Les administrateurs de l'instance destinataire peuvent voir toutes les notes publiées. Soyez prudent·e avec vos informations sensibles quand vous envoyez des notes directes aux utilisateurs dont vous ne vous fiez pas aux instances.",
-	"visibilityDisableFederation": "Défédérer",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Désactiver la fédération de la note aux autres instances. Les utilisateurs des autres instances ne pourront pas voir directement la note quelle que soit l'étendue de la publication mentionnée ci-dessus.",
 	"initialTutorialPostNoteCwTitle": "Masquer le contenu (CW)",
 	"initialTutorialPostNoteCwDescription": "Au lieu du corps du texte, le contenu du champ « commentaires » s'affichera. Appuyez sur « afficher le contenu » pour voir le corps du texte.",
@@ -337,7 +325,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="id-ID">
 {
 	"initialTutorialPostNoteDescription1": "Ketika memposting catatan ke Misskey, terdapat beberapa opsi yang tersedia. Form posting terlihat seperti ini.",
-	"visibility": "Visibilitas",
 	"initialTutorialPostNoteVisibilityDescription": "Kamu dapat membatasi siapa yang dapat melihat catatan kamu.",
 	"visibilityPublic": "Publik",
 	"initialTutorialPostNoteVisibilityPublic": "Perlihatkan catatan ke semua pengguna.",
@@ -349,7 +336,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Hanya perlihatkan ke pengguna spesifik dan penerima akan diberi tahu. Dapat juga digunakan sebagai alternatif dari pesan langsung.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Hati-hati ketika mengirim informasi yang sensitif!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Admin dari peladen dapat melihat apa yang kamu tulis. Hati-hati dengan informasi sensitif ketika mengirimkan catatan langsung kepada pengguna pada peladen yang tidak dipercaya.",
-	"visibilityDisableFederation": "Matikan federasi",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Memposting dengan opsi ini tidak akan memfederasi catatan ke peladen lain. Pengguna pada peladen lain tidak akan dapat melihat catatan ini secara langsung, meskipun dengan pengaturan visibilitas yang sudah diatur di atas.",
 	"initialTutorialPostNoteCwTitle": "Peringatan Konten (CW)",
 	"initialTutorialPostNoteCwDescription": "Alih-alih isinya, konten yang ditulis dalam kolom 'komentar' akan ditampilkan. Menekan 'Selebihnya' akan menampilkan isi konten.",
@@ -362,7 +348,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="it-IT">
 {
 	"initialTutorialPostNoteDescription1": "Quando scrivi una Nota su Misskey, hai a disposizione varie opzioni. Il modulo di invio è simile a questo.",
-	"visibility": "Visibilità",
 	"initialTutorialPostNoteVisibilityDescription": "Puoi limitare chi può vedere la tua Nota.",
 	"visibilityPublic": "Pubblica",
 	"initialTutorialPostNoteVisibilityPublic": "Visibile a tutti.",
@@ -374,7 +359,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Visibile solo ai profili specificati, i quali riceveranno una notifica. Puoi usarlo come se fossero messaggi diretti.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Attenzione, quando si inviano informazioni confidenziali.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Poiché le Note non sono crittografate, l'amministratore del server di destinazione potrebbe leggere cosa è stato scritto, quindi se spedisci una Nota diretta a un profilo che risiede su un server non attendibile, evita di scrivere informazioni riservate.",
-	"visibilityDisableFederation": "Gestisci la federazione",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Indipendentemente dalla visualizzazione sopra indicata, i profili su altri server non saranno in grado di visualizzare la Nota, se questa impostazione è attivata. Non non verrà comunicata ad altri server.",
 	"initialTutorialPostNoteCwTitle": "Nascondere il contenuto esplicito",
 	"initialTutorialPostNoteCwDescription": "Verrà visualizzato il testo scritto nel campo \"Annotazione preventiva\" al posto del testo principale della Nota. Premere il bottone \"Continua la lettura\" se si intende davvero leggere il testo.",
@@ -387,7 +371,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="ja-JP">
 {
 	"initialTutorialPostNoteDescription1": "Misskeyにノートを投稿する際には、様々なオプションの設定が可能です。投稿フォームはこのようになっています。",
-	"visibility": "公開範囲",
 	"initialTutorialPostNoteVisibilityDescription": "ノートを表示できる相手を制限できます。",
 	"visibilityPublic": "パブリック",
 	"initialTutorialPostNoteVisibilityPublic": "すべてのユーザーに公開。",
@@ -399,7 +382,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "指定したユーザーにのみ公開され、また相手に通知が入ります。",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "機密情報は送信する際は注意してください。",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "送信先のサーバーの管理者は投稿内容を見ることが可能なので、信頼できないサーバーのユーザーが含まれる限定公開のノートを作成する際は、機密情報の扱いに注意が必要です。",
-	"visibilityDisableFederation": "連合なし",
 	"initialTutorialPostNoteVisibilityLocalOnly": "他のサーバーに投稿を連合しません。上記の公開範囲に関わらず、他のサーバーのユーザーは、この設定がついたノートを直接閲覧することができなくなります。",
 	"initialTutorialPostNoteCwTitle": "内容を隠す（CW）",
 	"initialTutorialPostNoteCwDescription": "本文のかわりに「注釈」に書いた内容が表示されます。「もっと見る」を押すと本文が表示されます。",
@@ -412,7 +394,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="ja-KS">
 {
 	"initialTutorialPostNoteDescription1": "Misskeyにノートを投稿するとき、いろんなオプションが付けれるで。投稿画面はこんな感じや。",
-	"visibility": "公開範囲",
 	"initialTutorialPostNoteVisibilityDescription": "ノートを見れる相手を制限できるわ。",
 	"visibilityPublic": "パブリック",
 	"initialTutorialPostNoteVisibilityPublic": "みんなに見せるで。",
@@ -424,7 +405,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "指定した人にだけ公開されて、ついでに通知も送るで。ダイレクトメールの代わりとして使ってな。",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "機密情報を送るときは十分注意せえよ。",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "送信先のサーバーの管理者は投稿内容が見れるから、信用できへんサーバーのひとにダイレクト投稿するときには、めっちゃ用心しとくんやで。",
-	"visibilityDisableFederation": "連合なし",
 	"initialTutorialPostNoteVisibilityLocalOnly": "他のサーバーに投稿せえへんくなるで。他の公開範囲とか一切無視して、他のサーバーの人らはこの設定がされたノートは絶対に見れへん。",
 	"initialTutorialPostNoteCwTitle": "内容隠し（CW）",
 	"initialTutorialPostNoteCwDescription": "本文のかわりに「注釈」に書いた内容だけ見せるで。「続き見して！」を押すと本文も見れんねん。",
@@ -437,7 +417,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="kab-KAB">
 {
 	"initialTutorialPostNoteDescription1": "When posting a note on Misskey, various options are available. The posting form looks like this.",
-	"visibility": "Visibility",
 	"initialTutorialPostNoteVisibilityDescription": "You can limit who can view your note.",
 	"visibilityPublic": "Public",
 	"initialTutorialPostNoteVisibilityPublic": "Your note will be visible for all users.",
@@ -449,7 +428,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Visible only to specified users, and the recipient will be notified. It can be used as an alternative to direct messaging.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Be careful when sending sensitive information!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Administrators of the server can see what you write. Be careful with sensitive information when sending direct notes to users on untrusted servers.",
-	"visibilityDisableFederation": "Defederate",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Posting with this flag will not federate the note to other servers. Users on other servers will not be able to view these notes directly, regardless of the display settings above.",
 	"initialTutorialPostNoteCwTitle": "Content Warning",
 	"initialTutorialPostNoteCwDescription": "Instead of the body, the content written in 'comments' field will be displayed. Pressing \"read more\" will reveal the body.",
@@ -462,7 +440,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="kn-IN">
 {
 	"initialTutorialPostNoteDescription1": "When posting a note on Misskey, various options are available. The posting form looks like this.",
-	"visibility": "Visibility",
 	"initialTutorialPostNoteVisibilityDescription": "You can limit who can view your note.",
 	"visibilityPublic": "Public",
 	"initialTutorialPostNoteVisibilityPublic": "Your note will be visible for all users.",
@@ -474,7 +451,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Visible only to specified users, and the recipient will be notified. It can be used as an alternative to direct messaging.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Be careful when sending sensitive information!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Administrators of the server can see what you write. Be careful with sensitive information when sending direct notes to users on untrusted servers.",
-	"visibilityDisableFederation": "Defederate",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Posting with this flag will not federate the note to other servers. Users on other servers will not be able to view these notes directly, regardless of the display settings above.",
 	"initialTutorialPostNoteCwTitle": "Content Warning",
 	"initialTutorialPostNoteCwDescription": "Instead of the body, the content written in 'comments' field will be displayed. Pressing \"read more\" will reveal the body.",
@@ -487,7 +463,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="ko-KR">
 {
 	"initialTutorialPostNoteDescription1": "Misskey에 노트를 게시할 때에는 다양한 옵션 설정이 가능합니다. 노트를 게시할 때 쓰이는 '글 입력란'은 이렇게 생겼습니다.",
-	"visibility": "공개 범위",
 	"initialTutorialPostNoteVisibilityDescription": "노트를 볼 수 있는 사람을 제한할 수 있습니다.",
 	"visibilityPublic": "공개",
 	"initialTutorialPostNoteVisibilityPublic": "모든 유저에게 공개합니다.",
@@ -499,7 +474,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "지정한 유저에게만 공개되며, 상대방에게 알림이 갑니다. 다이렉트 메시지(DM) 대용으로써 사용하실 수 있습니다.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "민감한 정보를 보낼 때에는 주의하십시오.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "서버 관리자는 기술적으로 게시물 내용을 열람할 수 있습니다. 신뢰할 수 없는 서버의 유저에게 다이렉트 메시지를 보내는 경우, 민감한 정보가 포함되어 있는 지 확인하십시오.",
-	"visibilityDisableFederation": "연합에 보내지 않기",
 	"initialTutorialPostNoteVisibilityLocalOnly": "다른 서버에 게시물을 보내지 않습니다. 앞서 설정한 공개 범위와 상관 없이, 다른 서버의 유저는 이 게시물을 직접 열람할 수 없게 됩니다.",
 	"initialTutorialPostNoteCwTitle": "내용 가리기 (CW)",
 	"initialTutorialPostNoteCwDescription": "본문 대신에 '내용에 대한 주석'에 입력한 텍스트가 먼저 표시됩니다. '더 보기' 버튼을 누르면 본문이 표시됩니다.",
@@ -512,7 +486,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="nl-NL">
 {
 	"initialTutorialPostNoteDescription1": "When posting a note on Misskey, various options are available. The posting form looks like this.",
-	"visibility": "Zichtbaarheid",
 	"initialTutorialPostNoteVisibilityDescription": "You can limit who can view your note.",
 	"visibilityPublic": "Public",
 	"initialTutorialPostNoteVisibilityPublic": "Your note will be visible for all users.",
@@ -524,7 +497,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Visible only to specified users, and the recipient will be notified. It can be used as an alternative to direct messaging.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Be careful when sending sensitive information!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Administrators of the server can see what you write. Be careful with sensitive information when sending direct notes to users on untrusted servers.",
-	"visibilityDisableFederation": "Defederate",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Posting with this flag will not federate the note to other servers. Users on other servers will not be able to view these notes directly, regardless of the display settings above.",
 	"initialTutorialPostNoteCwTitle": "Content Warning",
 	"initialTutorialPostNoteCwDescription": "Instead of the body, the content written in 'comments' field will be displayed. Pressing \"read more\" will reveal the body.",
@@ -537,7 +509,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="no-NO">
 {
 	"initialTutorialPostNoteDescription1": "When posting a note on Misskey, various options are available. The posting form looks like this.",
-	"visibility": "Visibility",
 	"initialTutorialPostNoteVisibilityDescription": "You can limit who can view your note.",
 	"visibilityPublic": "Public",
 	"initialTutorialPostNoteVisibilityPublic": "Your note will be visible for all users.",
@@ -549,7 +520,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Visible only to specified users, and the recipient will be notified. It can be used as an alternative to direct messaging.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Be careful when sending sensitive information!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Administrators of the server can see what you write. Be careful with sensitive information when sending direct notes to users on untrusted servers.",
-	"visibilityDisableFederation": "Defederate",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Posting with this flag will not federate the note to other servers. Users on other servers will not be able to view these notes directly, regardless of the display settings above.",
 	"initialTutorialPostNoteCwTitle": "Content Warning",
 	"initialTutorialPostNoteCwDescription": "Instead of the body, the content written in 'comments' field will be displayed. Pressing \"read more\" will reveal the body.",
@@ -562,7 +532,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="pl-PL">
 {
 	"initialTutorialPostNoteDescription1": "When posting a note on Misskey, various options are available. The posting form looks like this.",
-	"visibility": "Widoczność",
 	"initialTutorialPostNoteVisibilityDescription": "You can limit who can view your note.",
 	"visibilityPublic": "Publiczny",
 	"initialTutorialPostNoteVisibilityPublic": "Your note will be visible for all users.",
@@ -574,7 +543,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Visible only to specified users, and the recipient will be notified. It can be used as an alternative to direct messaging.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Be careful when sending sensitive information!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Administrators of the server can see what you write. Be careful with sensitive information when sending direct notes to users on untrusted servers.",
-	"visibilityDisableFederation": "Defederate",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Posting with this flag will not federate the note to other servers. Users on other servers will not be able to view these notes directly, regardless of the display settings above.",
 	"initialTutorialPostNoteCwTitle": "Content Warning",
 	"initialTutorialPostNoteCwDescription": "Instead of the body, the content written in 'comments' field will be displayed. Pressing \"read more\" will reveal the body.",
@@ -587,7 +555,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="pt-PT">
 {
 	"initialTutorialPostNoteDescription1": "Ao postar uma nota no Misskey, diversas opções estão disponíveis. A ficha de publicação parece com isto: ",
-	"visibility": "Visibilidade",
 	"initialTutorialPostNoteVisibilityDescription": "Você pode limitar quem vê a sua nota.",
 	"visibilityPublic": "Público",
 	"initialTutorialPostNoteVisibilityPublic": "Sua nota será visível a todos os usuários.",
@@ -599,7 +566,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Visível apenas para usuários específicos, e o destinatário será notificado. Pode ser usado como uma alternativa às mensagens diretas.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Tenha cuidado ao enviar informações sensíveis!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Administradores do servidor podem ver o que foi escrito. Cuidado, também, ao enviar notas diretas a usuários de servidores não confiáveis.",
-	"visibilityDisableFederation": "Defederar",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Publicar com essa opção não federará a nota com outros servidores. Usuários desses servidores não poderão ver essas notas diretamente, independente das opções de visibilidade acima. ",
 	"initialTutorialPostNoteCwTitle": "Aviso de Conteúdo",
 	"initialTutorialPostNoteCwDescription": "Ao invés do corpo do texto, o conteúdo escrito na caixa \"anotação\" será exibido. Apertar \"Carregar mais\" irá revelar o corpo.",
@@ -612,7 +578,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="ru-RU">
 {
 	"initialTutorialPostNoteDescription1": "Когда вы публикуете заметку на Misskey, вы можете изменить некоторые настройки. Окно написания заметки выглядит вот так.",
-	"visibility": "Видимость",
 	"initialTutorialPostNoteVisibilityDescription": "Вы можете ограничить кто может увидеть вашу заметку.",
 	"visibilityPublic": "Общедоступно",
 	"initialTutorialPostNoteVisibilityPublic": "Твоя заметка будет видна всем.",
@@ -624,7 +589,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Видно только выбранным пользователям, и получатели получат уведомление. Может быть использовано как альтернатива личным сообщениям.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Будьте осторожны с отправкой конфиденциальной информации!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Администратор целевого сервера может видеть что вы отправляете. Будьте осторожны с конфиденциальной информацией, когда отправляете личные заметки пользователям с ненадёжных серверов.",
-	"visibilityDisableFederation": "Отключить федерацию",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Заметки с этим флагом не будут передаваться присоединённым серверам. Пользователи на других серверах не смогут увидеть её вне зависимости от настроек выше.",
 	"initialTutorialPostNoteCwTitle": "Спойлер",
 	"initialTutorialPostNoteCwDescription": "Instead of the body, the content written in 'comments' field will be displayed. Pressing \"read more\" will reveal the body.",
@@ -637,7 +601,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="sk-SK">
 {
 	"initialTutorialPostNoteDescription1": "When posting a note on Misskey, various options are available. The posting form looks like this.",
-	"visibility": "Viditeľnosť",
 	"initialTutorialPostNoteVisibilityDescription": "You can limit who can view your note.",
 	"visibilityPublic": "Verejné",
 	"initialTutorialPostNoteVisibilityPublic": "Your note will be visible for all users.",
@@ -649,7 +612,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Visible only to specified users, and the recipient will be notified. It can be used as an alternative to direct messaging.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Be careful when sending sensitive information!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Administrators of the server can see what you write. Be careful with sensitive information when sending direct notes to users on untrusted servers.",
-	"visibilityDisableFederation": "Defederate",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Posting with this flag will not federate the note to other servers. Users on other servers will not be able to view these notes directly, regardless of the display settings above.",
 	"initialTutorialPostNoteCwTitle": "Content Warning",
 	"initialTutorialPostNoteCwDescription": "Instead of the body, the content written in 'comments' field will be displayed. Pressing \"read more\" will reveal the body.",
@@ -662,7 +624,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="th-TH">
 {
 	"initialTutorialPostNoteDescription1": "เมื่อโพสต์โน้ตบน Misskey คุณสามารถตั้งค่าตัวเลือกต่างๆ ได้ แบบฟอร์มการส่งมีลักษณะดังนี้",
-	"visibility": "การมองเห็น",
 	"initialTutorialPostNoteVisibilityDescription": "คุณสามารถจำกัดผู้ที่สามารถดูโน้ตของคุณได้นะ",
 	"visibilityPublic": "สาธารณะ",
 	"initialTutorialPostNoteVisibilityPublic": "โน้ตของคุณนั้นจะปรากฏแก่ผู้ใช้งานทุกคน",
@@ -674,7 +635,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "เปิดให้เห็นเฉพาะผู้ใช้ที่ระบุเท่านั้น และพวกเขาจะได้รับแจ้งเตือนด้วย คุณสามารถใช้มันแทนข้อความโดยตรง (dm)",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "โปรดใช้ความระมัดระวังในการส่งข้อมูลที่ละเอียดอ่อน",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "ผู้ดูแลระบบเซิร์ฟเวอร์ปลายทางสามารถดูเนื้อหาที่โพสต์ได้ ดังนั้นหากคุณส่งโพสต์โดยตรงไปยังผู้ใช้บนเซิร์ฟเวอร์ที่ไม่น่าเชื่อถือ คุณจะต้องใช้ความระมัดระวังในการจัดการข้อมูลที่เป็นความลับ",
-	"visibilityDisableFederation": "การปิดใช้งานสหพันธ์",
 	"initialTutorialPostNoteVisibilityLocalOnly": "การโพสต์ด้วย flag นี้จะไม่รวมโน้ตไปยังเซิร์ฟเวอร์อื่น ผู้ใช้บนเซิร์ฟเวอร์อื่นจะไม่สามารถดูโน้ตเหล่านี้ได้โดยตรง โดยไม่คำนึงถึงการตั้งค่าการแสดงผลข้างต้น",
 	"initialTutorialPostNoteCwTitle": "คำเตือนเกี่ยวกับเนื้อหา",
 	"initialTutorialPostNoteCwDescription": "เนื้อหาที่เขียนใน “ข้อความเกริ่น” จะแสดงแทนเนื้อหาหลัก ต้องกด “ดูเพิ่มเติม” เพื่อให้เนื้อหาหลักแสดง",
@@ -687,7 +647,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="tr-TR">
 {
 	"initialTutorialPostNoteDescription1": "Misskey'de not yayınlarken çeşitli seçenekler mevcuttur. Yayınlama formu şu şekildedir.",
-	"visibility": "Görünürlük",
 	"initialTutorialPostNoteVisibilityDescription": "Notunu kimlerin görüntüleyebileceğini sınırlayabilirsin.",
 	"visibilityPublic": "Halka açık",
 	"initialTutorialPostNoteVisibilityPublic": "Notunuz tüm kullanıcılar tarafından görülebilir olacaktır.",
@@ -699,7 +658,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Yalnızca belirli kullanıcılar tarafından görülebilir ve alıcıya bildirim gönderilir. Doğrudan mesajlaşma yerine alternatif olarak kullanılabilir.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Hassas bilgileri gönderirken dikkatli olun!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Sunucu yöneticileri yazdıklarınızı görebilir. Güvenilir olmayan sunuculardaki kullanıcılara doğrudan not gönderirken hassas bilgilere dikkat edin.",
-	"visibilityDisableFederation": "Federasyon olmadan",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Bu bayrakla yayınlamak, notu diğer sunuculara aktarmaz. Diğer sunuculardaki kullanıcılar, yukarıdaki görüntüleme ayarlarından bağımsız olarak bu notları doğrudan görüntüleyemezler.",
 	"initialTutorialPostNoteCwTitle": "İçerik Uyarısı",
 	"initialTutorialPostNoteCwDescription": "Gövde yerine, “Yorumlar” alanına yazılan içerik görüntülenecek. “Devamını oku” düğmesine basıldığında gövde görüntülenecek.",
@@ -712,7 +670,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="ug-CN">
 {
 	"initialTutorialPostNoteDescription1": "When posting a note on Misskey, various options are available. The posting form looks like this.",
-	"visibility": "Visibility",
 	"initialTutorialPostNoteVisibilityDescription": "You can limit who can view your note.",
 	"visibilityPublic": "Public",
 	"initialTutorialPostNoteVisibilityPublic": "Your note will be visible for all users.",
@@ -724,7 +681,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Visible only to specified users, and the recipient will be notified. It can be used as an alternative to direct messaging.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Be careful when sending sensitive information!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Administrators of the server can see what you write. Be careful with sensitive information when sending direct notes to users on untrusted servers.",
-	"visibilityDisableFederation": "Defederate",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Posting with this flag will not federate the note to other servers. Users on other servers will not be able to view these notes directly, regardless of the display settings above.",
 	"initialTutorialPostNoteCwTitle": "Content Warning",
 	"initialTutorialPostNoteCwDescription": "Instead of the body, the content written in 'comments' field will be displayed. Pressing \"read more\" will reveal the body.",
@@ -737,7 +693,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="uk-UA">
 {
 	"initialTutorialPostNoteDescription1": "Коли ви публікуєте нотатку у Missket, доступно декілька її налаштувань. Публікація буде виглядати ось так.",
-	"visibility": "Видимість",
 	"initialTutorialPostNoteVisibilityDescription": "Ви можете обмежити хто може побачити вашу нотатку.",
 	"visibilityPublic": "Публічний",
 	"initialTutorialPostNoteVisibilityPublic": "Цю нотатку буде видно для кожного користувача.",
@@ -749,7 +704,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Цю нотатку зможуть побачити лише обрані користувачі, та їм буде оголошено про це. Може використовуватися як альтернатива особливим повідомленням.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Будьте обережними з відсиланням конфіденційної інформації!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Адміністратор сервера може бачити що ви пишете. Будьте обережними с чутливою інформацією коли відправляєте особисті нотатки користувачам на ненадійні сервери.",
-	"visibilityDisableFederation": "Defederate",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Публікування з цією позначкою не буде передаватися приєднаним серверам. Користувачі на інших серверах не зможуть переглядати ці нотатки напряму, всупереч налаштуванню зверху.",
 	"initialTutorialPostNoteCwTitle": "Попередження щодо змісту",
 	"initialTutorialPostNoteCwDescription": "Замість тіла буде показано зміст секції \"коментарі\". Натискання \"прочитати більше\" покаже тіло.",
@@ -762,7 +716,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="vi-VN">
 {
 	"initialTutorialPostNoteDescription1": "When posting a note on Misskey, various options are available. The posting form looks like this.",
-	"visibility": "Hiển thị",
 	"initialTutorialPostNoteVisibilityDescription": "You can limit who can view your note.",
 	"visibilityPublic": "Công khai",
 	"initialTutorialPostNoteVisibilityPublic": "Your note will be visible for all users.",
@@ -774,7 +727,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "Visible only to specified users, and the recipient will be notified. It can be used as an alternative to direct messaging.",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "Be careful when sending sensitive information!",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "Administrators of the server can see what you write. Be careful with sensitive information when sending direct notes to users on untrusted servers.",
-	"visibilityDisableFederation": "Không liên hợp",
 	"initialTutorialPostNoteVisibilityLocalOnly": "Posting with this flag will not federate the note to other servers. Users on other servers will not be able to view these notes directly, regardless of the display settings above.",
 	"initialTutorialPostNoteCwTitle": "Content Warning",
 	"initialTutorialPostNoteCwDescription": "Instead of the body, the content written in 'comments' field will be displayed. Pressing \"read more\" will reveal the body.",
@@ -787,7 +739,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="zh-CN">
 {
 	"initialTutorialPostNoteDescription1": "在 Misskey 发布帖子时，您可以设置各种选项。发帖窗口看起来是这样的。\n",
-	"visibility": "可见性",
 	"initialTutorialPostNoteVisibilityDescription": "您可以限制谁可以看到您的帖子。",
 	"visibilityPublic": "公开",
 	"initialTutorialPostNoteVisibilityPublic": "向所有用户公开。\n",
@@ -799,7 +750,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "仅对指定用户公开，且收件人将收到通知。",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "发送敏感信息时请注意。\n",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "目标服务器的管理员可以看到发布的内容，因此如果您向不受信任的服务器上的用户发送私信，则在处理敏感信息时需要小心。",
-	"visibilityDisableFederation": "仅限本地",
 	"initialTutorialPostNoteVisibilityLocalOnly": "不将帖子通过联邦推送到其它服务器。 无论上述公开范围如何，其它服务器的用户将无法看到附加了此设定的帖子。\n",
 	"initialTutorialPostNoteCwTitle": "隐藏内容（CW）",
 	"initialTutorialPostNoteCwDescription": "显示 “注释” 中的内容，而非正文。点击 “查看更多” 以显示正文。",
@@ -812,7 +762,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 <locale lang="json" locale="zh-TW">
 {
 	"initialTutorialPostNoteDescription1": "在Misskey上發布貼文時，可以設定各種選項。發布表單如下所示。",
-	"visibility": "可見性",
 	"initialTutorialPostNoteVisibilityDescription": "可以限制誰可以看到您的貼文。",
 	"visibilityPublic": "公開",
 	"initialTutorialPostNoteVisibilityPublic": "所有人都可以看見。",
@@ -824,7 +773,6 @@ const exampleCWNote = reactive<Misskey.entities.Note>({
 	"initialTutorialPostNoteVisibilityDirect": "僅指定的使用者可見，對方也會收到通知。可代替直接訊息使用。",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect1": "發送機密訊息時請務必注意。",
 	"initialTutorialPostNoteVisibilityDoNotSendConfidencialOnDirect2": "目標伺服器的管理員可以看到發布的內容，因此如果您向不受信任的伺服器上的使用者發送直接訊息，必須小心處理機密訊息。",
-	"visibilityDisableFederation": "停用聯邦",
 	"initialTutorialPostNoteVisibilityLocalOnly": "不將貼文發布到聯邦上的其他伺服器。不論上述發布範圍，使用此設定後，其他伺服器上的使用者將無法直接查看此貼文。",
 	"initialTutorialPostNoteCwTitle": "隱藏內容（CW）",
 	"initialTutorialPostNoteCwDescription": "將顯示「註釋」中寫入的內容而不是本文。按一下「顯示內容」以顯示本文。",

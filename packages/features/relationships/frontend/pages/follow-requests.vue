@@ -18,11 +18,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 								<p class="acct">@{{ acct(displayUser(req)) }}</p>
 							</div>
 							<div v-if="tab === 'list'" class="commands">
-								<MkButton class="command" rounded primary @click="accept(displayUser(req))"><i class="ti ti-check"></i> {{ $locale.sfc.accept }}</MkButton>
-								<MkButton class="command" rounded danger @click="reject(displayUser(req))"><i class="ti ti-x"></i> {{ $locale.sfc.reject }}</MkButton>
+								<MkButton class="command" rounded primary @click="accept(displayUser(req))"><i class="ti ti-check"></i> {{ globalLocale.env.accept }}</MkButton>
+								<MkButton class="command" rounded danger @click="reject(displayUser(req))"><i class="ti ti-x"></i> {{ globalLocale.env.reject }}</MkButton>
 							</div>
 							<div v-else class="commands">
-								<MkButton class="command" rounded danger @click="cancel(displayUser(req))"><i class="ti ti-x"></i> {{ $locale.sfc.cancel }}</MkButton>
+								<MkButton class="command" rounded danger @click="cancel(displayUser(req))"><i class="ti ti-x"></i> {{ globalLocale.env.cancel }}</MkButton>
 							</div>
 						</div>
 					</div>
@@ -34,6 +34,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
 import { computed, markRaw, ref, watch } from 'vue';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
@@ -44,6 +45,9 @@ import { interpolateLocaleParameters } from '@features/runtime/frontend/interpol
 import { definePage } from '@features/navigation/frontend/page.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const tab = ref($i?.isLocked ? 'list' : 'sent');
 
@@ -80,6 +84,8 @@ async function cancel(user: Misskey.entities.UserLite) {
 	const { canceled } = await os.confirm({
 		type: 'question',
 		text: interpolateLocaleParameters($locale.value.sfc.cancelFollowRequestConfirm, { name: user.name || user.username }),
+		okText: $locale.value.sfc.yes,
+		cancelText: $locale.value.sfc.no,
 	});
 
 	if (canceled) return;
@@ -201,10 +207,7 @@ definePage(() => ({
 	"recieved": "Received request",
 	"sent": "Sent request",
 	"followRequests": "طلبات الإشتراك",
-	"noFollowRequests": "ليس لديك طلبات متابعة معلقة",
-	"accept": "السماح",
-	"reject": "رفض",
-	"cancel": " إلغاء"
+	"noFollowRequests": "ليس لديك طلبات متابعة معلقة"
 }
 </locale>
 
@@ -215,10 +218,7 @@ definePage(() => ({
 	"recieved": "Sol·licituds rebudes",
 	"sent": "Sol·licituds enviades",
 	"followRequests": "Peticions de seguiment",
-	"noFollowRequests": "No tens sol·licituds de seguiment",
-	"accept": "Acceptar",
-	"reject": "Denega",
-	"cancel": "Cancel·lar"
+	"noFollowRequests": "No tens sol·licituds de seguiment"
 }
 </locale>
 
@@ -229,10 +229,7 @@ definePage(() => ({
 	"recieved": "Received request",
 	"sent": "Sent request",
 	"followRequests": "Žádosti o sledování",
-	"noFollowRequests": "Nemáte žádné žádosti o sledování",
-	"accept": "Souhlasím",
-	"reject": "Odmítnout",
-	"cancel": "Zrušit"
+	"noFollowRequests": "Nemáte žádné žádosti o sledování"
 }
 </locale>
 
@@ -243,10 +240,7 @@ definePage(() => ({
 	"recieved": "Received request",
 	"sent": "Sent request",
 	"followRequests": "Follow requests",
-	"noFollowRequests": "You don't have any pending follow requests",
-	"accept": "Accept",
-	"reject": "Reject",
-	"cancel": "Cancel"
+	"noFollowRequests": "You don't have any pending follow requests"
 }
 </locale>
 
@@ -257,10 +251,7 @@ definePage(() => ({
 	"recieved": "Anfrage erhalten",
 	"sent": "Anfrage gesendet",
 	"followRequests": "Follow-Anfragen",
-	"noFollowRequests": "Keine ausstehenden Follow-Anfragen vorhanden",
-	"accept": "Akzeptieren",
-	"reject": "Ablehnen",
-	"cancel": "Abbrechen"
+	"noFollowRequests": "Keine ausstehenden Follow-Anfragen vorhanden"
 }
 </locale>
 
@@ -271,10 +262,7 @@ definePage(() => ({
 	"recieved": "Received request",
 	"sent": "Sent request",
 	"followRequests": "Follow requests",
-	"noFollowRequests": "You don't have any pending follow requests",
-	"accept": "Accept",
-	"reject": "Reject",
-	"cancel": "Cancel"
+	"noFollowRequests": "You don't have any pending follow requests"
 }
 </locale>
 
@@ -285,10 +273,7 @@ definePage(() => ({
 	"recieved": "Solicitud de seguimiento recibida",
 	"sent": "Solicitud de seguimiento enviada",
 	"followRequests": "Solicitudes de seguimiento",
-	"noFollowRequests": "No hay solicitudes de seguimiento",
-	"accept": "Aceptar",
-	"reject": "Rechazar",
-	"cancel": "Cancelar"
+	"noFollowRequests": "No hay solicitudes de seguimiento"
 }
 </locale>
 
@@ -299,10 +284,7 @@ definePage(() => ({
 	"recieved": "Received request",
 	"sent": "Sent request",
 	"followRequests": "Demandes d’abonnement",
-	"noFollowRequests": "Vous n’avez aucune demande d’abonnement en attente",
-	"accept": "Autoriser",
-	"reject": "Refuser",
-	"cancel": "Annuler"
+	"noFollowRequests": "Vous n’avez aucune demande d’abonnement en attente"
 }
 </locale>
 
@@ -313,10 +295,7 @@ definePage(() => ({
 	"recieved": "Received request",
 	"sent": "Sent request",
 	"followRequests": "Permintaan mengikuti",
-	"noFollowRequests": "Kamu tidak memiliki permintaan mengikuti yang menunggu",
-	"accept": "Terima",
-	"reject": "Tolak",
-	"cancel": "Batalkan"
+	"noFollowRequests": "Kamu tidak memiliki permintaan mengikuti yang menunggu"
 }
 </locale>
 
@@ -327,24 +306,20 @@ definePage(() => ({
 	"recieved": "Richieste in ingresso",
 	"sent": "Richieste in uscita",
 	"followRequests": "Relazioni",
-	"noFollowRequests": "Non ci sono richieste di relazione",
-	"accept": "Accetta",
-	"reject": "Rifiuta",
-	"cancel": "Annulla"
+	"noFollowRequests": "Non ci sono richieste di relazione"
 }
 </locale>
 
 <locale lang="json" locale="ja-JP">
 {
+	"yes": "はい",
+	"no": "いいえ",
 	"rejectFollowRequestConfirm": "{name}からのフォロー申請を拒否しますか？",
 	"cancelFollowRequestConfirm": "{name}へのフォロー申請をキャンセルしますか？",
 	"recieved": "受け取った申請",
 	"sent": "送った申請",
 	"followRequests": "フォロー申請",
-	"noFollowRequests": "フォロー申請はありません",
-	"accept": "許可",
-	"reject": "拒否",
-	"cancel": "キャンセル"
+	"noFollowRequests": "フォロー申請はありません"
 }
 </locale>
 
@@ -355,10 +330,7 @@ definePage(() => ({
 	"recieved": "もらった申請",
 	"sent": "送った申請",
 	"followRequests": "フォロー申請",
-	"noFollowRequests": "フォロー申請はあらへんで",
-	"accept": "ええで",
-	"reject": "あかん",
-	"cancel": "やめる"
+	"noFollowRequests": "フォロー申請はあらへんで"
 }
 </locale>
 
@@ -369,10 +341,7 @@ definePage(() => ({
 	"recieved": "Received request",
 	"sent": "Sent request",
 	"followRequests": "Follow requests",
-	"noFollowRequests": "You don't have any pending follow requests",
-	"accept": "Accept",
-	"reject": "Reject",
-	"cancel": "Cancel"
+	"noFollowRequests": "You don't have any pending follow requests"
 }
 </locale>
 
@@ -383,10 +352,7 @@ definePage(() => ({
 	"recieved": "Received request",
 	"sent": "Sent request",
 	"followRequests": "Follow requests",
-	"noFollowRequests": "You don't have any pending follow requests",
-	"accept": "Accept",
-	"reject": "Reject",
-	"cancel": "ರದ್ದು"
+	"noFollowRequests": "You don't have any pending follow requests"
 }
 </locale>
 
@@ -397,10 +363,7 @@ definePage(() => ({
 	"recieved": "받은 신청",
 	"sent": "보낸 신청",
 	"followRequests": "팔로우 요청",
-	"noFollowRequests": "처리되지 않은 팔로우 요청이 없습니다",
-	"accept": "수락하기",
-	"reject": "거절하기",
-	"cancel": "취소"
+	"noFollowRequests": "처리되지 않은 팔로우 요청이 없습니다"
 }
 </locale>
 
@@ -411,10 +374,7 @@ definePage(() => ({
 	"recieved": "Received request",
 	"sent": "Sent request",
 	"followRequests": "Volgverzoeken",
-	"noFollowRequests": "Je hebt geen lopende volgverzoeken",
-	"accept": "Accepteren",
-	"reject": "Weigeren",
-	"cancel": "Annuleren"
+	"noFollowRequests": "Je hebt geen lopende volgverzoeken"
 }
 </locale>
 
@@ -425,10 +385,7 @@ definePage(() => ({
 	"recieved": "Received request",
 	"sent": "Sent request",
 	"followRequests": "Følgeforespørsel",
-	"noFollowRequests": "You don't have any pending follow requests",
-	"accept": "Tillatt",
-	"reject": "Avslå",
-	"cancel": "Avbryt"
+	"noFollowRequests": "You don't have any pending follow requests"
 }
 </locale>
 
@@ -439,10 +396,7 @@ definePage(() => ({
 	"recieved": "Received request",
 	"sent": "Sent request",
 	"followRequests": "Prośby o możliwość obserwacji",
-	"noFollowRequests": "Nie masz żadnych oczekujących próśb o możliwość obserwacji",
-	"accept": "Akceptuj",
-	"reject": "Odrzuć",
-	"cancel": "Anuluj"
+	"noFollowRequests": "Nie masz żadnych oczekujących próśb o możliwość obserwacji"
 }
 </locale>
 
@@ -453,10 +407,7 @@ definePage(() => ({
 	"recieved": "Aplicação recebida",
 	"sent": "Aplicação enviada",
 	"followRequests": "Pedidos de seguidor",
-	"noFollowRequests": "Não há pedidos de seguidor pendentes",
-	"accept": "Aceitar",
-	"reject": "Rejeitar",
-	"cancel": "Cancelar"
+	"noFollowRequests": "Não há pedidos de seguidor pendentes"
 }
 </locale>
 
@@ -467,10 +418,7 @@ definePage(() => ({
 	"recieved": "Received request",
 	"sent": "Sent request",
 	"followRequests": "Запросы на подписку",
-	"noFollowRequests": "Нерассмотренные запросы на подписку отсутствуют",
-	"accept": "Принять",
-	"reject": "Отклонить",
-	"cancel": "Отмена"
+	"noFollowRequests": "Нерассмотренные запросы на подписку отсутствуют"
 }
 </locale>
 
@@ -481,10 +429,7 @@ definePage(() => ({
 	"recieved": "Received request",
 	"sent": "Sent request",
 	"followRequests": "Žiadosti o sledovanie",
-	"noFollowRequests": "Nemáte nijaké čakajúce žiadosti o sledovanie",
-	"accept": "Súhlasím",
-	"reject": "Nesúhlasím",
-	"cancel": "Zrušiť"
+	"noFollowRequests": "Nemáte nijaké čakajúce žiadosti o sledovanie"
 }
 </locale>
 
@@ -495,10 +440,7 @@ definePage(() => ({
 	"recieved": "คำขอที่ได้รับ",
 	"sent": "คำที่ส่งไป",
 	"followRequests": "ส่งคำขอติดตาม",
-	"noFollowRequests": "คุณไม่มีคำขอติดตามที่รอดำเนินการ",
-	"accept": "ยอมรับ",
-	"reject": "ปฏิเสธ",
-	"cancel": "ยกเลิก"
+	"noFollowRequests": "คุณไม่มีคำขอติดตามที่รอดำเนินการ"
 }
 </locale>
 
@@ -509,10 +451,7 @@ definePage(() => ({
 	"recieved": "Talep alındı",
 	"sent": "İstek gönderildi",
 	"followRequests": "Takip istekleri",
-	"noFollowRequests": "Bekleyen takip istekleri yok.",
-	"accept": "Kabul et",
-	"reject": "Reddet",
-	"cancel": "Vazgeç"
+	"noFollowRequests": "Bekleyen takip istekleri yok."
 }
 </locale>
 
@@ -523,10 +462,7 @@ definePage(() => ({
 	"recieved": "Received request",
 	"sent": "Sent request",
 	"followRequests": "Follow requests",
-	"noFollowRequests": "You don't have any pending follow requests",
-	"accept": "Accept",
-	"reject": "Reject",
-	"cancel": "Cancel"
+	"noFollowRequests": "You don't have any pending follow requests"
 }
 </locale>
 
@@ -537,10 +473,7 @@ definePage(() => ({
 	"recieved": "Received request",
 	"sent": "Sent request",
 	"followRequests": "Запити на підписку",
-	"noFollowRequests": "Немає запитів на підписку",
-	"accept": "Прийняти",
-	"reject": "Відхилити",
-	"cancel": "Скасувати"
+	"noFollowRequests": "Немає запитів на підписку"
 }
 </locale>
 
@@ -551,10 +484,7 @@ definePage(() => ({
 	"recieved": "Received request",
 	"sent": "Sent request",
 	"followRequests": "Yêu cầu theo dõi",
-	"noFollowRequests": "Bạn không có yêu cầu theo dõi nào",
-	"accept": "Đồng ý",
-	"reject": "Từ chối",
-	"cancel": "Hủy"
+	"noFollowRequests": "Bạn không có yêu cầu theo dõi nào"
 }
 </locale>
 
@@ -565,10 +495,7 @@ definePage(() => ({
 	"recieved": "收到的请求",
 	"sent": "发送的请求",
 	"followRequests": "关注请求",
-	"noFollowRequests": "没有关注请求",
-	"accept": "允许",
-	"reject": "拒绝",
-	"cancel": "取消"
+	"noFollowRequests": "没有关注请求"
 }
 </locale>
 
@@ -579,9 +506,6 @@ definePage(() => ({
 	"recieved": "收到的請求",
 	"sent": "送出的請求",
 	"followRequests": "追隨請求",
-	"noFollowRequests": "沒有追隨您的請求",
-	"accept": "接受",
-	"reject": "拒絕",
-	"cancel": "取消"
+	"noFollowRequests": "沒有追隨您的請求"
 }
 </locale>

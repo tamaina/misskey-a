@@ -61,7 +61,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<MkFolder :defaultOpen="false">
 			<template #icon><i class="ti ti-message-2"></i></template>
 			<template #label>{{ $locale.sfc.moderationNote }}</template>
-			<template #suffix>{{ moderationNote.length > 0 ? '...' : $locale.sfc.none }}</template>
+			<template #suffix>{{ moderationNote.length > 0 ? '...' : globalLocale.env.none }}</template>
 			<div class="_gaps_s">
 				<MkTextarea v-model="moderationNote" manualSave>
 					<template #caption>{{ $locale.sfc.moderationNoteDescription }}</template>
@@ -70,7 +70,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</MkFolder>
 
 		<div v-if="report.assignee">
-			{{ $locale.sfc.moderator }}:
+			{{ globalLocale.env.moderator }}:
 			<MkAcct :user="report.assignee"/>
 		</div>
 	</div>
@@ -78,11 +78,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { provide, ref, watch } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
-import MkKeyValue from '@features/ui/frontend/components/MkKeyValue.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { dateString } from '@features/ui/frontend/filters/date.js';
 import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
@@ -90,6 +90,9 @@ import RouterView from '@features/navigation/frontend/components/global/RouterVi
 import MkTextarea from '@features/ui/frontend/components/MkTextarea.vue';
 import { copyToClipboard } from '@features/ui/frontend/utility/copy-to-clipboard.js';
 import { createRouter } from '@features/navigation/frontend/router.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	report: Misskey.entities.AdminAbuseUserReportsResponse[number];
@@ -163,9 +166,7 @@ function showMenu(ev: PointerEvent) {
   "details": "التفاصيل",
   "reporter": "المُبلّغ",
   "moderationNote": "Moderation note",
-  "none": "لا شيء",
-  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-  "moderator": "مشرِف"
+  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators."
 }
 </locale>
 
@@ -181,9 +182,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Detalls",
   "reporter": "Denunciant ",
   "moderationNote": "Nota de moderació ",
-  "none": "Res",
-  "moderationNoteDescription": "Pots escriure notes que es compartiran entre els moderadors.",
-  "moderator": "Moderador/a"
+  "moderationNoteDescription": "Pots escriure notes que es compartiran entre els moderadors."
 }
 </locale>
 
@@ -199,9 +198,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Detaily",
   "reporter": "Nahlásil",
   "moderationNote": "Poznámka moderátora",
-  "none": "Žádný",
-  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-  "moderator": "Moderátor"
+  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators."
 }
 </locale>
 
@@ -217,9 +214,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Details",
   "reporter": "Reporter",
   "moderationNote": "Moderation note",
-  "none": "None",
-  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-  "moderator": "Moderator"
+  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators."
 }
 </locale>
 
@@ -235,9 +230,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Details",
   "reporter": "Melder",
   "moderationNote": "Moderationsnotiz",
-  "none": "Nichts",
-  "moderationNoteDescription": "Trage hier Notizen ein. Diese sind nur für die Moderatoren sichtbar.",
-  "moderator": "Moderator"
+  "moderationNoteDescription": "Trage hier Notizen ein. Diese sind nur für die Moderatoren sichtbar."
 }
 </locale>
 
@@ -253,9 +246,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Details",
   "reporter": "Reporter",
   "moderationNote": "Moderation note",
-  "none": "None",
-  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-  "moderator": "Moderator"
+  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators."
 }
 </locale>
 
@@ -271,9 +262,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Detalles",
   "reporter": "Reportador",
   "moderationNote": "Nota de moderación",
-  "none": "Ninguna",
-  "moderationNoteDescription": "Puedes rellenar notas que solo se comparten entre moderadores.",
-  "moderator": "Moderador"
+  "moderationNoteDescription": "Puedes rellenar notas que solo se comparten entre moderadores."
 }
 </locale>
 
@@ -289,9 +278,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Détails",
   "reporter": "Signalé par",
   "moderationNote": "Note de modération",
-  "none": "Rien",
-  "moderationNoteDescription": "Vous pouvez remplir des notes qui seront partagés seulement entre modérateurs.",
-  "moderator": "Modérateur·rice·s"
+  "moderationNoteDescription": "Vous pouvez remplir des notes qui seront partagés seulement entre modérateurs."
 }
 </locale>
 
@@ -307,9 +294,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Selengkapnya",
   "reporter": "Pelapor",
   "moderationNote": "Catatan moderasi",
-  "none": "Tidak ada",
-  "moderationNoteDescription": "Anda dapat mengisi note yang hanya akan dibagikan diantara moderator.",
-  "moderator": "Moderator"
+  "moderationNoteDescription": "Anda dapat mengisi note yang hanya akan dibagikan diantara moderator."
 }
 </locale>
 
@@ -325,9 +310,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Dettagli",
   "reporter": "il corrispondente",
   "moderationNote": "Promemoria di moderazione",
-  "none": "Nessuna",
-  "moderationNoteDescription": "Puoi scrivere promemoria condivisi solo tra moderatori.",
-  "moderator": "Moderatore"
+  "moderationNoteDescription": "Puoi scrivere promemoria condivisi solo tra moderatori."
 }
 </locale>
 
@@ -343,9 +326,7 @@ function showMenu(ev: PointerEvent) {
   "details": "詳細",
   "reporter": "通報者",
   "moderationNote": "モデレーションノート",
-  "none": "なし",
-  "moderationNoteDescription": "モデレーター間でだけ共有されるメモを記入することができます。",
-  "moderator": "モデレーター"
+  "moderationNoteDescription": "モデレーター間でだけ共有されるメモを記入することができます。"
 }
 </locale>
 
@@ -361,9 +342,7 @@ function showMenu(ev: PointerEvent) {
   "details": "もっと",
   "reporter": "通報者",
   "moderationNote": "モデレーションノート",
-  "none": "なし",
-  "moderationNoteDescription": "モデレーターの中だけで共有するメモを入れれるで。",
-  "moderator": "モデレーター"
+  "moderationNoteDescription": "モデレーターの中だけで共有するメモを入れれるで。"
 }
 </locale>
 
@@ -379,9 +358,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Details",
   "reporter": "Reporter",
   "moderationNote": "Moderation note",
-  "none": "None",
-  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-  "moderator": "Moderator"
+  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators."
 }
 </locale>
 
@@ -397,9 +374,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Details",
   "reporter": "Reporter",
   "moderationNote": "Moderation note",
-  "none": "None",
-  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-  "moderator": "Moderator"
+  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators."
 }
 </locale>
 
@@ -415,9 +390,7 @@ function showMenu(ev: PointerEvent) {
   "details": "자세히",
   "reporter": "신고자",
   "moderationNote": "조정 기록",
-  "none": "없음",
-  "moderationNoteDescription": "모더레이터 역할을 가진 유저만 보이는 메모를 적을 수 있습니다.",
-  "moderator": "모더레이터"
+  "moderationNoteDescription": "모더레이터 역할을 가진 유저만 보이는 메모를 적을 수 있습니다."
 }
 </locale>
 
@@ -433,9 +406,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Details",
   "reporter": "Verslaggever",
   "moderationNote": "Moderatienotitie",
-  "none": "Niets",
-  "moderationNoteDescription": "Voer hier notities in. Deze zijn alleen zichtbaar voor de moderators.",
-  "moderator": "Moderator"
+  "moderationNoteDescription": "Voer hier notities in. Deze zijn alleen zichtbaar voor de moderators."
 }
 </locale>
 
@@ -451,9 +422,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Details",
   "reporter": "Reporter",
   "moderationNote": "Moderation note",
-  "none": "Ingen",
-  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-  "moderator": "Moderator"
+  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators."
 }
 </locale>
 
@@ -469,9 +438,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Szczegóły",
   "reporter": "Zgłaszający",
   "moderationNote": "Notka moderacyjna",
-  "none": "Brak",
-  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-  "moderator": "Moderator"
+  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators."
 }
 </locale>
 
@@ -487,9 +454,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Detalhes",
   "reporter": "Denunciante",
   "moderationNote": "Nota de moderação",
-  "none": "Nenhum",
-  "moderationNoteDescription": "Você pode preencher notas que serão compartilhadas apenas com moderadores.",
-  "moderator": "Moderador"
+  "moderationNoteDescription": "Você pode preencher notas que serão compartilhadas apenas com moderadores."
 }
 </locale>
 
@@ -505,9 +470,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Подробнее",
   "reporter": "Сообщивший",
   "moderationNote": "Примечания модератора",
-  "none": "Ничего",
-  "moderationNoteDescription": "Вы можете заполнять заметки, которые будут доступны только модераторам.",
-  "moderator": "Модератор"
+  "moderationNoteDescription": "Вы можете заполнять заметки, которые будут доступны только модераторам."
 }
 </locale>
 
@@ -523,9 +486,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Detaily",
   "reporter": "Nahlásil",
   "moderationNote": "Moderation note",
-  "none": "Žiadne",
-  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-  "moderator": "Moderátor"
+  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators."
 }
 </locale>
 
@@ -541,9 +502,7 @@ function showMenu(ev: PointerEvent) {
   "details": "รายละเอียด",
   "reporter": "ผู้รายงาน",
   "moderationNote": "โน้ตการกลั่นกรอง",
-  "none": "ไม่มี",
-  "moderationNoteDescription": "สามารถจดเมโมที่จะแบ่งปันเฉพาะระหว่างผู้ควบคุมได้",
-  "moderator": "ผู้ควบคุม"
+  "moderationNoteDescription": "สามารถจดเมโมที่จะแบ่งปันเฉพาะระหว่างผู้ควบคุมได้"
 }
 </locale>
 
@@ -559,9 +518,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Ayrıntılar",
   "reporter": "Raporlayan",
   "moderationNote": "Moderasyon notu",
-  "none": "Hiçbiri",
-  "moderationNoteDescription": "Moderatörler arasında paylaşılacak notları girebilirsin.",
-  "moderator": "Moderatör"
+  "moderationNoteDescription": "Moderatörler arasında paylaşılacak notları girebilirsin."
 }
 </locale>
 
@@ -577,9 +534,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Details",
   "reporter": "Reporter",
   "moderationNote": "Moderation note",
-  "none": "None",
-  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators.",
-  "moderator": "Moderator"
+  "moderationNoteDescription": "You can fill in notes that will be shared only among moderators."
 }
 </locale>
 
@@ -595,9 +550,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Детальніше",
   "reporter": "Репортер",
   "moderationNote": "Модераторська нотатка",
-  "none": "Відсутній",
-  "moderationNoteDescription": "Ви можете додати нотатки, які будуть доступні лише модераторам.\n",
-  "moderator": "Модератор"
+  "moderationNoteDescription": "Ви можете додати нотатки, які будуть доступні лише модераторам.\n"
 }
 </locale>
 
@@ -613,9 +566,7 @@ function showMenu(ev: PointerEvent) {
   "details": "Chi tiết",
   "reporter": "Người báo cáo",
   "moderationNote": "Ghi chú kiểm duyệt",
-  "none": "Không",
-  "moderationNoteDescription": "Bạn có thể điền vào những ghi chú chỉ được chia sẻ giữa những người kiểm duyệt.",
-  "moderator": "Kiểm duyệt viên"
+  "moderationNoteDescription": "Bạn có thể điền vào những ghi chú chỉ được chia sẻ giữa những người kiểm duyệt."
 }
 </locale>
 
@@ -631,9 +582,7 @@ function showMenu(ev: PointerEvent) {
   "details": "详情",
   "reporter": "举报者",
   "moderationNote": "管理笔记",
-  "none": "无",
-  "moderationNoteDescription": "可以用来记录仅在管理员之间共享的笔记。",
-  "moderator": "监察员"
+  "moderationNoteDescription": "可以用来记录仅在管理员之间共享的笔记。"
 }
 </locale>
 
@@ -649,8 +598,6 @@ function showMenu(ev: PointerEvent) {
   "details": "詳細資訊",
   "reporter": "檢舉者",
   "moderationNote": "管理筆記",
-  "none": "無",
-  "moderationNoteDescription": "您可以編寫僅在審查員之間共用的註解。",
-  "moderator": "審查員"
+  "moderationNoteDescription": "您可以編寫僅在審查員之間共用的註解。"
 }
 </locale>

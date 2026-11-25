@@ -3,11 +3,10 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
 import { url } from '@features/boot/frontend/shared/config.js';
 import { claimAchievement } from '@features/users/frontend/utility/achievements.js';
-import type { Ref, ShallowRef } from 'vue';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import { $i } from '@features/auth/frontend/i.js';
 import FeatureLocaleMessages from '@features/notes/frontend/ts-messages.vue';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
@@ -26,6 +25,13 @@ import { genEmbedCode } from '@features/web/frontend/utility/get-embed-code.js';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { getPluginHandlers } from '@features/integrations/frontend/plugin.js';
 import { globalEvents } from '@features/runtime/frontend/events.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Ref, ShallowRef } from 'vue';
+import type { Locale } from 'i18n';
+
+function getGlobalLocale() {
+	return useLocale<Locale>(import.meta.url).value.env;
+}
 
 const isInBrowserTranslationAvailable = (
 	'LanguageDetector' in window &&
@@ -101,24 +107,24 @@ export async function getNoteClipMenu(props: {
 		},
 	})), { type: 'divider' }, {
 		icon: 'ti ti-plus',
-		text: FeatureLocaleMessages.$locale.createNew,
+		text: getGlobalLocale().createNew,
 		action: async () => {
 			const { canceled, result } = await os.form(FeatureLocaleMessages.$locale.createNewClip, {
 				name: {
 					type: 'string',
 					default: null as string | null,
-					label: FeatureLocaleMessages.$locale.name,
+					label: getGlobalLocale().name,
 				},
 				description: {
 					type: 'string',
 					required: false,
 					default: null,
 					multiline: true,
-					label: FeatureLocaleMessages.$locale.description,
+					label: getGlobalLocale().description,
 				},
 				isPublic: {
 					type: 'boolean',
-					label: FeatureLocaleMessages.$locale.public,
+					label: getGlobalLocale().public,
 					default: false,
 				},
 			});
@@ -292,7 +298,7 @@ export function getNoteMenu(props: {
 
 	function share(): void {
 		navigator.share({
-			title: interpolateLocaleParameters(FeatureLocaleMessages.$locale.noteOf, { user: appearNote.user.name ?? appearNote.user.username }),
+			title: interpolateLocaleParameters(getGlobalLocale().noteOf, { user: appearNote.user.name ?? appearNote.user.username }),
 			text: appearNote.text ?? '',
 			url: `${url}/notes/${appearNote.id}`,
 		});
@@ -395,7 +401,7 @@ export function getNoteMenu(props: {
 				},
 			});
 		} else {
-			const embedMenu = getNoteEmbedCodeMenu(appearNote, FeatureLocaleMessages.$locale.embed);
+			const embedMenu = getNoteEmbedCodeMenu(appearNote, getGlobalLocale().embed);
 			if (embedMenu != null) {
 				menuItems.push(embedMenu);
 			}
@@ -404,7 +410,7 @@ export function getNoteMenu(props: {
 		if (isSupportShare()) {
 			menuItems.push({
 				icon: 'ti ti-share',
-				text: FeatureLocaleMessages.$locale.share,
+				text: getGlobalLocale().share,
 				action: share,
 			});
 		}
@@ -421,18 +427,18 @@ export function getNoteMenu(props: {
 
 		menuItems.push(statePromise.then(state => state.isFavorited ? {
 			icon: 'ti ti-star-off',
-			text: FeatureLocaleMessages.$locale.unfavorite,
+			text: getGlobalLocale().unfavorite,
 			action: () => toggleFavorite(false),
 		} : {
 			icon: 'ti ti-star',
-			text: FeatureLocaleMessages.$locale.favorite,
+			text: getGlobalLocale().favorite,
 			action: () => toggleFavorite(true),
 		}));
 
 		menuItems.push({
 			type: 'parent',
 			icon: 'ti ti-paperclip',
-			text: FeatureLocaleMessages.$locale.clip,
+			text: getGlobalLocale().clip,
 			children: () => getNoteClipMenu(props),
 		});
 
@@ -465,7 +471,7 @@ export function getNoteMenu(props: {
 		menuItems.push({
 			type: 'parent',
 			icon: 'ti ti-user',
-			text: FeatureLocaleMessages.$locale.user,
+			text: getGlobalLocale().user,
 			children: async () => {
 				const user = appearNote.userId === $i?.id ? $i : await misskeyApi('users/show', { userId: appearNote.userId });
 				const { menu, cleanup } = getUserMenu(user);
@@ -484,7 +490,7 @@ export function getNoteMenu(props: {
 			menuItems.push({
 				type: 'parent',
 				icon: 'ti ti-device-tv',
-				text: FeatureLocaleMessages.$locale.channel,
+				text: getGlobalLocale().channel,
 				children: async () => {
 					const channelChildMenu = [] as MenuItem[];
 
@@ -533,7 +539,7 @@ export function getNoteMenu(props: {
 			}
 			menuItems.push({
 				icon: 'ti ti-trash',
-				text: FeatureLocaleMessages.$locale.delete,
+				text: getGlobalLocale().delete,
 				danger: true,
 				action: del,
 			});
@@ -572,7 +578,7 @@ export function getNoteMenu(props: {
 				},
 			});
 		} else {
-			const embedMenu = getNoteEmbedCodeMenu(appearNote, FeatureLocaleMessages.$locale.embed);
+			const embedMenu = getNoteEmbedCodeMenu(appearNote, getGlobalLocale().embed);
 			if (embedMenu != null) {
 				menuItems.push(embedMenu);
 			}
@@ -677,7 +683,7 @@ export function getRenoteMenu(props: {
 
 	if (!appearNote.channel || appearNote.channel.allowRenoteToExternal) {
 		normalRenoteItems.push(...[{
-			text: FeatureLocaleMessages.$locale.renote,
+			text: getGlobalLocale().renote,
 			icon: 'ti ti-repeat',
 			action: () => {
 				const el = props.renoteButton.value;
@@ -711,7 +717,7 @@ export function getRenoteMenu(props: {
 				}
 			},
 		}, ...(props.mock ? [] : [{
-			text: FeatureLocaleMessages.$locale.quote,
+			text: getGlobalLocale().quote,
 			icon: 'ti ti-quote',
 			action: () => {
 				os.post({

@@ -39,26 +39,8 @@ Feature production source (excluding feature test trees and *.test sources):
 | looseObject calls | 342 | 339 |
 | resultObject calls | 263 | 261 |
 
-The broader enforcement inventory covers repository-owned TS/JS source under
-packages, including historical tests and type references. It shrinks from 705
-to 700 known references (415 looseObject, 285 resultObject). This is a different
-scope and metric from production call counts above.
-
-Run `pnpm check:contract-object-inventory` to check the recorded inventory. After
-retiring references, run `pnpm check:contract-object-inventory --write`; writing
-only permits a subset of the existing fingerprints and counts. Source
-fingerprints include the file, declaring owner and complete reference/call
-text, so relocation or edits to retained legacy sites need deliberate review,
-rather than silently granting new allowed uses. Comments and ordinary strings
-do not count. Named imports, literal property keys, local aliases, casts,
-parentheses, destructuring, local object members and lexical shadowing are
-covered. This does not claim to evaluate arbitrary computed JavaScript keys.
-
-Maintenance CI checks the exact current inventory and a shrinking baseline from
-HEAD^ with checkout depth 2. New call/reference fingerprints or increased counts
-fail. The first inventory is initialized at this checkpoint; later commits may
-only shrink it. The guard has seven regression tests. Remove result-object.ts
-once its last real consumer and historical test consumer have been retired.
+Remove result-object.ts once its last real consumer and historical test
+consumer have been retired.
 
 ## Separate difficult shapes
 

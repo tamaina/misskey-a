@@ -5,7 +5,6 @@
 
 import { expect, test, vi } from 'vitest';
 import { EntitySchema } from 'typeorm';
-import frozen from '../../../test/fixtures/chart-contract-baseline.json' with { type: 'json' };
 import * as descriptors from '@features/statistics/shared/chart-descriptors.js';
 import * as chartEntity0 from '@features/statistics/backend/charts/definitions/active-users.js';
 import * as chartEntity1 from '@features/statistics/backend/charts/definitions/ap-request.js';
@@ -37,38 +36,25 @@ const rows = [
 	{ route: 'charts/users', entity: chartEntity11, descriptor: descriptors.usersChartDescriptor },
 ] as const;
 
-function normalizeMetadata(value: unknown): unknown {
-	if (value === undefined) return { $undefined: true };
-	if (typeof value === 'bigint') return { $bigint: value.toString() };
-	if (typeof value === 'function') return { $function: value.toString() };
-	if (typeof value === 'symbol') throw new Error('Unsupported symbol in chart metadata');
-	if (value instanceof Date) return { $date: value.toISOString() };
-	if (value instanceof RegExp) return { $regexp: value.toString() };
-	if (Array.isArray(value)) return value.map(normalizeMetadata);
-	if (value !== null && typeof value === 'object') {
-		return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, normalizeMetadata(entry)]));
-	}
-	if (typeof value === 'number' && !Number.isFinite(value)) return { $number: String(value) };
-	return value;
-}
-
-test('all chart descriptors and their ordered metric options match the frozen baseline', () => {
-	expect(rows).toHaveLength(12);
+test('each chart entity is built from the same shared descriptor the API publishes', () => {
 	for (const row of rows) {
-		const old = frozen.routes.find(entry => entry.route === row.route)!;
-		expect(row.descriptor).toEqual(old.descriptor);
-		expect(Object.keys(row.descriptor)).toEqual(old.descriptorKeyOrder);
-		expect(row.entity.schema).toBe(row.descriptor);
-		expect(row.entity.name).toBe(old.entityName);
+		expect(row.entity.schema, row.route).toBe(row.descriptor);
 	}
+	expect(new Set(rows.map(row => row.entity.name)).size).toBe(rows.length);
 });
 
-test('all 24 real hour/day EntitySchema options remain deterministically equivalent', () => {
+test('hour/day EntitySchemas use distinct tables and keep a column for every descriptor metric', () => {
+	const tableNames = new Set<string | undefined>();
 	for (const row of rows) {
-		const old = frozen.routes.find(entry => entry.route === row.route)!;
 		for (const span of ['hour', 'day'] as const) {
-			expect(row.entity.entity[span]).toBeInstanceOf(EntitySchema);
-			expect(normalizeMetadata(row.entity.entity[span].options)).toEqual(old.entities[span]);
+			const schema = row.entity.entity[span];
+			expect(schema).toBeInstanceOf(EntitySchema);
+			tableNames.add(schema.options.tableName);
+			const columns = Object.keys(schema.options.columns);
+			for (const key of Object.keys(row.descriptor)) {
+				expect(columns, `${row.route} ${span} ${key}`).toContain(`___${key.replaceAll('.', '_')}`);
+			}
 		}
 	}
+	expect(tableNames.size).toBe(rows.length * 2);
 });

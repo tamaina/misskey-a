@@ -9,7 +9,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<Transition :name="prefer.s.animation ? 'fade' : ''" mode="out-in">
 			<div v-if="note">
 				<div v-if="showNext" class="_margin">
-					<MkNotesTimeline direction="up" :withControl="false" :pullToRefresh="false" class="" :paginator="showNext === 'channel' ? nextChannelPaginator : nextUserPaginator" :noGap="true" :forceDisableInfiniteScroll="true" />
+					<MkNotesTimeline direction="up" :withControl="false" :pullToRefresh="false" class="" :paginator="showNext === 'channel' ? nextChannelPaginator : nextUserPaginator" :noGap="true" :forceDisableInfiniteScroll="true"/>
 				</div>
 
 				<div class="_margin">
@@ -22,7 +22,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkNoteDetailed :key="note.id" v-model:note="note" :initialTab="initialTab" :class="$style.note"/>
 					</div>
 					<div v-if="clips && clips.length > 0" class="_margin">
-						<div style="font-weight: bold; padding: 12px;">{{ $locale.sfc.clip }}</div>
+						<div style="font-weight: bold; padding: 12px;">{{ globalLocale.env.clip }}</div>
 						<div class="_gaps">
 							<MkClipPreview v-for="item in clips" :key="item.id" :clip="item"/>
 						</div>
@@ -45,6 +45,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, watch, ref, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
 import { host } from '@features/boot/frontend/shared/config.js';
@@ -63,6 +64,9 @@ import { getAppearNote } from '@features/notes/frontend/utility/get-appear-note.
 import { serverContext, assertServerContext } from '@features/runtime/frontend/server-context.js';
 import { $i } from '@features/auth/frontend/i.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 // contextは非ログイン状態の情報しかないためログイン時は利用できない
 const CTX_NOTE = !$i && assertServerContext(serverContext, 'note') ? serverContext.note : null;
@@ -171,7 +175,7 @@ definePage(() => ({
 		avatar: note.value.user,
 		path: `/notes/${note.value.id}`,
 		share: {
-			title: interpolateLocaleParameters($locale.value.sfc.noteOf, { user: note.value.user.name ?? note.value.user.username }),
+			title: interpolateLocaleParameters(globalLocale.value.env.noteOf, { user: note.value.user.name ?? note.value.user.username }),
 			text: note.value.text,
 		},
 	} : {},
@@ -215,9 +219,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "Set by the author to require login to view",
 	"signinOrContinueOnRemote": "To continue, you need to move your server or sign up / log in to this server.",
-	"note": "ملاحظة",
-	"noteOf": "ملاحظات {user}",
-	"clip": "مِشبك"
+	"note": "ملاحظة"
 }
 </locale>
 
@@ -225,9 +227,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "L'autor requereix l'inici de sessió per poder veure",
 	"signinOrContinueOnRemote": "Per continuar necessites moure el teu servidor o registrar-te / iniciar sessió en aquest servidor.",
-	"note": "Nota",
-	"noteOf": "Publicació de: {user}",
-	"clip": "Retalls"
+	"note": "Nota"
 }
 </locale>
 
@@ -235,9 +235,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "Set by the author to require login to view",
 	"signinOrContinueOnRemote": "To continue, you need to move your server or sign up / log in to this server.",
-	"note": "Poznámka",
-	"noteOf": "{user} poznámky",
-	"clip": "Oříznout"
+	"note": "Poznámka"
 }
 </locale>
 
@@ -245,9 +243,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "Set by the author to require login to view",
 	"signinOrContinueOnRemote": "To continue, you need to move your server or sign up / log in to this server.",
-	"note": "Note",
-	"noteOf": "Note by {user}",
-	"clip": "Clip"
+	"note": "Note"
 }
 </locale>
 
@@ -255,9 +251,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "Logge dich ein, um weitere Inhalte von diesem Nutzer zu sehen.",
 	"signinOrContinueOnRemote": "Um fortzufahren, gehe zu deiner Instanz oder registriere bzw. melde dich an dieser Instanz an. ",
-	"note": "Notiz",
-	"noteOf": "Notiz von {user}",
-	"clip": "Clip erstellen"
+	"note": "Notiz"
 }
 </locale>
 
@@ -265,9 +259,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "Set by the author to require login to view",
 	"signinOrContinueOnRemote": "To continue, you need to move your server or sign up / log in to this server.",
-	"note": "Note",
-	"noteOf": "Note by {user}",
-	"clip": "Clip"
+	"note": "Note"
 }
 </locale>
 
@@ -275,9 +267,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": " Establecido por el autor: requiere iniciar  sesión para ver",
 	"signinOrContinueOnRemote": "Para continuar, tendrá que ir a su servidor o registrarse e iniciar sesión en este servidor",
-	"note": "Nota",
-	"noteOf": "Notas de {user}",
-	"clip": "Clip"
+	"note": "Nota"
 }
 </locale>
 
@@ -285,9 +275,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "Set by the author to require login to view",
 	"signinOrContinueOnRemote": "To continue, you need to move your server or sign up / log in to this server.",
-	"note": "Note",
-	"noteOf": "Notes de {user}",
-	"clip": "Clip"
+	"note": "Note"
 }
 </locale>
 
@@ -295,9 +283,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "Penulis mengatur konten ini hanya bisa dilihat setelah masuk",
 	"signinOrContinueOnRemote": "Untuk melanjutkan, anda perlu berpindah peladen atau mendaftar / masuk ke peladen ini.",
-	"note": "Catatan",
-	"noteOf": "Catatan milik {user}",
-	"clip": "Klip"
+	"note": "Catatan"
 }
 </locale>
 
@@ -305,9 +291,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "L'autore richiede di iscriversi per vedere il contenuto",
 	"signinOrContinueOnRemote": "Per continuare, devi accedere alla tua istanza o registrarti su questa e poi accedere",
-	"note": "Nota",
-	"noteOf": "Note di {user}",
-	"clip": "Clip"
+	"note": "Nota"
 }
 </locale>
 
@@ -315,9 +299,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "投稿者により、表示にはログインが必要と設定されています",
 	"signinOrContinueOnRemote": "続行するには、お使いのサーバーに移動するか、このサーバーに登録・ログインする必要があります",
-	"note": "ノート",
-	"noteOf": "{user}のノート",
-	"clip": "クリップ"
+	"note": "ノート"
 }
 </locale>
 
@@ -325,9 +307,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "投稿者が、表示にログインが要るって設定してるで",
 	"signinOrContinueOnRemote": "続行するには、お使いのサーバーに移動するか、このサーバーに登録・ログインする必要があるで",
-	"note": "ノート",
-	"noteOf": "{user}はんのノート",
-	"clip": "クリップ"
+	"note": "ノート"
 }
 </locale>
 
@@ -335,9 +315,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "Set by the author to require login to view",
 	"signinOrContinueOnRemote": "To continue, you need to move your server or sign up / log in to this server.",
-	"note": "Note",
-	"noteOf": "Note by {user}",
-	"clip": "Clip"
+	"note": "Note"
 }
 </locale>
 
@@ -345,9 +323,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "Set by the author to require login to view",
 	"signinOrContinueOnRemote": "To continue, you need to move your server or sign up / log in to this server.",
-	"note": "Note",
-	"noteOf": "Note by {user}",
-	"clip": "Clip"
+	"note": "Note"
 }
 </locale>
 
@@ -355,9 +331,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "게시자에 의해 로그인해야 볼 수 있도록 설정되어 있습니다.",
 	"signinOrContinueOnRemote": "계속하려면 사용하는 서버로 이동하거나 이 서버에 로그인해야 합니다.",
-	"note": "노트",
-	"noteOf": "{user}의 노트",
-	"clip": "클립"
+	"note": "노트"
 }
 </locale>
 
@@ -365,9 +339,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "Set by the author to require login to view",
 	"signinOrContinueOnRemote": "Ga naar je eigen instantie of registreer je/log in op deze server om door te gaan.",
-	"note": "Notitie",
-	"noteOf": "Notitie van {user}",
-	"clip": "Clip aanmaken"
+	"note": "Notitie"
 }
 </locale>
 
@@ -375,9 +347,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "Set by the author to require login to view",
 	"signinOrContinueOnRemote": "To continue, you need to move your server or sign up / log in to this server.",
-	"note": "Note",
-	"noteOf": "Note by {user}",
-	"clip": "Clip"
+	"note": "Note"
 }
 </locale>
 
@@ -385,9 +355,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "Set by the author to require login to view",
 	"signinOrContinueOnRemote": "To continue, you need to move your server or sign up / log in to this server.",
-	"note": "Utwórz wpis",
-	"noteOf": "Wpisy {user}",
-	"clip": "Klip"
+	"note": "Utwórz wpis"
 }
 </locale>
 
@@ -395,9 +363,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "O autor exige que você esteja cadastrado para ver",
 	"signinOrContinueOnRemote": "Para continuar, você precisa mover o seu servidor ou entrar/cadastrar-se nesse servidor.",
-	"note": "Publicar",
-	"noteOf": "Publicação de {user}",
-	"clip": "Clipe"
+	"note": "Publicar"
 }
 </locale>
 
@@ -405,9 +371,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "Автор сообщения установил требование в виде авторизации для просмотра",
 	"signinOrContinueOnRemote": "Чтобы продолжить, вам необходимо войти в аккаунт на своём сервере или зарегистрироваться / войти в аккаунт на этом.",
-	"note": "Заметка",
-	"noteOf": "Что пишет {user}",
-	"clip": "Подборка"
+	"note": "Заметка"
 }
 </locale>
 
@@ -415,9 +379,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "Set by the author to require login to view",
 	"signinOrContinueOnRemote": "To continue, you need to move your server or sign up / log in to this server.",
-	"note": "Poznámka",
-	"noteOf": "Poznámky používateľa {user}",
-	"clip": "Klip"
+	"note": "Poznámka"
 }
 </locale>
 
@@ -425,9 +387,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "ผู้โพสต์ได้ตั้งค่าว่าต้องเข้าสู่ระบบจึงจะสามารถดูได้",
 	"signinOrContinueOnRemote": "เพื่อดำเนินการต่อได้ คุณต้องไปที่เซิร์ฟเวอร์ที่คุณใช้งานอยู่ หรือลงทะเบียน/เข้าสู่ระบบเซิร์ฟเวอร์นี้",
-	"note": " โน้ต",
-	"noteOf": "โน้ตของ {user}",
-	"clip": "คลิป"
+	"note": " โน้ต"
 }
 </locale>
 
@@ -435,9 +395,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "Yazar tarafından görüntülemek için oturum açma gerektirir.",
 	"signinOrContinueOnRemote": "Devam etmek için sunucunuzu taşıyın veya bu sunucuya kaydolun / giriş yapın.",
-	"note": "Not",
-	"noteOf": "{user} not'u",
-	"clip": "Klip"
+	"note": "Not"
 }
 </locale>
 
@@ -445,9 +403,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "Set by the author to require login to view",
 	"signinOrContinueOnRemote": "To continue, you need to move your server or sign up / log in to this server.",
-	"note": "Note",
-	"noteOf": "Note by {user}",
-	"clip": "Clip"
+	"note": "Note"
 }
 </locale>
 
@@ -455,9 +411,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "Автор встановив необхідність авторизації для перегляду",
 	"signinOrContinueOnRemote": "Щоб продовжити, потрібно перейти на свій сервер або зареєструватися / увійти на цей сервер.",
-	"note": "Запис",
-	"noteOf": "Нотатка {user}",
-	"clip": "Добірка"
+	"note": "Запис"
 }
 </locale>
 
@@ -465,9 +419,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "Set by the author to require login to view",
 	"signinOrContinueOnRemote": "Để tiếp tục, bạn cần chuyển máy chủ hoặc đăng nhập/đăng ký ở máy chủ này.",
-	"note": "Bài viết",
-	"noteOf": "Tút của {user}",
-	"clip": "Lưu bài viết"
+	"note": "Bài viết"
 }
 </locale>
 
@@ -475,9 +427,7 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "根据发帖者的设定，需要登录才能显示",
 	"signinOrContinueOnRemote": "若要继续，需要转到您所使用的实例，或者在此服务器上注册或登录。",
-	"note": "发帖",
-	"noteOf": "{user} 的帖子",
-	"clip": "便签"
+	"note": "发帖"
 }
 </locale>
 
@@ -485,8 +435,6 @@ definePage(() => ({
 {
 	"thisContentsAreMarkedAsSigninRequiredByAuthor": "作者將其設定為需要登入才能顯示。",
 	"signinOrContinueOnRemote": "若要繼續，需前往您所在的伺服器，或者註冊並登入此伺服器",
-	"note": "貼文",
-	"noteOf": "{user}的貼文",
-	"clip": "摘錄"
+	"note": "貼文"
 }
 </locale>

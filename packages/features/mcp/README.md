@@ -64,7 +64,22 @@ body-reading timeouts remain its responsibility.
 the same handler, disabled by default, with explicit HTTP loopback resource,
 request logging/proxy trust disabled and its existing 30-second request timeout.
 
-`list_my_notes`, `list_api_endpoints` and `call_api` are listed. Its descriptive schema comes from the native
+`list_my_notes` and `list_api_endpoints` remain available. API calls are split by
+native endpoint `policy.kind`: `write:notes` becomes `call_api_write_notes`,
+`read:account` becomes `call_api_read_account`, and
+`write:admin:abuse-user-reports` becomes `call_api_write_admin_abuse_user_reports`.
+Each colon or hyphen is replaced with an underscore, preserving the other characters.
+Endpoints without a kind use `call_api_general`. Names are stable; new kinds that
+would collide or violate the MCP name syntax fail closed. There is no `call_api` alias.
+Only kinds with MCP-supported endpoints are created. Each tools/list request uses
+fresh native endpoint discovery, so only groups with at least one endpoint allowed
+by current token/app grants and account roles are advertised. Discovery definitions
+include `callTool`. Calling an unadvertised group still applies native authorization;
+using a group for another kind (including kindless endpoints) is rejected with
+`TOOL_UNAVAILABLE` before dispatch. `read:*` groups carry `readOnlyHint: true`;
+write groups and general conservatively advertise possible mutations, destructive
+and non-idempotent behavior. Kindless native APIs include stateful operations such
+as `sw/unregister` and must not be assumed read-only. Its descriptive schema comes from the native
 contract; native validation remains authoritative. `McpApiService` reuses the
 shared API context, original AuthenticateService tuple, assembled router and
 existing feature repositories. It retains authentication only within each HTTP
@@ -156,7 +171,7 @@ and revocation ports. Full application boot, live network/proxy behavior and rea
 client/account grants remain outside these fixtures. This small transport does
 not complete every acceptance criterion of #10.
 
-Administrative APIs are available through discovery and `call_api` when the
+Administrative APIs are available through discovery and their kind-specific call tools when the
 native permission and current administrator, moderator or role policy both allow
 them. MCP reads the account, grant/app permissions, role definitions and unexpired
 assignments afresh for each invocation. Role/policy results are reused only within
@@ -170,6 +185,5 @@ Auth-owned credential/session operations, integrations/webhooks, `secure` sessio
 APIs, credential/role-required APIs with no native scope, multipart and raw HTTP
 routes remain unsupported. API tags are documentation, not authorization gates.
 Discovery lists policy candidates and cannot evaluate handler-only runtime
-conditions: for example `reset-db` rejects a non-test runtime before deleting data,
-while `test` only returns validated input. Neither endpoint is invoked by the
-administrative test fixture.
+conditions. Endpoints tagged non-productive, including `reset-db` and `test`, are
+omitted from discovery and all call groups.

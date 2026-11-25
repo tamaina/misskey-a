@@ -36,6 +36,8 @@ function transactionFixture() {
 	const saved: object[] = [];
 	let account = new MiUser({ id: 'alice' });
 	const manager = {
+		// Signup serializes equal usernames with a transaction-scoped advisory lock (upstream #18035).
+		query: vi.fn(async () => []),
 		findOneBy: vi.fn(async (): Promise<MiUser | null> => null),
 		save: vi.fn(async (entity: object) => { saved.push(entity); return entity; }),
 		insert: vi.fn(async (target: unknown, data: Record<string, unknown>) => {

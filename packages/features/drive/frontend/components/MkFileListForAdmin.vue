@@ -20,7 +20,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				:to="`/admin/file/${file.id}`"
 				:class="[$style.file, '_button']"
 			>
-				<div v-if="file.isSensitive" :class="$style.sensitiveLabel">{{ $locale.sfc.sensitive }}</div>
+				<div v-if="file.isSensitive" :class="$style.sensitiveLabel">{{ globalLocale.env.sensitive }}</div>
 				<MkDriveFileThumbnail :class="$style.thumbnail" :file="file" fit="contain" :highlightWhenSensitive="true"/>
 				<div v-if="viewMode === 'list'" :class="$style.body">
 					<div>
@@ -45,12 +45,16 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
-import type { Paginator } from '@features/ui/frontend/utility/paginator.js';
 import MkPagination from '@features/ui/frontend/components/MkPagination.vue';
 import MkDriveFileThumbnail from '@features/drive/frontend/components/MkDriveFileThumbnail.vue';
 import bytes from '@features/ui/frontend/filters/bytes.js';
 import { dateString } from '@features/ui/frontend/filters/date.js';
+import type { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 defineProps<{
 	paginator: Paginator<'admin/drive/files'>;
@@ -126,7 +130,6 @@ defineProps<{
 
 <locale locale="ar-SA" lang="json">
 {
-  "sensitive": "محتوى حساس",
   "system": "النظام",
   "registeredDate": "انضم في"
 }
@@ -134,7 +137,6 @@ defineProps<{
 
 <locale locale="ca-ES" lang="json">
 {
-  "sensitive": "Sensible",
   "system": "Sistema",
   "registeredDate": "Data de registre"
 }
@@ -142,7 +144,6 @@ defineProps<{
 
 <locale locale="cs-CZ" lang="json">
 {
-  "sensitive": "NSFW",
   "system": "Systém",
   "registeredDate": "Datum registrace"
 }
@@ -150,7 +151,6 @@ defineProps<{
 
 <locale locale="da-DK" lang="json">
 {
-  "sensitive": "Sensitive",
   "system": "System",
   "registeredDate": "Joined on"
 }
@@ -158,7 +158,6 @@ defineProps<{
 
 <locale locale="de-DE" lang="json">
 {
-  "sensitive": "Sensibel",
   "system": "System",
   "registeredDate": "Registrationsdatum"
 }
@@ -166,7 +165,6 @@ defineProps<{
 
 <locale locale="en-US" lang="json">
 {
-  "sensitive": "Sensitive",
   "system": "System",
   "registeredDate": "Joined on"
 }
@@ -174,7 +172,6 @@ defineProps<{
 
 <locale locale="es-ES" lang="json">
 {
-  "sensitive": "Marcado como sensible (NSFW)",
   "system": "Sistema",
   "registeredDate": "Fecha de registro"
 }
@@ -182,7 +179,6 @@ defineProps<{
 
 <locale locale="fr-FR" lang="json">
 {
-  "sensitive": "Contenu sensible",
   "system": "Système",
   "registeredDate": "Inscrit le"
 }
@@ -190,7 +186,6 @@ defineProps<{
 
 <locale locale="id-ID" lang="json">
 {
-  "sensitive": "Konten sensitif",
   "system": "Sistem",
   "registeredDate": "Bergabung pada"
 }
@@ -198,7 +193,6 @@ defineProps<{
 
 <locale locale="it-IT" lang="json">
 {
-  "sensitive": "Esplicito",
   "system": "Sistema",
   "registeredDate": "Data iscrizione"
 }
@@ -206,7 +200,6 @@ defineProps<{
 
 <locale locale="ja-JP" lang="json">
 {
-  "sensitive": "センシティブ",
   "system": "システム",
   "registeredDate": "登録日"
 }
@@ -214,7 +207,6 @@ defineProps<{
 
 <locale locale="ja-KS" lang="json">
 {
-  "sensitive": "気いつけて見いや",
   "system": "システム",
   "registeredDate": "始めた日"
 }
@@ -222,7 +214,6 @@ defineProps<{
 
 <locale locale="kab-KAB" lang="json">
 {
-  "sensitive": "Sensitive",
   "system": "System",
   "registeredDate": "Joined on"
 }
@@ -230,7 +221,6 @@ defineProps<{
 
 <locale locale="kn-IN" lang="json">
 {
-  "sensitive": "Sensitive",
   "system": "System",
   "registeredDate": "Joined on"
 }
@@ -238,7 +228,6 @@ defineProps<{
 
 <locale locale="ko-KR" lang="json">
 {
-  "sensitive": "열람 주의",
   "system": "시스템",
   "registeredDate": "등록일"
 }
@@ -246,7 +235,6 @@ defineProps<{
 
 <locale locale="nl-NL" lang="json">
 {
-  "sensitive": "NSFW",
   "system": "Systeem",
   "registeredDate": "Inschrijvingsdatum"
 }
@@ -254,7 +242,6 @@ defineProps<{
 
 <locale locale="no-NO" lang="json">
 {
-  "sensitive": "Sensitive",
   "system": "System",
   "registeredDate": "Joined on"
 }
@@ -262,7 +249,6 @@ defineProps<{
 
 <locale locale="pl-PL" lang="json">
 {
-  "sensitive": "NSFW",
   "system": "System",
   "registeredDate": "Zarejestrowano"
 }
@@ -270,7 +256,6 @@ defineProps<{
 
 <locale locale="pt-PT" lang="json">
 {
-  "sensitive": "Conteúdo sensível",
   "system": "Sistema",
   "registeredDate": "Data de registro"
 }
@@ -278,7 +263,6 @@ defineProps<{
 
 <locale locale="ru-RU" lang="json">
 {
-  "sensitive": "Содержимое не для всех",
   "system": "Система",
   "registeredDate": "Дата регистрации"
 }
@@ -286,7 +270,6 @@ defineProps<{
 
 <locale locale="sk-SK" lang="json">
 {
-  "sensitive": "NSFW",
   "system": "Systém",
   "registeredDate": "Dátum registrácie"
 }
@@ -294,7 +277,6 @@ defineProps<{
 
 <locale locale="th-TH" lang="json">
 {
-  "sensitive": "เนื้อหาที่ละเอียดอ่อน",
   "system": "ระบบ",
   "registeredDate": "วันที่ลงทะเบียน"
 }
@@ -302,7 +284,6 @@ defineProps<{
 
 <locale locale="tr-TR" lang="json">
 {
-  "sensitive": "Hassas",
   "system": "Sistem",
   "registeredDate": "Katılma tarihi"
 }
@@ -310,7 +291,6 @@ defineProps<{
 
 <locale locale="ug-CN" lang="json">
 {
-  "sensitive": "Sensitive",
   "system": "System",
   "registeredDate": "Joined on"
 }
@@ -318,7 +298,6 @@ defineProps<{
 
 <locale locale="uk-UA" lang="json">
 {
-  "sensitive": "NSFW",
   "system": "Система",
   "registeredDate": "Приєднання"
 }
@@ -326,7 +305,6 @@ defineProps<{
 
 <locale locale="vi-VN" lang="json">
 {
-  "sensitive": "Nhạy cảm",
   "system": "Hệ thống",
   "registeredDate": "Tham gia"
 }
@@ -334,7 +312,6 @@ defineProps<{
 
 <locale locale="zh-CN" lang="json">
 {
-  "sensitive": "敏感内容",
   "system": "系统",
   "registeredDate": "注册于"
 }
@@ -342,7 +319,6 @@ defineProps<{
 
 <locale locale="zh-TW" lang="json">
 {
-  "sensitive": "敏感內容",
   "system": "系統",
   "registeredDate": "註冊日期"
 }

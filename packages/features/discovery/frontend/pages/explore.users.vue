@@ -142,7 +142,7 @@ const recentlyUpdatedUsersFPaginator = markRaw(new Paginator('users', {
 	limit: 10,
 	noPaging: true,
 	params: {
-		origin: 'combined',
+		origin: 'remote',
 		sort: '+updatedAt',
 	},
 }));
@@ -151,7 +151,7 @@ const recentlyRegisteredUsersFPaginator = markRaw(new Paginator('users', {
 	limit: 10,
 	noPaging: true,
 	params: {
-		origin: 'combined',
+		origin: 'remote',
 		sort: '+createdAt',
 	},
 }));

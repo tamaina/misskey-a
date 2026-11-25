@@ -6,7 +6,7 @@ import { call } from '@orpc/server';
 import bcrypt from 'bcryptjs';
 import * as OTPAuth from 'otpauth';
 import type { EntityManager } from 'typeorm';
-import { MiUser, MiBrowserSession } from '@features/persistence/backend/repositories/models.js';
+import { MiUser, MiBrowserSession, MiUserProfile } from '@features/persistence/backend/repositories/models.js';
 import { afterEach, expect, test, vi } from 'vitest';
 import * as v from 'valibot';
 import { mockDeep } from 'vitest-mock-extended';
@@ -30,15 +30,18 @@ function fixture(twoFactorEnabled = true) {
 	vi.spyOn(Date, 'now').mockReturnValue(now);
 	const users = mockDeep<ConstructorParameters<typeof UserAuthService>[1]>();
 	const profiles = mockDeep<ConstructorParameters<typeof UserAuthService>[2]>();
+	profiles.update.mockResolvedValue({ affected: 1, raw: [], generatedMaps: [] });
 	const redis = mockDeep<ConstructorParameters<typeof UserAuthService>[0]>();
 	const events = mockDeep<Parameters<typeof createIRegenerateTokenProcedure>[0]['globalEventService']>();
-	const me = mockDeep<MiLocalUser>({ id: 'synthetic-user', token: 'synthetic-old-token', isSuspended: false, movedToUri: null });
+	const me = mockDeep<MiLocalUser>({ id: 'synthetic-user', host: null, isDeleted: false, token: 'synthetic-old-token', isSuspended: false, movedToUri: null });
 	const profile = mockDeep<NonNullable<Awaited<ReturnType<typeof profiles.findOneByOrFail>>>>({
 		userId: me.id, password: bcrypt.hashSync(password, 4), twoFactorEnabled,
-		twoFactorSecret: secret, twoFactorBackupSecret: [backup],
+		twoFactorSecret: secret, twoFactorBackupSecret: [backup], passkeyMfaEnabled: false,
 	});
 	users.findOneByOrFail.mockResolvedValue(me);
+	users.findOne.mockResolvedValue(me);
 	profiles.findOneByOrFail.mockResolvedValue(profile);
+	profiles.findOneOrFail.mockResolvedValue(profile);
 	redis.set.mockResolvedValue('OK');
 	const auth = new UserAuthService(redis, users, profiles);
 	const authenticate = vi.spyOn(auth, 'twoFactorAuthenticate');
@@ -48,6 +51,7 @@ function fixture(twoFactorEnabled = true) {
 	const manager = mockDeep<EntityManager>();
 	manager.getRepository.mockImplementation(entity => {
 		if (entity === MiUser) return users as unknown as ReturnType<EntityManager['getRepository']>;
+		if (entity === MiUserProfile) return profiles as unknown as ReturnType<EntityManager['getRepository']>;
 		if (entity === MiBrowserSession) return browserRows as unknown as ReturnType<EntityManager['getRepository']>;
 		throw new Error('unsupported synthetic repository');
 	});
@@ -57,7 +61,8 @@ function fixture(twoFactorEnabled = true) {
 		return await callback(manager);
 	});
 	const endpoint = createIRegenerateTokenProcedure({ db, browserSessionService, usersRepository: users, userProfilesRepository: profiles, userAuthService: auth, globalEventService: events });
-	const invoke = (proof?: string | null, suppliedPassword = password) => call(endpoint, { password: suppliedPassword, ...(proof === undefined ? {} : { token: proof }) }, { context: testContext(me) });
+	const context = testContext(me); context.credential = me.token;
+	const invoke = (proof?: string | null, suppliedPassword = password) => call(endpoint, { password: suppliedPassword, ...(proof === undefined ? {} : { token: proof }) }, { context });
 	const noRotation = () => {
 		expect(users.update).not.toHaveBeenCalled();
 		expect(db.transaction).not.toHaveBeenCalled();
@@ -109,9 +114,17 @@ test('already-used TOTP cannot rotate the token', async () => {
 test('backup proof is consumed by the existing verifier before rotation', async () => {
 	const h = fixture();
 	await expect(h.invoke(backup)).resolves.toBeUndefined();
-	expect(h.profiles.update).toHaveBeenCalledWith({ userId: h.me.id }, { twoFactorBackupSecret: [] });
+	expect(h.profiles.update).toHaveBeenCalledWith(expect.objectContaining({ userId: h.me.id }), { twoFactorBackupSecret: expect.any(Function) });
 	expect(h.redis.set).not.toHaveBeenCalled();
 	expect(h.profiles.update.mock.invocationCallOrder[0]).toBeLessThan(h.users.update.mock.invocationCallOrder[0]);
+});
+
+test('a recovery code not consumed by persistence cannot rotate credentials', async () => {
+	const h = fixture();
+	h.profiles.update.mockResolvedValue({ affected: 0, raw: [], generatedMaps: [] });
+	await expect(h.invoke(backup)).rejects.toThrow('authentication failed');
+	expect(h.profiles.update).toHaveBeenCalledOnce();
+	h.noRotation();
 });
 
 test.each([undefined, null, 'unused-code'])('MFA-off preserves password-only compatibility (%s)', async proof => {

@@ -15,6 +15,7 @@ import { acquireApObjectLock } from '@features/runtime/backend/cache/distributed
 import { toArray, toSingle, unique } from '@features/runtime/backend/data/array.js';
 import type { MiEmoji } from '@features/emojis/backend/models/Emoji.js';
 import type { MiDriveFile } from '@features/drive/backend/models/DriveFile.js';
+import { NoteEntityService } from '@features/notes/backend/serializers/NoteEntityService.js';
 import { NoteCreateService } from '@features/notes/backend/services/NoteCreateService.js';
 import type { Logger } from '@features/runtime/backend/logging/logger.js';
 import { IdService } from '@features/runtime/backend/services/IdService.js';
@@ -73,6 +74,7 @@ export class ApNoteService {
 		private apQuestionService: ApQuestionService,
 		private pollService: PollService,
 		private noteCreateService: NoteCreateService,
+		private noteEntityService: NoteEntityService,
 		private apDbResolverService: ApDbResolverService,
 		private apLoggerService: ApLoggerService,
 	) {
@@ -190,7 +192,7 @@ export class ApNoteService {
 		} else if (typeof note._misskey_content !== 'undefined') {
 			text = note._misskey_content;
 		} else if (typeof note.content === 'string') {
-			text = this.apMfmService.htmlToMfm(note.content, note.tag);
+			text = this.apMfmService.htmlToMfm(note.content, { tag: note.tag, hasQuote: !!(note._misskey_quote ?? note.quoteUrl) });
 		}
 
 		const poll = await this.apQuestionService.extractPollFromQuestion(note, resolver).catch(() => undefined);
@@ -238,10 +240,18 @@ export class ApNoteService {
 		// リプライ
 		const reply: MiNote | null = note.inReplyTo
 			? await this.resolveNote(note.inReplyTo, { resolver })
-				.then(x => {
+				.then(async x => {
 					if (x == null) {
 						this.logger.warn('Specified inReplyTo, but not found');
 						throw new Error('inReplyTo not found');
+					}
+
+					// ローカルのリプライ先(および投票先)をactorが閲覧できない場合は存在しないものとして扱う
+					// (localOnlyのノートはリモートユーザーからは参照できない)
+					// リモートのノートの公開範囲は配送元サーバーが判断するため、ここではチェックしない
+					if (x.userHost === null && (x.localOnly || !(await this.noteEntityService.isVisibleForMe(x, actor.id)))) {
+						this.logger.warn('Specified inReplyTo, but not visible to the actor');
+						throw new StatusError('inReplyTo not found', 404, 'inReplyTo not found');
 					}
 
 					return x;
@@ -264,6 +274,7 @@ export class ApNoteService {
 				try {
 					const res = await this.resolveNote(uri);
 					if (res == null) return { status: 'permerror' };
+					if (res.userHost === null && res.localOnly) return { status: 'permerror' };
 					return { status: 'ok', res };
 				} catch (e) {
 					return {

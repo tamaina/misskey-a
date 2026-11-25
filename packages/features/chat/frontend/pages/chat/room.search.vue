@@ -14,7 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<template #prefix><i class="ti ti-search"></i></template>
 	</MkInput>
 
-	<MkButton primary rounded @click="search">{{ $locale.sfc.search }}</MkButton>
+	<MkButton primary rounded @click="search">{{ globalLocale.env.search }}</MkButton>
 
 	<MkFoldableSection v-if="searched">
 		<template #header>{{ $locale.sfc.searchResult }}</template>
@@ -30,6 +30,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref } from 'vue';
 import * as Misskey from 'misskey-js';
 import XMessage from '@features/chat/frontend/pages/chat/XMessage.vue';
@@ -37,6 +38,9 @@ import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import MkInput from '@features/ui/frontend/components/MkInput.vue';
 import MkFoldableSection from '@features/ui/frontend/components/MkFoldableSection.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	userId?: string;
@@ -70,7 +74,6 @@ async function search() {
 <locale locale="ar-SA" lang="json">
 {
   "searchMessages": "Search messages",
-  "search": "البحث",
   "searchResult": "نتائج البحث"
 }
 </locale>
@@ -78,7 +81,6 @@ async function search() {
 <locale locale="ca-ES" lang="json">
 {
   "searchMessages": "Buscar missatges ",
-  "search": "Cercar",
   "searchResult": "Resultats de la cerca"
 }
 </locale>
@@ -86,7 +88,6 @@ async function search() {
 <locale locale="cs-CZ" lang="json">
 {
   "searchMessages": "Search messages",
-  "search": "Vyhledávání",
   "searchResult": "Výsledky hledání"
 }
 </locale>
@@ -94,7 +95,6 @@ async function search() {
 <locale locale="da-DK" lang="json">
 {
   "searchMessages": "Search messages",
-  "search": "Search",
   "searchResult": "Search results"
 }
 </locale>
@@ -102,7 +102,6 @@ async function search() {
 <locale locale="de-DE" lang="json">
 {
   "searchMessages": "Nachrichten suchen",
-  "search": "Suchen",
   "searchResult": "Suchergebnisse"
 }
 </locale>
@@ -110,7 +109,6 @@ async function search() {
 <locale locale="en-US" lang="json">
 {
   "searchMessages": "Search messages",
-  "search": "Search",
   "searchResult": "Search results"
 }
 </locale>
@@ -118,7 +116,6 @@ async function search() {
 <locale locale="es-ES" lang="json">
 {
   "searchMessages": "Buscar mensajes",
-  "search": "Buscar",
   "searchResult": "Resultados de búsqueda"
 }
 </locale>
@@ -126,7 +123,6 @@ async function search() {
 <locale locale="fr-FR" lang="json">
 {
   "searchMessages": "Search messages",
-  "search": "Rechercher",
   "searchResult": "Résultats de la recherche"
 }
 </locale>
@@ -134,7 +130,6 @@ async function search() {
 <locale locale="id-ID" lang="json">
 {
   "searchMessages": "Search messages",
-  "search": "Cari",
   "searchResult": "Hasil Penelusuran"
 }
 </locale>
@@ -142,7 +137,6 @@ async function search() {
 <locale locale="it-IT" lang="json">
 {
   "searchMessages": "Cerca messaggi",
-  "search": "Cerca",
   "searchResult": "Risultati della Ricerca"
 }
 </locale>
@@ -150,7 +144,6 @@ async function search() {
 <locale locale="ja-JP" lang="json">
 {
   "searchMessages": "メッセージを検索",
-  "search": "検索",
   "searchResult": "検索結果"
 }
 </locale>
@@ -158,7 +151,6 @@ async function search() {
 <locale locale="ja-KS" lang="json">
 {
   "searchMessages": "メッセージを検索",
-  "search": "探す",
   "searchResult": "検索結果やで"
 }
 </locale>
@@ -166,7 +158,6 @@ async function search() {
 <locale locale="kab-KAB" lang="json">
 {
   "searchMessages": "Search messages",
-  "search": "Nadi",
   "searchResult": "Search results"
 }
 </locale>
@@ -174,7 +165,6 @@ async function search() {
 <locale locale="kn-IN" lang="json">
 {
   "searchMessages": "Search messages",
-  "search": "ಹುಡುಕು",
   "searchResult": "Search results"
 }
 </locale>
@@ -182,7 +172,6 @@ async function search() {
 <locale locale="ko-KR" lang="json">
 {
   "searchMessages": "메시지 검색",
-  "search": "검색",
   "searchResult": "검색 결과"
 }
 </locale>
@@ -190,7 +179,6 @@ async function search() {
 <locale locale="nl-NL" lang="json">
 {
   "searchMessages": "Search messages",
-  "search": "Zoeken",
   "searchResult": "Zoekresultaten"
 }
 </locale>
@@ -198,7 +186,6 @@ async function search() {
 <locale locale="no-NO" lang="json">
 {
   "searchMessages": "Search messages",
-  "search": "Søk",
   "searchResult": "Search results"
 }
 </locale>
@@ -206,7 +193,6 @@ async function search() {
 <locale locale="pl-PL" lang="json">
 {
   "searchMessages": "Search messages",
-  "search": "Szukaj",
   "searchResult": "Wyniki wyszukiwania"
 }
 </locale>
@@ -214,7 +200,6 @@ async function search() {
 <locale locale="pt-PT" lang="json">
 {
   "searchMessages": "Pesquisar mensagens",
-  "search": "Pesquisar",
   "searchResult": "Pesquisar"
 }
 </locale>
@@ -222,7 +207,6 @@ async function search() {
 <locale locale="ru-RU" lang="json">
 {
   "searchMessages": "Поиск сообщений",
-  "search": "Поиск",
   "searchResult": "Результаты поиска"
 }
 </locale>
@@ -230,7 +214,6 @@ async function search() {
 <locale locale="sk-SK" lang="json">
 {
   "searchMessages": "Search messages",
-  "search": "Hľadať",
   "searchResult": "Výsledky hľadania"
 }
 </locale>
@@ -238,7 +221,6 @@ async function search() {
 <locale locale="th-TH" lang="json">
 {
   "searchMessages": "ค้นหาข้อความ",
-  "search": "ค้นหา",
   "searchResult": "ผลการค้นหา"
 }
 </locale>
@@ -246,7 +228,6 @@ async function search() {
 <locale locale="tr-TR" lang="json">
 {
   "searchMessages": "Mesajları ara",
-  "search": "Ara",
   "searchResult": "Arama sonuçları"
 }
 </locale>
@@ -254,7 +235,6 @@ async function search() {
 <locale locale="ug-CN" lang="json">
 {
   "searchMessages": "Search messages",
-  "search": "ئىزدەش",
   "searchResult": "Search results"
 }
 </locale>
@@ -262,7 +242,6 @@ async function search() {
 <locale locale="uk-UA" lang="json">
 {
   "searchMessages": "Шукати повідомлення",
-  "search": "Пошук",
   "searchResult": "Результати пошуку"
 }
 </locale>
@@ -270,7 +249,6 @@ async function search() {
 <locale locale="vi-VN" lang="json">
 {
   "searchMessages": "Search messages",
-  "search": "Tìm kiếm",
   "searchResult": "Kết quả tìm kiếm"
 }
 </locale>
@@ -278,7 +256,6 @@ async function search() {
 <locale locale="zh-CN" lang="json">
 {
   "searchMessages": "搜索消息",
-  "search": "搜索",
   "searchResult": "搜索结果"
 }
 </locale>
@@ -286,7 +263,6 @@ async function search() {
 <locale locale="zh-TW" lang="json">
 {
   "searchMessages": "搜尋聊天訊息",
-  "search": "搜尋",
   "searchResult": "搜尋結果"
 }
 </locale>

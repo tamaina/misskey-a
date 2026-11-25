@@ -2,6 +2,7 @@
  * SPDX-FileCopyrightText: syuilo and misskey-project
  * SPDX-License-Identifier: AGPL-3.0-only
  */
+import { accessTokenExpired } from '@features/auth/backend/access-token-expiry.js';
 import { EventEmitter } from 'node:events';
 import { Inject, Injectable } from '@nestjs/common';
 import { ContextIdFactory, ModuleRef } from '@nestjs/core';
@@ -70,6 +71,7 @@ export class McpStreamAccessService {
 				// from pending packing; isolate mutable event bodies from other consumers.
 				await Promise.all((subscriber as EventEmitter).rawListeners(source.channel).map(listener => listener(structuredClone(message))));
 			}
+			if (accessTokenExpired(grant)) throw new McpEventError(-32602, 'Stream access denied');
 			return frames;
 		} finally { connection.dispose(); }
 	}
@@ -107,7 +109,7 @@ export class McpStreamAccessService {
 			// the freshly fetched relationship snapshot. No deleted content is retained.
 			return message;
 		}
-		if (message.type === 'note' && !source.channel.startsWith('antennaStream:') || source.channel.startsWith('mainStream:') && ['mention', 'reply', 'renote'].includes(String(message.type))) {
+		if (message.type === 'note' || source.channel.startsWith('mainStream:') && ['mention', 'reply', 'renote'].includes(String(message.type))) {
 			if (!isJsonObject(message.body) || typeof message.body.id !== 'string') return undefined;
 			const current = await this.currentNote(message.body.id, userId); if (!current) return undefined;
 			message.body = current;

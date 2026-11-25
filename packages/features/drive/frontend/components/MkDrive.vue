@@ -106,6 +106,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							:file="file"
 							:folder="folder"
 							:isSelected="selectedFiles.some(x => x.id === file.id)"
+							:isDisabled="excludeSensitive && file.isSensitive"
 							@click="onFileClick($event, file)"
 							@dragstart="onFileDragstart(file, $event)"
 							@dragend="isDragSource = false"
@@ -129,6 +130,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					:file="file"
 					:folder="folder"
 					:isSelected="selectedFiles.some(x => x.id === file.id)"
+					:isDisabled="excludeSensitive && file.isSensitive"
 					@click="onFileClick($event, file)"
 					@dragstart="onFileDragstart(file, $event)"
 					@dragend="isDragSource = false"
@@ -165,10 +167,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { nextTick, onActivated, onBeforeUnmount, onMounted, ref, useTemplateRef, watch, computed, TransitionGroup, markRaw } from 'vue';
 import * as Misskey from 'misskey-js';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
 import XNavFolder from '@features/drive/frontend/components/MkDrive.navFolder.vue';
 import XFolder from '@features/drive/frontend/components/MkDrive.folder.vue';
 import XFile from '@features/drive/frontend/components/MkDrive.file.vue';
@@ -184,16 +186,22 @@ import { globalEvents, useGlobalEvent } from '@features/runtime/frontend/events.
 import { checkDragDataType, getDragData, setDragData } from '@features/ui/frontend/drag-and-drop.js';
 import { getDriveFileMenu } from '@features/drive/frontend/utility/get-drive-file-menu.js';
 import { Paginator } from '@features/ui/frontend/utility/paginator.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	initialFolder?: Misskey.entities.DriveFolder | Misskey.entities.DriveFolder['id'] | null;
 	type?: string;
 	multiple?: boolean;
+	excludeSensitive?: boolean;
 	select?: 'file' | 'folder' | null;
 	forceDisableInfiniteScroll?: boolean;
 }>(), {
 	initialFolder: null,
 	multiple: false,
+	excludeSensitive: false,
 	select: null,
 	forceDisableInfiniteScroll: false,
 });
@@ -405,7 +413,7 @@ function onDrop(ev: DragEvent): void | boolean {
 					default:
 						os.alert({
 							type: 'error',
-							text: $locale.value.sfc.somethingHappened,
+							text: globalLocale.value.env.somethingHappened,
 						});
 				}
 			});
@@ -470,10 +478,21 @@ async function renameFolder(folderToRename: Misskey.entities.DriveFolder) {
 	globalEvents.emit('driveFoldersUpdated', [updatedFolder]);
 }
 
-function deleteFolder(folderToDelete: Misskey.entities.DriveFolder) {
+async function deleteFolder(folderToDelete: Misskey.entities.DriveFolder) {
+	if (prefer.s.uploadFolder === folderToDelete.id) {
+		const { canceled } = await os.confirm({
+			type: 'warning',
+			text: $locale.value.sfc.uploadFolderDeletionConfirm,
+		});
+		if (canceled) return;
+	}
+
 	misskeyApi('drive/folders/delete', {
 		folderId: folderToDelete.id,
 	}).then(() => {
+		if (prefer.s.uploadFolder === folderToDelete.id) {
+			prefer.commit('uploadFolder', null);
+		}
 		// 削除時に親フォルダに移動
 		cd(folderToDelete.parentId);
 		globalEvents.emit('driveFoldersDeleted', [folderToDelete]);
@@ -496,6 +515,8 @@ function deleteFolder(folderToDelete: Misskey.entities.DriveFolder) {
 }
 
 function onFileClick(ev: PointerEvent, file: Misskey.entities.DriveFile) {
+	if (props.excludeSensitive && file.isSensitive) return;
+
 	if (ev.shiftKey) {
 		isEditMode.value = true;
 	}
@@ -613,7 +634,7 @@ function getMenu() {
 		text: $locale.value.sfc.addFile,
 		type: 'label',
 	}, {
-		text: $locale.value.sfc.upload,
+		text: globalLocale.value.env.upload,
 		icon: 'ti ti-upload',
 		action: () => {
 			chooseFileFromPcAndUpload({
@@ -626,7 +647,7 @@ function getMenu() {
 		icon: 'ti ti-link',
 		action: () => { urlUpload(); },
 	}, { type: 'divider' }, {
-		text: folder.value ? folder.value.name : $locale.value.sfc.drive,
+		text: folder.value ? folder.value.name : globalLocale.value.env.drive,
 		type: 'label',
 	});
 
@@ -655,12 +676,12 @@ function getMenu() {
 			action: () => { sortModeSelect.value = '-size'; },
 			active: sortModeSelect.value === '-size',
 		}, {
-			text: `${$locale.value.sfc.name} (${$locale.value.sfc.descendingOrder})`,
+			text: `${globalLocale.value.env.name} (${$locale.value.sfc.descendingOrder})`,
 			icon: 'ti ti-sort-descending-letters',
 			action: () => { sortModeSelect.value = '+name'; },
 			active: sortModeSelect.value === '+name',
 		}, {
-			text: `${$locale.value.sfc.name} (${$locale.value.sfc.ascendingOrder})`,
+			text: `${globalLocale.value.env.name} (${$locale.value.sfc.ascendingOrder})`,
 			icon: 'ti ti-sort-ascending-letters',
 			action: () => { sortModeSelect.value = '-name'; },
 			active: sortModeSelect.value === '-name',
@@ -685,7 +706,7 @@ function getMenu() {
 		action: () => { createFolder(); },
 	}, { type: 'divider' }, {
 		type: 'switch',
-		text: $locale.value.sfc.edit,
+		text: globalLocale.value.env.edit,
 		icon: 'ti ti-pointer',
 		ref: isEditMode,
 	});
@@ -919,7 +940,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "يتعذر إكمال العملية",
 	"circularReferenceFolder": "المجلد المستهدف ينتمي للمجلد الذي تريد حذفه",
-	"somethingHappened": "حدث خطأ",
 	"uploadFromUrl": "ارفع عبر رابط",
 	"uploadFromUrlDescription": "رابط الملف المراد رفعه",
 	"uploadFromUrlRequested": "الرفع مطلوب",
@@ -931,17 +951,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "لا يمكن حذفه",
 	"hasChildFilesOrFolders": "الان الملف غير فارغ. لا يمكن حذفه",
 	"addFile": "إضافة ملف",
-	"upload": "ارفع",
 	"fromUrl": "عبر رابط",
-	"drive": "قرص التخرين",
 	"sort": "ترتيب حسب",
 	"registeredDate": "انضم في",
 	"descendingOrder": "تنازلي",
 	"ascendingOrder": "تصاعدي",
 	"size": "الحجم",
-	"name": "الإسم",
 	"deleteFolder": "احذف هذا المجلد",
-	"edit": "التعديل",
 	"selectFolder": "اختر مجلدًا",
 	"unselectFolder": "Deselect folder",
 	"driveAboutTip": "In Drive, a list of files you've uploaded in the past will be displayed. \u003cbr>  \nYou can reuse these files when attaching them to notes, or you can upload files in advance to post later. \u003cbr>  \n\u003cb>Be careful when deleting a file, as it will not be available in all places where it was used (such as notes, pages, avatars, banners, etc.).\u003c/b> \u003cbr>  \nYou can also create folders to organize your files.",
@@ -957,7 +973,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "L'operació no pot ser completada ",
 	"circularReferenceFolder": "La carpeta destinatària és una subcarpeta de la carpeta a la qual la desitges moure",
-	"somethingHappened": "S'ha produït un error",
 	"uploadFromUrl": "Carrega des d'un enllaç",
 	"uploadFromUrlDescription": "Enllaç del fitxer que vols carregar",
 	"uploadFromUrlRequested": "Càrrega sol·licitada",
@@ -969,17 +984,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "No es pot eliminar",
 	"hasChildFilesOrFolders": "No és possible esborrar aquesta carpeta ja que no és buida",
 	"addFile": "Afegeix un fitxer",
-	"upload": "Puja",
 	"fromUrl": "Des d'un enllaç",
-	"drive": "Disc",
 	"sort": "Ordena",
 	"registeredDate": "Data de registre",
 	"descendingOrder": "Descendent",
 	"ascendingOrder": "Ascendent",
 	"size": "Mida",
-	"name": "Nom",
 	"deleteFolder": "Elimina la carpeta",
-	"edit": "Editar",
 	"selectFolder": "Selecció de carpeta",
 	"unselectFolder": "Deixa de seleccionar la carpeta",
 	"driveAboutTip": "Al Disc veure's una llista de tots els arxius que has anat pujant.\u003cbr>\nPots tornar-los a fer servir adjuntant-los a notes noves o pots adelantar-te i pujar arxius per publicar-los més tard!\u003cbr>\n\u003cb>Tingués en compte que si esborres un arxiu també desapareixerà de tots els llocs on l'has fet servir (notes, pàgines, avatars, imatges de capçalera, etc.)\u003c/b>\u003cbr>\nTambé pots crear carpetes per organitzar les.",
@@ -987,7 +998,8 @@ onBeforeUnmount(() => {
 	"dropHereToUpload": "Arrossega els arxius fins aquí per pujar-los al servidor",
 	"emptyDrive": "El teu Disc és buit",
 	"emptyFolder": "La carpeta està buida",
-	"move": "Mou"
+	"move": "Mou",
+	"uploadFolderDeletionConfirm": "Aquesta carpeta ha estat designada com a destinació predeterminada per a les pujades. Si l'elimineu, ja no serà la destinació predeterminada i els fitxers pujaran al directori arrel."
 }
 </locale>
 
@@ -995,7 +1007,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "Operace nebyla dokončena.",
 	"circularReferenceFolder": "Koncová složka je podsložka složky, kterou chcete přesunout.",
-	"somethingHappened": "Jejda. Něco se nepovedlo.",
 	"uploadFromUrl": "Nahrát z URL adresy",
 	"uploadFromUrlDescription": "URL adresa souboru, který chcete nahrát",
 	"uploadFromUrlRequested": "Upload zažádán",
@@ -1007,17 +1018,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Nelze smazat",
 	"hasChildFilesOrFolders": "Nemůžete odstranit složku, která není prázdná.",
 	"addFile": "Přidat soubor",
-	"upload": "Nahrát soubory",
 	"fromUrl": "Z URL",
-	"drive": "Úložiště",
 	"sort": "Seřadit",
 	"registeredDate": "Datum registrace",
 	"descendingOrder": "Sestupně",
 	"ascendingOrder": "Vzestupně",
 	"size": "Velikost",
-	"name": "Jméno",
 	"deleteFolder": "Odstranit složku",
-	"edit": "Upravit",
 	"selectFolder": "Vyberte složku",
 	"unselectFolder": "Deselect folder",
 	"driveAboutTip": "In Drive, a list of files you've uploaded in the past will be displayed. \u003cbr>  \nYou can reuse these files when attaching them to notes, or you can upload files in advance to post later. \u003cbr>  \n\u003cb>Be careful when deleting a file, as it will not be available in all places where it was used (such as notes, pages, avatars, banners, etc.).\u003c/b> \u003cbr>  \nYou can also create folders to organize your files.",
@@ -1033,7 +1040,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "The operation could not be completed",
 	"circularReferenceFolder": "The destination folder is a subfolder of the folder you wish to move.",
-	"somethingHappened": "An error has occurred",
 	"uploadFromUrl": "Upload from a URL",
 	"uploadFromUrlDescription": "URL of the file you want to upload",
 	"uploadFromUrlRequested": "Upload requested",
@@ -1045,17 +1051,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Unable to delete",
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"addFile": "Add a file",
-	"upload": "Upload",
 	"fromUrl": "From URL",
-	"drive": "Drive",
 	"sort": "Sorting order",
 	"registeredDate": "Joined on",
 	"descendingOrder": "Descending",
 	"ascendingOrder": "Ascending",
 	"size": "Size",
-	"name": "Name",
 	"deleteFolder": "Delete this folder",
-	"edit": "Edit",
 	"selectFolder": "Select a folder",
 	"unselectFolder": "Deselect folder",
 	"driveAboutTip": "In Drive, a list of files you've uploaded in the past will be displayed. \u003cbr>  \nYou can reuse these files when attaching them to notes, or you can upload files in advance to post later. \u003cbr>  \n\u003cb>Be careful when deleting a file, as it will not be available in all places where it was used (such as notes, pages, avatars, banners, etc.).\u003c/b> \u003cbr>  \nYou can also create folders to organize your files.",
@@ -1071,7 +1073,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "Der Vorgang konnte nicht abgeschlossen werden",
 	"circularReferenceFolder": "Der Zielordner ist ein Unterorder des Ordners, den du verschieben möchtest.",
-	"somethingHappened": "Ein Fehler ist aufgetreten",
 	"uploadFromUrl": "Von einer URL hochladen",
 	"uploadFromUrlDescription": "URL der hochzuladenden Datei",
 	"uploadFromUrlRequested": "Upload angefordert",
@@ -1083,17 +1084,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Nicht löschbar",
 	"hasChildFilesOrFolders": "Dieser Ordner kann nicht gelöscht werden, da er nicht leer ist.",
 	"addFile": "Datei hinzufügen",
-	"upload": "Hochladen",
 	"fromUrl": "Von einer URL",
-	"drive": "Drive",
 	"sort": "Sortieren",
 	"registeredDate": "Registrationsdatum",
 	"descendingOrder": "Absteigende Reihenfolge",
 	"ascendingOrder": "Aufsteigende Reihenfolge",
 	"size": "Größe",
-	"name": "Name",
 	"deleteFolder": "Ordner löschen",
-	"edit": "Bearbeiten",
 	"selectFolder": "Ordner auswählen",
 	"unselectFolder": "Ordnerauswahl aufheben",
 	"driveAboutTip": "In Drive sehen Sie eine Liste der Dateien, die Sie in der Vergangenheit hochgeladen haben. \u003cbr>\nSie können diese Dateien wiederverwenden um sie zu beispiel an Notizen anzuhängen, oder sie können Dateien vorab hochzuladen, um sie später zu versenden! \u003cbr>\n\u003cb>Wenn Sie eine Datei löschen, verschwindet sie auch von allen Stellen, an denen Sie sie verwendet haben (Notizen, Seiten, Avatare, Banner usw.).\u003c/b>\u003cbr>\nSie können auch Ordner erstellen, um sie zu organisieren.",
@@ -1109,7 +1106,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "The operation could not be completed",
 	"circularReferenceFolder": "The destination folder is a subfolder of the folder you wish to move.",
-	"somethingHappened": "An error has occurred",
 	"uploadFromUrl": "Upload from a URL",
 	"uploadFromUrlDescription": "URL of the file you want to upload",
 	"uploadFromUrlRequested": "Upload requested",
@@ -1121,17 +1117,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Unable to delete",
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"addFile": "Add a file",
-	"upload": "Upload",
 	"fromUrl": "From URL",
-	"drive": "Drive",
 	"sort": "Sorting order",
 	"registeredDate": "Joined on",
 	"descendingOrder": "Descending",
 	"ascendingOrder": "Ascending",
 	"size": "Size",
-	"name": "Name",
 	"deleteFolder": "Delete this folder",
-	"edit": "Edit",
 	"selectFolder": "Select a folder",
 	"unselectFolder": "Deselect folder",
 	"driveAboutTip": "In Drive, a list of files you've uploaded in the past will be displayed. \u003cbr>  \nYou can reuse these files when attaching them to notes, or you can upload files in advance to post later. \u003cbr>  \n\u003cb>Be careful when deleting a file, as it will not be available in all places where it was used (such as notes, pages, avatars, banners, etc.).\u003c/b> \u003cbr>  \nYou can also create folders to organize your files.",
@@ -1147,7 +1139,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "La operación no se puede llevar a cabo",
 	"circularReferenceFolder": "La carpeta de destino es una sub-carpeta de la carpeta que quieres mover.",
-	"somethingHappened": "Ocurrió un error",
 	"uploadFromUrl": "Subir desde una URL",
 	"uploadFromUrlDescription": "URL del fichero que quieres subir",
 	"uploadFromUrlRequested": "Subida solicitada",
@@ -1159,17 +1150,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "No se puede borrar",
 	"hasChildFilesOrFolders": "No se puede borrar esta carpeta. No está vacía.",
 	"addFile": "Agregar archivo",
-	"upload": "Subir",
 	"fromUrl": "Desde la URL",
-	"drive": "Drive",
 	"sort": "Ordenar",
 	"registeredDate": "Fecha de registro",
 	"descendingOrder": "Descendente",
 	"ascendingOrder": "Ascendente",
 	"size": "Tamaño",
-	"name": "Nombre",
 	"deleteFolder": "Borrar carpeta",
-	"edit": "Editar",
 	"selectFolder": "Seleccione una carpeta",
 	"unselectFolder": "Deseleccionar carpeta",
 	"driveAboutTip": "En Drive, aparecerá una lista de los archivos que has subido en el pasado. \u003cbr> \nPuedes reutilizar estos archivos al adjuntarlos a notas, o puedes subir archivos por adelantado para publicarlos más tarde. \u003cbr> \n\u003cb>Ten cuidado al eliminar un archivo, ya que no estará disponible en todos los lugares donde se utilizó (como notas, páginas, avatares, banners, etc.).\u003c/b> \u003cbr> \nTambién puedes crear carpetas para organizar tus archivos.",
@@ -1185,7 +1172,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "L’opération n’a pas pu être complétée.",
 	"circularReferenceFolder": "Le dossier de destination est un sous-dossier du dossier que vous souhaitez déplacer.",
-	"somethingHappened": "Une erreur est survenue",
 	"uploadFromUrl": "Téléverser via une URL",
 	"uploadFromUrlDescription": "URL du fichier que vous souhaitez téléverser",
 	"uploadFromUrlRequested": "Téléversement demandé",
@@ -1197,17 +1183,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Suppression impossible",
 	"hasChildFilesOrFolders": "Impossible de supprimer ce dossier car il n'est pas vide.",
 	"addFile": "Ajouter un fichier",
-	"upload": "Téléverser",
 	"fromUrl": "Depuis une URL",
-	"drive": "Disque",
 	"sort": "Trier",
 	"registeredDate": "Inscrit le",
 	"descendingOrder": "Descendant",
 	"ascendingOrder": "Ascendant",
 	"size": "Taille",
-	"name": "Nom",
 	"deleteFolder": "Supprimer le dossier",
-	"edit": "Editer",
 	"selectFolder": "Sélectionnez un dossier",
 	"unselectFolder": "Deselect folder",
 	"driveAboutTip": "In Drive, a list of files you've uploaded in the past will be displayed. \u003cbr>  \nYou can reuse these files when attaching them to notes, or you can upload files in advance to post later. \u003cbr>  \n\u003cb>Be careful when deleting a file, as it will not be available in all places where it was used (such as notes, pages, avatars, banners, etc.).\u003c/b> \u003cbr>  \nYou can also create folders to organize your files.",
@@ -1223,7 +1205,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "Operasi tersebut tidak dapat diselesaikan.",
 	"circularReferenceFolder": "Folder tujuan adalah subfolder dari folder yang ingin kamu pindahkan.",
-	"somethingHappened": "Terjadi kesalahan",
 	"uploadFromUrl": "Unggah dari URL",
 	"uploadFromUrlDescription": "URL berkas yang ingin kamu unggah",
 	"uploadFromUrlRequested": "Pengunggahan telah diminta",
@@ -1235,17 +1216,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Tidak dapat menghapus",
 	"hasChildFilesOrFolders": "Karena folder ini tidak kosong, maka tidak dapat dihapus.",
 	"addFile": "Tambahkan berkas",
-	"upload": "Unggah",
 	"fromUrl": "Dari URL",
-	"drive": "Drive",
 	"sort": "Urutkan",
 	"registeredDate": "Bergabung pada",
 	"descendingOrder": "Urutkan menurun",
 	"ascendingOrder": "Urutkan naik",
 	"size": "Ukuran",
-	"name": "Nama",
 	"deleteFolder": "Hapus folder",
-	"edit": "Sunting",
 	"selectFolder": "Pilih folder",
 	"unselectFolder": "Membatalkan seleksi folder",
 	"driveAboutTip": "Dalam Drive, daftar berkas yang telah anda unggah sebelumnya akan ditampilkan. \u003cbr>\nAnda dapat menggunakan kembali berkas-berkas tersebut dalam lampiran note, atau mengunggah berkas sekarang untuk dipublikasikan nanti. \u003cbr>\n\u003cb>Harap berhati-hati ketika menghapus berkas, karena berkas tersebut akan tidak bisa diakses di semua tempat yang menggunakan berkas tersebut (seperti note, halaman, avatar, banner, dll.)\u003c/b>\u003cbr>\nAnda juga dapat membuat folder untuk menata berkas-berkas anda.",
@@ -1261,7 +1238,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "Impossibile compiere l'operazione",
 	"circularReferenceFolder": "La cartella di destinazione è una sottocartella della cartella che vuoi spostare.",
-	"somethingHappened": "Si è verificato un problema",
 	"uploadFromUrl": "Incolla URL immagine",
 	"uploadFromUrlDescription": "URL del file che vuoi caricare",
 	"uploadFromUrlRequested": "Caricamento richiesto",
@@ -1273,17 +1249,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Eliminazione impossibile",
 	"hasChildFilesOrFolders": "Impossibile eliminare la cartella perché non è vuota",
 	"addFile": "Allega",
-	"upload": "Carica",
 	"fromUrl": "Dall'URL",
-	"drive": "Drive",
 	"sort": "Ordina per",
 	"registeredDate": "Data iscrizione",
 	"descendingOrder": "Diminuisce",
 	"ascendingOrder": "Aumenta",
 	"size": "Dimensioni",
-	"name": "Nome",
 	"deleteFolder": "Elimina cartella",
-	"edit": "Modifica",
 	"selectFolder": "Seleziona cartella",
 	"unselectFolder": "Deseleziona la cartella",
 	"driveAboutTip": "Il Drive mostra l'elenco di file caricati in passato. Puoi organizzarli in cartelle, riusarli allegandoli ad altre note, o caricarli in anticipo e poi pubblicarli in un secondo momento. Tieni presente che se elimini un file, non sarà più visibile in nessuno degli oggetti a cui è allegato (Note, pagine, avatar, banner, ecc.)",
@@ -1291,15 +1263,16 @@ onBeforeUnmount(() => {
 	"dropHereToUpload": "Trascina qui il tuo file per caricarlo",
 	"emptyDrive": "Il Drive è vuoto",
 	"emptyFolder": "La cartella è vuota",
-	"move": "Sposta"
+	"move": "Sposta",
+	"uploadFolderDeletionConfirm": "Questa cartella è scelta come destinazione predefinita per i caricamenti. Eliminandola, la destinazione predefinita scompare e i file vengono caricati alla radice."
 }
 </locale>
 
 <locale locale="ja-JP" lang="json">
 {
+	"uploadFolderDeletionConfirm": "このフォルダは既定アップロード先に指定されています。削除すると、既定アップロード先は解除され、ファイルはルートにアップロードされます。",
 	"unableToProcess": "操作を完了できません",
 	"circularReferenceFolder": "移動先のフォルダーは、移動するフォルダーのサブフォルダーです。",
-	"somethingHappened": "問題が発生しました",
 	"uploadFromUrl": "URLアップロード",
 	"uploadFromUrlDescription": "アップロードしたいファイルのURL",
 	"uploadFromUrlRequested": "アップロードをリクエストしました",
@@ -1311,17 +1284,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "削除できません",
 	"hasChildFilesOrFolders": "このフォルダは空でないため、削除できません。",
 	"addFile": "ファイルを追加",
-	"upload": "アップロード",
 	"fromUrl": "URLから",
-	"drive": "ドライブ",
 	"sort": "ソート",
 	"registeredDate": "登録日",
 	"descendingOrder": "降順",
 	"ascendingOrder": "昇順",
 	"size": "サイズ",
-	"name": "名前",
 	"deleteFolder": "フォルダーを削除",
-	"edit": "編集",
 	"selectFolder": "フォルダーを選択",
 	"unselectFolder": "フォルダーの選択を解除",
 	"driveAboutTip": "ドライブでは、過去にアップロードしたファイルの一覧が表示されます。\u003cbr>\nノートに添付する際に再利用したり、あとで投稿するファイルを予めアップロードしておくこともできます。\u003cbr>\n\u003cb>ファイルを削除すると、今までそのファイルを使用した全ての場所(ノート、ページ、アバター、バナー等)からも見えなくなるので注意してください。\u003c/b>\u003cbr>\nフォルダを作って整理することもできます。",
@@ -1337,7 +1306,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "なんか奥の方で詰まってもうた",
 	"circularReferenceFolder": "移動先のフォルダーは、移動するフォルダーのサブフォルダーや。",
-	"somethingHappened": "なんかあかんわ",
 	"uploadFromUrl": "URLアップロード",
 	"uploadFromUrlDescription": "このURLのファイルをアップロードしたいねん",
 	"uploadFromUrlRequested": "アップロードしたい言うといたで",
@@ -1349,17 +1317,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "消せんかったわ",
 	"hasChildFilesOrFolders": "このフォルダは空っぽちゃうから消されへん",
 	"addFile": "ファイルを追加",
-	"upload": "アップロード",
 	"fromUrl": "URLから",
-	"drive": "ドライブ",
 	"sort": "並び替え",
 	"registeredDate": "始めた日",
 	"descendingOrder": "大きい順",
 	"ascendingOrder": "小さい順",
 	"size": "大きさ",
-	"name": "名前",
 	"deleteFolder": "フォルダーをほかす",
-	"edit": "編集",
 	"selectFolder": "フォルダ選んでや",
 	"unselectFolder": "フォルダーの選択を解除",
 	"driveAboutTip": "ドライブでは、今までアップロードしたファイルがずらーっと表示されるで。\u003cbr>\nノートにファイルをもっかいのっけたり、あとで投稿するファイルをその辺に置いとくこともできるねん。\u003cbr>\n\u003cb>ファイルをほかすと、前にそのファイルをのっけた全部の場所(ノート、ページ、アバター、バナー等)からも見えんくなるから気いつけてな。\u003c/b>\u003cbr>\nフォルダを作って整理することもできるで。",
@@ -1375,7 +1339,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "The operation could not be completed",
 	"circularReferenceFolder": "The destination folder is a subfolder of the folder you wish to move.",
-	"somethingHappened": "An error has occurred",
 	"uploadFromUrl": "Upload from a URL",
 	"uploadFromUrlDescription": "URL of the file you want to upload",
 	"uploadFromUrlRequested": "Upload requested",
@@ -1387,17 +1350,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Unable to delete",
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"addFile": "Add a file",
-	"upload": "Upload",
 	"fromUrl": "From URL",
-	"drive": "Drive",
 	"sort": "Sorting order",
 	"registeredDate": "Joined on",
 	"descendingOrder": "Descending",
 	"ascendingOrder": "Ascending",
 	"size": "Size",
-	"name": "Name",
 	"deleteFolder": "Delete this folder",
-	"edit": "Edit",
 	"selectFolder": "Select a folder",
 	"unselectFolder": "Deselect folder",
 	"driveAboutTip": "In Drive, a list of files you've uploaded in the past will be displayed. \u003cbr>  \nYou can reuse these files when attaching them to notes, or you can upload files in advance to post later. \u003cbr>  \n\u003cb>Be careful when deleting a file, as it will not be available in all places where it was used (such as notes, pages, avatars, banners, etc.).\u003c/b> \u003cbr>  \nYou can also create folders to organize your files.",
@@ -1413,7 +1372,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "The operation could not be completed",
 	"circularReferenceFolder": "The destination folder is a subfolder of the folder you wish to move.",
-	"somethingHappened": "An error has occurred",
 	"uploadFromUrl": "Upload from a URL",
 	"uploadFromUrlDescription": "URL of the file you want to upload",
 	"uploadFromUrlRequested": "Upload requested",
@@ -1425,17 +1383,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Unable to delete",
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"addFile": "Add a file",
-	"upload": "Upload",
 	"fromUrl": "From URL",
-	"drive": "Drive",
 	"sort": "Sorting order",
 	"registeredDate": "Joined on",
 	"descendingOrder": "Descending",
 	"ascendingOrder": "Ascending",
 	"size": "Size",
-	"name": "Name",
 	"deleteFolder": "Delete this folder",
-	"edit": "Edit",
 	"selectFolder": "Select a folder",
 	"unselectFolder": "Deselect folder",
 	"driveAboutTip": "In Drive, a list of files you've uploaded in the past will be displayed. \u003cbr>  \nYou can reuse these files when attaching them to notes, or you can upload files in advance to post later. \u003cbr>  \n\u003cb>Be careful when deleting a file, as it will not be available in all places where it was used (such as notes, pages, avatars, banners, etc.).\u003c/b> \u003cbr>  \nYou can also create folders to organize your files.",
@@ -1451,7 +1405,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "작업을 완료할 수 없습니다",
 	"circularReferenceFolder": "지정한 폴더가 이동할 폴더의 하위 폴더입니다.",
-	"somethingHappened": "오류가 발생했습니다",
 	"uploadFromUrl": "URL 업로드",
 	"uploadFromUrlDescription": "업로드하려는 파일의 URL",
 	"uploadFromUrlRequested": "업로드를 요청했습니다",
@@ -1463,17 +1416,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "삭제할 수 없습니다",
 	"hasChildFilesOrFolders": "이 폴더는 비어있지 않기 때문에 삭제할 수 없습니다.",
 	"addFile": "파일 추가",
-	"upload": "업로드",
 	"fromUrl": "URL로부터",
-	"drive": "드라이브",
 	"sort": "정렬",
 	"registeredDate": "등록일",
 	"descendingOrder": "내림차순",
 	"ascendingOrder": "오름차순",
 	"size": "크기",
-	"name": "이름",
 	"deleteFolder": "폴더 삭제",
-	"edit": "편집",
 	"selectFolder": "폴더 선택",
 	"unselectFolder": "폴더 선택 해제",
 	"driveAboutTip": "드라이브는 이전에 업로드한 파일 목록을 표시해요. \u003cbr>\n노트에 첨부할 때 다시 사용하거나 나중에 게시할 파일을 미리 업로드할 수 있어요. \u003cbr>\n\u003cb>파일을 삭제하면, 지금까지 그 파일을 사용한 모든 장소(노트, 페이지, 아바타, 배너 등)에서도 보이지 않게 되므로 주의해 주세요. 폴더를 만들고 정리할 수도 있어요.\u003c/b>\u003cbr>",
@@ -1481,7 +1430,8 @@ onBeforeUnmount(() => {
 	"dropHereToUpload": "업로드할 파일을 여기로 드롭하십시오",
 	"emptyDrive": "드라이브가 비어 있습니다",
 	"emptyFolder": "폴더가 비어 있습니다",
-	"move": "이동"
+	"move": "이동",
+	"uploadFolderDeletionConfirm": "이 폴더는 기본 업로드 위치로 지정되어 있습니다. 삭제하면 기본 업로드 위치 지정이 해제되고, 이후 파일은 루트 폴더에 업로드됩니다."
 }
 </locale>
 
@@ -1489,7 +1439,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "De operatie kan niet worden voltooid.",
 	"circularReferenceFolder": "De bestemmingsmap is een submap van de map die je wilt verplaatsen.",
-	"somethingHappened": "Er is iets misgegaan.",
 	"uploadFromUrl": "Uploaden vanaf een URL",
 	"uploadFromUrlDescription": "URL van het bestand dat je wil uploaden",
 	"uploadFromUrlRequested": "Uploadverzoek",
@@ -1501,17 +1450,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Kan niet worden verwijderd",
 	"hasChildFilesOrFolders": "Omdat deze map niet leeg is, kan die niet worden verwijderd.",
 	"addFile": "Bestand toevoegen",
-	"upload": "Uploaden",
 	"fromUrl": "Van  URL",
-	"drive": "Schijf",
 	"sort": "Sorteren",
 	"registeredDate": "Inschrijvingsdatum",
 	"descendingOrder": "Aflopende volgorde",
 	"ascendingOrder": "Oplopende volgorde",
 	"size": "Size",
-	"name": "Naam",
 	"deleteFolder": "Map verwijderen",
-	"edit": "Bewerken",
 	"selectFolder": "Kies een map",
 	"unselectFolder": "Deselect folder",
 	"driveAboutTip": "In Drive, a list of files you've uploaded in the past will be displayed. \u003cbr>  \nYou can reuse these files when attaching them to notes, or you can upload files in advance to post later. \u003cbr>  \n\u003cb>Be careful when deleting a file, as it will not be available in all places where it was used (such as notes, pages, avatars, banners, etc.).\u003c/b> \u003cbr>  \nYou can also create folders to organize your files.",
@@ -1527,7 +1472,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "The operation could not be completed",
 	"circularReferenceFolder": "Målmappen er en undermappe til mappen du ønsker å flytte.",
-	"somethingHappened": "En feil har oppstått",
 	"uploadFromUrl": "Last opp fra en URL",
 	"uploadFromUrlDescription": "URL til filen du vil laste opp",
 	"uploadFromUrlRequested": "Upload requested",
@@ -1539,17 +1483,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Kan ikke slette",
 	"hasChildFilesOrFolders": "Siden denne mappen ikke er tom, kan den ikke slettes.",
 	"addFile": "Legg til en fil",
-	"upload": "Laste opp",
 	"fromUrl": "Fra URL",
-	"drive": "Drive",
 	"sort": "Sorting order",
 	"registeredDate": "Joined on",
 	"descendingOrder": "Descending",
 	"ascendingOrder": "Ascending",
 	"size": "Størrelse",
-	"name": "Navn",
 	"deleteFolder": "Slett denne mappen",
-	"edit": "Rediger",
 	"selectFolder": "Velg en mappe",
 	"unselectFolder": "Deselect folder",
 	"driveAboutTip": "In Drive, a list of files you've uploaded in the past will be displayed. \u003cbr>  \nYou can reuse these files when attaching them to notes, or you can upload files in advance to post later. \u003cbr>  \n\u003cb>Be careful when deleting a file, as it will not be available in all places where it was used (such as notes, pages, avatars, banners, etc.).\u003c/b> \u003cbr>  \nYou can also create folders to organize your files.",
@@ -1565,7 +1505,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "Nie udało się dokończyć działania.",
 	"circularReferenceFolder": "Katalog docelowy jest podkatalogiem katalogu, który chcesz przenieść.",
-	"somethingHappened": "Coś poszło nie tak",
 	"uploadFromUrl": "Wyślij z adresu URL",
 	"uploadFromUrlDescription": "Adres URL pliku, który chcesz wysłać",
 	"uploadFromUrlRequested": "Zażądano wysłania",
@@ -1577,17 +1516,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Nie można usunąć",
 	"hasChildFilesOrFolders": "Ponieważ ten katalog nie jest pusty, nie może być usunięty.",
 	"addFile": "Dodaj plik",
-	"upload": "Wyślij",
 	"fromUrl": "Z adresu URL",
-	"drive": "Dysk",
 	"sort": "Sortuj",
 	"registeredDate": "Zarejestrowano",
 	"descendingOrder": "Malejąco",
 	"ascendingOrder": "Rosnąco",
 	"size": "Rozmiar",
-	"name": "Nazwa",
 	"deleteFolder": "Usuń ten katalog",
-	"edit": "Edytuj",
 	"selectFolder": "Wybierz folder",
 	"unselectFolder": "Deselect folder",
 	"driveAboutTip": "In Drive, a list of files you've uploaded in the past will be displayed. \u003cbr>  \nYou can reuse these files when attaching them to notes, or you can upload files in advance to post later. \u003cbr>  \n\u003cb>Be careful when deleting a file, as it will not be available in all places where it was used (such as notes, pages, avatars, banners, etc.).\u003c/b> \u003cbr>  \nYou can also create folders to organize your files.",
@@ -1603,7 +1538,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "Não é possível concluir a operação",
 	"circularReferenceFolder": "A pasta de destino é uma subpasta da pasta que você deseja mover.",
-	"somethingHappened": "Ocorreu um erro",
 	"uploadFromUrl": "Enviar por URL",
 	"uploadFromUrlDescription": "URL do arquivo que você deseja enviar",
 	"uploadFromUrlRequested": "Upload solicitado",
@@ -1615,17 +1549,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Não é possível excluir",
 	"hasChildFilesOrFolders": "Esta pasta não está vazia e não pode ser excluída.",
 	"addFile": "Adicionar arquivo",
-	"upload": "Fazer upload",
 	"fromUrl": "Da URL",
-	"drive": "Drive",
 	"sort": "Ordenação",
 	"registeredDate": "Data de registro",
 	"descendingOrder": "Descendente",
 	"ascendingOrder": "Ascendente",
 	"size": "Tamanho",
-	"name": "Nome",
 	"deleteFolder": "Excluir pasta",
-	"edit": "Editar",
 	"selectFolder": "Selecionar uma pasta",
 	"unselectFolder": "Deselect folder",
 	"driveAboutTip": "No Drive, uma lista de arquivos enviados no passado será exibida. \u003cbr>\nVocê pode reutilizar esses arquivos anexando-os às notas, ou você pode enviar arquivos para publicar posteriormente. \u003cbr>\n\u003cb>Cuidado ao excluir um arquivo, pois ele será removido de quaisquer outros lugares onde está sendo utilizado (notas, páginas, avatares, banners, etc.)\u003c/b>\u003cbr>\nVocê também pode criar pastas para organizar seus arquivos.",
@@ -1641,7 +1571,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "Не удаётся завершить операцию",
 	"circularReferenceFolder": "Вы пытаетесь переместить папку внутрь себя.",
-	"somethingHappened": "Что-то пошло не так",
 	"uploadFromUrl": "Загрузить по ссылке",
 	"uploadFromUrlDescription": "Ссылка на файл, который хотите загрузить",
 	"uploadFromUrlRequested": "Загрузка выбранного",
@@ -1653,17 +1582,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Удаление невозможно",
 	"hasChildFilesOrFolders": "Эта папка не пуста и не может быть удалена.",
 	"addFile": "Добавить файл",
-	"upload": "Загрузить",
 	"fromUrl": "По ссылке",
-	"drive": "Диск",
 	"sort": "Сортировать",
 	"registeredDate": "Дата регистрации",
 	"descendingOrder": "По убыванию",
 	"ascendingOrder": "По возрастанию",
 	"size": "Размер",
-	"name": "Название",
 	"deleteFolder": "Удалить папку",
-	"edit": "Изменить",
 	"selectFolder": "Выберите папку",
 	"unselectFolder": "Снять выбор",
 	"driveAboutTip": "In Drive, a list of files you've uploaded in the past will be displayed. \u003cbr>  \nYou can reuse these files when attaching them to notes, or you can upload files in advance to post later. \u003cbr>  \n\u003cb>Be careful when deleting a file, as it will not be available in all places where it was used (such as notes, pages, avatars, banners, etc.).\u003c/b> \u003cbr>  \nYou can also create folders to organize your files.",
@@ -1679,7 +1604,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "Operáciu sa nepodarilo dokončiť.",
 	"circularReferenceFolder": "Cieľový priečinok je podpriečinkom priečinka, ktorý chcete presunúť.",
-	"somethingHappened": "Ups. Niečo sa nepodarilo.",
 	"uploadFromUrl": "Nahrať z URL adresy",
 	"uploadFromUrlDescription": "URL adresa nahrávaného súboru",
 	"uploadFromUrlRequested": "Upload vyžiadaný",
@@ -1691,17 +1615,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Nedá sa odstrániť",
 	"hasChildFilesOrFolders": "Nemôžete odstrániť priečinok sú súbormi.",
 	"addFile": "Pridať súbor",
-	"upload": "Nahrať súbor",
 	"fromUrl": "Z URL",
-	"drive": "Disk",
 	"sort": "Zoradiť",
 	"registeredDate": "Dátum registrácie",
 	"descendingOrder": "Zostupne",
 	"ascendingOrder": "Vzostupne",
 	"size": "Veľkosť",
-	"name": "Názov",
 	"deleteFolder": "Odstrániť priečinok",
-	"edit": "Upraviť",
 	"selectFolder": "Vyberte priečinok",
 	"unselectFolder": "Deselect folder",
 	"driveAboutTip": "In Drive, a list of files you've uploaded in the past will be displayed. \u003cbr>  \nYou can reuse these files when attaching them to notes, or you can upload files in advance to post later. \u003cbr>  \n\u003cb>Be careful when deleting a file, as it will not be available in all places where it was used (such as notes, pages, avatars, banners, etc.).\u003c/b> \u003cbr>  \nYou can also create folders to organize your files.",
@@ -1717,7 +1637,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "ไม่สามารถดำเนินการให้เสร็จสิ้นได้",
 	"circularReferenceFolder": "โฟลเดอร์ปลายทางคือโฟลเดอร์ย่อยของโฟลเดอร์ที่คุณกำลังย้าย",
-	"somethingHappened": "อุ๊ย ! มีอะไรบางอย่างผิดพลาด",
 	"uploadFromUrl": "อัปโหลดจาก URL",
 	"uploadFromUrlDescription": "URL ของไฟล์ที่คุณต้องการอัปโหลด",
 	"uploadFromUrlRequested": "ร้องขอการอัปโหลดแล้ว",
@@ -1729,17 +1648,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "ไม่สามารถลบออกได้",
 	"hasChildFilesOrFolders": "เนื่องจากโฟลเดอร์นี้ไม่ว่างเปล่า จึงไม่สามารถลบ",
 	"addFile": "เพิ่มไฟล์",
-	"upload": "อัปโหลด",
 	"fromUrl": "จาก URL",
-	"drive": "ไดรฟ์",
 	"sort": "เรียงลำดับ",
 	"registeredDate": "วันที่ลงทะเบียน",
 	"descendingOrder": "เรียงลำดับลง",
 	"ascendingOrder": "เรียงลำดับขึ้น",
 	"size": "ขนาด",
-	"name": "ชื่อ",
 	"deleteFolder": "ลบโฟลเดอร์",
-	"edit": "แก้ไข",
 	"selectFolder": "เลือกโฟลเดอร์",
 	"unselectFolder": "ยกเลิกการเลือกโฟลเดอร์",
 	"driveAboutTip": "ในไดรฟ์จะแสดงรายการไฟล์ที่เคยอัปโหลดไว้ก่อนหน้า\u003cbr>\nสามารถนำมาใช้ซ้ำเมื่อแนบไฟล์ในโน้ต หรือตั้งค่าให้อัปโหลดไฟล์ล่วงหน้าเพื่อนำไปโพสต์ทีหลังได้\u003cbr>\n\u003cb>โปรดระวัง เมื่อลบไฟล์ ไฟล์นั้นจะไม่แสดงในทุกที่ที่เคยใช้ไฟล์นี้ (โน้ต, หน้าเพจ, อวตาร, แบนเนอร์ ฯลฯ)\u003c/b>\u003cbr>\nสามารถสร้างโฟลเดอร์เพื่อจัดระเบียบได้",
@@ -1755,7 +1670,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "İşlem tamamlanamadı.",
 	"circularReferenceFolder": "Hedef klasör, taşımak istediğiniz klasörün bir alt klasörü.",
-	"somethingHappened": "Bir hata oluştu",
 	"uploadFromUrl": "URL'den yükle",
 	"uploadFromUrlDescription": "Yüklemek istediğiniz dosyanın URL'si",
 	"uploadFromUrlRequested": "Yükleme istendi",
@@ -1767,17 +1681,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Silinemiyor",
 	"hasChildFilesOrFolders": "Bu klasör boş olmadığı için silinemez.",
 	"addFile": "Bir dosya ekle",
-	"upload": "Yükle",
 	"fromUrl": "URL'den",
-	"drive": "Drive",
 	"sort": "Sıralama düzeni",
 	"registeredDate": "Katılma tarihi",
 	"descendingOrder": "Azalan",
 	"ascendingOrder": "Artan",
 	"size": "Boyut",
-	"name": "İsim",
 	"deleteFolder": "Bu klasörü sil",
-	"edit": "Düzenle",
 	"selectFolder": "Klasör seçin",
 	"unselectFolder": "Klasör seçimini kaldır",
 	"driveAboutTip": "Drive'da, geçmişte yüklediğin dosyaların bir listesi görüntülenir. \u003cbr>\nBu dosyaları notlara eklerken yeniden kullanabilir veya daha sonra paylaşmak üzere önceden yükleyebilirsin. \u003cbr>\n\u003cb>Bir dosyayı silerken dikkatli ol, çünkü kullanıldığı her yerde (notlar, sayfalar, avatarlar, afişler vb.) mevcut olmayacakt.\u003c/b> \u003cbr>\nAyrıca dosyalarını düzenlemek için klasörler oluşturabilirsin.",
@@ -1793,7 +1703,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "The operation could not be completed",
 	"circularReferenceFolder": "The destination folder is a subfolder of the folder you wish to move.",
-	"somethingHappened": "An error has occurred",
 	"uploadFromUrl": "Upload from a URL",
 	"uploadFromUrlDescription": "URL of the file you want to upload",
 	"uploadFromUrlRequested": "Upload requested",
@@ -1805,17 +1714,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Unable to delete",
 	"hasChildFilesOrFolders": "Since this folder is not empty, it can not be deleted.",
 	"addFile": "Add a file",
-	"upload": "Upload",
 	"fromUrl": "From URL",
-	"drive": "Drive",
 	"sort": "Sorting order",
 	"registeredDate": "Joined on",
 	"descendingOrder": "Descending",
 	"ascendingOrder": "Ascending",
 	"size": "Size",
-	"name": "Name",
 	"deleteFolder": "Delete this folder",
-	"edit": "Edit",
 	"selectFolder": "Select a folder",
 	"unselectFolder": "Deselect folder",
 	"driveAboutTip": "In Drive, a list of files you've uploaded in the past will be displayed. \u003cbr>  \nYou can reuse these files when attaching them to notes, or you can upload files in advance to post later. \u003cbr>  \n\u003cb>Be careful when deleting a file, as it will not be available in all places where it was used (such as notes, pages, avatars, banners, etc.).\u003c/b> \u003cbr>  \nYou can also create folders to organize your files.",
@@ -1831,7 +1736,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "Не вдається завершити операцію",
 	"circularReferenceFolder": "Ви намагаєтесь перемістити папку в її підпапку.",
-	"somethingHappened": "Щось пішло не так",
 	"uploadFromUrl": "Завантажити з посилання",
 	"uploadFromUrlDescription": "Посилання на файл для завантаження",
 	"uploadFromUrlRequested": "Завантаження розпочалось",
@@ -1843,17 +1747,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Видалення неможливе",
 	"hasChildFilesOrFolders": "Ця тека не порожня і не може бути видалена",
 	"addFile": "Додати файл",
-	"upload": "Завантажити",
 	"fromUrl": "З посилання",
-	"drive": "Диск",
 	"sort": "Сортування",
 	"registeredDate": "Приєднання",
 	"descendingOrder": "За спаданням",
 	"ascendingOrder": "За зростанням",
 	"size": "Розмір",
-	"name": "Ім'я",
 	"deleteFolder": "Видалити теку",
-	"edit": "Редагувати",
 	"selectFolder": "Вибрати теку",
 	"unselectFolder": "Скасувати вибір теки",
 	"driveAboutTip": "У Диску відображатиметься список файлів, які ви раніше завантажили.\u003cbr>Ви можете повторно використовувати ці файли, прикріплюючи їх до нотаток, або завантажувати файли заздалегідь, щоб опублікувати їх пізніше.\u003cbr>\u003cb>Будьте обережні під час видалення файлу, адже він стане недоступним усюди, де використовувався (наприклад, у нотатках, сторінках, аватарах, банерах тощо).\u003c/b>\u003cbr>Ви також можете створювати теки, щоб упорядкувати файли.",
@@ -1869,7 +1769,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "Không thể hoàn tất hành động",
 	"circularReferenceFolder": "Thư mục đích là một thư mục con của thư mục bạn muốn di chuyển.",
-	"somethingHappened": "Xảy ra lỗi",
 	"uploadFromUrl": "Tải lên bằng một URL",
 	"uploadFromUrlDescription": "URL của tập tin bạn muốn tải lên",
 	"uploadFromUrlRequested": "Đã yêu cầu tải lên",
@@ -1881,17 +1780,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "Không thể xóa",
 	"hasChildFilesOrFolders": "Không thể xóa cho đến khi không còn gì trong thư mục.",
 	"addFile": "Thêm tập tin",
-	"upload": "Tải lên",
 	"fromUrl": "Từ URL",
-	"drive": "Ổ đĩa",
 	"sort": "Sắp xếp",
 	"registeredDate": "Tham gia",
 	"descendingOrder": "Giảm dần",
 	"ascendingOrder": "Tăng dần",
 	"size": "Kích thước",
-	"name": "Tên",
 	"deleteFolder": "Xóa thư mục",
-	"edit": "Sửa",
 	"selectFolder": "Chọn thư mục",
 	"unselectFolder": "Deselect folder",
 	"driveAboutTip": "Trong Drive, danh sách các tệp bạn đã tải lên trước đây sẽ được hiển thị.\u003cbr>\nBạn có thể sử dụng lại chúng khi đính kèm vào ghi chú, hoặc tải lên trước các tệp để đăng sau.\u003cbr>\n\u003cb>Lưu ý rằng nếu bạn xóa một tệp, tệp đó cũng sẽ biến mất khỏi tất cả những nơi đã sử dụng tệp đó (ghi chú, trang, ảnh đại diện, biểu ngữ, v.v.).\u003c/b>\u003cbr>\nBạn cũng có thể tạo các thư mục để sắp xếp chúng.",
@@ -1907,7 +1802,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "操作无法完成",
 	"circularReferenceFolder": "目标文件夹是要移动的文件夹的子文件夹。",
-	"somethingHappened": "出错了",
 	"uploadFromUrl": "从网址上传",
 	"uploadFromUrlDescription": "输入文件的 URL",
 	"uploadFromUrlRequested": "请求上传",
@@ -1919,17 +1813,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "无法删除",
 	"hasChildFilesOrFolders": "此文件夹中有文件，无法删除。",
 	"addFile": "添加文件",
-	"upload": "本地上传",
 	"fromUrl": "从 URL",
-	"drive": "网盘",
 	"sort": "排序",
 	"registeredDate": "注册于",
 	"descendingOrder": "降序",
 	"ascendingOrder": "升序",
 	"size": "大小",
-	"name": "名称",
 	"deleteFolder": "删除文件夹",
-	"edit": "编辑",
 	"selectFolder": "选择文件夹",
 	"unselectFolder": "取消全选文件夹",
 	"driveAboutTip": "网盘可以显示以前上传的文件。\u003cbr>\n也可以在发布帖子时重复使用文件，或在发布帖子前预先上传文件。\u003cbr>\n\u003cb>删除文件时，其将从至今为止所有用到该文件的地方（如帖子、页面、头像、横幅）消失。\u003c/b>\u003cbr>\n也可以新建文件夹来整理文件。",
@@ -1945,7 +1835,6 @@ onBeforeUnmount(() => {
 {
 	"unableToProcess": "操作無法完成",
 	"circularReferenceFolder": "目標文件夾是您要移動的文件夾的子文件夾。",
-	"somethingHappened": "發生錯誤",
 	"uploadFromUrl": "從 URL 上傳",
 	"uploadFromUrlDescription": "您要上傳的檔案網址",
 	"uploadFromUrlRequested": "已請求上傳",
@@ -1957,17 +1846,13 @@ onBeforeUnmount(() => {
 	"unableToDelete": "無法刪除",
 	"hasChildFilesOrFolders": "此文件夾不是空的，無法刪除。",
 	"addFile": "加入附件",
-	"upload": "上傳",
 	"fromUrl": "從 URL 上傳",
-	"drive": "雲端硬碟",
 	"sort": "排序",
 	"registeredDate": "註冊日期",
 	"descendingOrder": "降冪",
 	"ascendingOrder": "昇冪",
 	"size": "大小",
-	"name": "名稱",
 	"deleteFolder": "刪除資料夾",
-	"edit": "編輯",
 	"selectFolder": "選擇資料夾",
 	"unselectFolder": "取消選擇資料夾",
 	"driveAboutTip": "在「雲端硬碟」中，會顯示過去上傳的檔案列表。\u003cbr>\n可以在附加到貼文時重新利用，或者事先上傳之後再用於發布。\u003cbr>\n\u003cb>請注意，刪除檔案後，之前使用過該檔案的所有地方（貼文、頁面、大頭貼、橫幅等）也會一併無法顯示。\u003c/b>\u003cbr>\n也可以建立資料夾來整理檔案。",

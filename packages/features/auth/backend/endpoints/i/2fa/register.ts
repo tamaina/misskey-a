@@ -3,10 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { legacyManagementOnly } from '../../../legacy-management.js';
 import { createApiProcedure } from '@features/api/backend/transport/api-procedure.js';
 import bcrypt from 'bcryptjs';
+import type { DataSource } from 'typeorm';
+import { MiUserProfile } from '@features/users/backend/models/UserProfile.js';
+import { assertLegacyMfaManagement } from '../../../mfa-policy.js';
+import { withLockedMfaProfile } from '../../../locked-mfa-profile.js';
 import * as OTPAuth from 'otpauth';
-import * as QRCode from 'qrcode';
 import type { UserProfilesRepository } from '@features/persistence/backend/repositories/models.js';
 import type { Config } from '@/config.js';
 import { apiError } from '@features/api/backend/transport/orpc-error.js';
@@ -28,17 +32,19 @@ export const meta = {
 	},
 } as const;
 export interface I2faRegisterDependencies {
+	db: DataSource;
 	config: Config;
 	userProfilesRepository: UserProfilesRepository;
 	userAuthService: Pick<UserAuthService, 'twoFactorAuthenticate'>;
 }
 export function createI2faRegisterProcedure(deps: I2faRegisterDependencies) {
-	return createApiProcedure<MiLocalUser>()(I2faRegisterContract).use(requirePrincipal<MiLocalUser>()).handler(async ({ input, context }) => {
+	return createApiProcedure<MiLocalUser>()(I2faRegisterContract).use(requirePrincipal<MiLocalUser>()).use(legacyManagementOnly()).handler(async ({ input, context }) => {
 		const ps = input;
 		const me = context.principal;
 		const result = await (async () => {
 			const token = ps.token;
 			const profile = await deps.userProfilesRepository.findOneByOrFail({ userId: me.id });
+			assertLegacyMfaManagement(profile);
 
 			if (profile.twoFactorEnabled) {
 				if (token == null) {
@@ -60,11 +66,12 @@ export function createI2faRegisterProcedure(deps: I2faRegisterDependencies) {
 			// Generate user's secret key
 			const secret = new OTPAuth.Secret();
 
-			await deps.userProfilesRepository.update(me.id, {
-				twoFactorTempSecret: secret.base32,
+			await withLockedMfaProfile(deps.db, me.id, profile, async (locked, manager) => {
+				assertLegacyMfaManagement(locked);
+				await manager.getRepository(MiUserProfile).update({ userId: me.id }, { twoFactorTempSecret: secret.base32 });
 			});
 
-			// Get the data URL of the authenticator URL
+			// Return the authenticator URL; the frontend renders its QR code.
 			const totp = new OTPAuth.TOTP({
 				secret,
 				digits: 6,
@@ -72,10 +79,8 @@ export function createI2faRegisterProcedure(deps: I2faRegisterDependencies) {
 				issuer: deps.config.host,
 			});
 			const url = totp.toString();
-			const qr = await QRCode.toDataURL(url);
 
 			return {
-				qr,
 				url,
 				secret: secret.base32,
 				label: me.username,

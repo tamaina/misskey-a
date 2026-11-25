@@ -27,7 +27,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template v-if="hide">
 		<div :class="$style.hiddenText">
 			<div :class="$style.hiddenTextWrapper">
-				<b v-if="image.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ $locale.sfc.sensitive }}</b>
+				<b v-if="image.isSensitive" style="display: block;"><i class="ti ti-eye-exclamation"></i> {{ globalLocale.env.sensitive }}</b>
 				<b v-else style="display: block;"><i class="ti ti-photo"></i> {{ $locale.sfc.image }}</b>
 				<span style="display: block;">{{ $locale.sfc.clickToShow }}</span>
 			</div>
@@ -36,16 +36,20 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<div :class="$style.indicators">
 		<div v-if="['image/gif', 'image/apng'].includes(image.type)" :class="$style.indicator">GIF</div>
 		<div v-if="image.comment" :class="$style.indicator">ALT</div>
-		<div v-if="image.isSensitive" :class="$style.indicator" style="color: var(--MI_THEME-warn);" :title="$locale.sfc.sensitive"><i class="ti ti-eye-exclamation"></i></div>
+		<div v-if="image.isSensitive" :class="$style.indicator" style="color: var(--MI_THEME-warn);" :title="globalLocale.env.sensitive"><i class="ti ti-eye-exclamation"></i></div>
 	</div>
 	<i v-if="!hide" class="ti ti-eye-off" :class="$style.hide" @click.stop="hide = true"></i>
 </div>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { ref, computed } from 'vue';
 import * as Misskey from 'misskey-js';
 import EmImgWithBlurhash from '@features/drive/frontend/embed/components/EmImgWithBlurhash.vue';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = withDefaults(defineProps<{
 	image: Misskey.entities.DriveFile;
@@ -162,7 +166,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="ar-SA">
 {
-	"sensitive": "محتوى حساس",
 	"image": "صور",
 	"clickToShow": "اضغط للعرض"
 }
@@ -170,7 +173,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="ca-ES">
 {
-	"sensitive": "Sensible",
 	"image": "Imatge",
 	"clickToShow": "Fes clic per mostrar"
 }
@@ -178,7 +180,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="cs-CZ">
 {
-	"sensitive": "NSFW",
 	"image": "Obrázky",
 	"clickToShow": "Klikněte pro zobrazení"
 }
@@ -186,7 +187,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="da-DK">
 {
-	"sensitive": "Sensitive",
 	"image": "Image",
 	"clickToShow": "Click to show"
 }
@@ -194,7 +194,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="de-DE">
 {
-	"sensitive": "Sensibel",
 	"image": "Bild",
 	"clickToShow": "Zum Anzeigen anklicken"
 }
@@ -202,7 +201,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="en-US">
 {
-	"sensitive": "Sensitive",
 	"image": "Image",
 	"clickToShow": "Click to show"
 }
@@ -210,7 +208,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="es-ES">
 {
-	"sensitive": "Marcado como sensible (NSFW)",
 	"image": "Imágenes",
 	"clickToShow": "Haz clic para verlo"
 }
@@ -218,7 +215,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="fr-FR">
 {
-	"sensitive": "Contenu sensible",
 	"image": "Images",
 	"clickToShow": "Cliquer pour afficher"
 }
@@ -226,7 +222,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="id-ID">
 {
-	"sensitive": "Konten sensitif",
 	"image": "Gambar",
 	"clickToShow": "Klik untuk melihat"
 }
@@ -234,7 +229,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="it-IT">
 {
-	"sensitive": "Esplicito",
 	"image": "Immagini",
 	"clickToShow": "Media nascosto, cliccare solo se si intende vedere"
 }
@@ -242,7 +236,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="ja-JP">
 {
-	"sensitive": "センシティブ",
 	"image": "画像",
 	"clickToShow": "クリックして表示"
 }
@@ -250,7 +243,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="ja-KS">
 {
-	"sensitive": "気いつけて見いや",
 	"image": "画像",
 	"clickToShow": "押したら見えるで"
 }
@@ -258,7 +250,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="kab-KAB">
 {
-	"sensitive": "Sensitive",
 	"image": "Image",
 	"clickToShow": "Click to show"
 }
@@ -266,7 +257,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="kn-IN">
 {
-	"sensitive": "Sensitive",
 	"image": "Image",
 	"clickToShow": "Click to show"
 }
@@ -274,7 +264,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="ko-KR">
 {
-	"sensitive": "열람 주의",
 	"image": "이미지",
 	"clickToShow": "클릭하여 보기"
 }
@@ -282,7 +271,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="nl-NL">
 {
-	"sensitive": "NSFW",
 	"image": "Afbeeldingen",
 	"clickToShow": "Klik om te bekijken"
 }
@@ -290,7 +278,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="no-NO">
 {
-	"sensitive": "Sensitive",
 	"image": "Bilde",
 	"clickToShow": "Klikk for å vise"
 }
@@ -298,7 +285,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="pl-PL">
 {
-	"sensitive": "NSFW",
 	"image": "Zdjęcia",
 	"clickToShow": "Kliknij, aby wyświetlić"
 }
@@ -306,7 +292,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="pt-PT">
 {
-	"sensitive": "Conteúdo sensível",
 	"image": "imagem",
 	"clickToShow": "Clique para ver"
 }
@@ -314,7 +299,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="ru-RU">
 {
-	"sensitive": "Содержимое не для всех",
 	"image": "Изображения",
 	"clickToShow": "Нажмите для просмотра"
 }
@@ -322,7 +306,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="sk-SK">
 {
-	"sensitive": "NSFW",
 	"image": "Obrázky",
 	"clickToShow": "Kliknutím zobrazíte"
 }
@@ -330,7 +313,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="th-TH">
 {
-	"sensitive": "เนื้อหาที่ละเอียดอ่อน",
 	"image": "รูปภาพ",
 	"clickToShow": "คลิกเพื่อแสดง"
 }
@@ -338,7 +320,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="tr-TR">
 {
-	"sensitive": "Hassas",
 	"image": "Görsel",
 	"clickToShow": "Göstermek için tıklayın"
 }
@@ -346,7 +327,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="ug-CN">
 {
-	"sensitive": "Sensitive",
 	"image": "Image",
 	"clickToShow": "Click to show"
 }
@@ -354,7 +334,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="uk-UA">
 {
-	"sensitive": "NSFW",
 	"image": "Зображення",
 	"clickToShow": "Натисніть для перегляду"
 }
@@ -362,7 +341,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="vi-VN">
 {
-	"sensitive": "Nhạy cảm",
 	"image": "Hình ảnh",
 	"clickToShow": "Nhấn để xem"
 }
@@ -370,7 +348,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="zh-CN">
 {
-	"sensitive": "敏感内容",
 	"image": "图片",
 	"clickToShow": "点击以显示"
 }
@@ -378,7 +355,6 @@ html[data-color-scheme=light] .visible {
 
 <locale lang="json" locale="zh-TW">
 {
-	"sensitive": "敏感內容",
 	"image": "圖片",
 	"clickToShow": "點擊查看"
 }

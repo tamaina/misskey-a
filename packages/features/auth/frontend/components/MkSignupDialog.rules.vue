@@ -36,8 +36,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template #label>{{ tosPrivacyPolicyLabel }}</template>
 				<template #suffix><i v-if="agreeTosAndPrivacyPolicy" class="ti ti-check" style="color: var(--MI_THEME-success)"></i></template>
 				<div class="_gaps_s">
-					<div v-if="availableTos"><a :href="instance.tosUrl ?? undefined" class="_link" target="_blank">{{ $locale.sfc.termsOfService }} <i class="ti ti-external-link"></i></a></div>
-					<div v-if="availablePrivacyPolicy"><a :href="instance.privacyPolicyUrl ?? undefined" class="_link" target="_blank">{{ $locale.sfc.privacyPolicy }} <i class="ti ti-external-link"></i></a></div>
+					<div v-if="availableTos"><a :href="instance.tosUrl ?? undefined" class="_link" target="_blank">{{ globalLocale.env.termsOfService }} <i class="ti ti-external-link"></i></a></div>
+					<div v-if="availablePrivacyPolicy"><a :href="instance.privacyPolicyUrl ?? undefined" class="_link" target="_blank">{{ globalLocale.env.privacyPolicy }} <i class="ti ti-external-link"></i></a></div>
 				</div>
 
 				<MkSwitch :modelValue="agreeTosAndPrivacyPolicy" style="margin-top: 16px;" @update:modelValue="updateAgreeTosAndPrivacyPolicy">{{ $locale.sfc.agree }}</MkSwitch>
@@ -55,8 +55,8 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div v-if="!agreed" style="text-align: center;">{{ $locale.sfc.pleaseAgreeAllToContinue }}</div>
 
 			<div class="_buttonsCenter">
-				<MkButton inline rounded @click="emit('cancel')">{{ $locale.sfc.cancel }}</MkButton>
-				<MkButton inline primary rounded gradate :disabled="!agreed" data-testid="signup-rules-continue" @click="emit('done')">{{ $locale.sfc.continue }} <i class="ti ti-arrow-right"></i></MkButton>
+				<MkButton inline rounded @click="emit('cancel')">{{ globalLocale.env.cancel }}</MkButton>
+				<MkButton inline primary rounded gradate :disabled="!agreed" data-testid="signup-rules-continue" @click="emit('done')">{{ globalLocale.env.continue }} <i class="ti ti-arrow-right"></i></MkButton>
 			</div>
 		</div>
 	</div>
@@ -64,6 +64,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { computed, ref } from 'vue';
 import { instance } from '@features/instance/frontend/instance.js';
 import { interpolateLocaleParameters } from '@features/runtime/frontend/interpolate-locale-parameters.js';
@@ -72,6 +73,9 @@ import MkFolder from '@features/ui/frontend/components/MkFolder.vue';
 import MkSwitch from '@features/ui/frontend/components/MkSwitch.vue';
 import MkInfo from '@features/ui/frontend/components/MkInfo.vue';
 import * as os from '@features/ui/frontend/os.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const availableServerRules = instance.serverRules.length > 0;
 const availableTos = instance.tosUrl != null && instance.tosUrl !== '';
@@ -94,9 +98,9 @@ const tosPrivacyPolicyLabel = computed(() => {
 	if (availableTos && availablePrivacyPolicy) {
 		return $locale.value.sfc.tosAndPrivacyPolicy;
 	} else if (availableTos) {
-		return $locale.value.sfc.termsOfService;
+		return globalLocale.value.env.termsOfService;
 	} else if (availablePrivacyPolicy) {
-		return $locale.value.sfc.privacyPolicy;
+		return globalLocale.value.env.privacyPolicy;
 	} else {
 		return '';
 	}
@@ -202,12 +206,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Please read this important information.",
 	"serverRules": "قوانين الخادم",
 	"agree": "أقبل",
-	"termsOfService": "شروط الخدمة",
-	"privacyPolicy": "Privacy Policy",
 	"basicNotesBeforeCreateAccount": "ملاحظات مهمة",
 	"pleaseAgreeAllToContinue": "للمتابعة وافق على الحقول أعلاه.",
-	"cancel": " إلغاء",
-	"continue": "متابعة",
 	"tosAndPrivacyPolicy": "Terms of Service and Privacy Policy",
 	"doYouAgree": "Agree?",
 	"iHaveReadXCarefullyAndAgree": "I have read the text \"{x}\" and agree."
@@ -223,12 +223,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Llegeix això perquè és molt important.",
 	"serverRules": "Regles del servidor",
 	"agree": "Hi estic d'acord",
-	"termsOfService": "Condicions d'ús",
-	"privacyPolicy": "Política de privacitat",
 	"basicNotesBeforeCreateAccount": "Notes importants",
 	"pleaseAgreeAllToContinue": "Has d'acceptar tots els camps de dalt per poder continuar.",
-	"cancel": "Cancel·lar",
-	"continue": "Continuar",
 	"tosAndPrivacyPolicy": "Termes d'ús i política de privacitat",
 	"doYouAgree": "Estàs d'acord?",
 	"iHaveReadXCarefullyAndAgree": "He llegit {x} i estic d'acord."
@@ -244,12 +240,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Přečtěte si prosím tyto důležité informace.",
 	"serverRules": "Pravidla serveru",
 	"agree": "Souhlasím",
-	"termsOfService": "Podmínky užívání",
-	"privacyPolicy": "Privacy Policy",
 	"basicNotesBeforeCreateAccount": "Důležité poznámky",
 	"pleaseAgreeAllToContinue": "Musíte souhlasit se vším abyste mohli pokračovat.",
-	"cancel": "Zrušit",
-	"continue": "Pokračovat",
 	"tosAndPrivacyPolicy": "Terms of Service and Privacy Policy",
 	"doYouAgree": "Souhlasíte?",
 	"iHaveReadXCarefullyAndAgree": "Přečetl jsem si text \"{x}\" a souhlasím s ním."
@@ -265,12 +257,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Please read this important information.",
 	"serverRules": "Server rules",
 	"agree": "Agree",
-	"termsOfService": "Terms of Service",
-	"privacyPolicy": "Privacy Policy",
 	"basicNotesBeforeCreateAccount": "Important notes",
 	"pleaseAgreeAllToContinue": "You must agree to all above fields to continue.",
-	"cancel": "Cancel",
-	"continue": "Continue",
 	"tosAndPrivacyPolicy": "Terms of Service and Privacy Policy",
 	"doYouAgree": "Agree?",
 	"iHaveReadXCarefullyAndAgree": "I have read the text \"{x}\" and agree."
@@ -286,12 +274,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Lies bitte diese wichtige Informationen.",
 	"serverRules": "Serverregeln",
 	"agree": "Zustimmen",
-	"termsOfService": "Nutzungsbedingungen",
-	"privacyPolicy": "Datenschutzerklärung",
 	"basicNotesBeforeCreateAccount": "Wichtige Infos",
 	"pleaseAgreeAllToContinue": "Zum Fortfahren muss allen obigen Feldern zugestimmt werden.",
-	"cancel": "Abbrechen",
-	"continue": "Fortfahren",
 	"tosAndPrivacyPolicy": "Nutzungsbedingungen und Datenschutzerklärung",
 	"doYouAgree": "Zustimmen?",
 	"iHaveReadXCarefullyAndAgree": "Ich habe den Text \"{x}\" gelesen und stimme zu."
@@ -307,12 +291,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Please read this important information.",
 	"serverRules": "Server rules",
 	"agree": "Agree",
-	"termsOfService": "Terms of Service",
-	"privacyPolicy": "Privacy Policy",
 	"basicNotesBeforeCreateAccount": "Important notes",
 	"pleaseAgreeAllToContinue": "You must agree to all above fields to continue.",
-	"cancel": "Cancel",
-	"continue": "Continue",
 	"tosAndPrivacyPolicy": "Terms of Service and Privacy Policy",
 	"doYouAgree": "Agree?",
 	"iHaveReadXCarefullyAndAgree": "I have read the text \"{x}\" and agree."
@@ -328,12 +308,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Por favor lea esto que es importante",
 	"serverRules": "Reglas del servidor",
 	"agree": "De acuerdo.",
-	"termsOfService": "Términos y condiciones",
-	"privacyPolicy": "Política de Privacidad",
 	"basicNotesBeforeCreateAccount": "Notas básicas",
 	"pleaseAgreeAllToContinue": "Tienes que estar de acuerdo con los campos anteriores para contnuar.",
-	"cancel": "Cancelar",
-	"continue": "Continuar",
 	"tosAndPrivacyPolicy": "Condiciones de Uso y Política de Privacidad",
 	"doYouAgree": "¿Está de acuerdo?",
 	"iHaveReadXCarefullyAndAgree": "He leído el texto {x} y estoy de acuerdo"
@@ -349,12 +325,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Assurez-vous de le lire\u202f; c'est important.",
 	"serverRules": "Règles du serveur",
 	"agree": "Accepter",
-	"termsOfService": "Conditions d'utilisation",
-	"privacyPolicy": "Politique de confidentialité",
 	"basicNotesBeforeCreateAccount": "Notes importantes",
 	"pleaseAgreeAllToContinue": "Pour continuer, veuillez accepter tous les champs ci-dessus.",
-	"cancel": "Annuler",
-	"continue": "Continuer",
 	"tosAndPrivacyPolicy": "Conditions d'utilisation et politique de confidentialité",
 	"doYouAgree": "Êtes-vous d’accord\u00a0?",
 	"iHaveReadXCarefullyAndAgree": "J'ai lu le contenu de « {x} » et donne mon accord."
@@ -370,12 +342,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Mohon baca informasi penting berikut.",
 	"serverRules": "Aturan peladen",
 	"agree": "Setuju",
-	"termsOfService": "Syarat dan ketentuan",
-	"privacyPolicy": "Kebijakan Privasi",
 	"basicNotesBeforeCreateAccount": "Catatan penting",
 	"pleaseAgreeAllToContinue": "Kamu harus menyetujui semua kolom di atas untuk melanjutkan.",
-	"cancel": "Batalkan",
-	"continue": "Lanjutkan",
 	"tosAndPrivacyPolicy": "Syarat dan Ketentuan serta Kebijakan Privasi",
 	"doYouAgree": "Apa kamu setuju?",
 	"iHaveReadXCarefullyAndAgree": "Saya telah membaca \"{x}\" dan menyetujui."
@@ -391,12 +359,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Si prega di leggere attentamente perché è importante.",
 	"serverRules": "Regolamento",
 	"agree": "Accetto",
-	"termsOfService": "Condizioni d'uso del servizio",
-	"privacyPolicy": "Informativa ai sensi del Reg. UE 2016/679 (GDPR)",
 	"basicNotesBeforeCreateAccount": "Note importanti",
 	"pleaseAgreeAllToContinue": "Occorre accettare tutte le condizioni prima di continuare.",
-	"cancel": "Annulla",
-	"continue": "Continua",
 	"tosAndPrivacyPolicy": "Condizioni d'uso e informativa privacy",
 	"doYouAgree": "Accetti le condizioni?",
 	"iHaveReadXCarefullyAndAgree": "Dichiaro di aver letto attentamente \"{x}\" e accettarne le condizioni."
@@ -412,12 +376,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "重要ですので必ずお読みください。",
 	"serverRules": "サーバールール",
 	"agree": "同意する",
-	"termsOfService": "利用規約",
-	"privacyPolicy": "プライバシーポリシー",
 	"basicNotesBeforeCreateAccount": "基本的な注意事項",
 	"pleaseAgreeAllToContinue": "続けるには、全ての「同意する」にチェックが入っている必要があります。",
-	"cancel": "キャンセル",
-	"continue": "続ける",
 	"tosAndPrivacyPolicy": "利用規約・プライバシーポリシー",
 	"doYouAgree": "同意しますか？",
 	"iHaveReadXCarefullyAndAgree": "「{x}」の内容をよく読み、同意します。"
@@ -433,12 +393,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "重要やから絶対読んでや。",
 	"serverRules": "サーバールール",
 	"agree": "せやな",
-	"termsOfService": "使うための決め事",
-	"privacyPolicy": "プライバシーポリシー",
 	"basicNotesBeforeCreateAccount": "よう読んどいてや",
 	"pleaseAgreeAllToContinue": "続けるんやったら、全部にチェック入れとかなアカンで。",
-	"cancel": "やめる",
-	"continue": "続けるで",
 	"tosAndPrivacyPolicy": "利用規約・プライバシーポリシー",
 	"doYouAgree": "ええんか？",
 	"iHaveReadXCarefullyAndAgree": "「{x}」の内容をよう読んで、同意するで。"
@@ -454,12 +410,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Please read this important information.",
 	"serverRules": "Server rules",
 	"agree": "Agree",
-	"termsOfService": "Terms of Service",
-	"privacyPolicy": "Privacy Policy",
 	"basicNotesBeforeCreateAccount": "Important notes",
 	"pleaseAgreeAllToContinue": "You must agree to all above fields to continue.",
-	"cancel": "Cancel",
-	"continue": "Continue",
 	"tosAndPrivacyPolicy": "Terms of Service and Privacy Policy",
 	"doYouAgree": "Agree?",
 	"iHaveReadXCarefullyAndAgree": "I have read the text \"{x}\" and agree."
@@ -475,12 +427,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Please read this important information.",
 	"serverRules": "Server rules",
 	"agree": "Agree",
-	"termsOfService": "Terms of Service",
-	"privacyPolicy": "Privacy Policy",
 	"basicNotesBeforeCreateAccount": "Important notes",
 	"pleaseAgreeAllToContinue": "You must agree to all above fields to continue.",
-	"cancel": "ರದ್ದು",
-	"continue": "Continue",
 	"tosAndPrivacyPolicy": "Terms of Service and Privacy Policy",
 	"doYouAgree": "Agree?",
 	"iHaveReadXCarefullyAndAgree": "I have read the text \"{x}\" and agree."
@@ -496,12 +444,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "중요하므로 반드시 읽어주십시오.",
 	"serverRules": "서버 규칙",
 	"agree": "동의합니다",
-	"termsOfService": "이용 약관",
-	"privacyPolicy": "개인정보 보호 정책",
 	"basicNotesBeforeCreateAccount": "기본적인 주의사항",
 	"pleaseAgreeAllToContinue": "계속하시려면 모든 항목에 동의하십시오.",
-	"cancel": "취소",
-	"continue": "계속",
 	"tosAndPrivacyPolicy": "약관 및 개인정보 보호 정책",
 	"doYouAgree": "동의하십니까?",
 	"iHaveReadXCarefullyAndAgree": "\"{x}\"의 내용을 읽고 동의합니다."
@@ -517,12 +461,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Please read this important information.",
 	"serverRules": "Server rules",
 	"agree": "Akkoord",
-	"termsOfService": "Gebruiksvoorwaarden",
-	"privacyPolicy": "Privacy Policy",
 	"basicNotesBeforeCreateAccount": "Belangrijke informatie",
 	"pleaseAgreeAllToContinue": "You must agree to all above fields to continue.",
-	"cancel": "Annuleren",
-	"continue": "Continue",
 	"tosAndPrivacyPolicy": "Terms of Service and Privacy Policy",
 	"doYouAgree": "Agree?",
 	"iHaveReadXCarefullyAndAgree": "I have read the text \"{x}\" and agree."
@@ -538,12 +478,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Please read this important information.",
 	"serverRules": "Server rules",
 	"agree": "Godta",
-	"termsOfService": "Vilkår for bruk",
-	"privacyPolicy": "Privacy Policy",
 	"basicNotesBeforeCreateAccount": "Viktige merknader",
 	"pleaseAgreeAllToContinue": "You must agree to all above fields to continue.",
-	"cancel": "Avbryt",
-	"continue": "Fortsett",
 	"tosAndPrivacyPolicy": "Terms of Service and Privacy Policy",
 	"doYouAgree": "Agree?",
 	"iHaveReadXCarefullyAndAgree": "I have read the text \"{x}\" and agree."
@@ -559,12 +495,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Please read this important information.",
 	"serverRules": "Server rules",
 	"agree": "Zatwierdź",
-	"termsOfService": "Warunki usługi",
-	"privacyPolicy": "Privacy Policy",
 	"basicNotesBeforeCreateAccount": "Ważne notatki",
 	"pleaseAgreeAllToContinue": "You must agree to all above fields to continue.",
-	"cancel": "Anuluj",
-	"continue": "Continue",
 	"tosAndPrivacyPolicy": "Terms of Service and Privacy Policy",
 	"doYouAgree": "Agree?",
 	"iHaveReadXCarefullyAndAgree": "I have read the text \"{x}\" and agree."
@@ -580,12 +512,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Por favor, leia essa informação importante.",
 	"serverRules": "Regras do servidor",
 	"agree": "Concordar",
-	"termsOfService": "Termos de Uso",
-	"privacyPolicy": "Política de Privacidade",
 	"basicNotesBeforeCreateAccount": "Observações importantes",
 	"pleaseAgreeAllToContinue": "Você precisa concordar com todos os campos acima para continuar.",
-	"cancel": "Cancelar",
-	"continue": "Continuar",
 	"tosAndPrivacyPolicy": "Termos de Serviço e Política de Privacidade",
 	"doYouAgree": "Concorda?",
 	"iHaveReadXCarefullyAndAgree": "Eu li o texto \"{x}\" e concordo."
@@ -601,12 +529,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Это важно, поэтому, пожалуйста, прочтите это.",
 	"serverRules": "Правила сервера",
 	"agree": "Согласен",
-	"termsOfService": "Условия использования",
-	"privacyPolicy": "Политика Конфиденциальности",
 	"basicNotesBeforeCreateAccount": "Записи, перед созданием аккаунта",
 	"pleaseAgreeAllToContinue": "Чтобы продолжить, необходимо поставить отметки во всех полях \"согласен\".",
-	"cancel": "Отмена",
-	"continue": "Продолжить",
 	"tosAndPrivacyPolicy": "Условия использования и политика конфиденциальности",
 	"doYouAgree": "Согласны?",
 	"iHaveReadXCarefullyAndAgree": "Я прочитал(а) и согласен(сна) с условиями \"{x}"
@@ -622,12 +546,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Please read this important information.",
 	"serverRules": "Server rules",
 	"agree": "Agree",
-	"termsOfService": "Terms of Service",
-	"privacyPolicy": "Privacy Policy",
 	"basicNotesBeforeCreateAccount": "Základné bezpečnostné opatrenia",
 	"pleaseAgreeAllToContinue": "You must agree to all above fields to continue.",
-	"cancel": "Zrušiť",
-	"continue": "Continue",
 	"tosAndPrivacyPolicy": "Terms of Service and Privacy Policy",
 	"doYouAgree": "Agree?",
 	"iHaveReadXCarefullyAndAgree": "I have read the text \"{x}\" and agree."
@@ -643,12 +563,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "กรุณาอ่านข้อมูลที่สำคัญอันนี้",
 	"serverRules": "กฎของเซิร์ฟเวอร์",
 	"agree": "ยอมรับ",
-	"termsOfService": "เงื่อนไขการให้บริการ",
-	"privacyPolicy": "นโยบายความเป็นส่วนตัว",
 	"basicNotesBeforeCreateAccount": "หมายเหตุสำคัญ",
 	"pleaseAgreeAllToContinue": "คุณต้องยอมรับทุกช่องตรงด้านบนเพื่อดำเนินการต่อค่ะ",
-	"cancel": "ยกเลิก",
-	"continue": "ดำเนินการต่อ",
 	"tosAndPrivacyPolicy": "เงื่อนไขในการให้บริการและนโยบายความเป็นส่วนตัว",
 	"doYouAgree": "ยอมรับไหม?",
 	"iHaveReadXCarefullyAndAgree": "ฉันได้อ่านและยินยอมเนื้อหาของ “{x}”"
@@ -664,12 +580,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Lütfen bu önemli bilgileri okuyun.",
 	"serverRules": "Sunucu kuralları",
 	"agree": "Kabul ediyorum",
-	"termsOfService": "Hizmet Şartları",
-	"privacyPolicy": "Gizlilik Politikası",
 	"basicNotesBeforeCreateAccount": "Önemli notlar",
 	"pleaseAgreeAllToContinue": "Devam etmek için yukarıdaki tüm alanları kabul etmelisin.",
-	"cancel": "Vazgeç",
-	"continue": "Devam et",
 	"tosAndPrivacyPolicy": "Hizmet Şartları ve Gizlilik Politikası",
 	"doYouAgree": "Katılıyor musunuz?",
 	"iHaveReadXCarefullyAndAgree": "“{x}” metnini okudum ve kabul ediyorum."
@@ -685,12 +597,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Please read this important information.",
 	"serverRules": "Server rules",
 	"agree": "Agree",
-	"termsOfService": "Terms of Service",
-	"privacyPolicy": "Privacy Policy",
 	"basicNotesBeforeCreateAccount": "Important notes",
 	"pleaseAgreeAllToContinue": "You must agree to all above fields to continue.",
-	"cancel": "Cancel",
-	"continue": "Continue",
 	"tosAndPrivacyPolicy": "Terms of Service and Privacy Policy",
 	"doYouAgree": "Agree?",
 	"iHaveReadXCarefullyAndAgree": "I have read the text \"{x}\" and agree."
@@ -706,12 +614,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Будь ласка, прочитайте цю важливу інформацію.",
 	"serverRules": "Правила сервера",
 	"agree": "Гаразд",
-	"termsOfService": "Умови використання",
-	"privacyPolicy": "Політика конфіденційності",
 	"basicNotesBeforeCreateAccount": "Важливі нотатки",
 	"pleaseAgreeAllToContinue": "Щоб продовжити, потрібно погодитися з усіма полями вище.\n\n",
-	"cancel": "Скасувати",
-	"continue": "Продовжити",
 	"tosAndPrivacyPolicy": "Умови користування та політика конфіденційності",
 	"doYouAgree": "Погоджуєтеся?",
 	"iHaveReadXCarefullyAndAgree": "Я прочитав/прочитала текст «{x}» і погоджуюся."
@@ -727,12 +631,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "Hãy đọc kỹ vì nó rất quan trọng.",
 	"serverRules": "Luật của máy chủ",
 	"agree": "Đồng ý",
-	"termsOfService": "Điều khoản và Điều kiện",
-	"privacyPolicy": "Chính sách bảo mật",
 	"basicNotesBeforeCreateAccount": "Những điều cơ bản cần chú ý ",
 	"pleaseAgreeAllToContinue": "Bạn phải đồng ý tất cả điều trên để tiếp tục.",
-	"cancel": "Hủy",
-	"continue": "Tiếp tục",
 	"tosAndPrivacyPolicy": "Điều khoản sử dụng và Chính sách bảo mật",
 	"doYouAgree": "Đồng ý?",
 	"iHaveReadXCarefullyAndAgree": "Tôi đã đọc và đồng ý với \"{x}\"."
@@ -748,12 +648,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "请好好阅读，这真的很重要。",
 	"serverRules": "服务器规则",
 	"agree": "同意",
-	"termsOfService": "服务条款",
-	"privacyPolicy": "隐私政策",
 	"basicNotesBeforeCreateAccount": "基本注意事项",
 	"pleaseAgreeAllToContinue": "必须全部勾选 “同意” 才能够继续。",
-	"cancel": "取消",
-	"continue": "继续",
 	"tosAndPrivacyPolicy": "服务条款及隐私政策",
 	"doYouAgree": "你同意吗？",
 	"iHaveReadXCarefullyAndAgree": "我已经仔细阅读并同意了 “{x}” 的内容。"
@@ -769,12 +665,8 @@ async function updateAgreeNote(v: boolean) {
 	"beSureToReadThisAsItIsImportant": "重要，請務必閱讀。",
 	"serverRules": "伺服器規則",
 	"agree": "同意",
-	"termsOfService": "服務條款",
-	"privacyPolicy": "隱私政策",
 	"basicNotesBeforeCreateAccount": "基本注意事項",
 	"pleaseAgreeAllToContinue": "必須全部勾選「同意」才能繼續。",
-	"cancel": "取消",
-	"continue": "繼續",
 	"tosAndPrivacyPolicy": "服務條款和隱私政策",
 	"doYouAgree": "你同意嗎？",
 	"iHaveReadXCarefullyAndAgree": "我已仔細閱讀並同意「{x}」的內容。"

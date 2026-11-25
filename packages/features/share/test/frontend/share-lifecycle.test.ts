@@ -35,10 +35,11 @@ function startPage(read: Promise<File[]>) {
 		'@features/api/frontend/utility/misskey-api.js': { misskeyApi: vi.fn(async () => undefined) },
 		'@features/navigation/frontend/page.js': { definePage: vi.fn() },
 		'@features/web/frontend/utility/post-message.js': { postMessageToParentWindow: vi.fn() },
+		'virtual:vite-vue-internationalization': { useLocale: () => ({ value: { env: { close: 'Close', share: 'Share' } } }) },
 	};
 	const script = shareSource.match(/<script lang="ts" setup>([\s\S]*?)<\/script>/)?.[1];
 	if (!script) throw new Error('Share page script not found');
-	const compiled = ts.transpileModule(`${script}\nexports.page = { state, tempFiles, close, goToMisskey };`, {
+	const compiled = ts.transpileModule(`${script.replaceAll('import.meta.url', JSON.stringify('share.vue'))}\nexports.page = { state, tempFiles, close, goToMisskey };`, {
 		compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 		reportDiagnostics: true,
 	});

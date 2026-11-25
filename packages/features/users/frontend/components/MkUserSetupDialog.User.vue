@@ -18,17 +18,21 @@ SPDX-License-Identifier: AGPL-3.0-only
 		<span v-else style="opacity: 0.7;">{{ $locale.sfc.noAccountDescription }}</span>
 	</div>
 	<div :class="$style.footer">
-		<MkButton v-if="!isFollowing" primary gradate rounded full @click="follow"><i class="ti ti-plus"></i> {{ $locale.sfc.follow }}</MkButton>
+		<MkButton v-if="!isFollowing" primary gradate rounded full @click="follow"><i class="ti ti-plus"></i> {{ globalLocale.env.follow }}</MkButton>
 		<div v-else style="opacity: 0.7; text-align: center;">{{ $locale.sfc.youFollowing }} <i class="ti ti-check"></i></div>
 	</div>
 </div>
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
 import { ref } from 'vue';
 import MkButton from '@features/ui/frontend/components/MkButton.vue';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	user: Misskey.entities.UserDetailed;
@@ -106,7 +110,6 @@ async function follow() {
 <locale locale="ar-SA" lang="json">
 {
   "noAccountDescription": "لم يكتب هذا المستخدم سيرته بعد.",
-  "follow": "تابِع",
   "youFollowing": "متابَع"
 }
 </locale>
@@ -114,7 +117,6 @@ async function follow() {
 <locale locale="ca-ES" lang="json">
 {
   "noAccountDescription": "Aquest usuari encara no ha escrit la seva biografia.",
-  "follow": "Segueix",
   "youFollowing": "Segueixes "
 }
 </locale>
@@ -122,7 +124,6 @@ async function follow() {
 <locale locale="cs-CZ" lang="json">
 {
   "noAccountDescription": "Tento uživatel zatím nenapsal svou biografii.",
-  "follow": "Sledovaní",
   "youFollowing": "Sleduji"
 }
 </locale>
@@ -130,7 +131,6 @@ async function follow() {
 <locale locale="da-DK" lang="json">
 {
   "noAccountDescription": "This user has not written their bio yet.",
-  "follow": "Follow",
   "youFollowing": "Followed"
 }
 </locale>
@@ -138,7 +138,6 @@ async function follow() {
 <locale locale="de-DE" lang="json">
 {
   "noAccountDescription": "Dieser Nutzer hat seine Profilbeschreibung noch nicht ausgefüllt",
-  "follow": "Folgen",
   "youFollowing": "Gefolgt"
 }
 </locale>
@@ -146,7 +145,6 @@ async function follow() {
 <locale locale="en-US" lang="json">
 {
   "noAccountDescription": "This user has not written their bio yet.",
-  "follow": "Follow",
   "youFollowing": "Followed"
 }
 </locale>
@@ -154,7 +152,6 @@ async function follow() {
 <locale locale="es-ES" lang="json">
 {
   "noAccountDescription": "Este usuario no ha escrito su biografía aún",
-  "follow": "Seguir",
   "youFollowing": "Siguiendo"
 }
 </locale>
@@ -162,7 +159,6 @@ async function follow() {
 <locale locale="fr-FR" lang="json">
 {
   "noAccountDescription": "L’utilisateur·rice n’a pas encore renseigné de biographie de présentation sur son profil.",
-  "follow": "S’abonner",
   "youFollowing": "Abonné·e"
 }
 </locale>
@@ -170,7 +166,6 @@ async function follow() {
 <locale locale="id-ID" lang="json">
 {
   "noAccountDescription": "Belum ada bio",
-  "follow": "Ikuti",
   "youFollowing": "Mengikuti"
 }
 </locale>
@@ -178,7 +173,6 @@ async function follow() {
 <locale locale="it-IT" lang="json">
 {
   "noAccountDescription": "La persona non ha ancora scritto alcuna autobiografia.",
-  "follow": "Segui",
   "youFollowing": "Following"
 }
 </locale>
@@ -186,7 +180,6 @@ async function follow() {
 <locale locale="ja-JP" lang="json">
 {
   "noAccountDescription": "自己紹介はありません",
-  "follow": "フォロー",
   "youFollowing": "フォロー中"
 }
 </locale>
@@ -194,7 +187,6 @@ async function follow() {
 <locale locale="ja-KS" lang="json">
 {
   "noAccountDescription": "自己紹介食ってもた",
-  "follow": "フォロー",
   "youFollowing": "フォロー中やで"
 }
 </locale>
@@ -202,7 +194,6 @@ async function follow() {
 <locale locale="kab-KAB" lang="json">
 {
   "noAccountDescription": "This user has not written their bio yet.",
-  "follow": "Ḍfeṛ",
   "youFollowing": "Followed"
 }
 </locale>
@@ -210,7 +201,6 @@ async function follow() {
 <locale locale="kn-IN" lang="json">
 {
   "noAccountDescription": "ಇವರು ಸ್ವಯಂ ಪರಿಚಯ ರಚಿಸಿಲ್ಲ",
-  "follow": "Follow",
   "youFollowing": "Followed"
 }
 </locale>
@@ -218,7 +208,6 @@ async function follow() {
 <locale locale="ko-KR" lang="json">
 {
   "noAccountDescription": "자기소개가 없습니다",
-  "follow": "팔로우",
   "youFollowing": "팔로잉"
 }
 </locale>
@@ -226,7 +215,6 @@ async function follow() {
 <locale locale="nl-NL" lang="json">
 {
   "noAccountDescription": "Deze gebruiker heeft nog geen bio geschreven",
-  "follow": "Volgen",
   "youFollowing": "Followed"
 }
 </locale>
@@ -234,7 +222,6 @@ async function follow() {
 <locale locale="no-NO" lang="json">
 {
   "noAccountDescription": "Denne brukeren har ikke skrevet sin biografi ennå.",
-  "follow": "Følg",
   "youFollowing": "Følger"
 }
 </locale>
@@ -242,7 +229,6 @@ async function follow() {
 <locale locale="pl-PL" lang="json">
 {
   "noAccountDescription": "Ten użytkownik nie napisał jeszcze swojej biografii.",
-  "follow": "Obserwuj",
   "youFollowing": "Śledzeni"
 }
 </locale>
@@ -250,7 +236,6 @@ async function follow() {
 <locale locale="pt-PT" lang="json">
 {
   "noAccountDescription": "Este usuário não tem uma descrição.",
-  "follow": "Seguir",
   "youFollowing": "Seguindo"
 }
 </locale>
@@ -258,7 +243,6 @@ async function follow() {
 <locale locale="ru-RU" lang="json">
 {
   "noAccountDescription": "Пользователь ничего не написал про себя",
-  "follow": "Подписка",
   "youFollowing": "Вы подписаны"
 }
 </locale>
@@ -266,7 +250,6 @@ async function follow() {
 <locale locale="sk-SK" lang="json">
 {
   "noAccountDescription": "Tento používateľ zatiaľ nenapísal o sebe.",
-  "follow": "Sledovať",
   "youFollowing": "Sledované"
 }
 </locale>
@@ -274,7 +257,6 @@ async function follow() {
 <locale locale="th-TH" lang="json">
 {
   "noAccountDescription": "ผู้ใช้รายนี้ยังไม่ได้เขียนคำแนะนำตัว",
-  "follow": "ติดตาม",
   "youFollowing": "ติดตามแล้ว"
 }
 </locale>
@@ -282,7 +264,6 @@ async function follow() {
 <locale locale="tr-TR" lang="json">
 {
   "noAccountDescription": "Bu kullanıcı henüz biyografisini yazmamış.",
-  "follow": "Takip et",
   "youFollowing": "Takip edildi"
 }
 </locale>
@@ -290,7 +271,6 @@ async function follow() {
 <locale locale="ug-CN" lang="json">
 {
   "noAccountDescription": "This user has not written their bio yet.",
-  "follow": "Follow",
   "youFollowing": "Followed"
 }
 </locale>
@@ -298,7 +278,6 @@ async function follow() {
 <locale locale="uk-UA" lang="json">
 {
   "noAccountDescription": "Цей користувач ще нічого не написав про себе",
-  "follow": "Підписатись",
   "youFollowing": "Підписки"
 }
 </locale>
@@ -306,7 +285,6 @@ async function follow() {
 <locale locale="vi-VN" lang="json">
 {
   "noAccountDescription": "Người này chưa viết mô tả.",
-  "follow": "Theo dõi",
   "youFollowing": "Đang theo dõi"
 }
 </locale>
@@ -314,7 +292,6 @@ async function follow() {
 <locale locale="zh-CN" lang="json">
 {
   "noAccountDescription": "此用户尚无自我介绍",
-  "follow": "关注",
   "youFollowing": "正在关注"
 }
 </locale>
@@ -322,7 +299,6 @@ async function follow() {
 <locale locale="zh-TW" lang="json">
 {
   "noAccountDescription": "此使用者尚未自我介紹",
-  "follow": "追隨",
   "youFollowing": "追隨中"
 }
 </locale>

@@ -8,6 +8,7 @@ import type { ApiProcedureMetadata } from '../../../api/backend/transport/policy
 import { oc, type InferContractRouterInputs, type InferContractRouterOutputs } from '@orpc/contract';
 import * as v from 'valibot';
 import { objectInput } from '../../../api/backend/transport/input.schema.js';
+import { jsonString } from '../../../api/backend/transport/string.schema.js';
 import { commonErrors, apiErrorData } from '../../../api/backend/transport/errors.schema.js';
 import { packedUserLiteSchema, packedUserDetailedSchema } from '../../../users/backend/user.schema.js';
 import type { BirthdaySelector } from './birthday.schema.js';
@@ -298,7 +299,7 @@ export const UsersListsCreateContract = oc.$meta({
 	prohibitMoved: true,
 	kind: 'write:account',
 } as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/users/lists/create', tags: ['lists'] }).errors({ ...commonErrors, TOO_MANY_USERLISTS: { status: 400, data: apiErrorData } }).input(objectInput({
-	'name': v.pipe(v.string(), v.minLength(1), v.maxLength(100)),
+	'name': jsonString({ minLength: 1, maxLength: 100 }),
 })).output(packedUserListSchema);
 
 export const UsersListsCreateFromPublicContract = oc.$meta({
@@ -307,7 +308,7 @@ export const UsersListsCreateFromPublicContract = oc.$meta({
 	prohibitMoved: true,
 	kind: 'write:account',
 } as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/users/lists/create-from-public', tags: [] }).errors({ ...commonErrors, TOO_MANY_USERLISTS: { status: 400, data: apiErrorData }, NO_SUCH_LIST: { status: 400, data: apiErrorData }, NO_SUCH_USER: { status: 400, data: apiErrorData }, ALREADY_ADDED: { status: 400, data: apiErrorData }, YOU_HAVE_BEEN_BLOCKED: { status: 400, data: apiErrorData }, TOO_MANY_USERS: { status: 400, data: apiErrorData } }).input(objectInput({
-	'name': v.pipe(v.string(), v.minLength(1), v.maxLength(100)),
+	'name': jsonString({ minLength: 1, maxLength: 100 }),
 	'listId': misskeyId,
 })).output(packedUserListSchema);
 
@@ -394,7 +395,7 @@ export const UsersListsUpdateContract = oc.$meta({
 	kind: 'write:account',
 } as const satisfies Meta & ApiProcedureMetadata).route({ method: 'POST', path: '/users/lists/update', tags: ['lists'] }).errors({ ...commonErrors, NO_SUCH_LIST: { status: 400, data: apiErrorData } }).input(objectInput({
 	'listId': misskeyId,
-	'name': v.exactOptional(v.pipe(v.string(), v.minLength(1), v.maxLength(100))),
+	'name': v.exactOptional(jsonString({ minLength: 1, maxLength: 100 })),
 	'isPublic': v.exactOptional(v.boolean()),
 })).output(packedUserListSchema);
 

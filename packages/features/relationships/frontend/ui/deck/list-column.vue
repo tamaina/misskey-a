@@ -14,18 +14,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import { watch, useTemplateRef, ref, onMounted } from 'vue';
-import XColumn from '../../../../navigation/frontend/ui/deck/column.vue';
-import type { entities as MisskeyEntities } from 'misskey-js';
-import type { Column } from '@features/preferences/frontend/deck.js';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
-import type { SoundStore } from '@features/preferences/frontend/state/def.js';
 import { updateColumn } from '@features/preferences/frontend/deck.js';
 import MkStreamingNotesTimeline from '@features/timelines/frontend/components/MkStreamingNotesTimeline.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { misskeyApi } from '@features/api/frontend/utility/misskey-api.js';
 import { userListsCache } from '@features/runtime/frontend/cache.js';
 import { soundSettingsButton } from '@features/notes/frontend/ui/deck/tl-note-notification.js';
+import XColumn from '../../../../navigation/frontend/ui/deck/column.vue';
+import type { SoundStore } from '@features/preferences/frontend/state/def.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Column } from '@features/preferences/frontend/deck.js';
+import type { entities as MisskeyEntities } from 'misskey-js';
+import type { Locale } from 'i18n';
+
+const globalLocale = useLocale<Locale>(import.meta.url);
 
 const props = defineProps<{
 	column: Column;
@@ -60,7 +64,7 @@ async function setList() {
 	const { canceled, result: listIdOrOperation } = await os.select({
 		title: $locale.value.sfc.selectList,
 		items: [
-			{ value: '_CREATE_', label: $locale.value.sfc.createNew },
+			{ value: '_CREATE_', label: globalLocale.value.env.createNew },
 			(lists.length > 0 ? {
 				type: 'group' as const,
 				label: $locale.value.sfc.createdLists,
@@ -127,7 +131,6 @@ const menu: MenuItem[] = [
 <locale locale="ar-SA" lang="json">
 {
 	"selectList": "اختر قائمة",
-	"createNew": "أنشِئ جديد",
 	"createdLists": "Created lists",
 	"enterListName": "اسم القائمة",
 	"editList": "عدّل القائمة",
@@ -140,7 +143,6 @@ const menu: MenuItem[] = [
 <locale locale="ca-ES" lang="json">
 {
 	"selectList": "Tria una llista",
-	"createNew": "Crear",
 	"createdLists": "Llistes creades ",
 	"enterListName": "Introdueix un nom per a la llista",
 	"editList": "Editar llista",
@@ -153,7 +155,6 @@ const menu: MenuItem[] = [
 <locale locale="cs-CZ" lang="json">
 {
 	"selectList": "Vybrat seznam",
-	"createNew": "Vytvořit nový",
 	"createdLists": "Created lists",
 	"enterListName": "Jméno seznamu",
 	"editList": "Upravit seznam",
@@ -166,7 +167,6 @@ const menu: MenuItem[] = [
 <locale locale="da-DK" lang="json">
 {
 	"selectList": "Select a list",
-	"createNew": "Create new",
 	"createdLists": "Created lists",
 	"enterListName": "Enter a name for the list",
 	"editList": "Edit list",
@@ -179,7 +179,6 @@ const menu: MenuItem[] = [
 <locale locale="de-DE" lang="json">
 {
 	"selectList": "Liste auswählen",
-	"createNew": "Neu erstellen",
 	"createdLists": "Erstellte Listen",
 	"enterListName": "Listennamen eingeben",
 	"editList": "Liste bearbeiten",
@@ -192,7 +191,6 @@ const menu: MenuItem[] = [
 <locale locale="en-US" lang="json">
 {
 	"selectList": "Select a list",
-	"createNew": "Create new",
 	"createdLists": "Created lists",
 	"enterListName": "Enter a name for the list",
 	"editList": "Edit list",
@@ -205,7 +203,6 @@ const menu: MenuItem[] = [
 <locale locale="es-ES" lang="json">
 {
 	"selectList": "Selecciona una lista",
-	"createNew": "Crear Nuevo",
 	"createdLists": "Listas creadas",
 	"enterListName": "Introduce un nombre para la lista",
 	"editList": "Editar lista",
@@ -218,7 +215,6 @@ const menu: MenuItem[] = [
 <locale locale="fr-FR" lang="json">
 {
 	"selectList": "Sélectionner une liste",
-	"createNew": "Créer",
 	"createdLists": "Listes créées",
 	"enterListName": "Nom de la liste",
 	"editList": "Modifier la liste",
@@ -231,7 +227,6 @@ const menu: MenuItem[] = [
 <locale locale="id-ID" lang="json">
 {
 	"selectList": "Pilih daftar",
-	"createNew": "Buat baru",
 	"createdLists": "Senarai yang dibuat",
 	"enterListName": "Masukkan nama daftar",
 	"editList": "Sunting daftar",
@@ -244,7 +239,6 @@ const menu: MenuItem[] = [
 <locale locale="it-IT" lang="json">
 {
 	"selectList": "Seleziona una lista",
-	"createNew": "Crea",
 	"createdLists": "Liste create",
 	"enterListName": "Nome della lista",
 	"editList": "Modifica Lista",
@@ -257,7 +251,6 @@ const menu: MenuItem[] = [
 <locale locale="ja-JP" lang="json">
 {
 	"selectList": "リストを選択",
-	"createNew": "新規作成",
 	"createdLists": "作成したリスト",
 	"enterListName": "リスト名を入力",
 	"editList": "リストを編集",
@@ -270,7 +263,6 @@ const menu: MenuItem[] = [
 <locale locale="ja-KS" lang="json">
 {
 	"selectList": "リストを選ぶ",
-	"createNew": "新しく作るで",
 	"createdLists": "作成したリスト",
 	"enterListName": "リスト名を入れてや",
 	"editList": "リストいじる",
@@ -283,7 +275,6 @@ const menu: MenuItem[] = [
 <locale locale="kab-KAB" lang="json">
 {
 	"selectList": "Fren tabdart",
-	"createNew": "Create new",
 	"createdLists": "Created lists",
 	"enterListName": "Isem n tebdart",
 	"editList": "Edit list",
@@ -296,7 +287,6 @@ const menu: MenuItem[] = [
 <locale locale="kn-IN" lang="json">
 {
 	"selectList": "Select a list",
-	"createNew": "Create new",
 	"createdLists": "Created lists",
 	"enterListName": "Enter a name for the list",
 	"editList": "Edit list",
@@ -309,7 +299,6 @@ const menu: MenuItem[] = [
 <locale locale="ko-KR" lang="json">
 {
 	"selectList": "리스트 선택",
-	"createNew": "새로 만들기",
 	"createdLists": "만든 리스트",
 	"enterListName": "리스트 이름을 입력",
 	"editList": "리스트 편집",
@@ -322,7 +311,6 @@ const menu: MenuItem[] = [
 <locale locale="nl-NL" lang="json">
 {
 	"selectList": "Kies een lijst.",
-	"createNew": "Nieuwe aanmaken",
 	"createdLists": "Created lists",
 	"enterListName": "Voer de naam van de lijst in",
 	"editList": "Lijst bewerken",
@@ -335,7 +323,6 @@ const menu: MenuItem[] = [
 <locale locale="no-NO" lang="json">
 {
 	"selectList": "Velg en liste",
-	"createNew": "Create new",
 	"createdLists": "Created lists",
 	"enterListName": "Skriv inn et navn på listen",
 	"editList": "Edit list",
@@ -348,7 +335,6 @@ const menu: MenuItem[] = [
 <locale locale="pl-PL" lang="json">
 {
 	"selectList": "Wybierz listę",
-	"createNew": "Utwórz nowy",
 	"createdLists": "Created lists",
 	"enterListName": "Nazwa listy",
 	"editList": "Edytuj listę",
@@ -361,7 +347,6 @@ const menu: MenuItem[] = [
 <locale locale="pt-PT" lang="json">
 {
 	"selectList": "Selecione uma lista",
-	"createNew": "Criar novo",
 	"createdLists": "Listas criadas",
 	"enterListName": "Insira um nome para a lista",
 	"editList": "Editar lista",
@@ -374,7 +359,6 @@ const menu: MenuItem[] = [
 <locale locale="ru-RU" lang="json">
 {
 	"selectList": "Выберите список",
-	"createNew": "Новый документ",
 	"createdLists": "Созданные списки",
 	"enterListName": "Название списка",
 	"editList": "Редактировать список",
@@ -387,7 +371,6 @@ const menu: MenuItem[] = [
 <locale locale="sk-SK" lang="json">
 {
 	"selectList": "Vyberte zoznam",
-	"createNew": "Vytvoriť nový",
 	"createdLists": "Created lists",
 	"enterListName": "Zadajte názov zoznamu",
 	"editList": "Edit list",
@@ -400,7 +383,6 @@ const menu: MenuItem[] = [
 <locale locale="th-TH" lang="json">
 {
 	"selectList": "เลือกรายชื่อ",
-	"createNew": "สร้างใหม่",
 	"createdLists": "รายชื่อที่ถูกสร้าง",
 	"enterListName": "ป้อนนามเรียกของรายชื่อชุดนี้",
 	"editList": "แก้ไขรายชื่อ",
@@ -413,7 +395,6 @@ const menu: MenuItem[] = [
 <locale locale="tr-TR" lang="json">
 {
 	"selectList": "Bir liste seç",
-	"createNew": "Yeni oluştur",
 	"createdLists": "Oluşturulan listeler",
 	"enterListName": "Listeye bir ad girin",
 	"editList": "Listeyi düzenle",
@@ -426,7 +407,6 @@ const menu: MenuItem[] = [
 <locale locale="ug-CN" lang="json">
 {
 	"selectList": "Select a list",
-	"createNew": "Create new",
 	"createdLists": "Created lists",
 	"enterListName": "Enter a name for the list",
 	"editList": "Edit list",
@@ -439,7 +419,6 @@ const menu: MenuItem[] = [
 <locale locale="uk-UA" lang="json">
 {
 	"selectList": "Виберіть список",
-	"createNew": "Створити новий",
 	"createdLists": "Створені списки",
 	"enterListName": "Введіть назву списку",
 	"editList": "Редагувати список",
@@ -452,7 +431,6 @@ const menu: MenuItem[] = [
 <locale locale="vi-VN" lang="json">
 {
 	"selectList": "Chọn danh sách",
-	"createNew": "Tạo mới",
 	"createdLists": "Created lists",
 	"enterListName": "Đặt tên cho danh sách",
 	"editList": "Chỉnh sửa danh sách",
@@ -465,7 +443,6 @@ const menu: MenuItem[] = [
 <locale locale="zh-CN" lang="json">
 {
 	"selectList": "选择列表",
-	"createNew": "新建",
 	"createdLists": "已创建的列表",
 	"enterListName": "输入列表名称",
 	"editList": "编辑列表",
@@ -478,7 +455,6 @@ const menu: MenuItem[] = [
 <locale locale="zh-TW" lang="json">
 {
 	"selectList": "選擇清單",
-	"createNew": "新建",
 	"createdLists": "已建立的清單",
 	"enterListName": "輸入清單名稱",
 	"editList": "編輯清單",

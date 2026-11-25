@@ -13,6 +13,7 @@ import fetch from 'node-fetch';
 import { HttpProxyAgent, HttpsProxyAgent } from 'hpagent';
 import { Inject, Injectable } from '@nestjs/common';
 import { DI } from '@/di-symbols.js';
+import { proxyForHpagent } from '../utility/hpagent-proxy.js';
 import type { Config } from '@/config.js';
 import { sendPublicWebhook } from '../http/mcp-webhook.js';
 import { postPublicJson } from '../http/public-json.js';
@@ -177,27 +178,29 @@ export class HttpRequestService {
 		this.https = new HttpsRequestServiceAgent(config, agentOption);
 
 		const maxSockets = Math.max(256, config.deliverJobConcurrency ?? 128);
+		// hpagent's types omit the URL-like object it accepts at runtime.
+		const proxy = config.proxy ? proxyForHpagent(config.proxy) as string : undefined;
 
-		this.httpAgent = config.proxy
+		this.httpAgent = proxy
 			? new HttpProxyAgent({
 				keepAlive: true,
 				keepAliveMsecs: 30 * 1000,
 				maxSockets,
 				maxFreeSockets: 256,
 				scheduling: 'lifo',
-				proxy: config.proxy,
+				proxy,
 				localAddress: config.outgoingAddress,
 			})
 			: this.http;
 
-		this.httpsAgent = config.proxy
+		this.httpsAgent = proxy
 			? new HttpsProxyAgent({
 				keepAlive: true,
 				keepAliveMsecs: 30 * 1000,
 				maxSockets,
 				maxFreeSockets: 256,
 				scheduling: 'lifo',
-				proxy: config.proxy,
+				proxy,
 				localAddress: config.outgoingAddress,
 			})
 			: this.https;

@@ -11,7 +11,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Configured value on server",
 	"preferenceSyncConflictChoiceDevice": "Configured value on device",
 	"preferenceSyncConflictChoiceCancel": "Cancel enabling sync",
-	"somethingHappened": "حدث خطأ",
 	"copyPreferenceId": "Copy the preference ID",
 	"resetToDefaultValue": "Revert to default",
 	"overrideByAccount": "Override by the account",
@@ -24,8 +23,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "No auto-created backups were found, but if you have manually saved a backup file, you can import and restore it.",
 		"selectBackupToRestore": "Select a backup to restore"
 	},
-	"noName": "No name",
-	"rename": "إعادة التسمية",
 	"export": "تصدير",
 	"import": "استيراد",
 	"_preferencesProfile": {
@@ -55,7 +52,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Valors de configuració del servidor",
 	"preferenceSyncConflictChoiceDevice": "Punts d'ajustos del dispositiu ",
 	"preferenceSyncConflictChoiceCancel": "Cancel·lar l'activació de la sincronització ",
-	"somethingHappened": "S'ha produït un error",
 	"copyPreferenceId": "Copiar l'ID de la configuració ",
 	"resetToDefaultValue": "Restaura al valor per defecte ",
 	"overrideByAccount": "Anul·lar per compte",
@@ -68,8 +64,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "No s'han trobat còpies de seguretat creades automàticament, però si has desat, manualment, un arxiu de còpia de seguretat, pots importar-lo i carregar-lo.",
 		"selectBackupToRestore": "Seleccionar la còpia de seguretat que vols restaurar"
 	},
-	"noName": "No hi ha un nom disponible ",
-	"rename": "Canvia el nom",
 	"export": "Exporta",
 	"import": "Importar",
 	"_preferencesProfile": {
@@ -99,7 +93,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Configured value on server",
 	"preferenceSyncConflictChoiceDevice": "Configured value on device",
 	"preferenceSyncConflictChoiceCancel": "Cancel enabling sync",
-	"somethingHappened": "Jejda. Něco se nepovedlo.",
 	"copyPreferenceId": "Copy the preference ID",
 	"resetToDefaultValue": "Revert to default",
 	"overrideByAccount": "Override by the account",
@@ -112,8 +105,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "No auto-created backups were found, but if you have manually saved a backup file, you can import and restore it.",
 		"selectBackupToRestore": "Select a backup to restore"
 	},
-	"noName": "No name",
-	"rename": "Přejmenovat",
 	"export": "Exportovat",
 	"import": "Importovat",
 	"_preferencesProfile": {
@@ -143,7 +134,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Configured value on server",
 	"preferenceSyncConflictChoiceDevice": "Configured value on device",
 	"preferenceSyncConflictChoiceCancel": "Cancel enabling sync",
-	"somethingHappened": "An error has occurred",
 	"copyPreferenceId": "Copy the preference ID",
 	"resetToDefaultValue": "Revert to default",
 	"overrideByAccount": "Override by the account",
@@ -156,8 +146,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "No auto-created backups were found, but if you have manually saved a backup file, you can import and restore it.",
 		"selectBackupToRestore": "Select a backup to restore"
 	},
-	"noName": "No name",
-	"rename": "Rename",
 	"export": "Export",
 	"import": "Import",
 	"_preferencesProfile": {
@@ -187,7 +175,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Konfigurierte Werte auf dem Server",
 	"preferenceSyncConflictChoiceDevice": "Konfigurierte Werte auf dem Gerät",
 	"preferenceSyncConflictChoiceCancel": "Einrichten der Synchronisierung abbrechen",
-	"somethingHappened": "Ein Fehler ist aufgetreten",
 	"copyPreferenceId": "Kopiere die Einstellungs-ID",
 	"resetToDefaultValue": "Auf Standard zurücksetzen",
 	"overrideByAccount": "Überschreibung durch das Konto",
@@ -200,8 +187,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "Es wurden keine automatisch erstellten Sicherungen gefunden, aber wenn du eine Sicherungsdatei manuell gespeichert hast, kannst du diese importieren und wiederherstellen.",
 		"selectBackupToRestore": "Wähle die wiederherzustellende Sicherung"
 	},
-	"noName": "Kein Name",
-	"rename": "Umbenennen",
 	"export": "Export",
 	"import": "Import",
 	"_preferencesProfile": {
@@ -231,7 +216,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Configured value on server",
 	"preferenceSyncConflictChoiceDevice": "Configured value on device",
 	"preferenceSyncConflictChoiceCancel": "Cancel enabling sync",
-	"somethingHappened": "An error has occurred",
 	"copyPreferenceId": "Copy the preference ID",
 	"resetToDefaultValue": "Revert to default",
 	"overrideByAccount": "Override by the account",
@@ -244,8 +228,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "No auto-created backups were found, but if you have manually saved a backup file, you can import and restore it.",
 		"selectBackupToRestore": "Select a backup to restore"
 	},
-	"noName": "No name",
-	"rename": "Rename",
 	"export": "Export",
 	"import": "Import",
 	"_preferencesProfile": {
@@ -275,7 +257,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Valores de configuración del servidor",
 	"preferenceSyncConflictChoiceDevice": "Valor configurado en el dispositivo",
 	"preferenceSyncConflictChoiceCancel": "Cancelar la activación de la sincronización",
-	"somethingHappened": "Ocurrió un error",
 	"copyPreferenceId": "Copiar  ID de la configuración",
 	"resetToDefaultValue": "Revertir a valor predeterminado",
 	"overrideByAccount": "Anulado por la cuenta",
@@ -288,8 +269,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "No se han encontrado copias de seguridad creadas automáticamente, pero si has guardado manualmente un archivo de copia de seguridad, puedes importarlo y restaurarlo.",
 		"selectBackupToRestore": "Selecciona una copia de seguridad para restaurar"
 	},
-	"noName": "No hay nombre.",
-	"rename": "Renombrar",
 	"export": "Exportar",
 	"import": "Importar",
 	"_preferencesProfile": {
@@ -319,7 +298,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Configured value on server",
 	"preferenceSyncConflictChoiceDevice": "Configured value on device",
 	"preferenceSyncConflictChoiceCancel": "Cancel enabling sync",
-	"somethingHappened": "Une erreur est survenue",
 	"copyPreferenceId": "Copy the preference ID",
 	"resetToDefaultValue": "Revert to default",
 	"overrideByAccount": "Override by the account",
@@ -332,8 +310,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "No auto-created backups were found, but if you have manually saved a backup file, you can import and restore it.",
 		"selectBackupToRestore": "Select a backup to restore"
 	},
-	"noName": "No name",
-	"rename": "Renommer",
 	"export": "Exporter",
 	"import": "Importer",
 	"_preferencesProfile": {
@@ -363,7 +339,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Configured value on server",
 	"preferenceSyncConflictChoiceDevice": "Configured value on device",
 	"preferenceSyncConflictChoiceCancel": "Cancel enabling sync",
-	"somethingHappened": "Terjadi kesalahan",
 	"copyPreferenceId": "Copy the preference ID",
 	"resetToDefaultValue": "Revert to default",
 	"overrideByAccount": "Override by the account",
@@ -376,8 +351,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "Tidak ada pencadangan otomatis yang ditemukan, namun jika anda pernah membuat cadangan secara manual, anda bisa mengimpor dan mengembalikan pencadangan tersebut.",
 		"selectBackupToRestore": "Pilih pencadangan untuk dikembalikan"
 	},
-	"noName": "Tidak ada nama",
-	"rename": "Ubah nama",
 	"export": "Ekspor",
 	"import": "Impor",
 	"_preferencesProfile": {
@@ -407,7 +380,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Valore del server",
 	"preferenceSyncConflictChoiceDevice": "Valore del dispositivo",
 	"preferenceSyncConflictChoiceCancel": "Annulla la sincronizzazione",
-	"somethingHappened": "Si è verificato un problema",
 	"copyPreferenceId": "Copia ID preferenze",
 	"resetToDefaultValue": "Ripristina a predefinito",
 	"overrideByAccount": "Sovrascrivere col profilo",
@@ -420,8 +392,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "Impossibile trovare un backup creato automaticamente. Se se hai salvato il file di backup manualmente, puoi importarlo e ripristinarlo.",
 		"selectBackupToRestore": "Seleziona un backup da ripristinare"
 	},
-	"noName": "Senza nome",
-	"rename": "Modifica nome",
 	"export": "Esporta",
 	"import": "Importa",
 	"_preferencesProfile": {
@@ -451,7 +421,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "サーバーの設定値で上書き",
 	"preferenceSyncConflictChoiceDevice": "デバイスの設定値で上書き",
 	"preferenceSyncConflictChoiceCancel": "同期の有効化をキャンセル",
-	"somethingHappened": "問題が発生しました",
 	"copyPreferenceId": "設定IDをコピー",
 	"resetToDefaultValue": "初期値に戻す",
 	"overrideByAccount": "アカウントで上書き",
@@ -464,8 +433,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "自動で作成されたバックアップは見つかりませんでしたが、バックアップファイルを手動で保存している場合、それをインポートして復元することはできます。",
 		"selectBackupToRestore": "復元するバックアップを選択してください"
 	},
-	"noName": "名前はありません",
-	"rename": "名前を変更",
 	"export": "エクスポート",
 	"import": "インポート",
 	"_preferencesProfile": {
@@ -495,7 +462,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "サーバーの設定値で上書き",
 	"preferenceSyncConflictChoiceDevice": "デバイスの設定値で上書き",
 	"preferenceSyncConflictChoiceCancel": "同期の有効化はやめとくわ",
-	"somethingHappened": "なんかあかんわ",
 	"copyPreferenceId": "設定IDをコピー",
 	"resetToDefaultValue": "初期値に戻す",
 	"overrideByAccount": "アカウントで上書き",
@@ -508,8 +474,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "自動で作られたバックアップは見つからんかったけど、バックアップファイルを手動で保存してるんやったら、それをインポートして復元できるで。",
 		"selectBackupToRestore": "復元するバックアップを選んでや"
 	},
-	"noName": "名前はあらへんで",
-	"rename": "名前を変えるで",
 	"export": "エクスポート",
 	"import": "インポート",
 	"_preferencesProfile": {
@@ -539,7 +503,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Configured value on server",
 	"preferenceSyncConflictChoiceDevice": "Configured value on device",
 	"preferenceSyncConflictChoiceCancel": "Cancel enabling sync",
-	"somethingHappened": "An error has occurred",
 	"copyPreferenceId": "Copy the preference ID",
 	"resetToDefaultValue": "Revert to default",
 	"overrideByAccount": "Override by the account",
@@ -552,8 +515,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "No auto-created backups were found, but if you have manually saved a backup file, you can import and restore it.",
 		"selectBackupToRestore": "Select a backup to restore"
 	},
-	"noName": "No name",
-	"rename": "Rename",
 	"export": "Sifeḍ",
 	"import": "Kter",
 	"_preferencesProfile": {
@@ -583,7 +544,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Configured value on server",
 	"preferenceSyncConflictChoiceDevice": "Configured value on device",
 	"preferenceSyncConflictChoiceCancel": "Cancel enabling sync",
-	"somethingHappened": "An error has occurred",
 	"copyPreferenceId": "Copy the preference ID",
 	"resetToDefaultValue": "Revert to default",
 	"overrideByAccount": "Override by the account",
@@ -596,8 +556,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "No auto-created backups were found, but if you have manually saved a backup file, you can import and restore it.",
 		"selectBackupToRestore": "Select a backup to restore"
 	},
-	"noName": "No name",
-	"rename": "Rename",
 	"export": "ರಫ್ತು",
 	"import": "ಆಮದು",
 	"_preferencesProfile": {
@@ -627,7 +585,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "서버 설정값",
 	"preferenceSyncConflictChoiceDevice": "장치 설정 값",
 	"preferenceSyncConflictChoiceCancel": "동기화 취소",
-	"somethingHappened": "오류가 발생했습니다",
 	"copyPreferenceId": "설정한 ID를 복사",
 	"resetToDefaultValue": "기본값으로 되돌리기",
 	"overrideByAccount": "계정으로 덮어쓰기",
@@ -640,8 +597,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "자동으로 생성된 백업은 찾을 수 없었지만, 수동으로 백업 파일을 저장한 경우 해당 파일을 가져와 복원할 수 있습니다.",
 		"selectBackupToRestore": "복원할 백업을 선택하세요"
 	},
-	"noName": "이름이 없습니다.",
-	"rename": "이름 변경",
 	"export": "내보내기",
 	"import": "가져오기",
 	"_preferencesProfile": {
@@ -671,7 +626,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Configured value on server",
 	"preferenceSyncConflictChoiceDevice": "Configured value on device",
 	"preferenceSyncConflictChoiceCancel": "Cancel enabling sync",
-	"somethingHappened": "Er is iets misgegaan.",
 	"copyPreferenceId": "Copy the preference ID",
 	"resetToDefaultValue": "Revert to default",
 	"overrideByAccount": "Override by the account",
@@ -684,8 +638,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "No auto-created backups were found, but if you have manually saved a backup file, you can import and restore it.",
 		"selectBackupToRestore": "Select a backup to restore"
 	},
-	"noName": "No name",
-	"rename": "Hernoemen",
 	"export": "Export",
 	"import": "Import",
 	"_preferencesProfile": {
@@ -715,7 +667,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Configured value on server",
 	"preferenceSyncConflictChoiceDevice": "Configured value on device",
 	"preferenceSyncConflictChoiceCancel": "Cancel enabling sync",
-	"somethingHappened": "En feil har oppstått",
 	"copyPreferenceId": "Copy the preference ID",
 	"resetToDefaultValue": "Revert to default",
 	"overrideByAccount": "Override by the account",
@@ -728,8 +679,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "No auto-created backups were found, but if you have manually saved a backup file, you can import and restore it.",
 		"selectBackupToRestore": "Select a backup to restore"
 	},
-	"noName": "No name",
-	"rename": "Endre navn",
 	"export": "Eksporter",
 	"import": "Importer",
 	"_preferencesProfile": {
@@ -759,7 +708,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Configured value on server",
 	"preferenceSyncConflictChoiceDevice": "Configured value on device",
 	"preferenceSyncConflictChoiceCancel": "Cancel enabling sync",
-	"somethingHappened": "Coś poszło nie tak",
 	"copyPreferenceId": "Copy the preference ID",
 	"resetToDefaultValue": "Revert to default",
 	"overrideByAccount": "Override by the account",
@@ -772,8 +720,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "No auto-created backups were found, but if you have manually saved a backup file, you can import and restore it.",
 		"selectBackupToRestore": "Select a backup to restore"
 	},
-	"noName": "No name",
-	"rename": "Zmień nazwę",
 	"export": "Eksportuj",
 	"import": "Importuj",
 	"_preferencesProfile": {
@@ -803,7 +749,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Valor configurado no servidor",
 	"preferenceSyncConflictChoiceDevice": "Valor configurado no dispositivo",
 	"preferenceSyncConflictChoiceCancel": "Cancelar a habilitação de sincronização",
-	"somethingHappened": "Ocorreu um erro",
 	"copyPreferenceId": "Copiar ID de preferências",
 	"resetToDefaultValue": "Reverter ao padrão",
 	"overrideByAccount": "Sobrescrever pela conta",
@@ -816,8 +761,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "Nenhum backup automático foi encontrado. Se você salvou um arquivo de backup manualmente, você pode importá-lo e restaurá-lo.",
 		"selectBackupToRestore": "Selecionar um backup para restaurar"
 	},
-	"noName": "Sem nome",
-	"rename": "Renomear",
 	"export": "Exportar",
 	"import": "Importar",
 	"_preferencesProfile": {
@@ -847,7 +790,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Configured value on server",
 	"preferenceSyncConflictChoiceDevice": "Configured value on device",
 	"preferenceSyncConflictChoiceCancel": "Cancel enabling sync",
-	"somethingHappened": "Что-то пошло не так",
 	"copyPreferenceId": "Копировать ID настройки",
 	"resetToDefaultValue": "Восстановить значения по умолчанию",
 	"overrideByAccount": "Переопределить этим аккаунтом",
@@ -860,8 +802,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "No auto-created backups were found, but if you have manually saved a backup file, you can import and restore it.",
 		"selectBackupToRestore": "Select a backup to restore"
 	},
-	"noName": "Имя не указано",
-	"rename": "Переименовать",
 	"export": "Экспорт",
 	"import": "Импорт",
 	"_preferencesProfile": {
@@ -891,7 +831,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Configured value on server",
 	"preferenceSyncConflictChoiceDevice": "Configured value on device",
 	"preferenceSyncConflictChoiceCancel": "Cancel enabling sync",
-	"somethingHappened": "Ups. Niečo sa nepodarilo.",
 	"copyPreferenceId": "Copy the preference ID",
 	"resetToDefaultValue": "Revert to default",
 	"overrideByAccount": "Override by the account",
@@ -904,8 +843,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "No auto-created backups were found, but if you have manually saved a backup file, you can import and restore it.",
 		"selectBackupToRestore": "Select a backup to restore"
 	},
-	"noName": "No name",
-	"rename": "Premenovať",
 	"export": "Exportovať",
 	"import": "Importovať",
 	"_preferencesProfile": {
@@ -935,7 +872,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "เขียนทับด้วยค่าการตั้งค่าของเซิร์ฟเวอร์",
 	"preferenceSyncConflictChoiceDevice": "เขียนทับด้วยค่าการตั้งค่าของอุปกรณ์",
 	"preferenceSyncConflictChoiceCancel": "ยกเลิกการเปิดใช้งานการซิงค์",
-	"somethingHappened": "อุ๊ย ! มีอะไรบางอย่างผิดพลาด",
 	"copyPreferenceId": "คัดลือก ID การตั้งค่า",
 	"resetToDefaultValue": "คืนค่าเป็นค่าเริ่มต้น",
 	"overrideByAccount": "เขียนทับด้วยบัญชี",
@@ -948,8 +884,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "ไม่พบข้อมูลสำรองที่สร้างโดยอัตโนมัติ แต่หากมีข้อมูลสำรองที่บันทึกด้วยตนเอง สามารถนำเข้ามาเพื่อกู้คืนได้",
 		"selectBackupToRestore": "กรุณาเลือกข้อมูลสำรองที่ต้องการกู้คืน"
 	},
-	"noName": "ไม่มีชื่อ",
-	"rename": "เปลี่ยนชื่อ",
 	"export": "ส่งออก",
 	"import": "นำเข้า",
 	"_preferencesProfile": {
@@ -979,7 +913,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Sunucuda yapılandırılan değer",
 	"preferenceSyncConflictChoiceDevice": "Cihazda yapılandırılan değer",
 	"preferenceSyncConflictChoiceCancel": "Senkronizasyonu etkinleştirmeyi iptal et",
-	"somethingHappened": "Bir hata oluştu",
 	"copyPreferenceId": "Tercih ID kopyala",
 	"resetToDefaultValue": "Varsayılana dön",
 	"overrideByAccount": "Hesap tarafından geçersiz kılma",
@@ -992,8 +925,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "Otomatik olarak oluşturulan yedekleme bulunamadı, ancak manuel olarak bir yedekleme dosyası kaydettiysen, bunu içe aktarabilir ve geri yükleyebilirsin.",
 		"selectBackupToRestore": "Geri yüklemek için bir yedekleme seçin"
 	},
-	"noName": "İsim yok",
-	"rename": "Yeniden adlandır",
 	"export": "Dışa aktar",
 	"import": "İçeri aktar",
 	"_preferencesProfile": {
@@ -1023,7 +954,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Configured value on server",
 	"preferenceSyncConflictChoiceDevice": "Configured value on device",
 	"preferenceSyncConflictChoiceCancel": "Cancel enabling sync",
-	"somethingHappened": "An error has occurred",
 	"copyPreferenceId": "Copy the preference ID",
 	"resetToDefaultValue": "Revert to default",
 	"overrideByAccount": "Override by the account",
@@ -1036,8 +966,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "No auto-created backups were found, but if you have manually saved a backup file, you can import and restore it.",
 		"selectBackupToRestore": "Select a backup to restore"
 	},
-	"noName": "No name",
-	"rename": "Rename",
 	"export": "Export",
 	"import": "Import",
 	"_preferencesProfile": {
@@ -1067,7 +995,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Налаштоване значення на сервері",
 	"preferenceSyncConflictChoiceDevice": "Налаштоване значення на пристрої",
 	"preferenceSyncConflictChoiceCancel": "Скасувати увімкнення синхронізації",
-	"somethingHappened": "Щось пішло не так",
 	"copyPreferenceId": "Скопіювати ID налаштування",
 	"resetToDefaultValue": "Скинути налаштування до стандартних",
 	"overrideByAccount": "Перевизначити цим обліковим записом",
@@ -1080,8 +1007,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "Автоматично створених резервних копій не знайдено, але якщо ви зберегли файл з резервними копіями, ви можете імпортувати його та відновити їх.",
 		"selectBackupToRestore": "Оберіть резервну копію для відновлення"
 	},
-	"noName": "Ім'я не вказано",
-	"rename": "Перейменувати",
 	"export": "Експорт",
 	"import": "Імпорт",
 	"_preferencesProfile": {
@@ -1111,7 +1036,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "Configured value on server",
 	"preferenceSyncConflictChoiceDevice": "Configured value on device",
 	"preferenceSyncConflictChoiceCancel": "Cancel enabling sync",
-	"somethingHappened": "Xảy ra lỗi",
 	"copyPreferenceId": "Copy the preference ID",
 	"resetToDefaultValue": "Revert to default",
 	"overrideByAccount": "Override by the account",
@@ -1124,8 +1048,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "No auto-created backups were found, but if you have manually saved a backup file, you can import and restore it.",
 		"selectBackupToRestore": "Select a backup to restore"
 	},
-	"noName": "No name",
-	"rename": "Đổi tên",
 	"export": "Xuất dữ liệu",
 	"import": "Nhập dữ liệu",
 	"_preferencesProfile": {
@@ -1155,7 +1077,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "服务器上的设定值",
 	"preferenceSyncConflictChoiceDevice": "设备上的设定值",
 	"preferenceSyncConflictChoiceCancel": "取消同步",
-	"somethingHappened": "出错了",
 	"copyPreferenceId": "复制设置 ID",
 	"resetToDefaultValue": "重置为默认值",
 	"overrideByAccount": "使用账户设置",
@@ -1168,8 +1089,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "没有找到自动备份。若有手动保存备份文件，可将其导入来恢复。",
 		"selectBackupToRestore": "请选择要恢复的备份"
 	},
-	"noName": "未命名",
-	"rename": "重命名",
 	"export": "导出",
 	"import": "导入",
 	"_preferencesProfile": {
@@ -1199,7 +1118,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 	"preferenceSyncConflictChoiceServer": "伺服器設定值",
 	"preferenceSyncConflictChoiceDevice": "裝置的設定值",
 	"preferenceSyncConflictChoiceCancel": "取消啟用同步",
-	"somethingHappened": "發生錯誤",
 	"copyPreferenceId": "複製設定 ID",
 	"resetToDefaultValue": "還原成預設值",
 	"overrideByAccount": "覆寫帳號",
@@ -1212,8 +1130,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 		"noBackupsFoundDescription": "沒有找到自動建立的備份，但如果您手動儲存了備份檔案，則可以匯入並還原。",
 		"selectBackupToRestore": "選擇要還原的備份"
 	},
-	"noName": "沒有名稱",
-	"rename": "重新命名",
 	"export": "匯出",
 	"import": "匯入",
 	"_preferencesProfile": {

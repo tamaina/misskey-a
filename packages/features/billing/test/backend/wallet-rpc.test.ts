@@ -106,6 +106,26 @@ test('native timeout bounds a pending RPC without returning URL details', async 
 	await rejected;
 });
 
+test.each([
+	['0x1', ['eth_chainId']],
+	['0x1e240', ['eth_chainId', 'eth_call']],
+])('proof verification checks the actual RPC chain %s before attempting the signature', async (rpcChainId, expectedMethods) => {
+	const native = service();
+	const methods: string[] = [];
+	mocks.fetch.mockImplementation(async (_url: string, init: NativeRequestInit) => {
+		const request = JSON.parse(String(init.body)) as { id: number; method: string };
+		methods.push(request.method);
+		if (request.method !== 'eth_chainId') throw new Error('Synthetic signature verification failure');
+		return new NativeResponse(JSON.stringify({ jsonrpc: '2.0', id: request.id, result: rpcChainId }), { headers: { 'Content-Type': 'application/json' } });
+	});
+	const address = '0x0000000000000000000000000000000000000001';
+	const message = createSiweMessage({ address, chainId: 123456, domain: 'misskey.example.test', uri: 'https://misskey.example.test', nonce: 'syntheticNonce0001', version: '1', issuedAt: new Date(0), expirationTime: new Date(600000) });
+	const challenge = { nonce: 'syntheticNonce0001', userId: 'alice', chainId: 123456, address, domain: 'misskey.example.test', uri: 'https://misskey.example.test', message, createdAt: 0, expiresAt: 600000, usedAt: null };
+	const signature = `0x${'00'.repeat(65)}` as const;
+	expect(await createWalletProof(native).verify(challenge, signature, 'https://rpc.example.test', 1000)).toBe(false);
+	expect(methods).toEqual(expectedMethods);
+});
+
 test('proof verifier uses native RPC and fails closed without propagating URL-bearing viem errors', async () => {
 	const native = service();
 	const globalFetch = vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('Global fetch must not run'));

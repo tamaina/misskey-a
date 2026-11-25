@@ -3,23 +3,29 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { useLocale } from 'virtual:vite-vue-internationalization';
 import * as Misskey from 'misskey-js';
 import { readAndCompressImage } from '@misskey-dev/browser-image-resizer';
 import isAnimated from 'is-file-animated';
 import { EventEmitter } from 'eventemitter3';
 import { computed, markRaw, onMounted, onUnmounted, ref, triggerRef } from 'vue';
-import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
-import type { WatermarkLayers, WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';
-import type { ImageFrameParams, ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
 import { genId } from '@features/runtime/frontend/utility/id.js';
 import FeatureLocaleMessages from '@features/drive/frontend/ts-messages.vue';
 import { prefer } from '@features/preferences/frontend/preferences.js';
 import { isWebpSupported } from '@features/drive/frontend/utility/isWebpSupported.js';
 import { uploadFile, UploadAbortedError } from '@features/drive/frontend/utility/drive.js';
-import type { Content } from '@features/drive/frontend/components/MkLightbox.item.vue';
 import * as os from '@features/ui/frontend/os.js';
 import { isPreviewable, getType } from '@features/drive/frontend/utility/lightbox.js';
 import { ensureSignin } from '@features/auth/frontend/i.js';
+import type { Content } from '@features/drive/frontend/components/MkLightbox.item.vue';
+import type { ImageFrameParams, ImageFramePreset } from '@features/drive/frontend/utility/image-frame-renderer/ImageFrameRenderer.js';
+import type { WatermarkLayers, WatermarkPreset } from '@features/drive/frontend/utility/watermark/WatermarkRenderer.js';
+import type { MenuItem } from '@features/navigation/frontend/types/menu.js';
+import type { Locale } from 'i18n';
+
+function getGlobalLocale() {
+	return useLocale<Locale>(import.meta.url).value.env;
+}
 
 export type UploaderFeatures = {
 	imageEditing?: boolean;
@@ -219,11 +225,11 @@ export function useUploader(options: {
 		) {
 			menu.push({
 				icon: 'ti ti-forms',
-				text: FeatureLocaleMessages.$locale.rename,
+				text: getGlobalLocale().rename,
 				action: async () => {
 					const { result, canceled } = await os.inputText({
 						type: 'text',
-						title: FeatureLocaleMessages.$locale.rename,
+						title: getGlobalLocale().rename,
 						placeholder: item.name,
 						default: item.name,
 					});
@@ -234,7 +240,7 @@ export function useUploader(options: {
 				},
 			}, {
 				type: 'switch',
-				text: FeatureLocaleMessages.$locale.sensitive,
+				text: getGlobalLocale().sensitive,
 				icon: 'ti ti-eye-exclamation',
 				ref: computed({
 					get: () => item.isSensitive ?? false,
@@ -259,7 +265,7 @@ export function useUploader(options: {
 
 			if (isPreviewable(item.file.type)) {
 				menu.push({
-					text: FeatureLocaleMessages.$locale.preview,
+					text: getGlobalLocale().preview,
 					icon: 'ti ti-photo-search',
 					action: async () => {
 						const contents = items.value
@@ -330,7 +336,7 @@ export function useUploader(options: {
 							image: item.file,
 						}, {
 							ok: (file) => {
-									const newObjectUrl = createItemObjectUrl(item, file);
+								const newObjectUrl = createItemObjectUrl(item, file);
 								items.value.splice(items.value.indexOf(item), 1, {
 									...item,
 									file: markRaw(file),
@@ -373,7 +379,7 @@ export function useUploader(options: {
 				children: [{
 					type: 'button' as const,
 					icon: 'ti ti-pencil',
-					text: FeatureLocaleMessages.$locale.edit,
+					text: getGlobalLocale().edit,
 					action: async () => {
 						const { dispose } = await os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkWatermarkEditorDialog.vue').then(x => x.default), {
 							layers: item.watermarkLayers,
@@ -388,7 +394,7 @@ export function useUploader(options: {
 				}, {
 					type: 'button' as const,
 					icon: 'ti ti-x',
-					text: FeatureLocaleMessages.$locale.remove,
+					text: getGlobalLocale().remove,
 					action: () => change(null),
 				}, {
 					type: 'divider',
@@ -425,7 +431,7 @@ export function useUploader(options: {
 				children: [{
 					type: 'button' as const,
 					icon: 'ti ti-pencil',
-					text: FeatureLocaleMessages.$locale.edit,
+					text: getGlobalLocale().edit,
 					action: async () => {
 						const { dispose } = await os.popupAsyncWithDialog(import('@features/drive/frontend/components/MkImageFrameEditorDialog.vue').then(x => x.default), {
 							params: item.imageFrameParams,
@@ -442,7 +448,7 @@ export function useUploader(options: {
 				}, ...(item.imageFrameParams != null ? [{
 					type: 'button' as const,
 					icon: 'ti ti-x',
-					text: FeatureLocaleMessages.$locale.remove,
+					text: getGlobalLocale().remove,
 					action: () => change(null),
 				}] : []), {
 					type: 'divider' as const,
@@ -488,13 +494,13 @@ export function useUploader(options: {
 					let text = FeatureLocaleMessages.$locale.compress;
 
 					if (item.compressionLevel === 0 || item.compressionLevel == null) {
-						text += `: ${FeatureLocaleMessages.$locale.none}`;
+						text += `: ${getGlobalLocale().none}`;
 					} else if (item.compressionLevel === 1) {
-						text += `: ${FeatureLocaleMessages.$locale.low}`;
+						text += `: ${getGlobalLocale().low}`;
 					} else if (item.compressionLevel === 2) {
-						text += `: ${FeatureLocaleMessages.$locale.medium}`;
+						text += `: ${getGlobalLocale().medium}`;
 					} else if (item.compressionLevel === 3) {
-						text += `: ${FeatureLocaleMessages.$locale.high}`;
+						text += `: ${getGlobalLocale().high}`;
 					}
 
 					return text;
@@ -502,24 +508,24 @@ export function useUploader(options: {
 				type: 'parent',
 				children: [{
 					type: 'radioOption',
-					text: FeatureLocaleMessages.$locale.none,
+					text: getGlobalLocale().none,
 					active: computed(() => item.compressionLevel === 0 || item.compressionLevel == null),
 					action: () => changeCompressionLevel(0),
 				}, {
 					type: 'divider',
 				}, {
 					type: 'radioOption',
-					text: FeatureLocaleMessages.$locale.low,
+					text: getGlobalLocale().low,
 					active: computed(() => item.compressionLevel === 1),
 					action: () => changeCompressionLevel(1),
 				}, {
 					type: 'radioOption',
-					text: FeatureLocaleMessages.$locale.medium,
+					text: getGlobalLocale().medium,
 					active: computed(() => item.compressionLevel === 2),
 					action: () => changeCompressionLevel(2),
 				}, {
 					type: 'radioOption',
-					text: FeatureLocaleMessages.$locale.high,
+					text: getGlobalLocale().high,
 					active: computed(() => item.compressionLevel === 3),
 					action: () => changeCompressionLevel(3),
 				}],
@@ -531,13 +537,13 @@ export function useUploader(options: {
 				type: 'divider',
 			}, {
 				icon: 'ti ti-upload',
-				text: FeatureLocaleMessages.$locale.upload,
+				text: getGlobalLocale().upload,
 				action: () => {
 					uploadOne(item);
 				},
 			}, {
 				icon: 'ti ti-x',
-				text: FeatureLocaleMessages.$locale.remove,
+				text: getGlobalLocale().remove,
 				danger: true,
 				action: () => {
 					removeItem(item);

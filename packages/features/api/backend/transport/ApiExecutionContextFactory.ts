@@ -51,13 +51,13 @@ export class ApiExecutionContextFactory {
 		const { credential, upload } = request;
 		const fresh = request.freshAuthorization === true;
 		const roleReads = new Map<string, ReturnType<RoleService['getUserRoles']>>();
-		const policyReads = new Map<string, ReturnType<RoleService['getUserPolicies']>>();
+		const policyReads = new Map<string | null, ReturnType<RoleService['getUserPolicies']>>();
 		const readRoles = (id: string) => {
 			if (!fresh) return this.roles.getUserRoles(id);
 			if (!roleReads.has(id)) roleReads.set(id, this.roles.getUserRoles(id, true));
 			return roleReads.get(id)!;
 		};
-		const readPolicies = (id: string) => {
+		const readPolicies = (id: string | null) => {
 			if (!fresh) return this.roles.getUserPolicies(id);
 			if (!policyReads.has(id)) policyReads.set(id, this.roles.getUserPolicies(id, true));
 			return policyReads.get(id)!;
@@ -67,7 +67,8 @@ export class ApiExecutionContextFactory {
 				rootUserId: () => this.settings.rootUserId,
 				roles: actor => readRoles(actor.id),
 				policyAllowed: async (actor, key) => {
-					const policies = await readPolicies(actor.id);
+					// 未ログイン時は既定ポリシーで判定
+					const policies = await readPolicies(actor?.id ?? null);
 					return Boolean(Object.entries(policies).find(([name]) => name === key)?.[1]);
 				},
 			},
@@ -76,8 +77,8 @@ export class ApiExecutionContextFactory {
 			services: {
 				authenticate: async token => {
 					try {
-						const principal = await this.authenticate.authenticate(token);
-						if (principal[0]) this.ipLogging.log(request.ip, principal[0].id);
+						const principal = await this.authenticate.authenticate(token, { ip: request.ip, userAgent: typeof request.headers['user-agent'] === 'string' ? request.headers['user-agent'] : null });
+						if (principal[0]) void this.ipLogging.log(request.ip, principal[0].id, principal[2]?.id ?? null);
 						return principal;
 					} catch (error) {
 						if (!(error instanceof AuthenticationError)) throw error;

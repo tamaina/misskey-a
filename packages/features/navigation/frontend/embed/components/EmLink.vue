@@ -14,7 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import EmA from '@features/navigation/frontend/embed/components/EmA.vue';
 import { url as local } from '@features/boot/frontend/shared/config.js';
 import { maybeMakeRelative } from '@features/web/frontend/shared/url.js';
@@ -25,10 +25,10 @@ const props = withDefaults(defineProps<{
 }>(), {
 });
 
-const maybeRelativeUrl = maybeMakeRelative(props.url, local);
-const self = maybeRelativeUrl !== props.url;
-const attr = self ? 'to' : 'href';
-const target = self ? null : '_blank';
+const maybeRelativeUrl = computed(() => maybeMakeRelative(props.url, local));
+const self = computed(() => maybeRelativeUrl.value !== props.url);
+const attr = computed(() => self.value ? 'to' : 'href');
+const target = computed(() => self.value ? null : '_blank');
 
 const el = ref<HTMLElement | { $el: HTMLElement }>();
 
