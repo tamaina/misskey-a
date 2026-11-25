@@ -4,6 +4,7 @@
  */
 
 import assert from 'node:assert/strict';
+import { createWalletRouter } from '../../../backend/built/features/billing/backend.js';
 import { createApiRouter, createInstanceRouter, createNotesRouter, createDriveRouter,
 	createStatisticsRouter, createEmojisRouter, createNotificationsRouter, createTimelinesRouter,
 	createNoteSearchRouter, createUsersRouter, createRelationshipsRouter, createCollectionsRouter,
@@ -12,6 +13,7 @@ import { createApiRouter, createInstanceRouter, createNotesRouter, createDriveRo
 /** Test-only composition uses actual business handlers; unexercised feature routers are empty. */
 export function composeNativeTestRouter(dependencies) {
 	return createApiRouter({
+		wallets: dependencies.wallets ? createWalletRouter(dependencies.wallets) : {},
 		roles: {}, moderation: {}, auth: {}, portability: {}, driveManagement: {}, integrations: {},
 		operations: {}, federation: {}, games: {}, play: {}, pages: {}, channels: {}, chat: {},
 		discovery: {}, announcements: {}, avatarDecorations: {}, preferences: {},

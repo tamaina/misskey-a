@@ -107,6 +107,11 @@ const menuDef = computed<SuperMenuDef[]>(() => [{
 		to: '/settings/email',
 		active: currentPage.value?.route.name === 'email',
 	}, {
+		icon: 'ti ti-wallet',
+		text: $locale.value.sfc.wallets,
+		to: '/settings/wallets',
+		active: currentPage.value?.route.name === 'wallets',
+	}, {
 		icon: 'ti ti-lock',
 		text: $locale.value.sfc.security,
 		to: '/settings/security',
@@ -576,6 +581,7 @@ definePage(() => INFO.value);
 
 <locale locale="ja-JP" lang="json">
 {
+	"wallets": "ウォレット",
 	"profile": "プロフィール",
 	"privacy": "プライバシー",
 	"email": "メール",

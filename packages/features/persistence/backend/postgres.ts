@@ -80,6 +80,9 @@ import { MiRole } from '@features/roles/backend/models/Role.js';
 import { MiRoleAssignment } from '@features/roles/backend/models/RoleAssignment.js';
 import { MiFlash } from '@features/play/backend/models/Flash.js';
 import { MiFlashLike } from '@features/play/backend/models/FlashLike.js';
+import { MiBillingWalletChain } from '@features/billing/backend/models/BillingWalletChain.js';
+import { MiBillingWallet } from '@features/billing/backend/models/BillingWallet.js';
+import { MiBillingWalletChallenge } from '@features/billing/backend/models/BillingWalletChallenge.js';
 import { MiUserMemo } from '@features/users/backend/models/UserMemo.js';
 import { MiChatMessage } from '@features/chat/backend/models/ChatMessage.js';
 import { MiChatRoom } from '@features/chat/backend/models/ChatRoom.js';
@@ -131,7 +134,8 @@ class MyCustomLogger implements Logger {
 	}
 
 	@bindThis
-	private transformParameters(parameters?: any[]) {
+	private transformParameters(parameters?: any[], queryRunner?: QueryRunner) {
+		if (queryRunner?.data.billingWalletRpc === true) return undefined;
 		if (this.props.enableQueryParamLogging && parameters && parameters.length > 0) {
 			return parameters.map(stringifyParameter);
 		}
@@ -144,7 +148,7 @@ class MyCustomLogger implements Logger {
 		const prefix = (this.props.printReplicationMode && queryRunner)
 			? `[${queryRunner.getReplicationMode()}] `
 			: undefined;
-		sqlLogger.info(this.transformQueryLog(query, { prefix }), this.transformParameters(parameters));
+		sqlLogger.info(this.transformQueryLog(query, { prefix }), this.transformParameters(parameters, queryRunner));
 	}
 
 	@bindThis
@@ -152,7 +156,7 @@ class MyCustomLogger implements Logger {
 		const prefix = (this.props.printReplicationMode && queryRunner)
 			? `[${queryRunner.getReplicationMode()}] `
 			: undefined;
-		sqlLogger.error(this.transformQueryLog(query, { prefix }), this.transformParameters(parameters));
+		sqlLogger.error(this.transformQueryLog(query, { prefix }), this.transformParameters(parameters, queryRunner));
 	}
 
 	@bindThis
@@ -160,7 +164,7 @@ class MyCustomLogger implements Logger {
 		const prefix = (this.props.printReplicationMode && queryRunner)
 			? `[${queryRunner.getReplicationMode()}] `
 			: undefined;
-		sqlLogger.warn(this.transformQueryLog(query, { prefix }), this.transformParameters(parameters));
+		sqlLogger.warn(this.transformQueryLog(query, { prefix }), this.transformParameters(parameters, queryRunner));
 	}
 
 	@bindThis
@@ -251,6 +255,9 @@ export const entities = [
 	MiFlash,
 	MiFlashLike,
 	MiUserMemo,
+	MiBillingWalletChain,
+	MiBillingWallet,
+	MiBillingWalletChallenge,
 	MiChatMessage,
 	MiChatRoom,
 	MiChatRoomMembership,

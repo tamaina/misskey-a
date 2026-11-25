@@ -34,6 +34,7 @@ type SentryBackendConfig = {
  * 設定ファイルの型
  */
 type Source = {
+	/** Optional read-only wallet verification catalog. No payments or charging policy. */
 	url?: string;
 	port?: number;
 	socket?: string;

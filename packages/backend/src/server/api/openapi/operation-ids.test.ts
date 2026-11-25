@@ -43,6 +43,12 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 	for (const path of ['signup-pending', 'signin-flow', 'signin-with-passkey']) {
 		expect(spec.paths?.[`/${path}`]?.post?.operationId).toBe(`post___${path.replaceAll('-', '_')}`);
 	}
+	const walletPaths = ['account/wallets/link/passkey-options', 'account/wallets/list', 'account/wallets/link/chains',
+		'account/wallets/link/begin', 'account/wallets/link/verify', 'account/wallets/unlink',
+		'admin/wallets/chains/list', 'admin/wallets/chains/upsert'];
+	for (const path of walletPaths) {
+		expect(spec.paths?.[`/${path}`]?.post?.operationId).toBe(`post___${path.replaceAll('/', '___')}`);
+	}
 	const identifiers = Object.values(spec.paths ?? {}).flatMap(item => (['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'] as const).flatMap(method => {
 		const operation = item?.[method];
 		return operation ? [operation.operationId] : [];
@@ -109,8 +115,8 @@ test('real external IDs preserve avatar, GET aliases and historical special-rout
 		expect(spec.paths?.[path]?.post?.operationId).toBe(`post___${path.slice(1).replaceAll('/', '___')}`);
 	}
 	// Exclude the fifteen deferred SSO routes from the preceding API count.
-	expect(identifiers.filter(id => !addedSecurityIds.has(id!))).toHaveLength(481);
-	expect(identifiers).toHaveLength(481 + 27);
+	expect(identifiers.filter(id => !addedSecurityIds.has(id!))).toHaveLength(481 + walletPaths.length);
+	expect(identifiers).toHaveLength(481 + 27 + walletPaths.length);
 	expect(new Set(identifiers).size).toBe(identifiers.length);
 });
 
