@@ -9,7 +9,7 @@ const sha256 = (source: string) => createHash('sha256').update(source).digest('h
 /** Reverse only reviewed posting-policy edits while retaining all frozen locale proofs. */
 export function restorePostingRoleBaseline(file: string, source: string): string {
 	const rebase = rebases.find(entry => entry.file === file);
-	if (!rebase) return source;
+	if (!rebase || sha256(source) === rebase.baselineSha256) return source;
 	if (sha256(source) !== rebase.currentSha256) throw new Error(`Source differs from posting-policy change: ${file}`);
 	for (const edit of [...rebase.edits].reverse()) {
 		if (source.slice(edit.start, edit.end) !== edit.current) throw new Error(`Posting-policy rebase boundary differs: ${file}`);
