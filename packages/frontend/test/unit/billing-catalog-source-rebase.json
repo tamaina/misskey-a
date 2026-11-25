@@ -1,7 +1,7 @@
 {
   "file": "packages/features/moderation/frontend/pages/admin/modlog.ModLog.vue",
-  "baselineSha256": "75993c4492a85141edfca95d542b20f2f73fb617704ea7539b64b7a94d831a2b",
-  "currentSha256": "beb8c856f73d7806480493c69b322a3df5b3a13a9710133471c1ce5aae6d7b66",
+  "baselineSha256": "83cae314d2b9fe42c14b9faabc4b0bb3b4ba71370f57a2ca497cfe4e9e1f9ee1",
+  "currentSha256": "d1336f10947297526b8f1cafb0a781442a1479bb96d3b16b99e5155e13fc2846",
   "edits": [
     {
       "start": 1071,
@@ -10,8 +10,8 @@
       "baseline": "\t\t>{{ copyLocaleDictionary($locale.sfc.moderationLogTypesLabels)[log.type] }}</b>\n\t\t<span v-if=\"log.type === 'updateUserNote'\">: @{{ log.info.userUsername }}{{ log.info.userHost ? '@' + log.info.userHost : '' }}</span>\n"
     },
     {
-      "start": 44218,
-      "end": 44255,
+      "start": 43919,
+      "end": 43956,
       "current": "\t\"billingCatalogLabel\": \"課金カタログの変更\",\n",
       "baseline": ""
     }

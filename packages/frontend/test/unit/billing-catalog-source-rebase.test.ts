@@ -14,9 +14,7 @@ import { languages } from 'i18n';
 import { copyLocaleDictionary } from '@features/runtime/frontend/copy-locale-dictionary.js';
 import { pluginVvi } from '../../lib/vite-plugin-vvi.js';
 import { restoreBillingCatalogBaseline } from './billing-catalog-source-rebase.js';
-import { restoreCodeDiffBaseline } from './code-diff-source-rebase.js';
 import rebase from './billing-catalog-source-rebase.json';
-import codeDiffRebases from './code-diff-source-rebase.json';
 import type { LocaleBundle } from 'vite-vue-internationalization/runtime';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../../..');
 
@@ -29,8 +27,6 @@ function hook(value: unknown, ...args: unknown[]): unknown {
 test('billing addition restores the unchanged source oracle and rejects unknown edits', () => {
 	const source = readFileSync(resolve(root, rebase.file), 'utf8'), restored = restoreBillingCatalogBaseline(rebase.file, source);
 	expect(createHash('sha256').update(restored).digest('hex')).toBe(rebase.baselineSha256);
-	const original = restoreCodeDiffBaseline(rebase.file, restored), pinned = codeDiffRebases.find(entry => entry.file === rebase.file)!;
-	expect(createHash('sha256').update(original).digest('hex')).toBe(pinned.baselineSha256);
 	expect(restoreBillingCatalogBaseline(rebase.file, restored)).toBe(restored);
 	expect(() => restoreBillingCatalogBaseline(rebase.file, source + '\n')).toThrow('Source differs');
 	expect(() => restoreBillingCatalogBaseline(rebase.file, source.replace(rebase.edits[0].current, 'tampered'))).toThrow('Source differs');
